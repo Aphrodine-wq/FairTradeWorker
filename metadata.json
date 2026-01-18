@@ -1,0 +1,9 @@
+{
+  "name": "FairTradeWorker",
+  "description": "A dual-sided marketplace and SaaS platform revolutionizing home services. Features AI-powered job scoping, an AI Voice Receptionist, and a complete 'Business-in-a-Box' operating system.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}

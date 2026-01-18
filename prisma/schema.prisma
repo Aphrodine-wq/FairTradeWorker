@@ -1,0 +1,532 @@
+// ============================================================================
+// FairTradeWorker Database Schema
+// ============================================================================
+// Database: PostgreSQL (recommended) or MongoDB
+// ORM: Prisma
+//
+// Run migrations:
+// npx prisma migrate dev
+// npx prisma db push
+// npx prisma studio (UI)
+
+datasource db {
+  provider = "postgresql" // or "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ============================================================================
+// USER MODEL
+// ============================================================================
+
+model User {
+  id                String   @id @default(cuid())
+  email             String   @unique
+  phone             String   @unique
+  passwordHash      String
+  firstName         String
+  lastName          String
+  role              String   @default("HOMEOWNER")
+  avatar            String?
+
+  // Verification
+  verified          Boolean  @default(false)
+  emailVerified     Boolean  @default(false)
+  phoneVerified     Boolean  @default(false)
+  verifiedAt        DateTime?
+
+  // Contractor fields
+  specializations   String[]
+  licenseNumber     String?
+  licenseState      String?
+  businessName      String?
+  businessPhone     String?
+  businessWebsite   String?
+  businessAddress   String?
+
+  // Ratings & Reviews
+  averageRating     Float    @default(0)
+  totalReviews      Int      @default(0)
+  responseTime      Int?     // hours
+  completedJobs     Int      @default(0)
+  activeContracts   Int      @default(0)
+  jobAcceptanceRate Float    @default(0)
+  reworkRate        Float    @default(0)
+
+  // Preferences
+  preferences       Json     @default("{}")
+  notificationSettings Json  @default("{}")
+  theme            String    @default("light")
+  uiDensity        String    @default("normal")
+
+  // Status
+  isActive         Boolean  @default(true)
+  isSuspended      Boolean  @default(false)
+  suspensionReason String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  lastLogin        DateTime?
+
+  // Relations
+  postedJobs              Job[]
+  bids                    Bid[]
+  contractsAsHomeowner    BidContract[] @relation("homeowner")
+  contractsAsContractor   BidContract[] @relation("contractor")
+  completionsSubmitted    JobCompletion[]
+  disputesInitiated       Dispute[] @relation("homeowner")
+  disputesResponded       Dispute[] @relation("contractor")
+  notifications           Notification[]
+  inAppNotifications      InAppNotification[]
+  verifications           Verification[]
+  transactions            Transaction[]
+  auditLogs               AuditLog[]
+  reviews                 Review[]
+  messages                Message[]
+
+  @@index([email])
+  @@index([phone])
+  @@index([role])
+  @@index([isActive])
+  @@index([specializations])
+}
+
+// ============================================================================
+// JOB MODEL
+// ============================================================================
+
+model Job {
+  id              String   @id @default(cuid())
+  title           String
+  description     String
+  category        String
+  location        String
+  zipCode         String?
+  latitude        Float?
+  longitude       Float?
+
+  // Budget & Timeline
+  budget          Float
+  estimatedDays   Int?
+  deadline        DateTime?
+  scheduledDate   DateTime?
+
+  // Media
+  images          String[]
+  attachments     String[]
+
+  // Job Settings
+  visibility      String   @default("PUBLIC")
+  status          String   @default("OPEN")
+  maxBids         Int      @default(50)
+  blindBidding    Boolean  @default(true)
+
+  // Contractor Preferences
+  preferredTradeTypes    String[]
+  minimumRating          Float    @default(0)
+  requiresVerification   Boolean  @default(false)
+
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  closedAt        DateTime?
+
+  // Relations
+  postedBy        User     @relation(fields: [postedById], references: [id])
+  postedById      String
+  bids            Bid[]
+  contract        BidContract?
+  completion      JobCompletion?
+  reviews         Review[]
+
+  @@index([postedById])
+  @@index([category])
+  @@index([status])
+  @@index([createdAt])
+  @@index([budget])
+}
+
+// ============================================================================
+// BID MODEL
+// ============================================================================
+
+model Bid {
+  id            String   @id @default(cuid())
+  amount        Float
+  timeline      String   // "3 days", "1 week", etc.
+  proposal      String?
+  status        String   @default("SUBMITTED")
+
+  // Contractor info snapshot
+  contractorRating Float?
+  contractorReviews Int?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  job           Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  jobId         String
+  contractor    User     @relation(fields: [contractorId], references: [id])
+  contractorId  String
+
+  @@unique([jobId, contractorId])
+  @@index([jobId])
+  @@index([contractorId])
+  @@index([status])
+  @@index([amount])
+}
+
+// ============================================================================
+// BID CONTRACT MODEL (Core Business Entity)
+// ============================================================================
+
+model BidContract {
+  id              String   @id @default(cuid())
+  status          String   @default("DRAFT")
+  amount          Float
+  timeline        String
+  description     String?
+  termsAccepted   Boolean  @default(false)
+
+  // Payment Info
+  depositAmount   Float    @default(0)
+  finalAmount     Float    @default(0)
+  platformFee     Float    @default(0)
+  contractorNet   Float    @default(0)
+
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  acceptedAt      DateTime?
+  completedAt     DateTime?
+  cancelledAt     DateTime?
+
+  // Change Orders
+  changeOrders    ChangeOrder[]
+
+  // Relations
+  job             Job      @relation(fields: [jobId], references: [id])
+  jobId           String   @unique
+  homeowner       User     @relation("homeowner", fields: [homeownerId], references: [id])
+  homeownerId     String
+  contractor      User     @relation("contractor", fields: [contractorId], references: [id])
+  contractorId    String
+  escrow          EscrowAccount?
+  completion      JobCompletion?
+  dispute         Dispute?
+
+  @@index([jobId])
+  @@index([homeownerId])
+  @@index([contractorId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// CHANGE ORDER MODEL
+// ============================================================================
+
+model ChangeOrder {
+  id              String   @id @default(cuid())
+  title           String
+  description     String
+  amount          Float
+  status          String   @default("PENDING")
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  contract        BidContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  contractId      String
+
+  @@index([contractId])
+  @@index([status])
+}
+
+// ============================================================================
+// ESCROW ACCOUNT MODEL
+// ============================================================================
+
+model EscrowAccount {
+  id              String   @id @default(cuid())
+  depositAmount   Float    @default(0)
+  finalAmount     Float    @default(0)
+  totalFees       Float    @default(0)
+  status          String   @default("ACTIVE")
+
+  depositReleasedAt DateTime?
+  finalReleasedAt   DateTime?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  contract        BidContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  contractId      String  @unique
+
+  @@index([contractId])
+  @@index([status])
+}
+
+// ============================================================================
+// JOB COMPLETION MODEL
+// ============================================================================
+
+model JobCompletion {
+  id              String   @id @default(cuid())
+  photos          String[]
+  videos          String[]
+  notes           String?
+  geolocation     Json?    // {latitude, longitude}
+  status          String   @default("SUBMITTED")
+
+  // Rating
+  rating          Int?     // 1-5 stars
+  feedback        String?
+
+  // Dispute
+  disputeWindow   DateTime?
+  isDisputed      Boolean  @default(false)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  contract        BidContract @relation(fields: [contractId], references: [id])
+  contractId      String  @unique
+
+  @@index([contractId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// DISPUTE MODEL
+// ============================================================================
+
+model Dispute {
+  id              String   @id @default(cuid())
+  reason          String
+  homeownerEvidence String[]
+  contractorResponse String?
+  contractorEvidence String[]
+
+  status          String   @default("OPEN")
+  resolution      String?
+  resolutionAmount Float?
+  resolutionNotes String?
+
+  mediationDeadline DateTime
+  responseDeadline  DateTime
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  resolvedAt      DateTime?
+
+  contract        BidContract @relation(fields: [contractId], references: [id])
+  contractId      String  @unique
+  homeowner       User     @relation("homeowner", fields: [homeownerId], references: [id])
+  homeownerId     String
+  contractor      User     @relation("contractor", fields: [contractorId], references: [id])
+  contractorId    String
+
+  @@index([contractId])
+  @@index([status])
+  @@index([homeownerId])
+  @@index([contractorId])
+}
+
+// ============================================================================
+// VERIFICATION MODEL
+// ============================================================================
+
+model Verification {
+  id              String   @id @default(cuid())
+  type            String   // LICENSE, BACKGROUND_CHECK, INSURANCE
+  status          String   @default("PENDING")
+
+  // License
+  licenseNumber   String?
+  licenseState    String?
+  licenseExpiry   DateTime?
+
+  // Background Check
+  backgroundCheckId String?
+  backgroundStatus String?
+
+  // Insurance
+  insurancePolicyId String?
+  insuranceProvider String?
+  insuranceExpiry   DateTime?
+
+  verifiedAt      DateTime?
+  expiresAt       DateTime?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  contractor      User     @relation(fields: [contractorId], references: [id])
+  contractorId    String
+
+  @@unique([type, contractorId])
+  @@index([contractorId])
+  @@index([status])
+}
+
+// ============================================================================
+// NOTIFICATION MODELS
+// ============================================================================
+
+model Notification {
+  id              String   @id @default(cuid())
+  type            String
+  channel         String   // EMAIL, SMS, PUSH, IN_APP
+  to              String   // email, phone, or token
+  subject         String?
+  body            String
+  data            Json?
+  status          String   @default("SENT")
+
+  createdAt       DateTime @default(now())
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
+
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model InAppNotification {
+  id              String   @id @default(cuid())
+  title           String
+  body            String
+  actionUrl       String?
+  icon            String?
+  read            Boolean  @default(false)
+  priority        String   @default("NORMAL")
+
+  createdAt       DateTime @default(now())
+  readAt          DateTime?
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// TRANSACTION MODEL
+// ============================================================================
+
+model Transaction {
+  id              String   @id @default(cuid())
+  amount          Float
+  type            String   // DEPOSIT, FINAL_PAYMENT, REFUND, PAYOUT
+  status          String   @default("PENDING")
+
+  stripeId        String?
+  refundId        String?
+  paymentIntentId String?
+
+  createdAt       DateTime @default(now())
+  completedAt     DateTime?
+
+  user            User     @relation(fields: [userId], references: [id])
+  userId          String
+  contract        BidContract? @relation(fields: [contractId], references: [id])
+  contractId      String?
+
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// AUDIT LOG MODEL
+// ============================================================================
+
+model AuditLog {
+  id              String   @id @default(cuid())
+  action          String
+  entity          String
+  entityId        String
+  changes         Json?
+  reason          String?
+  ipAddress       String?
+  userAgent       String?
+
+  createdAt       DateTime @default(now())
+
+  user            User     @relation(fields: [userId], references: [id])
+  userId          String
+
+  @@index([userId])
+  @@index([entity])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// REVIEW MODEL
+// ============================================================================
+
+model Review {
+  id              String   @id @default(cuid())
+  rating          Int      // 1-5
+  title           String
+  body            String
+  isVerified      Boolean  @default(false)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  author          User     @relation(fields: [authorId], references: [id])
+  authorId        String
+  job             Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  jobId           String
+
+  @@index([authorId])
+  @@index([jobId])
+  @@index([rating])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// MESSAGE MODEL (For future real-time messaging)
+// ============================================================================
+
+model Message {
+  id              String   @id @default(cuid())
+  body            String
+  mediaUrls       String[]
+  read            Boolean  @default(false)
+
+  createdAt       DateTime @default(now())
+  readAt          DateTime?
+
+  sender          User     @relation(fields: [senderId], references: [id])
+  senderId        String
+  conversationId  String   // For grouping messages
+
+  @@index([senderId])
+  @@index([conversationId])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// INDEX STRATEGY
+// ============================================================================
+// Key queries and indexes:
+//
+// Jobs by category & status: (category, status)
+// User jobs: (postedById, status)
+// Contract by user & status: (homeownerId, status), (contractorId, status)
+// Recent activity: All dates indexed with DESC
+// Search: Consider full-text indexes on title, description
+// Financial: (status, createdAt) for payment reconciliation

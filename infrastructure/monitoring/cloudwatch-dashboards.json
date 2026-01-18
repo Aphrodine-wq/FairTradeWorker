@@ -1,0 +1,139 @@
+{
+  "dashboards": [
+    {
+      "name": "FairTradeWorker-Application-Performance",
+      "description": "Real-time application performance metrics",
+      "body": {
+        "widgets": [
+          {
+            "type": "metric",
+            "properties": {
+              "metrics": [
+                ["AWS/ApplicationELB", "TargetResponseTime", {"stat": "Average"}],
+                [".", "HTTPCode_Target_5XX_Count", {"stat": "Sum"}],
+                [".", "HTTPCode_Target_4XX_Count", {"stat": "Sum"}],
+                [".", "RequestCount", {"stat": "Sum"}]
+              ],
+              "period": 60,
+              "stat": "Average",
+              "region": "${AWS_REGION}",
+              "title": "Load Balancer Performance"
+            }
+          },
+          {
+            "type": "metric",
+            "properties": {
+              "metrics": [
+                ["AWS/ECS", "CPUUtilization", {"dimensions": {"ServiceName": "fairtradeworker-api"}}],
+                [".", "MemoryUtilization", {"dimensions": {"ServiceName": "fairtradeworker-api"}}]
+              ],
+              "period": 60,
+              "stat": "Average",
+              "region": "${AWS_REGION}",
+              "title": "ECS Task Utilization"
+            }
+          },
+          {
+            "type": "metric",
+            "properties": {
+              "metrics": [
+                ["AWS/ECS", "RunningCount", {"dimensions": {"ServiceName": "fairtradeworker-api"}}],
+                [".", "DesiredCount", {"dimensions": {"ServiceName": "fairtradeworker-api"}}]
+              ],
+              "period": 60,
+              "stat": "Average",
+              "region": "${AWS_REGION}",
+              "title": "ECS Task Count"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "FairTradeWorker-Database-Performance",
+      "description": "RDS and database metrics",
+      "body": {
+        "widgets": [
+          {
+            "type": "metric",
+            "properties": {
+              "metrics": [
+                ["AWS/RDS", "CPUUtilization", {"dimensions": {"DBInstanceIdentifier": "fairtradeworker-db"}}],
+                [".", "DatabaseConnections", {"dimensions": {"DBInstanceIdentifier": "fairtradeworker-db"}}],
+                [".", "FreeableMemory", {"dimensions": {"DBInstanceIdentifier": "fairtradeworker-db"}}]
+              ],
+              "period": 60,
+              "stat": "Average",
+              "region": "${AWS_REGION}",
+              "title": "RDS Instance Metrics"
+            }
+          },
+          {
+            "type": "metric",
+            "properties": {
+              "metrics": [
+                ["AWS/RDS", "ReadLatency", {"dimensions": {"DBInstanceIdentifier": "fairtradeworker-db"}}],
+                [".", "WriteLatency", {"dimensions": {"DBInstanceIdentifier": "fairtradeworker-db"}}]
+              ],
+              "period": 60,
+              "stat": "Average",
+              "region": "${AWS_REGION}",
+              "title": "Database Latency"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "FairTradeWorker-Cache-Performance",
+      "description": "ElastiCache Redis metrics",
+      "body": {
+        "widgets": [
+          {
+            "type": "metric",
+            "properties": {
+              "metrics": [
+                ["AWS/ElastiCache", "CPUUtilization", {"dimensions": {"CacheClusterId": "fairtradeworker-redis"}}],
+                [".", "DatabaseMemoryUsagePercentage", {"dimensions": {"CacheClusterId": "fairtradeworker-redis"}}],
+                [".", "Evictions", {"dimensions": {"CacheClusterId": "fairtradeworker-redis"}}]
+              ],
+              "period": 60,
+              "stat": "Average",
+              "region": "${AWS_REGION}",
+              "title": "Redis Cache Metrics"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "FairTradeWorker-Error-Tracking",
+      "description": "Error rates and application health",
+      "body": {
+        "widgets": [
+          {
+            "type": "metric",
+            "properties": {
+              "metrics": [
+                ["AWS/ApplicationELB", "HTTPCode_Target_5XX_Count", {"stat": "Sum"}],
+                ["AWS/ApplicationELB", "HTTPCode_Target_4XX_Count", {"stat": "Sum"}]
+              ],
+              "period": 300,
+              "stat": "Sum",
+              "region": "${AWS_REGION}",
+              "title": "HTTP Error Rates (5-minute)"
+            }
+          },
+          {
+            "type": "log",
+            "properties": {
+              "query": "fields @timestamp, @message | filter @message like /ERROR/ | stats count()",
+              "region": "${AWS_REGION}",
+              "title": "Application Errors (CloudWatch Logs)"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

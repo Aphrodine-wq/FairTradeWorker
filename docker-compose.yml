@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: fairtradeworker-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-fairtradeworker}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-development-password}
+      POSTGRES_DB: ${DB_NAME:-fairtradeworker}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.UTF-8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/database/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-fairtradeworker}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fairtradeworker-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: fairtradeworker-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-development-password}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fairtradeworker-network
+
+  # Backend API
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fairtradeworker-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      DATABASE_URL: postgresql://${DB_USER:-fairtradeworker}:${DB_PASSWORD:-development-password}@postgres:5432/${DB_NAME:-fairtradeworker}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-development-password}@redis:6379
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-key-minimum-32-characters-long}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-sk_test_}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-whsec_test_}
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY:-SG.test}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-AC}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-test}
+      TWILIO_PHONE_NUMBER: ${TWILIO_PHONE_NUMBER:-+15551234567}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET:-fairtradeworker-uploads-dev}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3001}
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    volumes:
+      - ./backend:/app/backend
+      - ./dist:/app/dist
+    networks:
+      - fairtradeworker-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  fairtradeworker-network:
+    driver: bridge

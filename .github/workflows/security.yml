@@ -1,0 +1,264 @@
+name: Security Scanning & Vulnerability Check
+
+on:
+  push:
+    branches:
+      - main
+      - production
+  pull_request:
+    branches:
+      - main
+      - production
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM UTC
+
+jobs:
+  dependency-scan:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: Run Snyk scan
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+
+  sast-scan:
+    name: SAST (Static Application Security Testing)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Run SonarQube scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  container-scan:
+    name: Container Image Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t fairtradeworker-api:scan .
+
+      - name: Run Trivy image scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: fairtradeworker-api:scan
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Run Grype scan
+        uses: anchore/scan-action@v3
+        id: grype
+        with:
+          image: fairtradeworker-api:scan
+          fail-build: true
+          severity-cutoff: high
+
+  secret-scan:
+    name: Secret Detection
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run GitGuardian scan
+        uses: gitguardian/ggshield-action@master
+        env:
+          GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
+
+      - name: Run TruffleHog scan
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint -- --format json > eslint-report.json
+        continue-on-error: true
+
+      - name: Run code complexity analysis
+        run: npm run complexity-check
+        continue-on-error: true
+
+      - name: Run security checks with npm scripts
+        run: npm run security:check
+        continue-on-error: true
+
+  infrastructure-scan:
+    name: Infrastructure Security Scan (Terraform)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Run Terraform format check
+        run: terraform fmt -check -recursive infrastructure/
+
+      - name: Run TFLint
+        uses: terraform-linters/setup-tflint@v3
+        with:
+          tflint_version: latest
+
+      - name: Initialize TFLint
+        run: cd infrastructure/terraform && tflint --init
+
+      - name: Run TFLint checks
+        run: cd infrastructure/terraform && tflint -f json > tflint-results.json
+        continue-on-error: true
+
+      - name: Run Checkov infrastructure scan
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: infrastructure/
+          framework: terraform
+          output_format: sarif
+          output_file_path: checkov-results.sarif
+
+      - name: Upload Checkov results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'checkov-results.sarif'
+
+  database-scan:
+    name: Database Security Review
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Verify SQL best practices
+        run: |
+          # Check for common SQL injection patterns
+          grep -r "CONCAT\|concatenation" backend/database/ && exit 1 || true
+
+          # Check for hardcoded credentials
+          grep -r "password\|secret\|key" backend/database/migrations/ && exit 1 || true
+
+          echo "Database security checks passed"
+
+  api-security:
+    name: API Security Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check for OWASP vulnerabilities in code
+        run: |
+          # Check for common vulnerabilities
+          grep -r "eval(" backend/ && exit 1 || true
+          grep -r "new Function(" backend/ && exit 1 || true
+          grep -r "innerHTML" backend/ && exit 1 || true
+          grep -r "dangerouslySetInnerHTML" backend/ && exit 1 || true
+          echo "OWASP vulnerability checks passed"
+
+      - name: Validate API security headers
+        run: npm run test:security:headers
+        continue-on-error: true
+
+  report:
+    name: Generate Security Report
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create security report
+        run: |
+          echo "# Security Scan Report" > SECURITY_REPORT.md
+          echo "Date: $(date)" >> SECURITY_REPORT.md
+          echo "Commit: ${{ github.sha }}" >> SECURITY_REPORT.md
+          echo "Status: All security scans completed" >> SECURITY_REPORT.md
+
+      - name: Upload security report
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-report
+          path: SECURITY_REPORT.md
+
+      - name: Comment on PR with security summary
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🔒 Security scanning completed. Review results in the "Security" tab.'
+            });

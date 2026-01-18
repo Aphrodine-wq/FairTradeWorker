@@ -1,0 +1,205 @@
+config:
+  target: "{{ $processEnvironment.TARGET_URL || 'http://localhost:3000' }}"
+  phases:
+    - duration: 60
+      arrivalRate: 10
+      name: "Warm up"
+    - duration: 120
+      arrivalRate: 50
+      name: "Ramp up"
+    - duration: 180
+      arrivalRate: 100
+      name: "Sustained load"
+    - duration: 60
+      arrivalRate: 50
+      name: "Ramp down"
+  processor: "./load-testing/processors.js"
+  variables:
+    emails:
+      - "contractor1@test.com"
+      - "contractor2@test.com"
+      - "contractor3@test.com"
+      - "homeowner1@test.com"
+      - "homeowner2@test.com"
+    passwords:
+      - "SecurePass123!@#"
+  defaults:
+    headers:
+      Content-Type: "application/json"
+      User-Agent: "Artillery Load Test"
+    timeout: 30000
+
+scenarios:
+  - name: "Authentication Flow"
+    weight: 15
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "{{ $randomString(8) }}@test.com"
+            password: "{{ password }}"
+          capture:
+            json: "$.data.tokens.accessToken"
+            as: "accessToken"
+          timeout: 5000
+      - think: 2
+      - post:
+          url: "/api/auth/refresh-token"
+          json:
+            refreshToken: "{{ refreshToken }}"
+          timeout: 5000
+
+  - name: "Bid Submission Flow"
+    weight: 25
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "contractor1@test.com"
+            password: "{{ password }}"
+          capture:
+            json: "$.data.tokens.accessToken"
+            as: "accessToken"
+          timeout: 5000
+      - think: 1
+      - post:
+          url: "/api/bids"
+          headers:
+            Authorization: "Bearer {{ accessToken }}"
+          json:
+            jobId: "{{ $randomString(12) }}"
+            amount: 5000
+            timeline: "5 days"
+            proposal: "I can complete this efficiently"
+          timeout: 5000
+      - think: 2
+      - get:
+          url: "/api/jobs/{{ jobId }}/bids"
+          headers:
+            Authorization: "Bearer {{ accessToken }}"
+          timeout: 5000
+
+  - name: "Payment Processing Flow"
+    weight: 20
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "homeowner1@test.com"
+            password: "{{ password }}"
+          capture:
+            json: "$.data.tokens.accessToken"
+            as: "homeownerToken"
+          timeout: 5000
+      - think: 2
+      - post:
+          url: "/api/payments/create-intent"
+          headers:
+            Authorization: "Bearer {{ homeownerToken }}"
+          json:
+            contractId: "{{ $randomString(12) }}"
+            amount: 50000
+            currency: "usd"
+            type: "DEPOSIT"
+          capture:
+            json: "$.data.clientSecret"
+            as: "clientSecret"
+          timeout: 10000
+      - think: 3
+      - post:
+          url: "/api/payments/confirm"
+          headers:
+            Authorization: "Bearer {{ homeownerToken }}"
+          json:
+            paymentIntentId: "{{ clientSecret }}"
+            contractId: "{{ contractId }}"
+          timeout: 10000
+
+  - name: "Job Completion Flow"
+    weight: 15
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "contractor1@test.com"
+            password: "{{ password }}"
+          capture:
+            json: "$.data.tokens.accessToken"
+            as: "contractorToken"
+          timeout: 5000
+      - think: 2
+      - post:
+          url: "/api/contracts/{{ $randomString(12) }}/submit-completion"
+          headers:
+            Authorization: "Bearer {{ contractorToken }}"
+          json:
+            photos:
+              - "https://example.com/photo1.jpg"
+              - "https://example.com/photo2.jpg"
+            videos: []
+            notes: "Work completed successfully"
+            geolocation:
+              latitude: 40.7128
+              longitude: -74.006
+          timeout: 5000
+      - think: 3
+      - get:
+          url: "/api/contracts/{{ contractId }}/completion"
+          headers:
+            Authorization: "Bearer {{ contractorToken }}"
+          timeout: 5000
+
+  - name: "Dispute Resolution Flow"
+    weight: 15
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "homeowner1@test.com"
+            password: "{{ password }}"
+          capture:
+            json: "$.data.tokens.accessToken"
+            as: "homeownerToken"
+          timeout: 5000
+      - think: 2
+      - post:
+          url: "/api/contracts/{{ $randomString(12) }}/initiate-dispute"
+          headers:
+            Authorization: "Bearer {{ homeownerToken }}"
+          json:
+            reason: "Work does not meet specifications"
+            evidence:
+              - "https://example.com/evidence1.jpg"
+            requestedResolution: "REFUND"
+          timeout: 5000
+      - think: 3
+      - get:
+          url: "/api/disputes/{{ $randomString(12) }}"
+          headers:
+            Authorization: "Bearer {{ homeownerToken }}"
+          timeout: 5000
+
+  - name: "Health Check"
+    weight: 10
+    flow:
+      - get:
+          url: "/api/health"
+          timeout: 5000
+          expect:
+            - statusCode: 200
+
+  - name: "API Status Check"
+    weight: 10
+    flow:
+      - get:
+          url: "/api/status"
+          headers:
+            Authorization: "Bearer {{ adminToken }}"
+          timeout: 5000
+          expect:
+            - statusCode: 200
+
+after:
+  flow:
+    - log: "Load test completed. Check results in reports directory."
+
