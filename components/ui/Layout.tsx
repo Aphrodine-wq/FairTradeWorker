@@ -215,6 +215,19 @@ const Layout: React.FC<LayoutProps> = ({ children, profile, setRole, currentView
               </div>
               <button onClick={onLogout} className="text-slate-400 hover:text-red-500 transition-colors"><LogOut size={16}/></button>
             </div>
+            
+            <button 
+              onClick={() => setView('SETTINGS')}
+              className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl font-bold text-sm transition-all duration-200 group mt-2 ${
+                currentView === 'SETTINGS'
+                  ? 'bg-brand-primary text-white shadow-md shadow-brand-primary/25' 
+                  : 'text-slate-500 hover:bg-white/50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <Settings size={18} />
+              <span>Account</span>
+              {currentView === 'SETTINGS' && <div className="ml-auto w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>}
+            </button>
           </div>
         </aside>
 
@@ -222,7 +235,6 @@ const Layout: React.FC<LayoutProps> = ({ children, profile, setRole, currentView
         <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-white/10 z-50 p-4 flex justify-around">
            <button onClick={() => setView('DASHBOARD')} className={`p-2 rounded-xl ${currentView === 'DASHBOARD' ? 'text-brand-primary bg-brand-primary/10' : 'text-slate-400'}`}><Home size={24}/></button>
            <button onClick={() => setView(profile.role === 'HOMEOWNER' ? 'MARKETPLACE' : 'OPERATIONS')} className={`p-2 rounded-xl ${['MARKETPLACE', 'OPERATIONS'].includes(currentView) ? 'text-brand-primary bg-brand-primary/10' : 'text-slate-400'}`}>{profile.role === 'HOMEOWNER' ? <Search size={24}/> : <Briefcase size={24}/>}</button>
-           {profile.role === 'CONTRACTOR' && <button onClick={() => setView('VOICE_COMMAND')} className="p-3 -mt-8 bg-brand-primary text-white rounded-full shadow-lg"><Clock size={24}/></button>}
            <button onClick={() => setView('WALLET')} className={`p-2 rounded-xl ${currentView === 'WALLET' ? 'text-brand-primary bg-brand-primary/10' : 'text-slate-400'}`}><Wallet size={24}/></button>
            <button onClick={() => setView('SETTINGS')} className={`p-2 rounded-xl ${currentView === 'SETTINGS' ? 'text-brand-primary bg-brand-primary/10' : 'text-slate-400'}`}><Settings size={24}/></button>
         </div>

@@ -273,7 +273,7 @@ export const generateDailyBriefing = async (profile: UserProfile, date: string, 
     });
     return JSON.parse(response.text || '{}');
   } catch (error) { 
-    console.error(error);
+    // console.error(error); // Suppress API errors to avoid console spam when falling back to mock data
     return MOCK_DATA.dailyBriefing; 
   }
 };

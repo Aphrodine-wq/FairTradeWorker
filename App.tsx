@@ -20,7 +20,6 @@ import AdminDashboard from './components/AdminDashboard';
 import HomeProfile from './components/HomeProfile';
 import Estimates from './components/Estimates';
 import SplashScreen from './components/SplashScreen';
-import EliteVoiceHub from './components/EliteVoiceHub';
 import InfoPage from './components/InfoPage';
 import { UserRole, View, Job, ThemeSettings, NavItemConfig, UserProfile } from './types';
 
@@ -68,7 +67,6 @@ const App: React.FC = () => {
     
     const baseNav: NavItemConfig[] = [
       { id: 'DASHBOARD', label: 'Home', visible: true, required: true },
-      { id: 'SETTINGS', label: 'Account', visible: true, required: true },
     ];
 
     let specificNav: NavItemConfig[] = [];
@@ -192,7 +190,6 @@ const App: React.FC = () => {
       case 'CRM': return <CRM />;
       case 'OPERATIONS': return <Operations role={profile.role} />;
       case 'ESTIMATES': return <Estimates />;
-      case 'VOICE_COMMAND': return <EliteVoiceHub onClose={() => setCurrentView('DASHBOARD')} profile={profile} />;
       case 'TERRITORY_MAP': return <TerritoryMarketplace />;
       case 'WALLET': return <Wallet role={profile.role} />;
       case 'PRICING': return <Pricing currentTier={profile.tier} />;

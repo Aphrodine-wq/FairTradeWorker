@@ -43,6 +43,22 @@ const HomeProfile: React.FC<HomeProfileProps> = ({ role }) => {
   const [showAddTask, setShowAddTask] = useState(false);
   const [newSystem, setNewSystem] = useState({ name: '', age: '', status: 'GOOD', nextService: '' });
   const [newTask, setNewTask] = useState({ title: '', due: '', urgent: false });
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [predictions, setPredictions] = useState<any>(null);
+
+  const handleRunDiagnostics = () => {
+    setIsAnalyzing(true);
+    setTimeout(() => {
+       setPredictions({
+          overallHealthScore: 88,
+          predictions: [
+             { systemName: 'HVAC', riskLevel: 'LOW', reasoning: 'Operating within optimal parameters.', recommendedAction: 'Schedule annual maintenance.' },
+             { systemName: 'Water Heater', riskLevel: 'HIGH', reasoning: 'Age exceeds recommended lifespan (12 years).', recommendedAction: 'Plan for replacement.' }
+          ]
+       });
+       setIsAnalyzing(false);
+    }, 1500);
+  };
 
   // Contractor State
   const [bizBio, setBizBio] = useState("We are a family-owned plumbing business serving Austin for over 20 years. Certified experts in leak detection and pipe repair.");

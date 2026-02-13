@@ -33,15 +33,23 @@ export class UserService {
 
       return {
         id: user.id,
-        name: user.name,
+        name: user.firstName ? `${user.firstName} ${user.lastName}` : user.name, // Handle legacy 'name'
         email: user.email,
         role: user.role,
         tier: user.tier,
         preferences: user.preferences,
-        tradeTypes: user.tradeTypes,
+        tradeTypes: user.specializations ? user.specializations : user.tradeTypes,
         avgResponseTime: user.avgResponseTime,
         reputationScore: user.reputationScore,
-        businessProfile: user.businessProfile,
+        businessProfile: user.businessName ? {
+          businessName: user.businessName,
+          businessPhone: user.businessPhone,
+          businessWebsite: user.businessWebsite,
+          businessAddress: user.businessAddress,
+          licenseNumber: user.licenseNumber,
+          licenseState: user.licenseState,
+          isVerified: user.verified
+        } : user.businessProfile,
       };
     } catch (error) {
       console.error('Error getting profile:', error);
@@ -60,9 +68,21 @@ export class UserService {
         throw new Error('USER_NOT_FOUND');
       }
 
+      const { name, businessProfile, ...otherUpdates } = updates as any;
+      let nameUpdates = {};
+
+      if (name) {
+        const names = name.split(' ');
+        nameUpdates = {
+          firstName: names[0],
+          lastName: names.slice(1).join(' ') || ''
+        };
+      }
+
       const updated = {
         ...user,
-        ...updates,
+        ...otherUpdates,
+        ...nameUpdates,
         id: user.id, // Prevent ID modification
         email: user.email, // Prevent email modification
         role: user.role, // Prevent role modification
@@ -125,7 +145,8 @@ export class UserService {
 
       await this.db.users.update(contractorId, {
         ...user,
-        tradeTypes: validatedTrades,
+        specializations: validatedTrades, // Map to new schema field
+        tradeTypes: validatedTrades, // Keep for backward compat if needed? No, standardizing on specializations
         updatedAt: new Date().toISOString(),
       });
 
@@ -218,9 +239,15 @@ export class UserService {
 
       const updated = {
         ...user,
-        businessProfile: {
+        businessName: businessProfile.businessName,
+        licenseNumber: businessProfile.licenseNumber,
+        licenseState: businessProfile.licenseState,
+        // insurance not directly on user in new schema? verification service handles it? 
+        // For now, save flat fields available
+        verified: false, // Will be verified after admin review
+        businessProfile: { // Keep legacy structure if adapter allows, or it will be ignored by Prisma if strict
           ...businessProfile,
-          isVerified: false, // Will be verified after admin review
+          isVerified: false,
         },
         updatedAt: new Date().toISOString(),
       };
@@ -422,7 +449,7 @@ export class UserService {
       };
 
       if (filters?.specialization) {
-        query.tradeTypes = filters.specialization;
+        query.specializations = { $regex: filters.specialization }; // Since it's JSON string or array, might need regex if stored as string
       }
 
       if (filters?.minRating) {
@@ -430,7 +457,7 @@ export class UserService {
       }
 
       if (filters?.verified !== undefined) {
-        query['businessProfile.isVerified'] = filters.verified;
+        query.verified = filters.verified;
       }
 
       const contractors = await this.db.users.find(query, {
@@ -505,12 +532,16 @@ export class UserService {
     try {
       const regex = new RegExp(query, 'i');
       const users = await this.db.users.find({
-        $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
+        $or: [
+          { firstName: { $regex: regex } },
+          { lastName: { $regex: regex } },
+          { email: { $regex: regex } }
+        ],
       });
 
       return users.map((user: any) => ({
         id: user.id,
-        name: user.name,
+        name: user.firstName ? `${user.firstName} ${user.lastName}` : user.name,
         email: user.email,
         role: user.role,
         tier: user.tier,

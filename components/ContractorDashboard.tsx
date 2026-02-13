@@ -38,9 +38,6 @@ const ContractorDashboard: React.FC<ContractorDashboardProps> = ({ onFindLeadsCl
            <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">Mission Control</h1>
         </div>
         <div className="flex gap-2 w-full md:w-auto">
-          <button onClick={() => setView('VOICE_COMMAND')} className="flex-1 md:flex-none px-4 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-bold text-sm shadow-md flex items-center justify-center gap-2 active:scale-95 transition-all">
-             <Phone size={16} /> Voice Hub
-          </button>
           <button onClick={onFindLeadsClick} className="flex-1 md:flex-none px-4 py-3 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-md flex items-center justify-center gap-2 hover:bg-blue-700 active:scale-95 transition-all">
              <Search size={16} /> Find Work
           </button>

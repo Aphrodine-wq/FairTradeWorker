@@ -3,32 +3,47 @@
  * Testing user registration, login, and token management
  */
 
+import { describe, it, expect, beforeEach } from 'vitest';
 import { AuthService } from '../services/authService';
+import { UserRole } from '../../types';
 import * as bcrypt from 'bcrypt';
+import { Database } from '../database';
 
 describe('AuthService', () => {
   let authService: AuthService;
+  const db = new Database();
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    try {
+      // Clean up related tables first
+      await (db as any).auditLog.deleteMany({});
+      await (db as any).refreshToken.deleteMany({});
+      // Then users
+      await (db as any).user.deleteMany({});
+    } catch (e) {
+      // Warning: if clean fails, tests might fail
+      console.warn('DB clean failed', e);
+    }
+
     authService = new AuthService();
   });
 
   describe('User Registration', () => {
     it('should register a new user with valid data', async () => {
       const userData = {
-        email: 'test@example.com',
-        phone: '+12125551234',
+        email: `test_${Date.now()}_${Math.random()}@example.com`,
+        phone: `+1${Date.now()}`,
         password: 'SecurePassword123!@#',
         firstName: 'John',
         lastName: 'Doe',
-        role: 'CONTRACTOR' as const,
+        role: UserRole.CONTRACTOR,
       };
 
       const result = await authService.register(userData);
 
       expect(result.user).toBeDefined();
       expect(result.user.email).toBe(userData.email);
-      expect(result.user.role).toBe('CONTRACTOR');
+      expect(result.user.role).toBe(UserRole.CONTRACTOR);
       expect(result.tokens.accessToken).toBeDefined();
       expect(result.tokens.refreshToken).toBeDefined();
     });
@@ -40,7 +55,7 @@ describe('AuthService', () => {
         password: 'SecurePassword123!@#',
         firstName: 'John',
         lastName: 'Doe',
-        role: 'HOMEOWNER' as const,
+        role: UserRole.HOMEOWNER,
       };
 
       await expect(authService.register(userData)).rejects.toThrow('INVALID_EMAIL');
@@ -48,12 +63,12 @@ describe('AuthService', () => {
 
     it('should reject password shorter than 8 characters', async () => {
       const userData = {
-        email: 'test@example.com',
-        phone: '+12125551234',
+        email: `test_${Date.now()}_${Math.random()}@example.com`,
+        phone: `+1${Date.now()}`,
         password: 'short',
         firstName: 'John',
         lastName: 'Doe',
-        role: 'CONTRACTOR' as const,
+        role: UserRole.CONTRACTOR,
       };
 
       await expect(authService.register(userData)).rejects.toThrow('PASSWORD_TOO_SHORT');
@@ -66,7 +81,7 @@ describe('AuthService', () => {
         password: 'SecurePassword123!@#',
         firstName: 'John',
         lastName: 'Doe',
-        role: 'CONTRACTOR' as const,
+        role: UserRole.CONTRACTOR,
       };
 
       await expect(authService.register(userData)).rejects.toThrow('INVALID_PHONE');
@@ -74,12 +89,12 @@ describe('AuthService', () => {
 
     it('should hash password using bcrypt', async () => {
       const userData = {
-        email: 'test@example.com',
-        phone: '+12125551234',
+        email: `test_${Date.now()}_${Math.random()}@example.com`,
+        phone: `+1${Date.now()}`,
         password: 'SecurePassword123!@#',
         firstName: 'John',
         lastName: 'Doe',
-        role: 'CONTRACTOR' as const,
+        role: UserRole.CONTRACTOR,
       };
 
       const result = await authService.register(userData);
@@ -94,12 +109,12 @@ describe('AuthService', () => {
     it('should login user with correct credentials', async () => {
       // First register
       const userData = {
-        email: 'login-test@example.com',
-        phone: '+12125551234',
+        email: `login_test_${Date.now()}@example.com`,
+        phone: `+1${Date.now()}`,
         password: 'SecurePassword123!@#',
         firstName: 'John',
         lastName: 'Doe',
-        role: 'CONTRACTOR' as const,
+        role: UserRole.CONTRACTOR,
       };
 
       await authService.register(userData);
@@ -122,7 +137,7 @@ describe('AuthService', () => {
         password: 'SecurePassword123!@#',
         firstName: 'John',
         lastName: 'Doe',
-        role: 'CONTRACTOR' as const,
+        role: UserRole.CONTRACTOR,
       };
 
       await authService.register(userData);
@@ -164,7 +179,19 @@ describe('AuthService', () => {
     });
 
     it('should refresh access token with valid refresh token', async () => {
-      const refreshToken = authService['generateRefreshToken']('user123');
+      // Register user to get tokens
+      const userData = {
+        email: `refresh_test_${Date.now()}@example.com`,
+        phone: `+1${Date.now()}`,
+        password: 'SecurePassword123!@#',
+        firstName: 'John',
+        lastName: 'Doe',
+        role: UserRole.CONTRACTOR,
+      };
+
+      const registerResult = await authService.register(userData);
+      const refreshToken = registerResult.tokens.refreshToken;
+
       const result = await authService.refreshAccessToken(refreshToken);
 
       expect(result.accessToken).toBeDefined();
@@ -174,21 +201,24 @@ describe('AuthService', () => {
   describe('Email Verification', () => {
     it('should verify email with correct token', async () => {
       const userData = {
-        email: 'verify-test@example.com',
-        phone: '+12125551234',
+        email: `verify_test_${Date.now()}@example.com`,
+        phone: `+1${Date.now()}`,
         password: 'SecurePassword123!@#',
         firstName: 'John',
         lastName: 'Doe',
-        role: 'CONTRACTOR' as const,
+        role: UserRole.CONTRACTOR,
       };
 
       const result = await authService.register(userData);
 
-      // In real test, we'd capture the token from the DB
-      // For now, simulate verification
+      // Get token from DB
+      const user = await (db as any).user.findUnique({
+        where: { id: result.user.id }
+      });
+
       const verifyResult = await authService.verifyEmail({
         userId: result.user.id,
-        token: 'token123', // Would be actual token
+        token: user.emailVerificationToken,
       });
 
       expect(verifyResult.success).toBe(true);
@@ -198,12 +228,12 @@ describe('AuthService', () => {
   describe('Password Reset', () => {
     it('should initiate password reset for existing user', async () => {
       const userData = {
-        email: 'reset-test@example.com',
-        phone: '+12125551234',
+        email: `reset_test_${Date.now()}@example.com`,
+        phone: `+1${Date.now()}`,
         password: 'OldPassword123!@#',
         firstName: 'John',
         lastName: 'Doe',
-        role: 'CONTRACTOR' as const,
+        role: UserRole.CONTRACTOR,
       };
 
       await authService.register(userData);
@@ -213,25 +243,48 @@ describe('AuthService', () => {
     });
 
     it('should reset password with valid token', async () => {
+      const userData = {
+        email: `reset_pw_test_${Date.now()}@example.com`,
+        phone: `+1${Date.now()}`,
+        password: 'OldPassword123!@#',
+        firstName: 'John',
+        lastName: 'Doe',
+        role: UserRole.CONTRACTOR,
+      };
+
+      const regResult = await authService.register(userData);
+      await authService.requestPasswordReset(userData.email);
+
+      // Get token from DB
+      const user = await (db as any).user.findUnique({
+        where: { id: regResult.user.id }
+      });
+
       const result = await authService.resetPassword({
-        token: 'reset-token-123',
+        token: user.passwordResetToken,
         newPassword: 'NewPassword123!@#',
       });
 
-      // In real test, this would be the actual reset token
-      expect(result).toBeDefined();
+      expect(result.success).toBe(true);
+
+      // Verify login works with new password
+      const login = await authService.login({
+        email: userData.email,
+        password: 'NewPassword123!@#'
+      });
+      expect(login.user).toBeDefined();
     });
   });
 
   describe('Logout', () => {
     it('should logout user and invalidate refresh token', async () => {
       const userData = {
-        email: 'logout-test@example.com',
-        phone: '+12125551234',
+        email: `logout_test_${Date.now()}@example.com`,
+        phone: `+1${Date.now()}`,
         password: 'SecurePassword123!@#',
         firstName: 'John',
         lastName: 'Doe',
-        role: 'CONTRACTOR' as const,
+        role: UserRole.CONTRACTOR,
       };
 
       const registerResult = await authService.register(userData);

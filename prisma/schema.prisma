@@ -1,17 +1,12 @@
 // ============================================================================
 // FairTradeWorker Database Schema
 // ============================================================================
-// Database: PostgreSQL (recommended) or MongoDB
+// Database: SQLite (local)
 // ORM: Prisma
-//
-// Run migrations:
-// npx prisma migrate dev
-// npx prisma db push
-// npx prisma studio (UI)
 
 datasource db {
-  provider = "postgresql" // or "mongodb"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:../data/dev.db"
 }
 
 generator client {
@@ -29,7 +24,8 @@ model User {
   passwordHash      String
   firstName         String
   lastName          String
-  role              String   @default("HOMEOWNER")
+  role              String   @default("HOMEOWNER") // Enum: 'HOMEOWNER', 'CONTRACTOR', 'SUBCONTRACTOR'
+  tier              String   @default("FREE")
   avatar            String?
 
   // Verification
@@ -37,9 +33,13 @@ model User {
   emailVerified     Boolean  @default(false)
   phoneVerified     Boolean  @default(false)
   verifiedAt        DateTime?
+  emailVerificationToken String?
+  phoneVerificationCode String?
+  passwordResetToken String?
+  passwordResetTokenExpiry DateTime?
 
   // Contractor fields
-  specializations   String[]
+  specializations   String?  // JSON
   licenseNumber     String?
   licenseState      String?
   businessName      String?
@@ -57,8 +57,8 @@ model User {
   reworkRate        Float    @default(0)
 
   // Preferences
-  preferences       Json     @default("{}")
-  notificationSettings Json  @default("{}")
+  preferences       String   @default("{}") // JSON
+  notificationSettings String @default("{}") // JSON
   theme            String    @default("light")
   uiDensity        String    @default("normal")
 
@@ -85,12 +85,12 @@ model User {
   auditLogs               AuditLog[]
   reviews                 Review[]
   messages                Message[]
+  refreshTokens           RefreshToken[]
 
   @@index([email])
   @@index([phone])
   @@index([role])
   @@index([isActive])
-  @@index([specializations])
 }
 
 // ============================================================================
@@ -114,8 +114,8 @@ model Job {
   scheduledDate   DateTime?
 
   // Media
-  images          String[]
-  attachments     String[]
+  images          String?  // JSON
+  attachments     String?  // JSON
 
   // Job Settings
   visibility      String   @default("PUBLIC")
@@ -124,7 +124,7 @@ model Job {
   blindBidding    Boolean  @default(true)
 
   // Contractor Preferences
-  preferredTradeTypes    String[]
+  preferredTradeTypes    String? // JSON
   minimumRating          Float    @default(0)
   requiresVerification   Boolean  @default(false)
 
@@ -217,6 +217,7 @@ model BidContract {
   escrow          EscrowAccount?
   completion      JobCompletion?
   dispute         Dispute?
+  transactions    Transaction[]
 
   @@index([jobId])
   @@index([homeownerId])
@@ -276,10 +277,10 @@ model EscrowAccount {
 
 model JobCompletion {
   id              String   @id @default(cuid())
-  photos          String[]
-  videos          String[]
+  photos          String?  // JSON
+  videos          String?  // JSON
   notes           String?
-  geolocation     Json?    // {latitude, longitude}
+  geolocation     String?  // JSON
   status          String   @default("SUBMITTED")
 
   // Rating
@@ -293,8 +294,19 @@ model JobCompletion {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
+  // Logic: Completion belongs to a Contract
   contract        BidContract @relation(fields: [contractId], references: [id])
   contractId      String  @unique
+
+  // Redundant but helpful relations
+  // Note: JobCompletion usually implies user submitted it. But who?
+  // We can track submittedById
+  submittedBy     User     @relation(fields: [submittedById], references: [id])
+  submittedById   String
+  
+  // Link to Job directly for easier querying
+  job             Job     @relation(fields: [jobId], references: [id])
+  jobId           String  @unique
 
   @@index([contractId])
   @@index([status])
@@ -308,9 +320,9 @@ model JobCompletion {
 model Dispute {
   id              String   @id @default(cuid())
   reason          String
-  homeownerEvidence String[]
+  homeownerEvidence String? // JSON
   contractorResponse String?
-  contractorEvidence String[]
+  contractorEvidence String? // JSON
 
   status          String   @default("OPEN")
   resolution      String?
@@ -385,7 +397,7 @@ model Notification {
   to              String   // email, phone, or token
   subject         String?
   body            String
-  data            Json?
+  data            String?  // JSON
   status          String   @default("SENT")
 
   createdAt       DateTime @default(now())
@@ -456,7 +468,7 @@ model AuditLog {
   action          String
   entity          String
   entityId        String
-  changes         Json?
+  changes         String?  // JSON
   reason          String?
   ipAddress       String?
   userAgent       String?
@@ -504,7 +516,7 @@ model Review {
 model Message {
   id              String   @id @default(cuid())
   body            String
-  mediaUrls       String[]
+  mediaUrls       String?  // JSON
   read            Boolean  @default(false)
 
   createdAt       DateTime @default(now())
@@ -512,21 +524,27 @@ model Message {
 
   sender          User     @relation(fields: [senderId], references: [id])
   senderId        String
-  conversationId  String   // For grouping messages
+  conversationId  String
 
   @@index([senderId])
-  @@index([conversationId])
   @@index([createdAt])
 }
 
 // ============================================================================
-// INDEX STRATEGY
+// REFRESH TOKEN MODEL
 // ============================================================================
-// Key queries and indexes:
-//
-// Jobs by category & status: (category, status)
-// User jobs: (postedById, status)
-// Contract by user & status: (homeownerId, status), (contractorId, status)
-// Recent activity: All dates indexed with DESC
-// Search: Consider full-text indexes on title, description
-// Financial: (status, createdAt) for payment reconciliation
+
+model RefreshToken {
+  id              String   @id @default(cuid())
+  token           String   @unique
+  expiresAt       DateTime
+  revoked         Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  replacedByToken String?
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
+
+  @@index([userId])
+  @@index([token])
+}

@@ -5,6 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:backend": "ts-node backend/server.ts",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push",
+    "prisma:studio": "prisma studio",
     "build": "vite build",
     "preview": "vite preview"
   },
@@ -27,14 +31,16 @@
     "react-dom": "^19.2.3",
     "recharts": "2.15.0",
     "stripe": "^20.1.0",
-    "ts-node": "^10.9.2",
     "twilio": "^5.11.1"
   },
   "devDependencies": {
+    "@prisma/client": "^5.21.1",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
-    "@types/node": "^22.19.3",
+    "@types/node": "^22.19.11",
     "@vitejs/plugin-react": "^5.0.0",
+    "prisma": "^5.21.1",
+    "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
     "vite": "^6.2.0"

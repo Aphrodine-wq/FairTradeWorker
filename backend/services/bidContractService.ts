@@ -73,11 +73,17 @@ export class BidContractService {
       changes: [],
     };
 
+    // Remove relations/virtuals before insert if necessary, or rely on adapter to strip them if they don't match schema
+    // But since changes is not in schema (it's a relation), passing it might error if adapter doesn't strip it.
+    // Let's rely on the fact that Prisma create ignores extra fields if not strict? No, it IS strict.
+    // We should sanitize.
+    const { changes, ...contractData } = contract;
+
     // Save to database
-    await this.db.contracts.insert(contract);
+    await this.db.bidContracts.insert(contractData);
 
     // Log in audit trail
-    await this.db.auditLog.insert({
+    await this.db.auditLogs.insert({
       id: `audit_${Date.now()}`,
       contractId,
       action: 'CONTRACT_CREATED',
@@ -93,21 +99,25 @@ export class BidContractService {
    * Retrieve contract by ID
    */
   async getContract(contractId: string): Promise<BidContract | null> {
-    return await this.db.contracts.findById(contractId);
+    const contract = await this.db.bidContracts.findUnique({
+      where: { id: contractId },
+      include: { changes: true }
+    });
+    return contract;
   }
 
   /**
    * Get all contracts for a job
    */
   async getContractsByJob(jobId: string): Promise<BidContract[]> {
-    return await this.db.contracts.find({ jobId });
+    return await this.db.bidContracts.find({ jobId });
   }
 
   /**
    * Get all contracts for a contractor
    */
   async getContractsByContractor(contractorId: string): Promise<BidContract[]> {
-    return await this.db.contracts.find({ contractorId });
+    return await this.db.bidContracts.find({ contractorId });
   }
 
   /**
@@ -127,11 +137,14 @@ export class BidContractService {
       ...updates,
     };
 
-    await this.db.contracts.update(contractId, updated);
+    // Sanitize 
+    const { changes, ...updateData } = updated as any;
+
+    await this.db.bidContracts.update(contractId, updateData);
 
     // Log status change
     if (updates.status) {
-      await this.db.auditLog.insert({
+      await this.db.auditLogs.insert({
         id: `audit_${Date.now()}`,
         contractId,
         action: 'STATUS_CHANGED',
@@ -172,18 +185,14 @@ export class BidContractService {
       proposedAmount: data.proposedAmount,
       status: 'PROPOSED',
       createdAt: new Date().toISOString(),
-    };
+      contractId, // Needed for relation
+    } as any;
 
-    // Add to contract
-    if (!contract.changes) {
-      contract.changes = [];
-    }
-    contract.changes.push(change);
-
-    await this.db.contracts.update(contractId, contract);
+    // Save change order
+    const createdChange = await this.db.changeOrders.insert(change);
 
     // Log change proposal
-    await this.db.auditLog.insert({
+    await this.db.auditLogs.insert({
       id: `audit_${Date.now()}`,
       contractId,
       action: 'CHANGE_PROPOSED',
@@ -196,7 +205,7 @@ export class BidContractService {
       },
     });
 
-    return change;
+    return createdChange;
   }
 
   /**
@@ -204,18 +213,22 @@ export class BidContractService {
    */
   async acceptChange(contractId: string, changeId: string): Promise<ContractChange> {
     const contract = await this.getContract(contractId);
-    if (!contract || !contract.changes) {
-      throw new Error('Contract or change not found');
+    if (!contract) {
+      throw new Error('Contract not found');
     }
 
-    const change = contract.changes.find(c => c.id === changeId);
+    const change = await this.db.changeOrders.findById(changeId);
     if (!change) {
       throw new Error('Change not found');
     }
 
     // Update change status
-    change.status = 'ACCEPTED';
-    change.respondedAt = new Date().toISOString();
+    const changeUpdates = {
+      status: 'ACCEPTED',
+      respondedAt: new Date().toISOString()
+    };
+    await this.db.changeOrders.update(changeId, changeUpdates);
+    Object.assign(change, changeUpdates);
 
     // Apply change to contract if it's a price adjustment
     if (change.type === 'PRICE_ADJUSTMENT' && change.proposedAmount) {
@@ -223,6 +236,9 @@ export class BidContractService {
       contract.paymentTerms.totalAmount += adjustmentAmount;
       contract.paymentTerms.finalPayment += adjustmentAmount;
       contract.bidAmount += adjustmentAmount;
+
+      const { changes, ...contractData } = contract as any;
+      await this.db.bidContracts.update(contractId, contractData);
     }
 
     // Update estimated end date if time extension
@@ -230,12 +246,13 @@ export class BidContractService {
       const currentEnd = new Date(contract.estimatedEndDate || new Date());
       currentEnd.setDate(currentEnd.getDate() + 3); // Default 3 day extension
       contract.estimatedEndDate = currentEnd.toISOString().split('T')[0];
+
+      const { changes, ...contractData } = contract as any;
+      await this.db.bidContracts.update(contractId, contractData);
     }
 
-    await this.db.contracts.update(contractId, contract);
-
     // Log change acceptance
-    await this.db.auditLog.insert({
+    await this.db.auditLogs.insert({
       id: `audit_${Date.now()}`,
       contractId,
       action: 'CHANGE_ACCEPTED',
@@ -251,23 +268,19 @@ export class BidContractService {
    * Reject change order
    */
   async rejectChange(contractId: string, changeId: string, reason: string): Promise<ContractChange> {
-    const contract = await this.getContract(contractId);
-    if (!contract || !contract.changes) {
-      throw new Error('Contract or change not found');
-    }
-
-    const change = contract.changes.find(c => c.id === changeId);
+    const change = await this.db.changeOrders.findById(changeId);
     if (!change) {
       throw new Error('Change not found');
     }
 
-    change.status = 'REJECTED';
-    change.respondedAt = new Date().toISOString();
-
-    await this.db.contracts.update(contractId, contract);
+    const changeUpdates = {
+      status: 'REJECTED',
+      respondedAt: new Date().toISOString()
+    };
+    await this.db.changeOrders.update(changeId, changeUpdates);
 
     // Log rejection
-    await this.db.auditLog.insert({
+    await this.db.auditLogs.insert({
       id: `audit_${Date.now()}`,
       contractId,
       action: 'CHANGE_REJECTED',
@@ -291,7 +304,7 @@ export class BidContractService {
     totalRevenue: number;
   }> {
     const filter = contractorId ? { contractorId } : {};
-    const contracts = await this.db.contracts.find(filter);
+    const contracts = await this.db.bidContracts.find(filter);
 
     const active = contracts.filter(c => c.status === 'ACTIVE').length;
     const completed = contracts.filter(c => c.status === 'COMPLETED').length;
@@ -341,13 +354,13 @@ export class BidContractService {
       };
     }
 
-    const contracts = await this.db.contracts.find(query, {
-      skip: offset,
+    const contracts = await this.db.bidContracts.find(query, {
+      offset,
       limit,
       sort: { createdAt: -1 },
     });
 
-    const total = await this.db.contracts.count(query);
+    const total = await this.db.bidContracts.count(query);
 
     return { contracts, total };
   }

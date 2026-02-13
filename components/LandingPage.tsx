@@ -85,12 +85,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin, onDemo
                     <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Live Infrastructure for Pros</span>
                  </div>
                  
-                 <h1 className="text-6xl md:text-8xl font-black text-slate-900 dark:text-white tracking-tighter leading-[0.9]">
+                 <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-slate-900 dark:text-white tracking-tighter leading-[0.9] mb-8">
                     Built for the <br/>
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-indigo-600">Job Site.</span>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary via-indigo-500 to-purple-600 animate-gradient-x">Job Site.</span>
                  </h1>
                  
-                 <p className="text-xl text-slate-500 dark:text-slate-400 font-medium max-w-xl leading-relaxed">
+                 <p className="text-xl md:text-2xl text-slate-500 dark:text-slate-400 font-medium max-w-xl leading-relaxed">
                     The first vertical operating system that combines AI dispatch, automated estimating, and instant banking into one tool.
                  </p>
 
@@ -146,10 +146,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin, onDemo
                              <div className="font-bold text-lg text-slate-900 dark:text-white">Water Heater Swap</div>
                              <div className="text-sm text-slate-400 mt-1">123 Oak St • 2:00 PM</div>
                           </div>
-                          <div className="w-1/3 bg-brand-primary/10 p-4 rounded-2xl border border-brand-primary/20 flex flex-col items-center justify-center text-brand-primary">
-                             <Mic size={24} className="mb-2" />
-                             <div className="text-xs font-bold uppercase">Voice Hub</div>
-                          </div>
                        </div>
                        
                        <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5 flex items-center gap-4">
@@ -196,61 +192,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin, onDemo
            </div>
         </div>
 
-        {/* Workforce Command Section (NEW) */}
-        <section id="workforce" className="py-24 bg-white dark:bg-slate-950">
-           <div className="max-w-7xl mx-auto px-6">
-              <div className="grid md:grid-cols-2 gap-16 items-center">
-                 <div className="order-2 md:order-1 relative">
-                    {/* Mock Workforce UI */}
-                    <div className="bg-slate-900 rounded-[2.5rem] p-6 shadow-2xl border border-slate-800 relative z-10">
-                       <div className="flex justify-between items-center mb-6">
-                          <h3 className="text-white font-bold text-lg">Live Map</h3>
-                          <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full text-xs font-bold flex items-center gap-2"><div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div> 4 Active</span>
-                       </div>
-                       <div className="h-64 bg-slate-800 rounded-2xl relative overflow-hidden mb-4">
-                          <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
-                          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-brand-primary rounded-full border-2 border-white shadow-[0_0_20px_#2563eb]"></div>
-                          <div className="absolute top-1/3 left-1/3 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white shadow-[0_0_20px_#10b981]"></div>
-                       </div>
-                       <div className="space-y-2">
-                          <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
-                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-white">M</div>
-                                <div>
-                                   <div className="text-white text-xs font-bold">Mike S.</div>
-                                   <div className="text-slate-400 text-[10px]">On Site • 2h 15m</div>
-                                </div>
-                             </div>
-                             <div className="text-emerald-400 text-xs font-bold">Active</div>
-                          </div>
-                       </div>
-                    </div>
-                    <div className="absolute -bottom-10 -left-10 w-full h-full bg-brand-primary/5 rounded-[3rem] -z-0"></div>
-                 </div>
-                 
-                 <div className="order-1 md:order-2 space-y-6">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-primary/10 text-brand-primary rounded-full text-xs font-bold uppercase tracking-widest">
-                       <Users size={14}/> Workforce Command
-                    </div>
-                    <h2 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight">Manage Your Crew.<br/>Track Every Minute.</h2>
-                    <p className="text-lg text-slate-500 leading-relaxed">
-                       Stop chasing timesheets. Our integrated workforce management suite gives you a God's-eye view of your operation. Real-time GPS tracking, automated clock-ins, and one-click payroll approval.
-                    </p>
-                    <ul className="space-y-4 pt-4">
-                       <li className="flex items-center gap-3 font-bold text-slate-700 dark:text-slate-300">
-                          <CheckCircle className="text-brand-primary" size={20}/> Live GPS Dispatch Map
-                       </li>
-                       <li className="flex items-center gap-3 font-bold text-slate-700 dark:text-slate-300">
-                          <CheckCircle className="text-brand-primary" size={20}/> Automated Time Sheets & Approval
-                       </li>
-                       <li className="flex items-center gap-3 font-bold text-slate-700 dark:text-slate-300">
-                          <CheckCircle className="text-brand-primary" size={20}/> Crew Status Monitoring (Idle/Active)
-                       </li>
-                    </ul>
-                 </div>
-              </div>
-           </div>
-        </section>
+        {/* Workforce Command Section (REMOVED) */}
 
         {/* Workflow Section (How it Works) */}
         <section id="workflow" className="py-32 max-w-7xl mx-auto px-6">
@@ -261,7 +203,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin, onDemo
 
            <div className="relative">
               {/* Connector Line */}
-              <div className="absolute top-1/2 left-0 w-full h-1 bg-slate-200 dark:bg-slate-800 -translate-y-1/2 hidden md:block z-0"></div>
+              <div className="absolute top-1/2 left-0 w-full h-1 bg-gradient-to-r from-slate-200 via-brand-primary/50 to-slate-200 dark:from-slate-800 dark:via-brand-primary/50 dark:to-slate-800 -translate-y-1/2 hidden md:block z-0"></div>
               
               <div className="grid md:grid-cols-4 gap-8 relative z-10">
                  <WorkflowStep 
@@ -302,9 +244,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin, onDemo
 
               <div className="grid md:grid-cols-3 gap-6 auto-rows-[300px]">
                  {/* Feature 1: AI Estimating */}
-                 <div className="md:col-span-2 bg-slate-100 dark:bg-slate-900 rounded-3xl p-10 relative overflow-hidden group border border-slate-200 dark:border-white/5 hover:border-brand-primary/50 transition-all">
+                 <div className="md:col-span-2 bg-slate-100 dark:bg-slate-900 rounded-3xl p-10 relative overflow-hidden group border border-slate-200 dark:border-white/5 hover:border-brand-primary/50 hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
                     <div className="relative z-10 max-w-md">
-                       <div className="w-12 h-12 bg-white dark:bg-white/10 rounded-2xl flex items-center justify-center text-brand-primary mb-6 shadow-sm"><Sparkles size={24}/></div>
+                       <div className="w-12 h-12 bg-white dark:bg-white/10 rounded-2xl flex items-center justify-center text-brand-primary mb-6 shadow-sm group-hover:scale-110 transition-transform"><Sparkles size={24}/></div>
                        <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">Multimodal AI Estimating</h3>
                        <p className="text-slate-500 font-medium leading-relaxed">Simply point your camera at the problem. Our Gemini-powered vision engine identifies issues, counts materials, and drafts a line-item estimate in seconds.</p>
                     </div>
@@ -322,28 +264,18 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin, onDemo
                     </div>
                  </div>
 
-                 {/* Feature 2: Voice Hub */}
-                 <div className="bg-slate-900 text-white rounded-3xl p-10 relative overflow-hidden group border border-white/10">
-                    <div className="absolute inset-0 bg-brand-primary/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div className="relative z-10">
-                       <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-white mb-6 backdrop-blur-sm"><Mic size={24}/></div>
-                       <h3 className="text-2xl font-bold mb-4">Zephyr Voice</h3>
-                       <p className="text-slate-400 font-medium text-sm leading-relaxed">Hands-free project management. Talk to your business like a partner.</p>
-                    </div>
-                    <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-brand-primary blur-[80px] rounded-full"></div>
-                 </div>
-
                  {/* Feature 3: Territory Map */}
-                 <div className="bg-white dark:bg-slate-900 rounded-3xl p-10 relative overflow-hidden group border border-slate-200 dark:border-white/5">
+                 <div className="bg-white dark:bg-slate-900 rounded-3xl p-10 relative overflow-hidden group border border-slate-200 dark:border-white/5 hover:border-purple-500/50 hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-[50px] -mr-10 -mt-10 transition-all group-hover:bg-purple-500/20"></div>
                     <div className="relative z-10">
-                       <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-purple-600 mb-6"><MapPin size={24}/></div>
+                       <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-purple-600 mb-6 group-hover:scale-110 transition-transform"><MapPin size={24}/></div>
                        <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Territory Defense</h3>
                        <p className="text-slate-500 font-medium text-sm leading-relaxed">Claim exclusive zip codes. Own the digital real estate in your neighborhood.</p>
                     </div>
                  </div>
 
                  {/* Feature 4: Financial */}
-                 <div className="md:col-span-2 bg-emerald-900 text-white rounded-3xl p-10 relative overflow-hidden group border border-white/10">
+                 <div className="md:col-span-2 bg-emerald-900 text-white rounded-3xl p-10 relative overflow-hidden group border border-white/10 hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
                     <div className="grid md:grid-cols-2 gap-10 relative z-10">
                        <div>
                           <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-emerald-400 mb-6 backdrop-blur-sm"><Zap size={24}/></div>
@@ -426,30 +358,42 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin, onDemo
 
       <footer className="bg-slate-50 dark:bg-slate-950 py-20 border-t border-slate-200 dark:border-white/5">
          <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-12 text-sm text-slate-500">
-            <div className="col-span-1 md:col-span-2 space-y-6">
+            <div className="space-y-6">
                <div className="flex items-center gap-2">
                   <Hexagon className="text-brand-primary" size={24} strokeWidth={3} />
                   <span className="font-black text-lg text-slate-900 dark:text-white uppercase italic">FairTrade</span>
                </div>
-               <p className="max-w-xs">The operating system for the modern tradesperson. Built with precision in Austin, TX.</p>
+               <p className="max-w-xs leading-relaxed">The operating system for the modern tradesperson. Built with precision in Austin, TX.</p>
+               <div className="flex gap-4">
+                  <a href="#" className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-brand-primary hover:text-white transition-all"><Globe size={18}/></a>
+                  <a href="#" className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-brand-primary hover:text-white transition-all"><Users size={18}/></a>
+               </div>
             </div>
             <div>
                <h4 className="font-bold text-slate-900 dark:text-white uppercase tracking-widest mb-6">Platform</h4>
                <ul className="space-y-4">
-                  <li><button onClick={() => scrollToSection('features')} className="hover:text-brand-primary">Features</button></li>
-                  <li><button onClick={() => scrollToSection('economy')} className="hover:text-brand-primary">Pricing</button></li>
-                  <li><button onClick={() => setView('LEGAL_TERMS')} className="hover:text-brand-primary">Terms of Service</button></li>
-                  <li><button onClick={() => setView('LEGAL_PRIVACY')} className="hover:text-brand-primary">Privacy Policy</button></li>
+                  <li><button onClick={() => scrollToSection('features')} className="hover:text-brand-primary transition-colors">Features</button></li>
+                  <li><button onClick={() => scrollToSection('economy')} className="hover:text-brand-primary transition-colors">Pricing</button></li>
+                  <li><button onClick={() => setView('LEGAL_TERMS')} className="hover:text-brand-primary transition-colors">Terms of Service</button></li>
+                  <li><button onClick={() => setView('LEGAL_PRIVACY')} className="hover:text-brand-primary transition-colors">Privacy Policy</button></li>
                </ul>
             </div>
             <div>
                <h4 className="font-bold text-slate-900 dark:text-white uppercase tracking-widest mb-6">Connect</h4>
                <ul className="space-y-4">
-                  <li><a href="#" className="hover:text-brand-primary">Twitter / X</a></li>
-                  <li><a href="#" className="hover:text-brand-primary">LinkedIn</a></li>
-                  <li><button onClick={() => setView('SUPPORT_HELP')} className="hover:text-brand-primary">Support</button></li>
-                  <li><button onClick={() => setView('SAFETY_GUIDELINES')} className="hover:text-brand-primary">Safety</button></li>
+                  <li><a href="#" className="hover:text-brand-primary transition-colors">Twitter / X</a></li>
+                  <li><a href="#" className="hover:text-brand-primary transition-colors">LinkedIn</a></li>
+                  <li><button onClick={() => setView('SUPPORT_HELP')} className="hover:text-brand-primary transition-colors">Support</button></li>
+                  <li><button onClick={() => setView('SAFETY_GUIDELINES')} className="hover:text-brand-primary transition-colors">Safety</button></li>
                </ul>
+            </div>
+            <div>
+               <h4 className="font-bold text-slate-900 dark:text-white uppercase tracking-widest mb-6">Newsletter</h4>
+               <p className="mb-4 text-xs">Latest feature releases and industry news.</p>
+               <div className="flex flex-col gap-2">
+                  <input type="email" placeholder="Enter your email" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-brand-primary transition-colors text-xs font-medium" />
+                  <button className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl px-4 py-3 font-bold text-xs uppercase tracking-widest hover:scale-105 transition-transform">Subscribe</button>
+               </div>
             </div>
          </div>
          <div className="max-w-7xl mx-auto px-6 mt-20 pt-8 border-t border-slate-200 dark:border-white/5 text-xs font-bold text-slate-400 uppercase tracking-widest flex justify-between">

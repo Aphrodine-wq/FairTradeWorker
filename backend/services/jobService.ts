@@ -38,7 +38,7 @@ export class JobService {
     input: CreateJobInput
   ): Promise<any> {
     try {
-      const job = await prisma.job.create({
+      const job = await prisma.jobs.create({
         data: {
           title: input.title,
           description: input.description,
@@ -79,7 +79,7 @@ export class JobService {
    */
   async getJob(jobId: string): Promise<any> {
     try {
-      const job = await prisma.job.findUnique({
+      const job = await prisma.jobs.findUnique({
         where: { id: jobId },
         include: {
           postedBy: {
@@ -162,7 +162,7 @@ export class JobService {
       if (filters.zipCode) where.zipCode = filters.zipCode;
 
       const [jobs, total] = await Promise.all([
-        prisma.job.findMany({
+        prisma.jobs.findMany({
           where,
           include: {
             postedBy: {
@@ -181,7 +181,7 @@ export class JobService {
           skip,
           take: limit,
         }),
-        prisma.job.count({ where }),
+        prisma.jobs.count(where),
       ]);
 
       return {
@@ -206,7 +206,7 @@ export class JobService {
       const where: any = { postedById: homeownerId };
       if (status) where.status = status;
 
-      const jobs = await prisma.job.findMany({
+      const jobs = await prisma.jobs.findMany({
         where,
         include: {
           _count: { select: { bids: true } },
@@ -234,12 +234,12 @@ export class JobService {
     input: UpdateJobInput
   ): Promise<any> {
     try {
-      const job = await prisma.job.findUnique({ where: { id: jobId } });
+      const job = await prisma.jobs.findUnique({ where: { id: jobId } });
 
       if (!job) throw new Error('Job not found');
       if (job.postedById !== homeownerId) throw new Error('Unauthorized');
 
-      const updated = await prisma.job.update({
+      const updated = await prisma.jobs.update({
         where: { id: jobId },
         data: input,
       });
@@ -256,12 +256,12 @@ export class JobService {
    */
   async closeJob(jobId: string, homeownerId: string): Promise<void> {
     try {
-      const job = await prisma.job.findUnique({ where: { id: jobId } });
+      const job = await prisma.jobs.findUnique({ where: { id: jobId } });
 
       if (!job) throw new Error('Job not found');
       if (job.postedById !== homeownerId) throw new Error('Unauthorized');
 
-      await prisma.job.update({
+      await prisma.jobs.update({
         where: { id: jobId },
         data: { status: 'CLOSED', closedAt: new Date() },
       });
@@ -278,7 +278,7 @@ export class JobService {
    */
   async deleteJob(jobId: string, homeownerId: string): Promise<void> {
     try {
-      const job = await prisma.job.findUnique({
+      const job = await prisma.jobs.findUnique({
         where: { id: jobId },
         include: { contract: true },
       });
@@ -287,7 +287,7 @@ export class JobService {
       if (job.postedById !== homeownerId) throw new Error('Unauthorized');
       if (job.contract) throw new Error('Cannot delete job with active contract');
 
-      await prisma.job.delete({ where: { id: jobId } });
+      await prisma.jobs.delete(jobId);
 
       console.log(`✅ Job deleted: ${jobId}`);
     } catch (error: any) {
@@ -301,13 +301,13 @@ export class JobService {
    */
   async searchJobs(keyword: string, limit: number = 10): Promise<any[]> {
     try {
-      const jobs = await prisma.job.findMany({
+      const jobs = await prisma.jobs.findMany({
         where: {
           status: 'OPEN',
           OR: [
-            { title: { contains: keyword, mode: 'insensitive' } },
-            { description: { contains: keyword, mode: 'insensitive' } },
-            { category: { contains: keyword, mode: 'insensitive' } },
+            { title: { contains: keyword } },
+            { description: { contains: keyword } },
+            { category: { contains: keyword } },
           ],
         },
         take: limit,

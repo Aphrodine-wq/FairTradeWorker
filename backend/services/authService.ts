@@ -74,7 +74,12 @@ export class AuthService {
       };
 
       const userRecord = {
-        ...user,
+        // ...user, // Don't spread user as it contains 'name' which is not in schema
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        tier: user.tier,
+        preferences: user.preferences,
         passwordHash,
         phone: data.phone,
         firstName: data.firstName,
@@ -99,10 +104,12 @@ export class AuthService {
       // Create audit log
       await this.db.auditLogs.insert({
         id: `log_${Date.now()}`,
-        timestamp: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
         action: 'USER_REGISTERED',
+        entity: 'User',
+        entityId: user.id,
         userId: user.id,
-        details: { email: data.email, role: data.role },
+        changes: { email: data.email, role: data.role },
       });
 
       return {
@@ -139,7 +146,7 @@ export class AuthService {
       // Create user profile object
       const user: UserProfile = {
         id: userRecord.id,
-        name: userRecord.name,
+        name: userRecord.firstName ? `${userRecord.firstName} ${userRecord.lastName}` : (userRecord as any).name,
         email: userRecord.email,
         role: userRecord.role,
         tier: userRecord.tier,
@@ -162,10 +169,12 @@ export class AuthService {
       // Create audit log
       await this.db.auditLogs.insert({
         id: `log_${Date.now()}`,
-        timestamp: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
         action: 'USER_LOGIN',
+        entity: 'User',
+        entityId: user.id,
         userId: user.id,
-        details: { email: data.email },
+        changes: { email: data.email },
       });
 
       return {
@@ -206,10 +215,12 @@ export class AuthService {
       // Create audit log
       await this.db.auditLogs.insert({
         id: `log_${Date.now()}`,
-        timestamp: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
         action: 'PHONE_VERIFIED',
+        entity: 'User',
+        entityId: data.userId,
         userId: data.userId,
-        details: {},
+        changes: {},
       });
 
       return { success: true };
@@ -244,10 +255,12 @@ export class AuthService {
       // Create audit log
       await this.db.auditLogs.insert({
         id: `log_${Date.now()}`,
-        timestamp: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
         action: 'EMAIL_VERIFIED',
+        entity: 'User',
+        entityId: data.userId,
         userId: data.userId,
-        details: {},
+        changes: {},
       });
 
       return { success: true };
@@ -307,10 +320,12 @@ export class AuthService {
       // Create audit log
       await this.db.auditLogs.insert({
         id: `log_${Date.now()}`,
-        timestamp: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
         action: 'USER_LOGOUT',
+        entity: 'User',
+        entityId: userId,
         userId,
-        details: {},
+        changes: {},
       });
 
       return { success: true };
@@ -389,10 +404,12 @@ export class AuthService {
       // Create audit log
       await this.db.auditLogs.insert({
         id: `log_${Date.now()}`,
-        timestamp: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
         action: 'PASSWORD_RESET',
+        entity: 'User',
+        entityId: user.id,
         userId: user.id,
-        details: {},
+        changes: {},
       });
 
       return { success: true };
@@ -435,7 +452,7 @@ export class AuthService {
 
       return {
         id: user.id,
-        name: user.name,
+        name: user.firstName ? `${user.firstName} ${user.lastName}` : (user as any).name,
         email: user.email,
         role: user.role,
         tier: user.tier,
@@ -472,6 +489,7 @@ export class AuthService {
     const payload = Buffer.from(
       JSON.stringify({
         sub: userId,
+        jti: crypto.randomUUID(),
         iat: Math.floor(Date.now() / 1000),
         exp: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60, // 7 days
         type: 'refresh',
