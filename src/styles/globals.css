@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --brand-primary: #059669;
+  --brand-hover: #047857;
+  --dark: #0F1419;
+  --bg-soft: #F7F8FA;
+  --bg-card: #FFFFFF;
+  --text-primary: #111318;
+  --text-secondary: #4B5563;
+  --text-muted: #9CA3AF;
+  --border: #E5E7EB;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--text-primary);
+    background-color: var(--bg-soft);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: #059669;
+    color: white;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-brand-600 text-white px-6 py-3 rounded-lg font-semibold
+           hover:bg-brand-700 transition-colors duration-200;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-brand-600 px-6 py-3 rounded-lg font-semibold
+           border border-brand-600 hover:bg-brand-50 transition-colors duration-200;
+  }
+
+  .btn-dark {
+    @apply bg-dark text-white px-6 py-3 rounded-lg font-semibold
+           hover:bg-gray-800 transition-colors duration-200;
+  }
+
+  .card {
+    @apply bg-white rounded-xl border border-border p-6 shadow-sm;
+  }
+
+  .section-padding {
+    @apply px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24;
+  }
+
+  .container-max {
+    @apply max-w-7xl mx-auto;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
