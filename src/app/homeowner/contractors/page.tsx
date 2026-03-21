@@ -2,13 +2,13 @@
 
 import { useState, useMemo } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
-import { AppHeader } from "@/components/app/app-header";
-import { ContractorCard } from "@/components/app/contractor-card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import { mockContractors, type Contractor } from "@/lib/mock-data";
+import { AppHeader } from "@shared/components/app-header";
+import { ContractorCard } from "@homeowner/components/contractor-card";
+import { Input } from "@shared/ui/input";
+import { Button } from "@shared/ui/button";
+import { Badge } from "@shared/ui/badge";
+import { cn } from "@shared/lib/utils";
+import { mockContractors, type Contractor } from "@shared/lib/mock-data";
 
 const SPECIALTIES = [
   "All",

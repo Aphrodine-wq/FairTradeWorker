@@ -1,0 +1,43 @@
+# AEON Verification Config — FairTradeWorker
+# Two-sided marketplace: escrow, payments, auth, contractor/homeowner flows
+profile: security
+
+engines:
+  symbolic_exec: true
+  taint_analysis: true
+  information_flow: true
+  numeric_safety: true
+  money_math: true
+  concurrency_check: true
+  framework_rules: true
+
+severity: warning
+
+include:
+  - "src/**/*.ts"
+  - "src/**/*.tsx"
+
+exclude:
+  - "node_modules/**"
+  - ".next/**"
+  - "dist/**"
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
+  - "**/*.spec.ts"
+  - "src/components/ui/**"
+
+custom_taint_sources:
+  - "searchParams"
+  - "params"
+  - "cookies"
+  - "formData"
+  - "request.json"
+  - "request.body"
+
+custom_taint_sinks:
+  - "supabase.from"
+  - "supabase.rpc"
+  - "redirect"
+  - "dangerouslySetInnerHTML"
+
+parallel: true

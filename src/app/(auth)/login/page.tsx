@@ -3,10 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { Button } from "@shared/ui/button";
+import { Card, CardContent } from "@shared/ui/card";
+import { Input } from "@shared/ui/input";
+import { cn } from "@shared/lib/utils";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -155,6 +155,25 @@ export default function LoginPage() {
             </p>
           </CardContent>
         </Card>
+
+        {/* Dev Quick Access */}
+        <div className="mt-6 rounded-lg border border-dashed border-amber-400 bg-amber-50 p-4">
+          <p className="text-xs font-semibold text-amber-700 mb-3 uppercase tracking-wide">
+            Dev Quick Access
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <Link href="/contractor/dashboard">
+              <Button variant="outline" size="sm" className="w-full text-xs">
+                Contractor Portal
+              </Button>
+            </Link>
+            <Link href="/homeowner/dashboard">
+              <Button variant="outline" size="sm" className="w-full text-xs">
+                Homeowner Portal
+              </Button>
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

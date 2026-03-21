@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { Check, Minus } from "lucide-react";
-import { Navbar } from "@/components/marketing/navbar";
-import { Footer } from "@/components/marketing/footer";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import { PLAN_TIERS } from "@/lib/constants";
+import { Navbar } from "@marketplace/components/navbar";
+import { Footer } from "@marketplace/components/footer";
+import { Button } from "@shared/ui/button";
+import { Badge } from "@shared/ui/badge";
+import { cn } from "@shared/lib/utils";
+import { PLAN_TIERS } from "@shared/lib/constants";
 
 // Full feature comparison table data
 const comparisonCategories = [

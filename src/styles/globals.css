@@ -10,9 +10,9 @@
   --dark: #0F1419;
   --bg-soft: #F7F8FA;
   --bg-card: #FFFFFF;
-  --text-primary: #111318;
-  --text-secondary: #4B5563;
-  --text-muted: #9CA3AF;
+  --text-primary: #050608;
+  --text-secondary: #0C0E14;
+  --text-muted: #141720;
   --border: #E5E7EB;
 }
 
@@ -68,6 +68,11 @@
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* Performance defaults for Intel Macs */
+* {
+  -webkit-tap-highlight-color: transparent;
 }
 
 @media (prefers-reduced-motion: reduce) {

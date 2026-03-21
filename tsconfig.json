@@ -19,7 +19,11 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@contractor/*": ["./src/domains/contractor/*"],
+      "@homeowner/*": ["./src/domains/homeowner/*"],
+      "@marketplace/*": ["./src/domains/marketplace/*"],
+      "@shared/*": ["./src/shared/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

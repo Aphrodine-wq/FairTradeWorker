@@ -1,12 +1,12 @@
-import { Navbar } from "@/components/marketing/navbar";
-import { Hero } from "@/components/marketing/hero";
-import { StatsBar } from "@/components/marketing/stats-bar";
-import { Features } from "@/components/marketing/features";
-import { HowItWorks } from "@/components/marketing/how-it-works";
-import { PricingSection } from "@/components/marketing/pricing-section";
-import { Testimonials } from "@/components/marketing/testimonials";
-import { CTASection } from "@/components/marketing/cta-section";
-import { Footer } from "@/components/marketing/footer";
+import { Navbar } from "@marketplace/components/navbar";
+import { Hero } from "@marketplace/components/hero";
+import { StatsBar } from "@marketplace/components/stats-bar";
+import { Features } from "@marketplace/components/features";
+import { HowItWorks } from "@marketplace/components/how-it-works";
+import { PricingSection } from "@marketplace/components/pricing-section";
+import { Testimonials } from "@marketplace/components/testimonials";
+import { CTASection } from "@marketplace/components/cta-section";
+import { Footer } from "@marketplace/components/footer";
 
 export default function HomePage() {
   return (

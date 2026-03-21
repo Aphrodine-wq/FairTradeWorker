@@ -3,10 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Home, HardHat, Eye, EyeOff, ChevronLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { Button } from "@shared/ui/button";
+import { Card, CardContent } from "@shared/ui/card";
+import { Input } from "@shared/ui/input";
+import { cn } from "@shared/lib/utils";
 
 type Role = "homeowner" | "contractor" | null;
 
@@ -123,7 +123,7 @@ function StepDot({
     <div className="flex flex-col items-center gap-1">
       <div
         className={cn(
-          "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all duration-300",
+          "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-colors duration-150",
           active
             ? "border-brand-600 bg-brand-600 text-white"
             : completed
@@ -219,7 +219,7 @@ function RoleCard({
       type="button"
       onClick={onClick}
       className={cn(
-        "relative w-full text-left rounded-xl border-2 p-5 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2",
+        "relative w-full text-left rounded-xl border-2 p-5 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2",
         selected
           ? "border-brand-600 bg-brand-50"
           : "border-border bg-white hover:border-gray-300 hover:bg-gray-50"

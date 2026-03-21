@@ -1,24 +1,59 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
-  FileText,
-  Mic,
   Briefcase,
+  FileText,
+  FolderOpen,
+  MessageSquare,
+  Star,
+  Receipt,
+  Bell,
+  Users,
   Settings,
 } from "lucide-react";
-import { Sidebar } from "@/components/app/sidebar";
-import { cn } from "@/lib/utils";
+import { Sidebar } from "@shared/components/sidebar";
+import { cn } from "@shared/lib/utils";
 
 const NAV_ITEMS = [
-  { label: "Dashboard", href: "/contractor/dashboard", icon: LayoutDashboard },
-  { label: "Estimates", href: "/contractor/estimates", icon: FileText },
-  { label: "New Estimate", href: "/contractor/estimates/new", icon: Mic },
-  { label: "Browse Jobs", href: "/contractor/jobs", icon: Briefcase },
-  { label: "Settings", href: "/contractor/settings", icon: Settings },
+  { label: "Dashboard",      href: "/contractor/dashboard",      icon: LayoutDashboard },
+  { label: "Browse Jobs",    href: "/contractor/work",            icon: Briefcase },
+  { label: "Estimates",      href: "/contractor/estimates",       icon: FileText },
+  { label: "Projects",       href: "/contractor/projects",       icon: FolderOpen },
+  { label: "Invoices",       href: "/contractor/invoices",       icon: Receipt },
+  { label: "Clients",        href: "/contractor/clients",        icon: Users },
+  { label: "Settings",       href: "/contractor/settings",       icon: Settings },
 ];
+
+function GlobalTopBar({ pathname }: { pathname: string }) {
+  return (
+    <div className="h-11 flex items-center justify-end gap-2 px-4 bg-white border-b border-gray-200 flex-shrink-0">
+      <Link
+        href="/contractor/messages"
+        className={cn(
+          "relative w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors",
+          pathname === "/contractor/messages" && "bg-gray-100"
+        )}
+      >
+        <MessageSquare className="w-[18px] h-[18px] text-gray-500" />
+        <span className="absolute top-1 right-1 w-2 h-2 bg-brand-600 rounded-full" />
+      </Link>
+      <Link
+        href="/contractor/notifications"
+        className={cn(
+          "relative w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors",
+          pathname === "/contractor/notifications" && "bg-gray-100"
+        )}
+      >
+        <Bell className="w-[18px] h-[18px] text-gray-500" />
+        <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+      </Link>
+    </div>
+  );
+}
 
 export default function ContractorLayout({
   children,
@@ -34,16 +69,8 @@ export default function ContractorLayout({
         currentPath={pathname}
         userRole="contractor"
       />
-      {/* Main content — offset by sidebar width. Use CSS var via Tailwind's arbitrary value. */}
-      <div
-        className={cn(
-          "flex flex-col flex-1 min-w-0 overflow-hidden",
-          // We can't easily react to the sidebar's collapsed state from here without lifting state.
-          // Use a fixed left margin matching expanded sidebar; sidebar is positioned fixed.
-          "ml-64"
-        )}
-        style={{}}
-      >
+      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+        <GlobalTopBar pathname={pathname} />
         <main className="flex-1 overflow-y-auto">
           {children}
         </main>
