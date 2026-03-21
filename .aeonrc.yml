@@ -1,6 +1,7 @@
 # AEON Verification Config — FairTradeWorker
-# Two-sided marketplace: escrow, payments, auth, contractor/homeowner flows
-profile: security
+# Two-sided marketplace: escrow payments, auth, contractor/homeowner flows
+# Backend not built yet — these sinks are pre-configured for when integrations land
+profile: construction
 
 engines:
   symbolic_exec: true
@@ -10,6 +11,7 @@ engines:
   money_math: true
   concurrency_check: true
   framework_rules: true
+  construction_domain: true
 
 severity: warning
 
@@ -21,10 +23,11 @@ exclude:
   - "node_modules/**"
   - ".next/**"
   - "dist/**"
+  - "out/**"
   - "**/*.test.ts"
   - "**/*.test.tsx"
   - "**/*.spec.ts"
-  - "src/components/ui/**"
+  - "src/shared/ui/**"
 
 custom_taint_sources:
   - "searchParams"
@@ -33,11 +36,26 @@ custom_taint_sources:
   - "formData"
   - "request.json"
   - "request.body"
+  - "supabase.auth.getUser"
+  - "req.nextUrl.searchParams"
+  - "req.headers"
 
 custom_taint_sinks:
+  # Database (planned: Supabase)
   - "supabase.from"
   - "supabase.rpc"
+  # Payments (planned: Stripe Connect escrow)
+  - "stripe.customers.create"
+  - "stripe.checkout.sessions.create"
+  - "stripe.paymentIntents.create"
+  - "stripe.transfers.create"
+  - "stripe.webhooks.constructEvent"
+  # Voice AI (planned: ElevenLabs)
+  - "elevenlabs"
+  # Navigation
   - "redirect"
   - "dangerouslySetInnerHTML"
+  # External APIs
+  - "fetch"
 
 parallel: true

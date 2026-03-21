@@ -7,6 +7,7 @@ import { Input } from "@shared/ui/input";
 import { Button } from "@shared/ui/button";
 import { mockContractors } from "@shared/lib/mock-data";
 import { cn, getInitials } from "@shared/lib/utils";
+import { useRealtimeChat } from "@shared/hooks/use-realtime";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -234,7 +235,40 @@ export default function HomeownerMessagesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Real-time chat connection — messages from the Elixir backend appear here
+  const { messages: realtimeMessages, sendMessage } = useRealtimeChat(activeConvId);
+
   const activeConv = conversations.find((c) => c.id === activeConvId)!;
+
+  // Merge real-time messages into the active conversation
+  useEffect(() => {
+    if (realtimeMessages.length > 0) {
+      setConversations((prev) =>
+        prev.map((c) => {
+          if (c.id !== activeConvId) return c;
+          const rtMsgs: Message[] = realtimeMessages.map((m) => ({
+            id: m.id,
+            sender: m.sender === "homeowner" ? "homeowner" as Sender : "contractor" as Sender,
+            text: m.body,
+            time: new Date(m.sent_at).toLocaleTimeString("en-US", {
+              hour: "numeric",
+              minute: "2-digit",
+            }),
+          }));
+          // Append real-time messages that aren't already in the mock list
+          const existingIds = new Set(c.messages.map((m) => m.id));
+          const newMsgs = rtMsgs.filter((m) => !existingIds.has(m.id));
+          if (newMsgs.length === 0) return c;
+          return {
+            ...c,
+            messages: [...c.messages, ...newMsgs],
+            lastMessage: newMsgs[newMsgs.length - 1].text,
+            lastTime: "Just now",
+          };
+        })
+      );
+    }
+  }, [realtimeMessages, activeConvId]);
 
   // Scroll to bottom whenever active conversation or messages change
   useEffect(() => {
@@ -272,6 +306,10 @@ export default function HomeownerMessagesPage() {
           : c
       )
     );
+
+    // Also send to Elixir backend for real-time delivery
+    sendMessage({ sender: "homeowner", body: text });
+
     setInputText("");
   };
 

@@ -14,6 +14,7 @@ import { AppHeader } from "@shared/components/app-header";
 import { Input } from "@shared/ui/input";
 import { Button } from "@shared/ui/button";
 import { cn, getInitials } from "@shared/lib/utils";
+import { useRealtimeChat } from "@shared/hooks/use-realtime";
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 
@@ -522,6 +523,9 @@ export default function ContractorMessagesPage() {
   const [showTyping, setShowTyping] = useState(false);
   const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Real-time chat connection to Elixir backend
+  const { messages: realtimeMessages, sendMessage } = useRealtimeChat(selectedId);
+
   const filtered = CONVERSATIONS.filter(
     (c) =>
       c.homeownerName.toLowerCase().includes(search.toLowerCase()) ||
@@ -555,6 +559,8 @@ export default function ContractorMessagesPage() {
 
   function handleSend() {
     if (!inputText.trim()) return;
+    // Send to Elixir backend for real-time delivery
+    sendMessage({ sender: "contractor", body: inputText.trim() });
     setInputText("");
   }
 

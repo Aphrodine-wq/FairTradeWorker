@@ -50,6 +50,7 @@ import {
 } from "@shared/ui/dialog";
 import { cn, formatCurrency, formatDate, getInitials } from "@shared/lib/utils";
 import { mockContractors, mockJobs, mockReviews } from "@shared/lib/mock-data";
+import { api } from "@shared/lib/realtime";
 
 // ─── Shared Helpers ────────────────────────────────────────────────────────────
 
@@ -477,7 +478,19 @@ function PostJobTab() {
             <ChevronRight className="w-4 h-4 ml-1" />
           </Button>
         ) : (
-          <Button onClick={() => setSubmitted(true)} disabled={!canAdvance()}>
+          <Button onClick={() => {
+            // Post to Elixir real-time backend
+            api.postJob({
+              title: form.title,
+              description: form.description,
+              category: form.category.toLowerCase(),
+              budget_min: parseInt(form.budgetMin) || 0,
+              budget_max: parseInt(form.budgetMax) || 0,
+              location: "Texas",
+              homeowner: "You",
+            }).catch(() => {});
+            setSubmitted(true);
+          }} disabled={!canAdvance()}>
             Post Job
           </Button>
         )}

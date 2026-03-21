@@ -56,6 +56,7 @@ import { mockJobs, mockEstimates, mockContractors, type Estimate } from "@shared
 import { JOB_CATEGORIES } from "@shared/lib/constants";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
 import { type BadgeProps } from "@shared/ui/badge";
+import { useRealtimeJobs } from "@shared/hooks/use-realtime";
 
 // ─── Shared types ─────────────────────────────────────────────────────────────
 
@@ -97,7 +98,35 @@ function BrowseJobsTab() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
 
-  const openJobs = mockJobs.filter((j) => j.status === "open");
+  // Real-time jobs from Elixir backend (layered on top of mock data)
+  const { jobs: realtimeJobs, connected } = useRealtimeJobs();
+
+  // Merge real-time jobs into mock jobs — real-time jobs appear at the top
+  const allJobs = useMemo(() => {
+    const rtConverted = realtimeJobs.map((rj) => ({
+      ...mockJobs[0], // inherit shape from mock for missing fields
+      id: rj.id,
+      title: rj.title,
+      description: rj.description,
+      detailedScope: rj.description,
+      category: rj.category,
+      budget: { min: rj.budget_min, max: rj.budget_max },
+      location: rj.location,
+      fullAddress: rj.location,
+      postedBy: rj.homeowner,
+      postedDate: rj.posted_at,
+      status: rj.status as "open" | "in_progress" | "completed" | "cancelled",
+      bidsCount: rj.bid_count,
+      tags: [rj.category],
+      thumbnail: "",
+      photos: [],
+    }));
+    const mockIds = new Set(mockJobs.map((j) => j.id));
+    const newRt = rtConverted.filter((j) => !mockIds.has(j.id));
+    return [...newRt, ...mockJobs];
+  }, [realtimeJobs]);
+
+  const openJobs = allJobs.filter((j) => j.status === "open");
 
   // Derived stats
   const urgentCount = openJobs.filter((j) => j.urgency === "high").length;
