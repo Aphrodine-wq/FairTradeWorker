@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   FileText,
@@ -1440,7 +1440,7 @@ function EstimateAgentTab() {
 
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
-export default function EstimatesPage() {
+function EstimatesPageContent() {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
   const defaultTab = tabParam === "my-estimates" ? "my-estimates" : tabParam === "calculator" ? "calculator" : "new";
@@ -1543,5 +1543,13 @@ export default function EstimatesPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function EstimatesPage() {
+  return (
+    <Suspense>
+      <EstimatesPageContent />
+    </Suspense>
   );
 }
