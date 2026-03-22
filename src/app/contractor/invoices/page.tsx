@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import {
   Plus,
   Search,
@@ -339,9 +340,11 @@ export default function InvoicesPage() {
                     {/* Header: Photo + Company + Invoice title */}
                     <div className="flex items-start justify-between mb-6">
                       <div className="flex items-center gap-3.5">
-                        <img
+                        <Image
                           src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face"
                           alt="Marcus Johnson"
+                          width={48}
+                          height={48}
                           className="w-12 h-12 rounded-full object-cover ring-2 ring-gray-100"
                         />
                         <div>

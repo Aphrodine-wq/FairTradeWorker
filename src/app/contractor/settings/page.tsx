@@ -353,7 +353,7 @@ function AvailabilitySection() {
     <div className="space-y-6">
       <div>
         <h2 className="text-lg font-bold text-gray-900">Availability</h2>
-        <p className="text-sm text-gray-500 mt-1">Set your working schedule so homeowners know when you're available</p>
+        <p className="text-sm text-gray-500 mt-1">Set your working schedule so homeowners know when you&apos;re available</p>
       </div>
 
       <div>
@@ -545,7 +545,7 @@ function InsuranceSection() {
     <div className="space-y-6">
       <div>
         <h2 className="text-lg font-bold text-gray-900">Insurance</h2>
-        <p className="text-sm text-gray-500 mt-1">General liability and workers' compensation policies</p>
+        <p className="text-sm text-gray-500 mt-1">General liability and workers&apos; compensation policies</p>
       </div>
 
       <div>
@@ -578,7 +578,7 @@ function InsuranceSection() {
 
       <div>
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-semibold text-gray-700">Workers' Compensation</p>
+          <p className="text-sm font-semibold text-gray-700">Workers&apos; Compensation</p>
           <VerifyBadge status="verified" />
         </div>
         <div className="grid grid-cols-3 gap-3">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, Suspense } from "react";
+import NextImage from "next/image";
 import { useSearchParams } from "next/navigation";
 import {
   FileText,
@@ -128,9 +129,11 @@ function EstimateRow({ est }: { est: Estimate }) {
               {/* Header: Photo + Company + Estimate title */}
               <div className="flex items-start justify-between mb-5">
                 <div className="flex items-center gap-3">
-                  <img
+                  <NextImage
                     src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face"
                     alt="Marcus Johnson"
+                    width={44}
+                    height={44}
                     className="w-11 h-11 rounded-full object-cover ring-2 ring-gray-100"
                   />
                   <div>
@@ -519,7 +522,7 @@ function NewEstimateTab() {
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-2.5">
-                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" alt="" className="w-9 h-9 rounded-full object-cover ring-2 ring-gray-100" />
+                <NextImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" alt="" width={36} height={36} className="w-9 h-9 rounded-full object-cover ring-2 ring-gray-100" />
                 <div>
                   <p className="text-[12px] font-bold text-gray-900">Johnson & Sons Construction</p>
                   <p className="text-[8px] text-gray-400">Marcus Johnson — TX #R21445</p>
@@ -971,7 +974,7 @@ function CalculatorTab() {
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" alt="" className="w-8 h-8 rounded-full object-cover ring-2 ring-gray-100" />
+                <NextImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" alt="" width={32} height={32} className="w-8 h-8 rounded-full object-cover ring-2 ring-gray-100" />
                 <div>
                   <p className="text-[11px] font-bold text-gray-900">Johnson & Sons</p>
                   <p className="text-[8px] text-gray-400">Cost Calculator</p>

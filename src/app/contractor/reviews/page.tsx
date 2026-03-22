@@ -89,7 +89,7 @@ export default function ContractorReviewsPage() {
                 <Star className="w-5 h-5 text-amber-400 mb-2" />
                 <p className="text-[12px] text-gray-400">Area Average</p>
                 <p className="text-[24px] font-bold text-gray-900 leading-tight">{areaAvg}</p>
-                <p className="text-[11px] text-emerald-600 font-semibold mt-0.5">You're {(avgRating - areaAvg).toFixed(1)} above</p>
+                <p className="text-[11px] text-emerald-600 font-semibold mt-0.5">You&apos;re {(avgRating - areaAvg).toFixed(1)} above</p>
               </div>
               <div className="w-[180px] rounded-xl bg-white p-4">
                 <ThumbsUp className="w-5 h-5 text-brand-600 mb-2" />

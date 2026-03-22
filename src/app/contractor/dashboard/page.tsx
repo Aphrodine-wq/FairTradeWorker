@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   Plus,
@@ -100,7 +101,7 @@ function JobCarousel({ jobs }: { jobs: Job[] }) {
       <div className="relative">
         {/* Image */}
         <div className="h-[180px] bg-gray-100 rounded-xl overflow-hidden relative">
-          <img src={job.thumbnail} alt={job.title} className="w-full h-full object-cover transition-opacity duration-300" />
+          <Image src={job.thumbnail} alt={job.title} width={400} height={300} className="w-full h-full object-cover transition-opacity duration-300" />
           {/* Nav arrows */}
           <button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center hover:bg-white transition-colors shadow-sm">
             <ChevronLeft className="w-4 h-4 text-gray-700" />
