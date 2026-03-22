@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   Shield,
   Star,
@@ -225,11 +226,14 @@ export function ContractorProfileDialog({
                 key={img.seed}
                 className="rounded-xl overflow-hidden border border-gray-200"
               >
-                <img
-                  src={`https://picsum.photos/seed/${img.seed}/400/300`}
-                  alt={img.caption}
-                  className="w-full h-36 object-cover"
-                />
+                <div className="relative h-36 w-full">
+                  <Image
+                    src={`https://picsum.photos/seed/${img.seed}/400/300`}
+                    alt={img.caption}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
                 <p className="text-xs text-gray-500 px-2.5 py-1.5">{img.caption}</p>
               </div>
             ))}

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import Image from "next/image";
 import {
   Search,
   SlidersHorizontal,
@@ -317,8 +318,8 @@ function BrowseJobsTab() {
           if (!pick) return null;
           return (
             <div className="flex items-center gap-3 bg-brand-50 border border-brand-100 rounded-xl px-4 py-3">
-              <div className="w-11 h-11 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
-                <img src={pick.thumbnail} alt="" className="w-full h-full object-cover" />
+              <div className="relative w-11 h-11 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
+                <Image src={pick.thumbnail} alt="" fill className="object-cover" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-[10px] font-bold text-brand-600 uppercase tracking-wide">Top Pick for You</p>

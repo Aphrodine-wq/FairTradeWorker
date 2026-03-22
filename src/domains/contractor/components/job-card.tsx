@@ -34,6 +34,7 @@ import {
   Layers,
   MessageSquare,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   Dialog,
@@ -199,10 +200,11 @@ function JobModalContent({ job }: { job: Job }) {
     <div className="flex flex-col">
       {/* Hero image */}
       <div className="relative h-64 bg-gray-100 flex-shrink-0 overflow-hidden rounded-t-xl">
-        <img
+        <Image
           src={job.thumbnail}
           alt={job.title}
-          className="w-full h-full object-cover"
+          fill
+          className="object-cover"
         />
         {/* Overlay badges */}
         <div className="absolute top-3 left-3 right-3 flex items-start justify-between">
@@ -474,10 +476,11 @@ function JobModalContent({ job }: { job: Job }) {
                 <div key={i} className="group">
                   <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 border border-border">
                     {photo.type === "photo" ? (
-                      <img
+                      <Image
                         src={photo.url}
                         alt={photo.caption}
-                        className="w-full h-full object-cover "
+                        fill
+                        className="object-cover"
                       />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center bg-gray-800">
@@ -685,10 +688,11 @@ export function JobCard({ job }: { job: Job }) {
         <Card className="overflow-hidden hover:shadow-sm transition-shadow duration-200 flex flex-col cursor-pointer group">
           {/* Thumbnail */}
           <div className="relative h-40 bg-gray-100 overflow-hidden flex-shrink-0">
-            <img
+            <Image
               src={job.thumbnail}
               alt={job.title}
-              className="w-full h-full object-cover "
+              fill
+              className="object-cover"
             />
 
             {/* Top badges */}
