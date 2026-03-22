@@ -25,7 +25,7 @@ import {
   CheckCircle2,
   Loader2,
   Crown,
-  Image,
+  Image as ImageIcon,
   Users,
 } from "lucide-react";
 import { Button } from "@shared/ui/button";
@@ -1360,7 +1360,7 @@ function EstimateAgentTab() {
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       {msg.attachments.map((att, i) => (
                         <span key={i} className="inline-flex items-center gap-1 text-[11px] font-medium text-gray-600 bg-gray-100 rounded-lg px-2.5 py-1">
-                          {att.type.startsWith("image") ? <Image className="w-3 h-3" /> : <FileText className="w-3 h-3" />}
+                          {att.type.startsWith("image") ? <ImageIcon className="w-3 h-3" /> : <FileText className="w-3 h-3" />}
                           {att.name}
                         </span>
                       ))}
@@ -1395,7 +1395,7 @@ function EstimateAgentTab() {
           <div className="flex flex-wrap gap-2 mb-2">
             {uploadedFiles.map((f, i) => (
               <span key={i} className="inline-flex items-center gap-1.5 text-[12px] font-medium text-gray-700 bg-white ring-1 ring-gray-200 rounded-lg px-3 py-1.5">
-                {f.type.startsWith("image") ? <Image className="w-3.5 h-3.5 text-gray-400" /> : <FileText className="w-3.5 h-3.5 text-gray-400" />}
+                {f.type.startsWith("image") ? <ImageIcon className="w-3.5 h-3.5 text-gray-400" /> : <FileText className="w-3.5 h-3.5 text-gray-400" />}
                 {f.name}
                 <button onClick={() => setUploadedFiles((prev) => prev.filter((_, j) => j !== i))} className="text-gray-300 hover:text-red-500 ml-1">
                   <Trash2 className="w-3 h-3" />
