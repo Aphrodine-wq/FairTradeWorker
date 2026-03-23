@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import {
   realtimeClient,
   api,
+  getAuthToken,
   type RealtimeJob,
   type RealtimeBid,
   type RealtimeMessage,
@@ -11,6 +12,7 @@ import {
 
 /**
  * Live job feed — jobs appear/update in real-time via WebSocket.
+ * Requires auth token to be set via setAuthToken() or api.login().
  */
 export function useRealtimeJobs() {
   const [jobs, setJobs] = useState<RealtimeJob[]>([]);
@@ -18,6 +20,15 @@ export function useRealtimeJobs() {
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
+    if (!getAuthToken()) {
+      // Fall back to REST if not authenticated
+      api.listJobs().then((list) => {
+        setJobs(list);
+        setLoading(false);
+      });
+      return;
+    }
+
     realtimeClient.connect();
 
     const leave = realtimeClient.joinJobFeed({
@@ -47,7 +58,6 @@ export function useRealtimeJobs() {
       budget_min: number;
       budget_max: number;
       location: string;
-      homeowner: string;
     }) => {
       return api.postJob(attrs);
     },
@@ -67,6 +77,15 @@ export function useRealtimeBids(jobId: string | null) {
 
   useEffect(() => {
     if (!jobId) return;
+
+    if (!getAuthToken()) {
+      api.getJob(jobId).then((data) => {
+        setJob(data.job);
+        setBids(data.bids);
+        setLoading(false);
+      });
+      return;
+    }
 
     realtimeClient.connect();
 
@@ -94,7 +113,6 @@ export function useRealtimeBids(jobId: string | null) {
 
   const placeBid = useCallback(
     async (attrs: {
-      contractor: string;
       amount: number;
       message: string;
       timeline: string;
@@ -124,7 +142,7 @@ export function useRealtimeChat(conversationId: string | null) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!conversationId) return;
+    if (!conversationId || !getAuthToken()) return;
 
     realtimeClient.connect();
 
@@ -142,12 +160,20 @@ export function useRealtimeChat(conversationId: string | null) {
   }, [conversationId]);
 
   const sendMessage = useCallback(
-    async (attrs: { sender: string; body: string }) => {
+    async (attrs: { body: string }) => {
       if (!conversationId) return;
       return api.sendMessage(conversationId, attrs);
     },
     [conversationId]
   );
 
-  return { messages, loading, sendMessage };
+  const sendTyping = useCallback(
+    (typing: boolean) => {
+      if (!conversationId) return;
+      realtimeClient.sendTyping(conversationId, typing);
+    },
+    [conversationId]
+  );
+
+  return { messages, loading, sendMessage, sendTyping };
 }

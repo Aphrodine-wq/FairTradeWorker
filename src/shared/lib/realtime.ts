@@ -6,14 +6,22 @@
  *
  * Usage:
  *   import { realtimeClient } from "@shared/lib/realtime"
- *   realtimeClient.connect()
+ *   realtimeClient.connect(jwtToken)
  */
 import { Socket, Channel } from "phoenix";
 
 const API_BASE = process.env.NEXT_PUBLIC_REALTIME_URL || "http://localhost:4000";
 const WS_URL = API_BASE.replace(/^http/, "ws") + "/socket";
 
-// ─── Types matching the Elixir backend ──────────────────────────────────────
+// --- Types matching the Elixir backend serializers ---
+
+export interface RealtimeUser {
+  id: string;
+  name: string;
+  role: "homeowner" | "contractor";
+  location: string;
+  rating: number | null;
+}
 
 export interface RealtimeJob {
   id: string;
@@ -23,49 +31,112 @@ export interface RealtimeJob {
   budget_min: number;
   budget_max: number;
   location: string;
-  homeowner: string;
-  status: "open" | "awarded" | "completed";
-  posted_at: string;
+  status: "open" | "bidding" | "awarded" | "in_progress" | "completed" | "disputed" | "cancelled";
   bid_count: number;
+  homeowner: RealtimeUser;
+  posted_at: string;
 }
 
 export interface RealtimeBid {
   id: string;
   job_id: string;
-  contractor: string;
   amount: number;
   message: string;
   timeline: string;
   status: "pending" | "accepted" | "rejected";
+  contractor: RealtimeUser;
   placed_at: string;
 }
 
 export interface RealtimeMessage {
   id: string;
   conversation_id: string;
-  sender: string;
   body: string;
+  sender: RealtimeUser;
   sent_at: string;
 }
 
-// ─── Event callbacks ────────────────────────────────────────────────────────
+export interface AuthResponse {
+  token: string;
+  user: {
+    id: string;
+    email: string;
+    name: string;
+    role: "homeowner" | "contractor";
+  };
+}
+
+// --- Event callbacks ---
 
 type JobCallback = (job: RealtimeJob) => void;
 type BidCallback = (bid: RealtimeBid) => void;
 type MessageCallback = (message: RealtimeMessage) => void;
 
-// ─── REST API ───────────────────────────────────────────────────────────────
+// --- Token management ---
+
+let _authToken: string | null = null;
+
+export function setAuthToken(token: string | null) {
+  _authToken = token;
+}
+
+export function getAuthToken(): string | null {
+  return _authToken;
+}
+
+// --- REST API ---
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  if (_authToken) {
+    headers["Authorization"] = `Bearer ${_authToken}`;
+  }
+
   const res = await fetch(`${API_BASE}${path}`, {
-    headers: { "Content-Type": "application/json" },
+    headers,
     ...options,
   });
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `API error: ${res.status}`);
+  }
+
   return res.json();
 }
 
 export const api = {
+  // Auth
+  async login(email: string, password: string): Promise<AuthResponse> {
+    const data = await apiFetch<AuthResponse>("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    });
+    setAuthToken(data.token);
+    return data;
+  },
+
+  async register(attrs: {
+    email: string;
+    password: string;
+    name: string;
+    role: "homeowner" | "contractor";
+    location?: string;
+  }): Promise<{ user: AuthResponse["user"] }> {
+    return apiFetch("/api/auth/register", {
+      method: "POST",
+      body: JSON.stringify(attrs),
+    });
+  },
+
+  async me(): Promise<{ user: AuthResponse["user"] }> {
+    return apiFetch("/api/auth/me");
+  },
+
+  // Jobs (public — no auth required for listing)
   async listJobs(): Promise<RealtimeJob[]> {
     const data = await apiFetch<{ jobs: RealtimeJob[] }>("/api/jobs");
     return data.jobs;
@@ -75,6 +146,7 @@ export const api = {
     return apiFetch(`/api/jobs/${id}`);
   },
 
+  // Jobs (authenticated)
   async postJob(job: {
     title: string;
     description: string;
@@ -82,7 +154,6 @@ export const api = {
     budget_min: number;
     budget_max: number;
     location: string;
-    homeowner: string;
   }): Promise<RealtimeJob> {
     const data = await apiFetch<{ job: RealtimeJob }>("/api/jobs", {
       method: "POST",
@@ -93,7 +164,7 @@ export const api = {
 
   async placeBid(
     jobId: string,
-    bid: { contractor: string; amount: number; message: string; timeline: string }
+    bid: { amount: number; message: string; timeline: string }
   ): Promise<RealtimeBid> {
     const data = await apiFetch<{ bid: RealtimeBid }>(`/api/jobs/${jobId}/bids`, {
       method: "POST",
@@ -110,6 +181,7 @@ export const api = {
     return data.bid;
   },
 
+  // Chat (authenticated)
   async listMessages(conversationId: string): Promise<RealtimeMessage[]> {
     const data = await apiFetch<{ messages: RealtimeMessage[] }>(
       `/api/chat/${conversationId}`
@@ -119,7 +191,7 @@ export const api = {
 
   async sendMessage(
     conversationId: string,
-    message: { sender: string; body: string }
+    message: { body: string }
   ): Promise<RealtimeMessage> {
     const data = await apiFetch<{ message: RealtimeMessage }>(
       `/api/chat/${conversationId}`,
@@ -129,26 +201,56 @@ export const api = {
   },
 };
 
-// ─── WebSocket Client ───────────────────────────────────────────────────────
+// --- WebSocket Client ---
 
 class RealtimeClient {
   private socket: Socket | null = null;
   private channels: Map<string, Channel> = new Map();
-  private userId: string = "anonymous";
+  private _connected = false;
 
-  connect(userId?: string) {
+  /**
+   * Connect to the Phoenix WebSocket with a JWT token.
+   * The token is verified server-side — no anonymous connections allowed.
+   */
+  connect(token?: string) {
     if (this.socket?.isConnected()) return;
 
-    this.userId = userId || "anonymous";
+    const authToken = token || _authToken;
+    if (!authToken) {
+      console.warn("[FTW Realtime] No auth token — cannot connect. Call api.login() first.");
+      return;
+    }
+
     this.socket = new Socket(WS_URL, {
-      params: { user_id: this.userId },
+      params: { token: authToken },
+      reconnectAfterMs: (tries: number) => [1000, 2000, 5000, 10000][Math.min(tries - 1, 3)],
     });
+
+    this.socket.onOpen(() => {
+      this._connected = true;
+    });
+
+    this.socket.onClose(() => {
+      this._connected = false;
+    });
+
+    this.socket.onError(() => {
+      this._connected = false;
+    });
+
     this.socket.connect();
   }
 
   disconnect() {
-    this.socket?.disconnect();
+    this.channels.forEach((ch) => ch.leave());
     this.channels.clear();
+    this.socket?.disconnect();
+    this.socket = null;
+    this._connected = false;
+  }
+
+  get isConnected() {
+    return this._connected;
   }
 
   // Subscribe to the live job feed
@@ -158,8 +260,9 @@ class RealtimeClient {
     onJobUpdated?: JobCallback;
   }): () => void {
     if (!this.socket) this.connect();
+    if (!this.socket) return () => {};
 
-    const channel = this.socket!.channel("jobs:feed", {});
+    const channel = this.socket.channel("jobs:feed", {});
 
     channel.on("jobs:list", (payload: { jobs: RealtimeJob[] }) => {
       callbacks.onJobsList?.(payload.jobs);
@@ -173,7 +276,12 @@ class RealtimeClient {
       callbacks.onJobUpdated?.(job);
     });
 
-    channel.join();
+    channel
+      .join()
+      .receive("error", (resp) => {
+        console.error("[FTW Realtime] Failed to join jobs:feed", resp);
+      });
+
     this.channels.set("jobs:feed", channel);
 
     return () => {
@@ -192,9 +300,10 @@ class RealtimeClient {
     }
   ): () => void {
     if (!this.socket) this.connect();
+    if (!this.socket) return () => {};
 
     const topic = `job:${jobId}`;
-    const channel = this.socket!.channel(topic, {});
+    const channel = this.socket.channel(topic, {});
 
     channel.on("job:details", (data: { job: RealtimeJob; bids: RealtimeBid[] }) => {
       callbacks.onJobDetails?.(data);
@@ -208,7 +317,12 @@ class RealtimeClient {
       callbacks.onBidAccepted?.(bid);
     });
 
-    channel.join();
+    channel
+      .join()
+      .receive("error", (resp) => {
+        console.error(`[FTW Realtime] Failed to join ${topic}`, resp);
+      });
+
     this.channels.set(topic, channel);
 
     return () => {
@@ -223,12 +337,14 @@ class RealtimeClient {
     callbacks: {
       onMessagesList?: (messages: RealtimeMessage[]) => void;
       onNewMessage?: MessageCallback;
+      onPresence?: (presences: Record<string, unknown>) => void;
     }
   ): () => void {
     if (!this.socket) this.connect();
+    if (!this.socket) return () => {};
 
     const topic = `chat:${conversationId}`;
-    const channel = this.socket!.channel(topic, {});
+    const channel = this.socket.channel(topic, {});
 
     channel.on("messages:list", (payload: { messages: RealtimeMessage[] }) => {
       callbacks.onMessagesList?.(payload.messages);
@@ -238,7 +354,20 @@ class RealtimeClient {
       callbacks.onNewMessage?.(message);
     });
 
-    channel.join();
+    channel.on("presence_state", (state) => {
+      callbacks.onPresence?.(state);
+    });
+
+    channel.on("presence_diff", (diff) => {
+      callbacks.onPresence?.(diff);
+    });
+
+    channel
+      .join()
+      .receive("error", (resp) => {
+        console.error(`[FTW Realtime] Failed to join ${topic}`, resp);
+      });
+
     this.channels.set(topic, channel);
 
     return () => {
@@ -247,23 +376,70 @@ class RealtimeClient {
     };
   }
 
-  // Send a message through a channel (instead of REST)
-  sendViaChannel(conversationId: string, attrs: { sender: string; body: string }) {
+  // Subscribe to user notifications
+  joinNotifications(
+    userId: string,
+    callbacks: {
+      onNotification?: (payload: Record<string, unknown>) => void;
+      onPresence?: (presences: Record<string, unknown>) => void;
+    }
+  ): () => void {
+    if (!this.socket) this.connect();
+    if (!this.socket) return () => {};
+
+    const topic = `user:${userId}`;
+    const channel = this.socket.channel(topic, {});
+
+    channel.on("notification", (payload) => {
+      callbacks.onNotification?.(payload);
+    });
+
+    channel.on("presence_state", (state) => {
+      callbacks.onPresence?.(state);
+    });
+
+    channel
+      .join()
+      .receive("error", (resp) => {
+        console.error(`[FTW Realtime] Failed to join ${topic}`, resp);
+      });
+
+    this.channels.set(topic, channel);
+
+    return () => {
+      channel.leave();
+      this.channels.delete(topic);
+    };
+  }
+
+  // Send a message through the chat channel (server uses socket auth for sender_id)
+  sendViaChannel(conversationId: string, attrs: { body: string }) {
     const channel = this.channels.get(`chat:${conversationId}`);
     if (channel) {
-      channel.push("send_message", attrs);
+      return channel.push("send_message", attrs);
     }
   }
 
-  // Place a bid through a channel
-  placeBidViaChannel(jobId: string, attrs: { contractor: string; amount: number; message: string; timeline: string }) {
+  // Send typing indicator
+  sendTyping(conversationId: string, typing: boolean) {
+    const channel = this.channels.get(`chat:${conversationId}`);
+    if (channel) {
+      channel.push("typing", { typing });
+    }
+  }
+
+  // Place a bid through the bid channel (server uses socket auth for contractor_id)
+  placeBidViaChannel(
+    jobId: string,
+    attrs: { amount: number; message: string; timeline: string }
+  ) {
     const channel = this.channels.get(`job:${jobId}`);
     if (channel) {
-      channel.push("place_bid", attrs);
+      return channel.push("place_bid", attrs);
     }
   }
 
-  // Post a job through the feed channel
+  // Post a job through the feed channel (server uses socket auth for homeowner_id)
   postJobViaChannel(attrs: {
     title: string;
     description: string;
@@ -271,11 +447,10 @@ class RealtimeClient {
     budget_min: number;
     budget_max: number;
     location: string;
-    homeowner: string;
   }) {
     const channel = this.channels.get("jobs:feed");
     if (channel) {
-      channel.push("post_job", attrs);
+      return channel.push("post_job", attrs);
     }
   }
 }
