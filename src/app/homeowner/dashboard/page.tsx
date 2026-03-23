@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   FolderOpen,
@@ -45,7 +45,8 @@ import { Card, CardContent } from "@shared/ui/card";
 import { Progress } from "@shared/ui/progress";
 import { Badge } from "@shared/ui/badge";
 import { formatCurrency, formatDate } from "@shared/lib/utils";
-import { mockProjects, homeownerDashboardStats } from "@shared/lib/mock-data";
+import { mockProjects, homeownerDashboardStats, type Project } from "@shared/lib/mock-data";
+import { fetchNotifications } from "@shared/lib/data";
 
 const CATEGORIES = [
   { label: "General Contracting", icon: Hammer, color: "text-orange-600", bg: "bg-orange-50", border: "border-orange-200" },
@@ -76,7 +77,18 @@ const AREAS = [
 ];
 
 export default function HomeownerDashboardPage() {
-  const activeProjects = mockProjects.filter((p) => p.status === "in_progress");
+  const [projects, setProjects] = useState<Project[]>(mockProjects);
+  const [notificationCount, setNotificationCount] = useState(0);
+
+  useEffect(() => {
+    fetchNotifications().then((notifs) => {
+      if (notifs.length > 0) {
+        setNotificationCount(notifs.filter((n: any) => !n.read).length);
+      }
+    });
+  }, []);
+
+  const activeProjects = projects.filter((p) => p.status === "in_progress");
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [step, setStep] = useState(1);

@@ -64,13 +64,16 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-surface flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-[480px] animate-fade-in-up">
-        {/* Logo */}
+    <div className="min-h-screen bg-[#FDFBF8] flex flex-col items-center justify-center px-4 py-12">
+      <div className="w-full max-w-[480px]">
+        {/* Brand */}
         <div className="text-center mb-8">
-          <span className="text-xl font-bold text-brand-600 tracking-tight">
-            FairTradeWorker
-          </span>
+          <Link href="/" className="inline-block">
+            <span className="text-2xl font-extrabold tracking-tight text-gray-900">
+              Fair<span className="text-brand-600">Trade</span>Worker
+            </span>
+          </Link>
+          <p className="text-sm text-gray-400 mt-1">The fair way to find and hire contractors</p>
         </div>
 
         <Card className="shadow-md">
@@ -103,6 +106,14 @@ export default function SignupPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Legal */}
+        <p className="mt-6 text-center text-xs text-gray-400">
+          By creating an account, you agree to our{" "}
+          <Link href="/terms" className="underline hover:text-gray-600 transition-colors">Terms</Link>
+          {" "}and{" "}
+          <Link href="/privacy" className="underline hover:text-gray-600 transition-colors">Privacy Policy</Link>.
+        </p>
       </div>
     </div>
   );

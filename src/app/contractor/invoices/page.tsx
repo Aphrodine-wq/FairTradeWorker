@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import {
   Plus,
@@ -21,6 +21,7 @@ import {
 import { Button } from "@shared/ui/button";
 import { Badge } from "@shared/ui/badge";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
+import { fetchInvoices } from "@shared/lib/data";
 
 // ─── Mock Data ───────────────────────────────────────────────────────────────
 
@@ -156,11 +157,31 @@ const STATUS_CONFIG: Record<InvoiceStatus, { label: string; icon: React.Componen
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function InvoicesPage() {
+  const [invoices, setInvoices] = useState<Invoice[]>(INVOICES);
   const [filter, setFilter] = useState<"all" | InvoiceStatus>("all");
   const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>("inv-2");
 
-  const filtered = INVOICES
+  useEffect(() => {
+    fetchInvoices().then((apiInvoices) => {
+      if (apiInvoices.length > 0) {
+        setInvoices(apiInvoices.map((inv: any) => ({
+          id: inv.id,
+          number: inv.invoice_number || inv.id,
+          client: inv.client?.name || "Unknown",
+          project: inv.project_id || "",
+          amount: typeof inv.amount === "number" && inv.amount > 1000 ? inv.amount / 100 : inv.amount,
+          status: inv.status as InvoiceStatus,
+          issuedDate: inv.created_at,
+          dueDate: inv.due_date,
+          paidDate: inv.paid_at,
+          items: [],
+        })));
+      }
+    });
+  }, []);
+
+  const filtered = invoices
     .filter((inv) => filter === "all" || inv.status === filter)
     .filter((inv) =>
       search === "" ||
@@ -169,21 +190,21 @@ export default function InvoicesPage() {
       inv.project.toLowerCase().includes(search.toLowerCase())
     );
 
-  const selected = INVOICES.find((inv) => inv.id === selectedId) || null;
+  const selected = invoices.find((inv) => inv.id === selectedId) || null;
 
-  const totalOutstanding = INVOICES
+  const totalOutstanding = invoices
     .filter((inv) => inv.status === "sent" || inv.status === "overdue")
     .reduce((sum, inv) => sum + inv.amount, 0);
 
-  const totalPaid = INVOICES
+  const totalPaid = invoices
     .filter((inv) => inv.status === "paid")
     .reduce((sum, inv) => sum + inv.amount, 0);
 
-  const totalOverdue = INVOICES
+  const totalOverdue = invoices
     .filter((inv) => inv.status === "overdue")
     .reduce((sum, inv) => sum + inv.amount, 0);
 
-  const overdueCount = INVOICES.filter((inv) => inv.status === "overdue").length;
+  const overdueCount = invoices.filter((inv) => inv.status === "overdue").length;
 
   return (
     <div className="flex flex-col min-h-full bg-surface">
@@ -236,7 +257,7 @@ export default function InvoicesPage() {
                   {f === "all" ? "All" : f.charAt(0).toUpperCase() + f.slice(1)}
                   {f !== "all" && (
                     <span className="ml-1 tabular-nums">
-                      {INVOICES.filter((inv) => inv.status === f).length}
+                      {invoices.filter((inv) => inv.status === f).length}
                     </span>
                   )}
                 </button>

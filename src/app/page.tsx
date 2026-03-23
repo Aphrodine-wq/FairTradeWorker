@@ -10,7 +10,7 @@ import { Footer } from "@marketplace/components/footer";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#FDFBF8]">
       <Navbar />
       <main>
         <Hero />

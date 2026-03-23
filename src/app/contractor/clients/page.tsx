@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   Plus,
@@ -27,6 +27,7 @@ import {
   DialogTrigger,
 } from "@shared/ui/dialog";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
+import { fetchClients } from "@shared/lib/data";
 
 // ─── Mock Data ───────────────────────────────────────────────────────────────
 
@@ -212,11 +213,43 @@ const STATUS_BADGE: Record<string, "default" | "success" | "secondary"> = {
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function ClientsPage() {
+  const [clients, setClients] = useState<Client[]>(CLIENTS);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "active" | "lead" | "past">("all");
   const [selectedId, setSelectedId] = useState<string>("c1");
 
-  const filtered = CLIENTS
+  useEffect(() => {
+    fetchClients().then((apiClients) => {
+      if (apiClients.length > 0) {
+        setClients(apiClients.map((c: any) => ({
+          id: c.id,
+          name: c.name,
+          email: c.email || "",
+          phone: c.phone || "",
+          address: c.address || "",
+          city: "",
+          propertyType: "",
+          source: "",
+          totalRevenue: 0,
+          totalPaid: 0,
+          outstanding: 0,
+          totalJobs: 0,
+          activeJobs: 0,
+          rating: null,
+          lastActivity: c.created_at,
+          firstContact: c.created_at,
+          status: "active" as const,
+          notes: c.notes || "",
+          tags: [],
+          jobs: [],
+          invoices: [],
+          communications: [],
+        })));
+      }
+    });
+  }, []);
+
+  const filtered = clients
     .filter((c) => filter === "all" || c.status === filter)
     .filter((c) =>
       search === "" ||
@@ -224,10 +257,10 @@ export default function ClientsPage() {
       c.city.toLowerCase().includes(search.toLowerCase())
     );
 
-  const selected = CLIENTS.find((c) => c.id === selectedId) || null;
-  const totalClientRevenue = CLIENTS.reduce((sum, c) => sum + c.totalRevenue, 0);
-  const activeCount = CLIENTS.filter((c) => c.status === "active").length;
-  const leadCount = CLIENTS.filter((c) => c.status === "lead").length;
+  const selected = clients.find((c) => c.id === selectedId) || null;
+  const totalClientRevenue = clients.reduce((sum, c) => sum + c.totalRevenue, 0);
+  const activeCount = clients.filter((c) => c.status === "active").length;
+  const leadCount = clients.filter((c) => c.status === "lead").length;
 
   return (
     <div className="flex flex-col min-h-full bg-surface">
@@ -354,7 +387,7 @@ export default function ClientsPage() {
             </div>
             <div>
               <p className="text-[13px] text-gray-400">Total Clients</p>
-              <p className="text-[28px] font-bold text-gray-900 tabular-nums leading-tight mt-0.5">{CLIENTS.length}</p>
+              <p className="text-[28px] font-bold text-gray-900 tabular-nums leading-tight mt-0.5">{clients.length}</p>
             </div>
           </div>
 

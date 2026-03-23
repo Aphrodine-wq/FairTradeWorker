@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   Hammer,
@@ -40,7 +40,8 @@ import {
   DialogDescription,
 } from "@shared/ui/dialog";
 import { cn, formatCurrency, formatDate, getInitials } from "@shared/lib/utils";
-import { mockContractors, mockJobs } from "@shared/lib/mock-data";
+import { mockContractors, mockJobs, type Job } from "@shared/lib/mock-data";
+import { fetchJobs } from "@shared/lib/data";
 import type { LucideIcon } from "lucide-react";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -180,7 +181,7 @@ const MOCK_BIDS: Bid[] = [
 ];
 
 // Use first 3 jobs, override statuses for filter variety
-const JOBS = mockJobs.slice(0, 3).map((job, i) => ({
+const INITIAL_JOBS = mockJobs.slice(0, 3).map((job, i) => ({
   ...job,
   status: i === 1 ? ("in_progress" as const) : i === 2 ? ("completed" as const) : job.status,
 }));
@@ -643,8 +644,17 @@ function InlineBidCard({
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function JobsPage() {
+  const [jobs, setJobs] = useState(INITIAL_JOBS);
   const [filter, setFilter] = useState<StatusFilter>("all");
   const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchJobs().then((apiJobs) => {
+      if (apiJobs.length > 0) {
+        setJobs(apiJobs);
+      }
+    });
+  }, []);
   const [bidStatuses, setBidStatuses] = useState<Record<string, BidStatus>>(() => {
     const initial: Record<string, BidStatus> = {};
     MOCK_BIDS.forEach((b) => { initial[b.id] = b.status; });
@@ -657,8 +667,8 @@ export default function JobsPage() {
   const handleDecline = (bidId: string) => setBidStatuses((prev) => ({ ...prev, [bidId]: "declined" }));
 
   const filteredJobs = useMemo(
-    () => JOBS.filter((j) => filter === "all" || j.status === filter),
-    [filter]
+    () => jobs.filter((j) => filter === "all" || j.status === filter),
+    [filter, jobs]
   );
 
   const getBidsForJob = (jobId: string) =>

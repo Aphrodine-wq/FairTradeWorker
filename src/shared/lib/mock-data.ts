@@ -17,15 +17,6 @@ export interface Contractor {
   skills: string[];
 }
 
-export interface Homeowner {
-  id: string;
-  name: string;
-  avatar: string;
-  location: string;
-  memberSince: string;
-  projectsPosted: number;
-}
-
 export interface JobPhoto {
   url: string;
   caption: string;
@@ -1100,33 +1091,6 @@ export const mockProjects: Project[] = [
       { name: "Second Coat", completed: true },
       { name: "Touch-ups & Cleanup", completed: true },
     ],
-  },
-];
-
-export const mockHomeowners: Homeowner[] = [
-  {
-    id: "h1",
-    name: "Michael Brown",
-    avatar: "",
-    location: "Austin, TX",
-    memberSince: "2025-06-15",
-    projectsPosted: 3,
-  },
-  {
-    id: "h2",
-    name: "Jennifer Wilson",
-    avatar: "",
-    location: "Dallas, TX",
-    memberSince: "2025-09-01",
-    projectsPosted: 1,
-  },
-  {
-    id: "h3",
-    name: "David Anderson",
-    avatar: "",
-    location: "San Antonio, TX",
-    memberSince: "2025-11-20",
-    projectsPosted: 2,
   },
 ];
 

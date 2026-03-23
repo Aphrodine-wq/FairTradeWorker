@@ -17,7 +17,7 @@ export function PricingSection() {
             <div
               key={tier.name}
               className={cn(
-                "bg-white border flex flex-col p-8",
+                "bg-white border rounded-none flex flex-col p-8",
                 tier.featured ? "border-brand-600 border-t-4" : "border-border"
               )}
             >

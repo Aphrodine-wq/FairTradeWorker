@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Eye,
@@ -15,6 +15,8 @@ import {
   Calendar,
 } from "lucide-react";
 import { cn } from "@shared/lib/utils";
+import { fetchNotifications } from "@shared/lib/data";
+import { api } from "@shared/lib/realtime";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -159,18 +161,36 @@ const NOTIF_ICONS: Record<NotifType, { icon: React.ComponentType<{ className?: s
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState(NOTIFICATIONS);
+  const [notifications, setNotifications] = useState<Notification[]>(NOTIFICATIONS);
   const [filter, setFilter] = useState<"all" | "unread">("all");
+
+  useEffect(() => {
+    fetchNotifications().then((apiNotifs) => {
+      if (apiNotifs.length > 0) {
+        setNotifications(apiNotifs.map((n: any) => ({
+          id: n.id,
+          type: (n.type || "new_job") as NotifType,
+          title: n.title,
+          body: n.body,
+          time: n.created_at ? new Date(n.created_at).toLocaleDateString() : "",
+          read: n.read ?? false,
+          href: "/contractor/dashboard",
+        })));
+      }
+    });
+  }, []);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
   const filtered = filter === "unread" ? notifications.filter((n) => !n.read) : notifications;
 
   const markAllRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    api.markAllNotificationsRead().catch(() => {});
   };
 
   const markRead = (id: string) => {
     setNotifications((prev) => prev.map((n) => n.id === id ? { ...n, read: true } : n));
+    api.markNotificationRead(id).catch(() => {});
   };
 
   return (

@@ -53,11 +53,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@shared/ui/dialog";
-import { mockJobs, mockEstimates, mockContractors, type Estimate } from "@shared/lib/mock-data";
+import { mockJobs, mockEstimates, mockContractors, type Estimate, type Job } from "@shared/lib/mock-data";
 import { JOB_CATEGORIES } from "@shared/lib/constants";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
 import { type BadgeProps } from "@shared/ui/badge";
 import { useRealtimeJobs } from "@shared/hooks/use-realtime";
+import { fetchJobs } from "@shared/lib/data";
 
 // ─── Shared types ─────────────────────────────────────────────────────────────
 
@@ -99,13 +100,20 @@ function BrowseJobsTab() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
 
-  // Real-time jobs from Elixir backend (layered on top of mock data)
+  // Load jobs from API (falls back to mock data if backend is down)
+  const [apiJobs, setApiJobs] = useState<Job[]>(mockJobs);
+  React.useEffect(() => {
+    fetchJobs().then(setApiJobs);
+  }, []);
+
+  // Real-time updates layer on top (only when authenticated via WebSocket)
   const { jobs: realtimeJobs, connected } = useRealtimeJobs();
 
-  // Merge real-time jobs into mock jobs — real-time jobs appear at the top
+  // Merge: API jobs as base, realtime updates overlay
   const allJobs = useMemo(() => {
-    const rtConverted = realtimeJobs.map((rj) => ({
-      ...mockJobs[0], // inherit shape from mock for missing fields
+    if (realtimeJobs.length === 0) return apiJobs;
+    const rtConverted: Job[] = realtimeJobs.map((rj) => ({
+      ...mockJobs[0],
       id: rj.id,
       title: rj.title,
       description: rj.description,
@@ -114,7 +122,7 @@ function BrowseJobsTab() {
       budget: { min: rj.budget_min, max: rj.budget_max },
       location: rj.location,
       fullAddress: rj.location,
-      postedBy: rj.homeowner,
+      postedBy: typeof rj.homeowner === "string" ? rj.homeowner : rj.homeowner?.name ?? "Homeowner",
       postedDate: rj.posted_at,
       status: rj.status as "open" | "in_progress" | "completed" | "cancelled",
       bidsCount: rj.bid_count,
@@ -122,10 +130,10 @@ function BrowseJobsTab() {
       thumbnail: "",
       photos: [],
     }));
-    const mockIds = new Set(mockJobs.map((j) => j.id));
-    const newRt = rtConverted.filter((j) => !mockIds.has(j.id));
-    return [...newRt, ...mockJobs];
-  }, [realtimeJobs]);
+    const apiIds = new Set(apiJobs.map((j) => j.id));
+    const newRt = rtConverted.filter((j) => !apiIds.has(j.id));
+    return [...newRt, ...apiJobs];
+  }, [realtimeJobs, apiJobs]);
 
   const openJobs = allJobs.filter((j) => j.status === "open");
 

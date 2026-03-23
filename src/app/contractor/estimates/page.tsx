@@ -35,6 +35,7 @@ import { Input } from "@shared/ui/input";
 import { Textarea } from "@shared/ui/textarea";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@shared/ui/tabs";
 import { mockEstimates, type Estimate } from "@shared/lib/mock-data";
+import { fetchEstimates } from "@shared/lib/data";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
 
 // ─── Status Config ───────────────────────────────────────────────────────────
@@ -272,15 +273,15 @@ function EstimateRow({ est }: { est: Estimate }) {
   );
 }
 
-function MyEstimatesTab() {
+function MyEstimatesTab({ estimates }: { estimates: Estimate[] }) {
   return (
     <Card className="overflow-hidden">
-      {mockEstimates.length === 0 ? (
+      {estimates.length === 0 ? (
         <div className="py-12 text-center text-sm text-gray-400">
           No estimates yet. Create your first one.
         </div>
       ) : (
-        mockEstimates.map((est) => <EstimateRow key={est.id} est={est} />)
+        estimates.map((est) => <EstimateRow key={est.id} est={est} />)
       )}
     </Card>
   );
@@ -1448,9 +1449,15 @@ function EstimatesPageContent() {
   const tabParam = searchParams.get("tab");
   const defaultTab = tabParam === "my-estimates" ? "my-estimates" : tabParam === "calculator" ? "calculator" : "new";
 
-  const sent = mockEstimates.filter((e) => e.status === "sent" || e.status === "viewed").length;
-  const accepted = mockEstimates.filter((e) => e.status === "accepted").length;
-  const totalValue = mockEstimates.reduce((sum, e) => sum + e.amount, 0);
+  const [estimates, setEstimates] = useState<Estimate[]>(mockEstimates);
+
+  useEffect(() => {
+    fetchEstimates().then(setEstimates);
+  }, []);
+
+  const sent = estimates.filter((e) => e.status === "sent" || e.status === "viewed").length;
+  const accepted = estimates.filter((e) => e.status === "accepted").length;
+  const totalValue = estimates.reduce((sum, e) => sum + e.amount, 0);
 
   const ESTIMATES_NAV = [
     { id: "new", label: "New Estimate", icon: Plus, pro: false },
@@ -1466,7 +1473,7 @@ function EstimatesPageContent() {
     switch (activeSection) {
       case "agent": return <EstimateAgentTab />;
       case "new": return <NewEstimateTab />;
-      case "my-estimates": return <MyEstimatesTab />;
+      case "my-estimates": return <MyEstimatesTab estimates={estimates} />;
       case "calculator": return <CalculatorTab />;
       default: return <EstimateAgentTab />;
     }
@@ -1479,7 +1486,7 @@ function EstimatesPageContent() {
         <div>
           <h1 className="text-[22px] font-bold text-gray-900 tracking-tight">Estimates</h1>
           <p className="text-sm text-gray-400 mt-1">
-            {mockEstimates.length} estimates · {formatCurrency(totalValue)} total value
+            {estimates.length} estimates · {formatCurrency(totalValue)} total value
           </p>
         </div>
         <div className="flex items-center gap-5 mt-3">
@@ -1488,7 +1495,7 @@ function EstimatesPageContent() {
             { dot: "bg-brand-500", value: String(accepted), label: "accepted" },
             {
               dot: "bg-brand-500",
-              value: `${mockEstimates.length > 0 ? Math.round((accepted / mockEstimates.length) * 100) : 0}%`,
+              value: `${estimates.length > 0 ? Math.round((accepted / estimates.length) * 100) : 0}%`,
               label: "win rate",
             },
             { dot: "bg-brand-500", value: formatCurrency(totalValue), label: "total value" },
@@ -1510,7 +1517,7 @@ function EstimatesPageContent() {
           {ESTIMATES_NAV.map((item) => {
             const Icon = item.icon;
             const isActive = activeSection === item.id;
-            const badge = item.id === "my-estimates" ? mockEstimates.length : null;
+            const badge = item.id === "my-estimates" ? estimates.length : null;
             return (
               <button
                 key={item.id}

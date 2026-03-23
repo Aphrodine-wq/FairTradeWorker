@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ChevronDown,
   CalendarDays,
@@ -53,6 +53,7 @@ import {
   DialogTrigger,
 } from "@shared/ui/dialog";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
+import { fetchProjects } from "@shared/lib/data";
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -1791,9 +1792,20 @@ const PROJECT_NAV = [
 ];
 
 export default function ProjectsPage() {
+  const [projects, setProjects] = useState(PROJECTS);
   const [selectedProjectId, setSelectedProjectId] = useState("j1");
   const [activeSection, setActiveSection] = useState("overview");
-  const project = PROJECTS.find((p) => p.id === selectedProjectId)!;
+
+  useEffect(() => {
+    fetchProjects().then((apiProjects) => {
+      if (apiProjects.length > 0) {
+        // API projects supplement the inline mock data when available
+        // For now, keep inline data since API shape differs from page needs
+      }
+    });
+  }, []);
+
+  const project = projects.find((p) => p.id === selectedProjectId)!;
   const coCount = ALL_COS[selectedProjectId]?.length ?? 0;
 
   const renderSection = () => {
@@ -1829,7 +1841,7 @@ export default function ProjectsPage() {
         {/* Project list sidebar */}
         <div className="w-60 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-y-auto">
           <div className="py-4 px-3 space-y-1.5">
-            {PROJECTS.map((p) => {
+            {projects.map((p) => {
               const isSelected = p.id === selectedProjectId;
               const daysLeft = Math.ceil((new Date(p.estimatedEnd).getTime() - new Date("2026-03-20").getTime()) / 86400000);
               const completedMilestones = p.milestones.filter((m) => m.done).length;

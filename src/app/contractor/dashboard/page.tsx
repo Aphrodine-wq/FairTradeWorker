@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -26,7 +26,9 @@ import {
   mockEstimates,
   mockReviews,
   type Job,
+  type Estimate,
 } from "@shared/lib/mock-data";
+import { fetchJobs, fetchEstimates } from "@shared/lib/data";
 import { formatCurrency, cn } from "@shared/lib/utils";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -167,11 +169,19 @@ function TileHeader({ title, count, linkHref, linkLabel }: { title: string; coun
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function ContractorDashboardPage() {
+  const [jobs, setJobs] = useState<Job[]>(mockJobs);
+  const [estimates, setEstimates] = useState<Estimate[]>(mockEstimates);
+
+  useEffect(() => {
+    fetchJobs().then(setJobs);
+    fetchEstimates().then(setEstimates);
+  }, []);
+
   const { activeJobs, monthlyRevenue, estimatesSent, estimatesAccepted, revenueChange, avgRating, responseTime } = contractorDashboardStats;
   const winRate = Math.round((estimatesAccepted / estimatesSent) * 100);
-  const openJobs = mockJobs.filter((j) => j.status === "open");
-  const pendingEstimates = mockEstimates.filter((e) => e.status === "sent" || e.status === "viewed");
-  const acceptedEstimates = mockEstimates.filter((e) => e.status === "accepted");
+  const openJobs = jobs.filter((j) => j.status === "open");
+  const pendingEstimates = estimates.filter((e) => e.status === "sent" || e.status === "viewed");
+  const acceptedEstimates = estimates.filter((e) => e.status === "accepted");
   const totalPipeline = pendingEstimates.reduce((s, e) => s + e.amount, 0);
 
   return (

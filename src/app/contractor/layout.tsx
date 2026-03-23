@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { Sidebar } from "@shared/components/sidebar";
 import { cn } from "@shared/lib/utils";
+import { authStore } from "@shared/lib/auth-store";
+import { realtimeClient } from "@shared/lib/realtime";
 
 const NAV_ITEMS = [
   { label: "Dashboard",      href: "/contractor/dashboard",      icon: LayoutDashboard },
@@ -61,6 +63,15 @@ export default function ContractorLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+
+  // Connect realtime WebSocket if authenticated
+  React.useEffect(() => {
+    const token = authStore.getToken();
+    if (token) {
+      realtimeClient.connect(token);
+    }
+    return () => realtimeClient.disconnect();
+  }, []);
 
   return (
     <div className="flex h-screen bg-surface overflow-hidden">

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Star, TrendingUp, MessageSquare, ThumbsUp } from "lucide-react";
 import { mockReviews } from "@shared/lib/mock-data";
+import { fetchReviews } from "@shared/lib/data";
 import { formatDate, cn } from "@shared/lib/utils";
 
 const RATING_BREAKDOWN = [
@@ -37,13 +38,36 @@ function StarRating({ rating, size = 16 }: { rating: number; size?: number }) {
 
 export default function ContractorReviewsPage() {
   const [filter, setFilter] = useState<"all" | "5" | "4" | "3">("all");
-  const avgRating = 4.9;
-  const totalReviews = mockReviews.length;
+  const [reviews, setReviews] = useState(mockReviews);
+
+  useEffect(() => {
+    fetchReviews().then((apiReviews) => {
+      if (apiReviews.length > 0) {
+        setReviews(
+          apiReviews.map((r: any) => ({
+            id: r.id,
+            authorName: r.reviewer?.name ?? "Unknown",
+            authorAvatar: "",
+            rating: r.rating,
+            text: r.comment,
+            date: r.created_at,
+            role: r.reviewer?.role ?? "homeowner",
+          }))
+        );
+      }
+    });
+  }, []);
+
+  const avgRating =
+    reviews.length > 0
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      : 0;
+  const totalReviews = reviews.length;
   const areaAvg = 4.2;
 
   const filteredReviews = filter === "all"
-    ? mockReviews
-    : mockReviews.filter((r) => r.rating === parseInt(filter));
+    ? reviews
+    : reviews.filter((r) => r.rating === parseInt(filter));
 
   return (
     <div className="flex flex-col min-h-full bg-surface">

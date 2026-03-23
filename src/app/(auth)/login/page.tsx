@@ -2,33 +2,50 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@shared/ui/button";
 import { Card, CardContent } from "@shared/ui/card";
 import { Input } from "@shared/ui/input";
 import { cn } from "@shared/lib/utils";
+import { authStore } from "@shared/lib/auth-store";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Auth logic goes here
+    setError("");
+    setLoading(true);
+    try {
+      const user = await authStore.login(email, password);
+      router.push(user.role === "homeowner" ? "/homeowner/dashboard" : "/contractor/dashboard");
+    } catch {
+      setError("Invalid email or password");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-surface flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-[420px] animate-fade-in-up">
-        {/* Logo */}
+    <div className="min-h-screen bg-[#FDFBF8] flex flex-col items-center justify-center px-4 py-12">
+      <div className="w-full max-w-[420px]">
+        {/* Brand */}
         <div className="text-center mb-8">
-          <span className="text-xl font-bold text-brand-600 tracking-tight">
-            FairTradeWorker
-          </span>
+          <Link href="/" className="inline-block">
+            <span className="text-2xl font-extrabold tracking-tight text-gray-900">
+              Fair<span className="text-brand-600">Trade</span>Worker
+            </span>
+          </Link>
+          <p className="text-sm text-gray-400 mt-1">The fair way to find and hire contractors</p>
         </div>
 
-        <Card className="shadow-md">
+        <Card className="shadow-md border-border">
           <CardContent className="p-8">
             {/* Heading */}
             <div className="mb-7">
@@ -41,6 +58,11 @@ export default function LoginPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+                  {error}
+                </div>
+              )}
               {/* Email */}
               <div className="space-y-1.5">
                 <label
@@ -81,7 +103,7 @@ export default function LoginPage() {
                     id="password"
                     type={showPassword ? "text" : "password"}
                     autoComplete="current-password"
-                    placeholder="••••••••"
+                    placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="pr-10"
@@ -104,8 +126,8 @@ export default function LoginPage() {
               </div>
 
               {/* Sign In Button */}
-              <Button type="submit" size="lg" className="w-full mt-1">
-                Sign In
+              <Button type="submit" size="lg" className="w-full mt-1" disabled={loading}>
+                {loading ? "Signing in..." : "Sign In"}
               </Button>
             </form>
 
@@ -156,30 +178,33 @@ export default function LoginPage() {
           </CardContent>
         </Card>
 
-        {/* Dev Quick Access */}
-        <div className="mt-6 rounded-lg border border-dashed border-amber-400 bg-amber-50 p-4">
-          <p className="text-xs font-semibold text-amber-700 mb-3 uppercase tracking-wide">
-            Dev Quick Access
-          </p>
-          <div className="grid grid-cols-2 gap-3">
-            <Link href="/contractor/dashboard">
-              <Button variant="outline" size="sm" className="w-full text-xs">
-                Contractor Portal
-              </Button>
-            </Link>
-            <Link href="/homeowner/dashboard">
-              <Button variant="outline" size="sm" className="w-full text-xs">
-                Homeowner Portal
-              </Button>
-            </Link>
-          </div>
+        {/* Demo Access */}
+        <div className="mt-6 flex items-center gap-3">
+          <Link href="/contractor/dashboard" className="flex-1">
+            <Button variant="outline" size="sm" className="w-full text-xs text-gray-500">
+              Contractor Demo
+            </Button>
+          </Link>
+          <Link href="/homeowner/dashboard" className="flex-1">
+            <Button variant="outline" size="sm" className="w-full text-xs text-gray-500">
+              Homeowner Demo
+            </Button>
+          </Link>
         </div>
+
+        {/* Legal */}
+        <p className="mt-4 text-center text-xs text-gray-400">
+          By signing in, you agree to our{" "}
+          <Link href="/terms" className="underline hover:text-gray-600 transition-colors">Terms</Link>
+          {" "}and{" "}
+          <Link href="/privacy" className="underline hover:text-gray-600 transition-colors">Privacy Policy</Link>.
+        </p>
       </div>
     </div>
   );
 }
 
-// Inline SVG icons for social providers — no emoji, no external deps
+// Inline SVG icons for social providers
 
 function GoogleIcon({ className }: { className?: string }) {
   return (

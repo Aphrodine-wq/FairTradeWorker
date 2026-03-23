@@ -560,7 +560,7 @@ export default function ContractorMessagesPage() {
   function handleSend() {
     if (!inputText.trim()) return;
     // Send to Elixir backend for real-time delivery
-    sendMessage({ sender: "contractor", body: inputText.trim() });
+    sendMessage({ body: inputText.trim() });
     setInputText("");
   }
 

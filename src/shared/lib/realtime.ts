@@ -199,6 +199,53 @@ export const api = {
     );
     return data.message;
   },
+
+  // Estimates
+  async listEstimates(): Promise<any[]> {
+    const data = await apiFetch<{ estimates: any[] }>("/api/estimates");
+    return data.estimates;
+  },
+  async getEstimate(id: string): Promise<any> {
+    const data = await apiFetch<{ estimate: any }>(`/api/estimates/${id}`);
+    return data.estimate;
+  },
+
+  // Invoices
+  async listInvoices(): Promise<any[]> {
+    const data = await apiFetch<{ invoices: any[] }>("/api/invoices");
+    return data.invoices;
+  },
+
+  // Projects
+  async listProjects(): Promise<any[]> {
+    const data = await apiFetch<{ projects: any[] }>("/api/projects");
+    return data.projects;
+  },
+
+  // Clients
+  async listClients(): Promise<any[]> {
+    const data = await apiFetch<{ clients: any[] }>("/api/clients");
+    return data.clients;
+  },
+
+  // Reviews
+  async listReviews(forUserId?: string): Promise<any[]> {
+    const params = forUserId ? `?for=${forUserId}` : "";
+    const data = await apiFetch<{ reviews: any[] }>(`/api/reviews${params}`);
+    return data.reviews;
+  },
+
+  // Notifications
+  async listNotifications(): Promise<any[]> {
+    const data = await apiFetch<{ notifications: any[] }>("/api/notifications");
+    return data.notifications;
+  },
+  async markNotificationRead(id: string): Promise<any> {
+    return apiFetch(`/api/notifications/${id}/read`, { method: "POST" });
+  },
+  async markAllNotificationsRead(): Promise<any> {
+    return apiFetch("/api/notifications/read-all", { method: "POST" });
+  },
 };
 
 // --- WebSocket Client ---

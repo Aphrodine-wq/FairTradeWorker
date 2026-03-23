@@ -1,9 +1,9 @@
 export function Features() {
   return (
-    <section id="features" className="divide-y divide-gray-100">
+    <section id="features" className="divide-y divide-border">
 
       {/* Feature 1 — Talk to Hunter */}
-      <div className="bg-white">
+      <div className="bg-[#FDFBF8]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="flex flex-col lg:flex-row lg:items-start lg:gap-12">
             <div className="lg:flex-1">
@@ -53,7 +53,7 @@ export function Features() {
       </div>
 
       {/* Feature 3 — Escrow */}
-      <div className="bg-white">
+      <div className="bg-[#FDFBF8]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <h2 className="text-3xl font-bold text-gray-900 leading-tight mb-5">
             Escrow. Every job.

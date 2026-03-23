@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   DollarSign,
@@ -15,6 +15,8 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { cn } from "@shared/lib/utils";
+import { fetchNotifications } from "@shared/lib/data";
+import { api } from "@shared/lib/realtime";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -109,11 +111,11 @@ const NOTIFICATIONS: Notification[] = [
   {
     id: "hn7",
     type: "contractor_match",
-    title: "New contractor match",
-    body: "3 new verified contractors match your Flooring Installation job",
+    title: "New bids available",
+    body: "3 new verified contractors bid on your Flooring Installation job",
     time: "Yesterday",
     read: true,
-    href: "/homeowner/contractors",
+    href: "/homeowner/jobs",
     filterGroup: "bids",
   },
   {
@@ -143,7 +145,7 @@ const NOTIFICATIONS: Notification[] = [
     body: "Marcus Johnson just completed background check verification",
     time: "3 days ago",
     read: true,
-    href: "/homeowner/contractors",
+    href: "/homeowner/jobs",
     filterGroup: "projects",
   },
 ];
@@ -172,8 +174,25 @@ const FILTERS: { key: FilterKey; label: string }[] = [
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function HomeownerNotificationsPage() {
-  const [notifications, setNotifications] = useState(NOTIFICATIONS);
+  const [notifications, setNotifications] = useState<Notification[]>(NOTIFICATIONS);
   const [filter, setFilter] = useState<FilterKey>("all");
+
+  useEffect(() => {
+    fetchNotifications().then((apiNotifs) => {
+      if (apiNotifs.length > 0) {
+        setNotifications(apiNotifs.map((n: any) => ({
+          id: n.id,
+          type: (n.type || "new_bid") as NotifType,
+          title: n.title,
+          body: n.body,
+          time: n.created_at ? new Date(n.created_at).toLocaleDateString() : "",
+          read: n.read ?? false,
+          href: "/homeowner/dashboard",
+          filterGroup: "all" as FilterKey,
+        })));
+      }
+    });
+  }, []);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -189,12 +208,14 @@ export default function HomeownerNotificationsPage() {
 
   const markAllRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    api.markAllNotificationsRead().catch(() => {});
   };
 
   const markRead = (id: string) => {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, read: true } : n))
     );
+    api.markNotificationRead(id).catch(() => {});
   };
 
   return (

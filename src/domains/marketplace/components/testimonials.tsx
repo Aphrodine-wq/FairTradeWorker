@@ -1,6 +1,6 @@
 export function Testimonials() {
   return (
-    <section className="bg-white py-24">
+    <section className="bg-[#FDFBF8] py-24">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative">
           {/* Decorative giant quote mark */}

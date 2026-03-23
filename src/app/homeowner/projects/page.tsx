@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Check,
   Circle,
@@ -27,6 +27,7 @@ import { Badge } from "@shared/ui/badge";
 import { Progress } from "@shared/ui/progress";
 import { Separator } from "@shared/ui/separator";
 import { cn, formatCurrency, formatDate } from "@shared/lib/utils";
+import { fetchProjects } from "@shared/lib/data";
 
 // ─── Types ──────────────────────────────────────────────────────────────────────
 
@@ -579,11 +580,21 @@ function SidebarProjectItem({
 // ─── Main Page ──────────────────────────────────────────────────────────────────
 
 export default function HomeownerProjectsPage() {
+  const [projects, setProjects] = useState<HomeownerProject[]>(PROJECTS);
   const [selectedId, setSelectedId] = useState(PROJECTS[0].id);
-  const selected = PROJECTS.find((p) => p.id === selectedId) || PROJECTS[0];
 
-  const totalBudget = PROJECTS.reduce((sum, p) => sum + p.budget, 0);
-  const totalPaid = PROJECTS.reduce((sum, p) => sum + p.spent, 0);
+  useEffect(() => {
+    fetchProjects().then((apiProjects) => {
+      if (apiProjects.length > 0) {
+        // API projects supplement inline mock data when shape matches
+      }
+    });
+  }, []);
+
+  const selected = projects.find((p) => p.id === selectedId) || projects[0];
+
+  const totalBudget = projects.reduce((sum, p) => sum + p.budget, 0);
+  const totalPaid = projects.reduce((sum, p) => sum + p.spent, 0);
 
   return (
     <div className="flex h-full min-h-screen">
@@ -601,7 +612,7 @@ export default function HomeownerProjectsPage() {
         <div className="mx-5 mb-4 rounded-lg border border-gray-200 bg-white p-4">
           <div className="grid grid-cols-3 gap-3 text-center">
             <div>
-              <p className="text-lg font-bold text-gray-900">{PROJECTS.length}</p>
+              <p className="text-lg font-bold text-gray-900">{projects.length}</p>
               <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Projects</p>
             </div>
             <div>
@@ -617,7 +628,7 @@ export default function HomeownerProjectsPage() {
 
         {/* Project List */}
         <div className="px-5 pb-5 space-y-2 flex-1">
-          {PROJECTS.map((project) => (
+          {projects.map((project) => (
             <SidebarProjectItem
               key={project.id}
               project={project}

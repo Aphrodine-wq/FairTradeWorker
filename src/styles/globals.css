@@ -5,18 +5,23 @@
 @tailwind utilities;
 
 :root {
-  --brand-primary: #059669;
-  --brand-hover: #047857;
+  --brand-primary: #C41E3A;
+  --brand-hover: #A5182F;
   --dark: #0F1419;
-  --bg-soft: #F7F8FA;
+  --bg-soft: #FDFBF8;
   --bg-card: #FFFFFF;
   --text-primary: #050608;
   --text-secondary: #0C0E14;
   --text-muted: #141720;
-  --border: #E5E7EB;
+  --border: #E5E1DB;
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+
   * {
     border-color: var(--border);
   }
@@ -24,13 +29,14 @@
   body {
     font-family: 'Inter', system-ui, sans-serif;
     color: var(--text-primary);
-    background-color: var(--bg-soft);
+    background-color: #FDFBF8;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
   }
 
   ::selection {
-    background-color: #059669;
+    background-color: #C41E3A;
     color: white;
   }
 }

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Star, MessageSquare } from "lucide-react";
 import { Button } from "@shared/ui/button";
+import { fetchReviews } from "@shared/lib/data";
 import { cn } from "@shared/lib/utils";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -181,6 +182,7 @@ const TAG_OPTIONS = [
 
 export default function HomeownerReviewsPage() {
   const [tab, setTab] = useState<"leave" | "history">("leave");
+  const [existingReviews, setExistingReviews] = useState<ExistingReview[]>(EXISTING_REVIEWS);
 
   // Review form state (per-project)
   const [activeFormId, setActiveFormId] = useState<string | null>(null);
@@ -189,9 +191,30 @@ export default function HomeownerReviewsPage() {
   const [formTags, setFormTags] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState<string[]>([]);
 
-  const totalReviews = EXISTING_REVIEWS.length;
+  useEffect(() => {
+    fetchReviews().then((apiReviews) => {
+      if (apiReviews.length > 0) {
+        setExistingReviews(
+          apiReviews.map((r: any) => ({
+            id: r.id,
+            contractorName: r.reviewed?.name ?? "Unknown",
+            projectTitle: r.job_id ?? "",
+            rating: r.rating,
+            text: r.comment,
+            date: r.created_at,
+            tags: [],
+            contractorResponse: r.response ?? undefined,
+          }))
+        );
+      }
+    });
+  }, []);
+
+  const totalReviews = existingReviews.length;
   const avgRating =
-    EXISTING_REVIEWS.reduce((sum, r) => sum + r.rating, 0) / totalReviews;
+    totalReviews > 0
+      ? existingReviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews
+      : 0;
 
   const unreviewedProjects = UNREVIEWED_PROJECTS.filter(
     (p) => !submitted.includes(p.id)
@@ -419,7 +442,7 @@ export default function HomeownerReviewsPage() {
           {/* ── My Reviews Tab ─────────────────────────────────────── */}
           {tab === "history" && (
             <div className="space-y-4">
-              {EXISTING_REVIEWS.map((review) => (
+              {existingReviews.map((review) => (
                 <div key={review.id} className="bg-white rounded-xl p-5">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">

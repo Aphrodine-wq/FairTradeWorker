@@ -5,7 +5,6 @@ import { Send, Search } from "lucide-react";
 import { AppHeader } from "@shared/components/app-header";
 import { Input } from "@shared/ui/input";
 import { Button } from "@shared/ui/button";
-import { mockContractors } from "@shared/lib/mock-data";
 import { cn, getInitials } from "@shared/lib/utils";
 import { useRealtimeChat } from "@shared/hooks/use-realtime";
 
@@ -248,7 +247,7 @@ export default function HomeownerMessagesPage() {
           if (c.id !== activeConvId) return c;
           const rtMsgs: Message[] = realtimeMessages.map((m) => ({
             id: m.id,
-            sender: m.sender === "homeowner" ? "homeowner" as Sender : "contractor" as Sender,
+            sender: (typeof m.sender === "string" ? m.sender : m.sender?.role ?? "contractor") === "homeowner" ? "homeowner" as Sender : "contractor" as Sender,
             text: m.body,
             time: new Date(m.sent_at).toLocaleTimeString("en-US", {
               hour: "numeric",
@@ -308,7 +307,7 @@ export default function HomeownerMessagesPage() {
     );
 
     // Also send to Elixir backend for real-time delivery
-    sendMessage({ sender: "homeowner", body: text });
+    sendMessage({ body: text });
 
     setInputText("");
   };
