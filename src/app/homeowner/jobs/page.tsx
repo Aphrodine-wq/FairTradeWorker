@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
+import Link from "next/link";
 import {
   Hammer,
   Zap,
@@ -14,11 +15,7 @@ import {
   Square,
   Fence,
   PanelTop as Wall2,
-  Upload,
-  ChevronLeft,
-  ChevronRight,
   CheckCircle2,
-  Calendar,
   DollarSign,
   Clock,
   FileText,
@@ -33,13 +30,7 @@ import {
   Briefcase,
   MessageSquare,
 } from "lucide-react";
-import { AppHeader } from "@shared/components/app-header";
 import { Button } from "@shared/ui/button";
-import { Card, CardContent } from "@shared/ui/card";
-import { Input } from "@shared/ui/input";
-import { Textarea } from "@shared/ui/textarea";
-import { Badge } from "@shared/ui/badge";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@shared/ui/tabs";
 import { Separator } from "@shared/ui/separator";
 import {
   Dialog,
@@ -49,10 +40,10 @@ import {
   DialogDescription,
 } from "@shared/ui/dialog";
 import { cn, formatCurrency, formatDate, getInitials } from "@shared/lib/utils";
-import { mockContractors, mockJobs, mockReviews } from "@shared/lib/mock-data";
-import { api } from "@shared/lib/realtime";
+import { mockContractors, mockJobs } from "@shared/lib/mock-data";
+import type { LucideIcon } from "lucide-react";
 
-// ─── Shared Helpers ────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const AVATAR_COLORS = [
   "bg-brand-600",
@@ -103,398 +94,29 @@ function StarRatingSmall({ rating }: { rating: number }) {
   );
 }
 
-// ─── Post a Job ────────────────────────────────────────────────────────────────
+// ─── Category Icon + Color Map ────────────────────────────────────────────────
 
-const CATEGORY_OPTIONS = [
-  { label: "General Contracting", icon: Hammer },
-  { label: "Plumbing", icon: Wrench },
-  { label: "Electrical", icon: Zap },
-  { label: "HVAC", icon: Wind },
-  { label: "Roofing", icon: Home },
-  { label: "Painting", icon: PaintBucket },
-  { label: "Flooring", icon: Layers },
-  { label: "Landscaping", icon: TreePine },
-  { label: "Remodeling", icon: LayoutGrid },
-  { label: "Concrete", icon: Square },
-  { label: "Fencing", icon: Fence },
-  { label: "Drywall", icon: Wall2 },
-];
-
-const TIMELINE_OPTIONS = [
-  { value: "asap", label: "As soon as possible" },
-  { value: "2weeks", label: "Within 2 weeks" },
-  { value: "1month", label: "Within 1 month" },
-  { value: "flexible", label: "I'm flexible" },
-];
-
-const URGENCY_OPTIONS = [
-  { value: "low", label: "Low", description: "Within a few months", color: "text-brand-700 border-brand-600 bg-brand-50" },
-  { value: "medium", label: "Medium", description: "Within 2–4 weeks", color: "text-amber-700 border-amber-500 bg-amber-50" },
-  { value: "high", label: "High", description: "Urgent — within days", color: "text-red-700 border-red-500 bg-red-50" },
-];
-
-const POST_STEPS = ["What", "Details", "Post"];
-
-interface PostFormData {
-  category: string;
-  title: string;
-  description: string;
-  timeline: string;
-  budgetMin: string;
-  budgetMax: string;
-  urgency: string;
-}
-
-const EMPTY_FORM: PostFormData = {
-  category: "",
-  title: "",
-  description: "",
-  timeline: "",
-  budgetMin: "",
-  budgetMax: "",
-  urgency: "",
+const CATEGORY_STYLE: Record<string, { icon: LucideIcon; color: string; bg: string }> = {
+  "General Contracting": { icon: Hammer, color: "text-brand-600", bg: "bg-brand-50" },
+  "Plumbing":            { icon: Wrench, color: "text-blue-600", bg: "bg-blue-50" },
+  "Electrical":          { icon: Zap, color: "text-amber-500", bg: "bg-amber-50" },
+  "HVAC":                { icon: Wind, color: "text-cyan-600", bg: "bg-cyan-50" },
+  "Roofing":             { icon: Home, color: "text-red-600", bg: "bg-red-50" },
+  "Painting":            { icon: PaintBucket, color: "text-violet-600", bg: "bg-violet-50" },
+  "Flooring":            { icon: Layers, color: "text-stone-600", bg: "bg-stone-50" },
+  "Landscaping":         { icon: TreePine, color: "text-emerald-600", bg: "bg-emerald-50" },
+  "Remodeling":          { icon: LayoutGrid, color: "text-indigo-600", bg: "bg-indigo-50" },
+  "Concrete":            { icon: Square, color: "text-slate-600", bg: "bg-slate-50" },
+  "Fencing":             { icon: Fence, color: "text-teal-600", bg: "bg-teal-50" },
+  "Drywall":             { icon: Wall2, color: "text-orange-600", bg: "bg-orange-50" },
 };
 
-function PostJobTab() {
-  const [step, setStep] = useState(1);
-  const [form, setForm] = useState<PostFormData>(EMPTY_FORM);
-  const [submitted, setSubmitted] = useState(false);
-
-  function update<K extends keyof PostFormData>(key: K, value: PostFormData[K]) {
-    setForm((prev) => ({ ...prev, [key]: value }));
-  }
-
-  function canAdvance(): boolean {
-    if (step === 1) return !!form.category;
-    if (step === 2) return !!form.title && !!form.description && !!form.timeline;
-    return !!form.budgetMin && !!form.budgetMax && !!form.urgency;
-  }
-
-  if (submitted) {
-    return (
-      <div className="max-w-2xl mx-auto text-center py-16">
-        <div className="w-16 h-16 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-4">
-          <CheckCircle2 className="w-8 h-8 text-brand-600" />
-        </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Job Posted!</h2>
-        <p className="text-gray-500 mb-6">
-          Your job has been posted. Verified contractors in your area will start
-          submitting estimates shortly.
-        </p>
-        <div className="flex justify-center gap-3">
-          <Button
-            variant="outline"
-            onClick={() => {
-              setForm(EMPTY_FORM);
-              setStep(1);
-              setSubmitted(false);
-            }}
-          >
-            Post Another Job
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
+function CategoryIcon({ category }: { category: string }) {
+  const style = CATEGORY_STYLE[category] ?? { icon: Hammer, color: "text-gray-500", bg: "bg-gray-100" };
+  const Icon = style.icon;
   return (
-    <div className="max-w-2xl">
-      {/* Step indicator */}
-      <div className="flex items-center gap-0 mb-8">
-        {POST_STEPS.map((label, i) => {
-          const num = i + 1;
-          const isActive = num === step;
-          const isDone = num < step;
-          return (
-            <div key={label} className="flex items-center flex-1 last:flex-none">
-              <div className="flex items-center gap-2">
-                <div
-                  className={cn(
-                    "w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-colors",
-                    isActive || isDone
-                      ? "bg-brand-600 border-brand-600 text-white"
-                      : "bg-white border-gray-200 text-gray-400"
-                  )}
-                >
-                  {isDone ? <CheckCircle2 className="w-4 h-4" /> : num}
-                </div>
-                <span
-                  className={cn(
-                    "text-sm font-medium hidden sm:block",
-                    isActive ? "text-gray-900" : isDone ? "text-brand-600" : "text-gray-400"
-                  )}
-                >
-                  {label}
-                </span>
-              </div>
-              {i < POST_STEPS.length - 1 && (
-                <div
-                  className={cn(
-                    "flex-1 h-0.5 mx-2",
-                    isDone ? "bg-brand-600" : "bg-gray-200"
-                  )}
-                />
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Step 1: What */}
-      {step === 1 && (
-        <Card>
-          <CardContent className="p-6">
-            <h2 className="text-base font-semibold text-gray-900 mb-1">
-              What type of job is this?
-            </h2>
-            <p className="text-sm text-gray-500 mb-5">
-              Select the category that best describes your project.
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {CATEGORY_OPTIONS.map(({ label, icon: Icon }) => (
-                <button
-                  key={label}
-                  onClick={() => update("category", label)}
-                  className={cn(
-                    "flex flex-col items-center gap-2 p-4 rounded-xl border-2 text-center transition-colors",
-                    form.category === label
-                      ? "border-brand-600 bg-brand-50 text-brand-700"
-                      : "border-border bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50"
-                  )}
-                >
-                  <Icon className="h-6 w-6" />
-                  <span className="text-xs font-medium leading-tight">{label}</span>
-                </button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Step 2: Details */}
-      {step === 2 && (
-        <Card>
-          <CardContent className="p-6 space-y-5">
-            <div>
-              <h2 className="text-base font-semibold text-gray-900 mb-1">
-                Describe your project
-              </h2>
-              <p className="text-sm text-gray-500">
-                More detail helps contractors give you accurate estimates.
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Job Title
-                </label>
-                <Input
-                  placeholder="e.g., Kitchen Remodel — Full Gut"
-                  value={form.title}
-                  onChange={(e) => update("title", e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Description
-                </label>
-                <Textarea
-                  placeholder="Describe the scope of work, any specific requirements, current conditions, etc."
-                  value={form.description}
-                  onChange={(e) => update("description", e.target.value)}
-                  rows={4}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Photos <span className="text-gray-400 font-normal">(optional)</span>
-                </label>
-                <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer">
-                  <Upload className="h-7 w-7 text-gray-300 mx-auto mb-2" />
-                  <p className="text-sm font-medium text-gray-500">
-                    Drag photos here or click to upload
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">PNG, JPG, HEIC up to 10MB each</p>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  When do you need this done?
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {TIMELINE_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.value}
-                      onClick={() => update("timeline", opt.value)}
-                      className={cn(
-                        "flex items-center gap-2 px-3 py-2.5 rounded-lg border-2 text-sm font-medium transition-colors text-left",
-                        form.timeline === opt.value
-                          ? "border-brand-600 bg-brand-50 text-brand-700"
-                          : "border-border bg-white text-gray-600 hover:border-gray-300"
-                      )}
-                    >
-                      <Calendar className="h-4 w-4 flex-shrink-0" />
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Step 3: Post (Budget + Urgency + Review) */}
-      {step === 3 && (
-        <div className="space-y-4">
-          <Card>
-            <CardContent className="p-6 space-y-5">
-              <div>
-                <h2 className="text-base font-semibold text-gray-900 mb-1">
-                  Budget &amp; Urgency
-                </h2>
-                <p className="text-sm text-gray-500">
-                  Set a budget range and how quickly you need this done.
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Budget Range
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Minimum</p>
-                    <div className="relative">
-                      <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        type="number"
-                        placeholder="5,000"
-                        value={form.budgetMin}
-                        onChange={(e) => update("budgetMin", e.target.value)}
-                        className="pl-8"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Maximum</p>
-                    <div className="relative">
-                      <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        type="number"
-                        placeholder="15,000"
-                        value={form.budgetMax}
-                        onChange={(e) => update("budgetMax", e.target.value)}
-                        className="pl-8"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Urgency
-                </label>
-                <div className="space-y-2">
-                  {URGENCY_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.value}
-                      onClick={() => update("urgency", opt.value)}
-                      className={cn(
-                        "w-full flex items-center gap-3 px-4 py-3 rounded-lg border-2 text-left transition-colors",
-                        form.urgency === opt.value
-                          ? opt.color + " border-current"
-                          : "border-border bg-white text-gray-600 hover:border-gray-300"
-                      )}
-                    >
-                      <Clock className="h-4 w-4 flex-shrink-0" />
-                      <div>
-                        <p className="text-sm font-semibold">{opt.label}</p>
-                        <p className="text-xs opacity-80">{opt.description}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Review summary */}
-          {form.budgetMin && form.budgetMax && form.urgency && (
-            <Card>
-              <CardContent className="p-6">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3">Review Your Posting</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Category</span>
-                    <Badge variant="secondary">{form.category}</Badge>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Title</span>
-                    <span className="font-medium text-gray-900 text-right max-w-[60%] truncate">{form.title}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Timeline</span>
-                    <span className="font-medium text-gray-900">
-                      {TIMELINE_OPTIONS.find((t) => t.value === form.timeline)?.label}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Budget</span>
-                    <span className="font-medium text-gray-900">
-                      {formatCurrency(Number(form.budgetMin))} – {formatCurrency(Number(form.budgetMax))}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Urgency</span>
-                    <span className="font-medium text-gray-900 capitalize">{form.urgency}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      )}
-
-      {/* Navigation */}
-      <div className="flex items-center justify-between mt-5">
-        <Button
-          variant="outline"
-          onClick={() => setStep((s) => s - 1)}
-          disabled={step === 1}
-        >
-          <ChevronLeft className="w-4 h-4 mr-1" />
-          Back
-        </Button>
-
-        {step < 3 ? (
-          <Button onClick={() => setStep((s) => s + 1)} disabled={!canAdvance()}>
-            Next
-            <ChevronRight className="w-4 h-4 ml-1" />
-          </Button>
-        ) : (
-          <Button onClick={() => {
-            // Post to Elixir real-time backend
-            api.postJob({
-              title: form.title,
-              description: form.description,
-              category: form.category.toLowerCase(),
-              budget_min: parseInt(form.budgetMin) || 0,
-              budget_max: parseInt(form.budgetMax) || 0,
-              location: "Texas",
-              homeowner: "You",
-            }).catch(() => {});
-            setSubmitted(true);
-          }} disabled={!canAdvance()}>
-            Post Job
-          </Button>
-        )}
-      </div>
+    <div className={cn("flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg", style.bg)}>
+      <Icon className={cn("h-4.5 w-4.5", style.color)} />
     </div>
   );
 }
@@ -517,17 +139,17 @@ interface Bid {
 const MOCK_BIDS: Bid[] = [
   {
     id: "b1", jobId: "j1", contractorId: "c1", amount: 38500, timeline: "5 weeks",
-    coverLetter: "We've completed over 40 kitchen remodels in the Austin area and this project is right in our wheelhouse. Our crew handles everything in-house — demo, framing, cabinet install, and finish work — which keeps your timeline tight and eliminates subcontractor delays. We pull our own permits and our licensed plumber and electrician are on staff. We'd love to walk the space before finalizing.",
+    coverLetter: "We've completed over 40 kitchen remodels in the Austin area and this project is right in our wheelhouse. Our crew handles everything in-house — demo, framing, cabinet install, and finish work — which keeps your timeline tight and eliminates subcontractor delays.",
     status: "pending", submittedDate: "2026-03-16",
   },
   {
     id: "b2", jobId: "j1", contractorId: "c3", amount: 41200, timeline: "6 weeks",
-    coverLetter: "My team has handled the plumbing rough-in on 30+ kitchen remodels. I can coordinate directly with a trusted GC I work with regularly to handle the full scope as a combined bid. The gas line relocation you mentioned is straightforward — we've done that same move in older Austin homes many times.",
+    coverLetter: "My team has handled the plumbing rough-in on 30+ kitchen remodels. I can coordinate directly with a trusted GC I work with regularly to handle the full scope as a combined bid.",
     status: "pending", submittedDate: "2026-03-17",
   },
   {
     id: "b3", jobId: "j1", contractorId: "c6", amount: 36900, timeline: "4.5 weeks",
-    coverLetter: "We specialize in kitchen and bathroom remodels and have installed the exact Calacatta Laza quartz you've selected on three recent projects. We work clean, protect adjacent spaces daily, and provide a daily job summary.",
+    coverLetter: "We specialize in kitchen and bathroom remodels and have installed the exact Calacatta Laza quartz you've selected on three recent projects. We work clean and provide daily summaries.",
     status: "declined", submittedDate: "2026-03-16",
   },
   {
@@ -537,7 +159,7 @@ const MOCK_BIDS: Bid[] = [
   },
   {
     id: "b5", jobId: "j2", contractorId: "c2", amount: 4850, timeline: "2 days",
-    coverLetter: "Panel upgrades and EV charger installs are my primary focus. I'm Oncor-approved and have done over 60 panel replacements in the Dallas area this year alone. I'll handle the utility coordination and pull the city permit.",
+    coverLetter: "Panel upgrades and EV charger installs are my primary focus. I'm Oncor-approved and have done over 60 panel replacements in the Dallas area this year alone.",
     status: "accepted", submittedDate: "2026-03-17",
   },
   {
@@ -557,25 +179,38 @@ const MOCK_BIDS: Bid[] = [
   },
 ];
 
-const JOBS = mockJobs.slice(0, 3);
+// Use first 3 jobs, override statuses for filter variety
+const JOBS = mockJobs.slice(0, 3).map((job, i) => ({
+  ...job,
+  status: i === 1 ? ("in_progress" as const) : i === 2 ? ("completed" as const) : job.status,
+}));
 
-// ─── Bid Dialog ────────────────────────────────────────────────────────────────
+type StatusFilter = "all" | "open" | "in_progress" | "completed";
 
-interface BidDialogProps {
+const STATUS_BADGE: Record<string, { label: string; className: string }> = {
+  open:        { label: "Open",        className: "bg-brand-50 text-brand-700 border-brand-200" },
+  in_progress: { label: "In Progress", className: "bg-amber-50 text-amber-700 border-amber-200" },
+  completed:   { label: "Completed",   className: "bg-gray-100 text-gray-600 border-gray-200" },
+  cancelled:   { label: "Cancelled",   className: "bg-red-50 text-red-600 border-red-200" },
+};
+
+// ─── Bid Dialog ───────────────────────────────────────────────────────────────
+
+function BidDialog({
+  bid,
+  open,
+  onClose,
+  onAccept,
+  onDecline,
+}: {
   bid: Bid;
   open: boolean;
   onClose: () => void;
   onAccept: (bidId: string) => void;
   onDecline: (bidId: string) => void;
-}
-
-function BidDialog({ bid, open, onClose, onAccept, onDecline }: BidDialogProps) {
+}) {
   const contractor = mockContractors.find((c) => c.id === bid.contractorId);
   if (!contractor) return null;
-
-  const contractorReviews = mockReviews
-    .filter((r) => r.authorName === contractor.name || r.role === "contractor")
-    .slice(0, 2);
 
   const isAccepted = bid.status === "accepted";
   const isDeclined = bid.status === "declined";
@@ -621,41 +256,31 @@ function BidDialog({ bid, open, onClose, onAccept, onDecline }: BidDialogProps) 
         </div>
 
         <div className="flex items-center gap-2 px-6 mt-2">
-          {contractor.verified && (
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-brand-700 bg-brand-50 border border-brand-100 rounded-full px-2.5 py-0.5">
-              <Shield className="h-3 w-3" /> Verified
+          {([
+            { show: contractor.verified, label: "Verified", style: "text-brand-700 bg-brand-50 border-brand-100" },
+            { show: contractor.licensed, label: "Licensed", style: "text-blue-700 bg-blue-50 border-blue-100" },
+            { show: contractor.insured,  label: "Insured",  style: "text-violet-700 bg-violet-50 border-violet-100" },
+          ] as const).filter((b) => b.show).map((b) => (
+            <span key={b.label} className={cn("inline-flex items-center gap-1 text-xs font-medium border rounded-full px-2.5 py-0.5", b.style)}>
+              <Shield className="h-3 w-3" /> {b.label}
             </span>
-          )}
-          {contractor.licensed && (
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-100 rounded-full px-2.5 py-0.5">
-              <Shield className="h-3 w-3" /> Licensed
-            </span>
-          )}
-          {contractor.insured && (
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-violet-700 bg-violet-50 border border-violet-100 rounded-full px-2.5 py-0.5">
-              <Shield className="h-3 w-3" /> Insured
-            </span>
-          )}
+          ))}
         </div>
 
         <Separator className="mx-6 mt-4" />
 
         <div className="grid grid-cols-3 gap-3 px-6 mt-4">
-          <div className="rounded-xl bg-brand-50 border border-brand-100 p-4 text-center">
-            <DollarSign className="h-4 w-4 text-brand-600 mx-auto mb-1" />
-            <p className="text-xs text-gray-500 mb-0.5">Bid Amount</p>
-            <p className="text-lg font-bold text-gray-900">{formatCurrency(bid.amount)}</p>
-          </div>
-          <div className="rounded-xl bg-gray-50 border border-gray-200 p-4 text-center">
-            <Clock className="h-4 w-4 text-gray-500 mx-auto mb-1" />
-            <p className="text-xs text-gray-500 mb-0.5">Timeline</p>
-            <p className="text-lg font-bold text-gray-900">{bid.timeline}</p>
-          </div>
-          <div className="rounded-xl bg-gray-50 border border-gray-200 p-4 text-center">
-            <CalendarDays className="h-4 w-4 text-gray-500 mx-auto mb-1" />
-            <p className="text-xs text-gray-500 mb-0.5">Submitted</p>
-            <p className="text-sm font-bold text-gray-900">{formatDate(bid.submittedDate)}</p>
-          </div>
+          {[
+            { icon: DollarSign, label: "Bid Amount", value: formatCurrency(bid.amount), accent: true },
+            { icon: Clock, label: "Timeline", value: bid.timeline, accent: false },
+            { icon: CalendarDays, label: "Submitted", value: formatDate(bid.submittedDate), accent: false },
+          ].map((s) => (
+            <div key={s.label} className={cn("rounded-xl border p-4 text-center", s.accent ? "bg-brand-50 border-brand-100" : "bg-gray-50 border-gray-200")}>
+              <s.icon className={cn("h-4 w-4 mx-auto mb-1", s.accent ? "text-brand-600" : "text-gray-500")} />
+              <p className="text-xs text-gray-500 mb-0.5">{s.label}</p>
+              <p className="text-lg font-bold text-gray-900">{s.value}</p>
+            </div>
+          ))}
         </div>
 
         <div className="px-6 mt-5">
@@ -667,50 +292,21 @@ function BidDialog({ bid, open, onClose, onAccept, onDecline }: BidDialogProps) 
 
         <div className="px-6 mt-4">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Contractor Stats</p>
-          <div className="grid grid-cols-3 gap-3 text-center">
-            <div className="rounded-lg border border-gray-200 p-3">
-              <Briefcase className="h-4 w-4 text-gray-400 mx-auto mb-1" />
-              <p className="text-lg font-bold text-gray-900">{contractor.jobsCompleted}</p>
-              <p className="text-xs text-gray-500">Jobs Done</p>
-            </div>
-            <div className="rounded-lg border border-gray-200 p-3">
-              <Clock className="h-4 w-4 text-gray-400 mx-auto mb-1" />
-              <p className="text-lg font-bold text-gray-900">{contractor.yearsExperience}</p>
-              <p className="text-xs text-gray-500">Years Exp.</p>
-            </div>
-            <div className="rounded-lg border border-gray-200 p-3">
-              <DollarSign className="h-4 w-4 text-gray-400 mx-auto mb-1" />
-              <p className="text-lg font-bold text-gray-900">${contractor.hourlyRate}</p>
-              <p className="text-xs text-gray-500">Per Hour</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="px-6 mt-4">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">About</p>
-          <p className="text-sm text-gray-600 leading-relaxed">{contractor.bio}</p>
-        </div>
-
-        {contractorReviews.length > 0 && (
-          <>
-            <Separator className="mx-6 mt-5" />
-            <div className="px-6 mt-4">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Recent Reviews</p>
-              <div className="space-y-3">
-                {contractorReviews.map((review) => (
-                  <div key={review.id} className="rounded-xl border border-gray-200 p-4">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <p className="text-sm font-semibold text-gray-900">{review.authorName}</p>
-                      <StarRating rating={review.rating} />
-                    </div>
-                    <p className="text-sm text-gray-600 leading-relaxed">{review.text}</p>
-                    <p className="text-xs text-gray-400 mt-1.5">{formatDate(review.date)}</p>
-                  </div>
-                ))}
+          <div className="flex items-center gap-6 text-center">
+            {[
+              { icon: Briefcase, val: contractor.jobsCompleted, label: "Jobs" },
+              { icon: Clock, val: `${contractor.yearsExperience} yrs`, label: "Exp." },
+              { icon: DollarSign, val: `$${contractor.hourlyRate}`, label: "/hr" },
+            ].map((s) => (
+              <div key={s.label} className="flex items-center gap-2">
+                <s.icon className="h-3.5 w-3.5 text-gray-400" />
+                <span className="text-sm font-bold text-gray-900">{s.val}</span>
+                <span className="text-xs text-gray-400">{s.label}</span>
               </div>
-            </div>
-          </>
-        )}
+            ))}
+          </div>
+          <p className="text-sm text-gray-600 leading-relaxed mt-3">{contractor.bio}</p>
+        </div>
 
         <div className="flex items-center gap-3 px-6 py-5 mt-2 border-t border-border">
           {isAccepted ? (
@@ -719,7 +315,7 @@ function BidDialog({ bid, open, onClose, onAccept, onDecline }: BidDialogProps) 
                 <MessageSquare className="h-4 w-4" />
                 Message Contractor
               </Button>
-              <div className="flex items-center gap-1.5 text-sm text-brand-600 font-semibold">
+              <div className="flex items-center gap-1.5 text-sm font-semibold text-brand-600">
                 <CheckCircle2 className="h-4 w-4" />
                 Bid Accepted
               </div>
@@ -753,344 +349,41 @@ function BidDialog({ bid, open, onClose, onAccept, onDecline }: BidDialogProps) 
   );
 }
 
-// ─── Bid Card ─────────────────────────────────────────────────────────────────
+// ─── Compare Modal ────────────────────────────────────────────────────────────
 
-interface BidCardProps {
-  bid: Bid;
-  onViewFull: () => void;
-}
-
-function BidCard({ bid, onViewFull }: BidCardProps) {
-  const contractor = mockContractors.find((c) => c.id === bid.contractorId);
-  if (!contractor) return null;
-
-  const statusColors: Record<BidStatus, string> = {
-    pending: "bg-amber-50 text-amber-700 border-amber-200",
-    accepted: "bg-brand-50 text-brand-700 border-brand-200",
-    declined: "bg-gray-100 text-gray-500 border-gray-200",
-  };
-
-  return (
-    <div className="flex items-start gap-4 p-4 rounded-xl border border-gray-200 bg-white hover:border-gray-300 transition-colors">
-      <div
-        className={cn(
-          "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-white text-sm font-bold",
-          avatarColor(contractor.id)
-        )}
-      >
-        {getInitials(contractor.name)}
-      </div>
-
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold text-gray-900">{contractor.name}</p>
-            <p className="text-xs text-gray-500">{contractor.company}</p>
-          </div>
-          <span
-            className={cn(
-              "flex-shrink-0 text-xs font-medium border rounded-full px-2.5 py-0.5 capitalize",
-              statusColors[bid.status]
-            )}
-          >
-            {bid.status}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-3 mt-1.5">
-          <StarRating rating={contractor.rating} />
-          <span className="text-xs font-medium text-gray-700">{contractor.rating}</span>
-          <span className="text-xs text-gray-400">({contractor.reviewCount})</span>
-        </div>
-
-        <div className="flex items-center gap-4 mt-2">
-          <div className="flex items-center gap-1 text-xs text-gray-600">
-            <DollarSign className="h-3 w-3 text-brand-600" />
-            <span className="font-semibold text-gray-900">{formatCurrency(bid.amount)}</span>
-          </div>
-          <div className="flex items-center gap-1 text-xs text-gray-500">
-            <Clock className="h-3 w-3" />
-            {bid.timeline}
-          </div>
-        </div>
-
-        <p className="text-xs text-gray-500 mt-2 line-clamp-2 leading-relaxed">
-          {bid.coverLetter}
-        </p>
-      </div>
-
-      <Button size="sm" variant="outline" onClick={onViewFull} className="flex-shrink-0">
-        View
-      </Button>
-    </div>
-  );
-}
-
-// ─── Job Section (for Bids tab) ───────────────────────────────────────────────
-
-function JobSection({
-  jobId,
-  bids,
-  bidStatuses,
-  onViewBid,
-}: {
-  jobId: string;
-  bids: Bid[];
-  bidStatuses: Record<string, BidStatus>;
-  onViewBid: (bid: Bid) => void;
-}) {
-  const job = JOBS.find((j) => j.id === jobId);
-  const [expanded, setExpanded] = useState(true);
-  if (!job) return null;
-
-  const effectiveBids = bids.map((b) => ({ ...b, status: bidStatuses[b.id] ?? b.status }));
-
-  return (
-    <Card>
-      <div
-        className="flex items-start justify-between gap-4 px-5 py-4 cursor-pointer"
-        onClick={() => setExpanded((v) => !v)}
-      >
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="text-sm font-bold text-gray-900">{job.title}</h3>
-            <Badge variant="secondary" className="text-xs">{job.category}</Badge>
-          </div>
-          <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
-            <span>Posted {formatDate(job.postedDate)}</span>
-            <span>{formatCurrency(job.budget.min)} – {formatCurrency(job.budget.max)}</span>
-            <span className="font-medium text-gray-700">
-              {effectiveBids.length} bid{effectiveBids.length !== 1 ? "s" : ""}
-            </span>
-          </div>
-        </div>
-        <div className="flex-shrink-0 text-gray-400">
-          {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-        </div>
-      </div>
-
-      {expanded && (
-        <CardContent className="pt-0 px-5 pb-5 space-y-3">
-          {effectiveBids.map((bid) => (
-            <BidCard key={bid.id} bid={bid} onViewFull={() => onViewBid(bid)} />
-          ))}
-        </CardContent>
-      )}
-    </Card>
-  );
-}
-
-// ─── Bids Tab ─────────────────────────────────────────────────────────────────
-
-function BidsTab() {
-  const [bidStatuses, setBidStatuses] = useState<Record<string, BidStatus>>(() => {
-    const initial: Record<string, BidStatus> = {};
-    MOCK_BIDS.forEach((b) => { initial[b.id] = b.status; });
-    return initial;
-  });
-  const [activeBid, setActiveBid] = useState<Bid | null>(null);
-
-  const handleAccept = (bidId: string) => setBidStatuses((prev) => ({ ...prev, [bidId]: "accepted" }));
-  const handleDecline = (bidId: string) => setBidStatuses((prev) => ({ ...prev, [bidId]: "declined" }));
-
-  const pendingBids = MOCK_BIDS.filter((b) => bidStatuses[b.id] === "pending");
-  const acceptedBids = MOCK_BIDS.filter((b) => bidStatuses[b.id] === "accepted");
-  const declinedBids = MOCK_BIDS.filter((b) => bidStatuses[b.id] === "declined");
-
-  const groupByJob = (filter: (b: Bid) => boolean) =>
-    JOBS.map((job) => ({
-      jobId: job.id,
-      bids: MOCK_BIDS.filter((b) => b.jobId === job.id && filter(b)),
-    })).filter((g) => g.bids.length > 0);
-
-  const effectiveActiveBid = activeBid
-    ? { ...activeBid, status: bidStatuses[activeBid.id] }
-    : null;
-
-  return (
-    <>
-      <Tabs defaultValue="active">
-        <TabsList className="mb-6">
-          <TabsTrigger value="active">
-            Active
-            {pendingBids.length > 0 && (
-              <span className="ml-1.5 text-xs bg-brand-600 text-white rounded-full px-1.5 py-0.5 leading-none">
-                {pendingBids.length}
-              </span>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="accepted">Accepted ({acceptedBids.length})</TabsTrigger>
-          <TabsTrigger value="declined">Declined ({declinedBids.length})</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="active" className="space-y-4">
-          {groupByJob((b) => bidStatuses[b.id] === "pending").length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mb-3">
-                <FileText className="h-6 w-6 text-gray-400" />
-              </div>
-              <p className="text-sm font-semibold text-gray-700">No pending bids</p>
-              <p className="text-xs text-gray-400 mt-1">All bids have been reviewed.</p>
-            </div>
-          ) : (
-            groupByJob((b) => bidStatuses[b.id] === "pending").map((group) => (
-              <JobSection
-                key={group.jobId}
-                jobId={group.jobId}
-                bids={group.bids}
-                bidStatuses={bidStatuses}
-                onViewBid={setActiveBid}
-              />
-            ))
-          )}
-        </TabsContent>
-
-        <TabsContent value="accepted" className="space-y-4">
-          {groupByJob((b) => bidStatuses[b.id] === "accepted").length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mb-3">
-                <CheckCircle2 className="h-6 w-6 text-gray-400" />
-              </div>
-              <p className="text-sm font-semibold text-gray-700">No accepted bids yet</p>
-            </div>
-          ) : (
-            groupByJob((b) => bidStatuses[b.id] === "accepted").map((group) => (
-              <JobSection
-                key={group.jobId}
-                jobId={group.jobId}
-                bids={group.bids}
-                bidStatuses={bidStatuses}
-                onViewBid={setActiveBid}
-              />
-            ))
-          )}
-        </TabsContent>
-
-        <TabsContent value="declined" className="space-y-4">
-          {groupByJob((b) => bidStatuses[b.id] === "declined").length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mb-3">
-                <XCircle className="h-6 w-6 text-gray-400" />
-              </div>
-              <p className="text-sm font-semibold text-gray-700">No declined bids</p>
-            </div>
-          ) : (
-            groupByJob((b) => bidStatuses[b.id] === "declined").map((group) => (
-              <JobSection
-                key={group.jobId}
-                jobId={group.jobId}
-                bids={group.bids}
-                bidStatuses={bidStatuses}
-                onViewBid={setActiveBid}
-              />
-            ))
-          )}
-        </TabsContent>
-      </Tabs>
-
-      {effectiveActiveBid && (
-        <BidDialog
-          bid={effectiveActiveBid as Bid}
-          open={!!activeBid}
-          onClose={() => setActiveBid(null)}
-          onAccept={handleAccept}
-          onDecline={handleDecline}
-        />
-      )}
-    </>
-  );
-}
-
-// ─── My Jobs Tab ──────────────────────────────────────────────────────────────
-
-function MyJobsTab({ onSwitchToBids }: { onSwitchToBids: () => void }) {
-  return (
-    <div className="space-y-4">
-      {JOBS.map((job) => {
-        const bidCount = MOCK_BIDS.filter((b) => b.jobId === job.id).length;
-        const pendingCount = MOCK_BIDS.filter((b) => b.jobId === job.id && b.status === "pending").length;
-        return (
-          <Card key={job.id}>
-            <CardContent className="p-5">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-semibold text-gray-900">{job.title}</h3>
-                    <Badge variant="secondary" className="text-xs">{job.category}</Badge>
-                  </div>
-                  <p className="text-sm text-gray-500 line-clamp-2">{job.description}</p>
-                  <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                    <span>Posted {formatDate(job.postedDate)}</span>
-                    <span>{formatCurrency(job.budget.min)} – {formatCurrency(job.budget.max)}</span>
-                    <span className="font-semibold text-brand-600">{bidCount} bid{bidCount !== 1 ? "s" : ""}</span>
-                    {pendingCount > 0 && (
-                      <span className="text-amber-600 font-medium">{pendingCount} pending</span>
-                    )}
-                  </div>
-                </div>
-                <Button size="sm" variant="outline" onClick={onSwitchToBids}>
-                  View Bids
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        );
-      })}
-    </div>
-  );
-}
-
-// ─── Compare Tab ──────────────────────────────────────────────────────────────
-
-interface CompareBid {
-  id: string;
-  jobId: string;
-  jobLabel: string;
-  contractorId: string;
-  amount: number;
-  timeline: string;
-  coverLetter: string;
-}
-
-const COMPARE_JOBS = [
-  { id: "j1", label: "Kitchen Remodel - Full Gut" },
-  { id: "j2", label: "Electrical Panel Upgrade + EV Charger" },
-  { id: "j3", label: "Master Bathroom Full Renovation" },
-];
-
-const COMPARE_BIDS: CompareBid[] = [
-  { id: "b1", jobId: "j1", jobLabel: "Kitchen Remodel - Full Gut", contractorId: "c1", amount: 38500, timeline: "5 weeks", coverLetter: "We've completed over 40 kitchen remodels in the Austin area and this project is right in our wheelhouse. Our crew handles everything in-house — demo, framing, cabinet install, and finish work." },
-  { id: "b2", jobId: "j1", jobLabel: "Kitchen Remodel - Full Gut", contractorId: "c3", amount: 41200, timeline: "6 weeks", coverLetter: "My team has handled the plumbing rough-in on 30+ kitchen remodels. I coordinate directly with a trusted GC to handle the full scope as a combined bid." },
-  { id: "b3", jobId: "j1", jobLabel: "Kitchen Remodel - Full Gut", contractorId: "c6", amount: 36900, timeline: "4.5 weeks", coverLetter: "We specialize in kitchen and bathroom remodels and have installed the exact Calacatta Laza quartz you selected on three recent projects. We work clean and provide daily summaries." },
-  { id: "b4", jobId: "j1", jobLabel: "Kitchen Remodel - Full Gut", contractorId: "c5", amount: 34750, timeline: "5.5 weeks", coverLetter: "While painting is our core trade, we manage full remodel scopes using our trusted subcontractor network. One point of contact throughout." },
-  { id: "b5", jobId: "j2", jobLabel: "Electrical Panel Upgrade + EV Charger", contractorId: "c2", amount: 4850, timeline: "2 days", coverLetter: "Panel upgrades and EV charger installs are my primary focus. I'm Oncor-approved and have done over 60 panel replacements in Dallas this year." },
-  { id: "b6", jobId: "j2", jobLabel: "Electrical Panel Upgrade + EV Charger", contractorId: "c1", amount: 5400, timeline: "3 days", coverLetter: "Licensed master electrician on staff. Fully insured with $2M GL and workers comp. All work NEC 2023 standard, first-attempt city inspection guaranteed." },
-  { id: "b7", jobId: "j3", jobLabel: "Master Bathroom Full Renovation", contractorId: "c3", amount: 26400, timeline: "4 weeks", coverLetter: "Licensed master plumber with 20 years in San Antonio. Schluter-certified, KERDI waterproofing on 80+ walk-in shower builds." },
-  { id: "b8", jobId: "j3", jobLabel: "Master Bathroom Full Renovation", contractorId: "c2", amount: 28900, timeline: "5 weeks", coverLetter: "Full bathroom remodel scope including electrical rough-in for heated floor and exhaust fan. Licensed plumber and certified tile installer on regular crew." },
-  { id: "b9", jobId: "j3", jobLabel: "Master Bathroom Full Renovation", contractorId: "c4", amount: 24100, timeline: "3.5 weeks", coverLetter: "Full remodel division alongside our roofing operation. Licensed plumber sub with own insurance. 15 full bathroom remodels in Alamo Heights in two years." },
-];
-
-interface ScoredBid {
-  bid: CompareBid;
-  score: number;
-  breakdown: { label: string; pts: number }[];
-}
-
-function scoreBids(bids: CompareBid[]): ScoredBid[] {
-  const amounts = bids.map((b) => b.amount);
+function scoreBid(bid: Bid, allBids: Bid[]): { score: number; breakdown: { label: string; pts: number }[] } {
+  const contractor = mockContractors.find((c) => c.id === bid.contractorId)!;
+  const amounts = allBids.map((b) => b.amount);
   const minAmt = Math.min(...amounts);
   const maxAmt = Math.max(...amounts);
+  const priceRange = maxAmt - minAmt || 1;
 
-  return bids.map((bid) => {
-    const contractor = mockContractors.find((c) => c.id === bid.contractorId)!;
-    const breakdown: { label: string; pts: number }[] = [];
-    const priceRange = maxAmt - minAmt || 1;
-    breakdown.push({ label: "Price", pts: Math.round(((maxAmt - bid.amount) / priceRange) * 35) });
-    breakdown.push({ label: "Rating", pts: Math.round(((contractor.rating - 4.0) / 1.0) * 30) });
-    breakdown.push({ label: "Experience", pts: Math.min(Math.round((contractor.yearsExperience / 20) * 20), 20) });
-    breakdown.push({ label: "Trust", pts: (contractor.verified ? 5 : 0) + (contractor.licensed ? 5 : 0) + (contractor.insured ? 5 : 0) });
-    return { bid, score: breakdown.reduce((s, b) => s + b.pts, 0), breakdown };
-  });
+  const breakdown = [
+    { label: "Price", pts: Math.round(((maxAmt - bid.amount) / priceRange) * 35) },
+    { label: "Rating", pts: Math.round(((contractor.rating - 4.0) / 1.0) * 30) },
+    { label: "Experience", pts: Math.min(Math.round((contractor.yearsExperience / 20) * 20), 20) },
+    { label: "Trust", pts: (contractor.verified ? 5 : 0) + (contractor.licensed ? 5 : 0) + (contractor.insured ? 5 : 0) },
+  ];
+  return { score: breakdown.reduce((s, b) => s + b.pts, 0), breakdown };
+}
+
+function compareRows(bids: Bid[], minAmt: number, maxRating: number, maxExp: number) {
+  const fastest = Math.min(...bids.map((b) => parseFloat(b.timeline)));
+  const c = (bid: Bid) => mockContractors.find((x) => x.id === bid.contractorId)!;
+  const hi = (v: boolean) => v ? "text-brand-600" : "text-gray-700";
+  return [
+    { label: "Price", render: (bid: Bid) => <span className={cn("text-sm font-bold", hi(bid.amount === minAmt))}>{formatCurrency(bid.amount)}</span> },
+    { label: "Rating", render: (bid: Bid) => {
+      const ct = c(bid);
+      return <div className="flex flex-col items-center gap-1"><StarRatingSmall rating={ct.rating} /><span className={cn("text-sm font-bold", hi(ct.rating === maxRating))}>{ct.rating}</span></div>;
+    }},
+    { label: "Timeline", render: (bid: Bid) => <span className={cn("text-sm font-semibold", hi(parseFloat(bid.timeline) === fastest))}>{bid.timeline}</span> },
+    { label: "Experience", render: (bid: Bid) => <span className={cn("text-sm font-bold", hi(c(bid).yearsExperience === maxExp))}>{c(bid).yearsExperience} yrs</span> },
+    { label: "Reviews", render: (bid: Bid) => <span className="text-sm font-semibold text-gray-700">{c(bid).reviewCount}</span> },
+    { label: "Verified", render: (bid: Bid) => <BoolCell value={c(bid).verified} /> },
+    { label: "Licensed", render: (bid: Bid) => <BoolCell value={c(bid).licensed} /> },
+    { label: "Insured", render: (bid: Bid) => <BoolCell value={c(bid).insured} /> },
+  ] as { label: string; render: (bid: Bid) => React.ReactNode }[];
 }
 
 function BoolCell({ value }: { value: boolean }) {
@@ -1101,135 +394,69 @@ function BoolCell({ value }: { value: boolean }) {
   );
 }
 
-function CompareTab() {
-  const [selectedJobId, setSelectedJobId] = useState("j1");
-  const [acceptedId, setAcceptedId] = useState<string | null>(null);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+function CompareModal({
+  open,
+  onClose,
+  bids,
+  bidStatuses,
+  onAccept,
+}: {
+  open: boolean;
+  onClose: () => void;
+  bids: Bid[];
+  bidStatuses: Record<string, BidStatus>;
+  onAccept: (bidId: string) => void;
+}) {
+  const effectiveBids = bids.map((b) => ({ ...b, status: bidStatuses[b.id] ?? b.status }));
+  const scored = effectiveBids
+    .map((bid) => ({
+      bid,
+      contractor: mockContractors.find((c) => c.id === bid.contractorId)!,
+      ...scoreBid(bid, effectiveBids),
+    }))
+    .sort((a, b) => b.score - a.score);
 
-  const selectedJob = COMPARE_JOBS.find((j) => j.id === selectedJobId)!;
-  const jobBids = COMPARE_BIDS.filter((b) => b.jobId === selectedJobId);
-  const scored = scoreBids(jobBids).sort((a, b) => b.score - a.score);
-  const topScore = scored[0];
-
-  const amounts = jobBids.map((b) => b.amount);
+  const amounts = effectiveBids.map((b) => b.amount);
   const minAmt = Math.min(...amounts);
-  const maxAmt = Math.max(...amounts);
-  const allRatings = jobBids.map((b) => mockContractors.find((c) => c.id === b.contractorId)!.rating);
+  const allRatings = scored.map((s) => s.contractor.rating);
   const maxRating = Math.max(...allRatings);
-  const allExp = jobBids.map((b) => mockContractors.find((c) => c.id === b.contractorId)!.yearsExperience);
+  const allExp = scored.map((s) => s.contractor.yearsExperience);
   const maxExp = Math.max(...allExp);
 
-  const TABLE_ROWS: { label: string; render: (bid: CompareBid) => React.ReactNode }[] = [
-    {
-      label: "Rating",
-      render: (bid) => {
-        const c = mockContractors.find((x) => x.id === bid.contractorId)!;
-        return (
-          <div className="flex flex-col items-center gap-1">
-            <StarRatingSmall rating={c.rating} />
-            <span className={cn("text-sm font-bold", c.rating === maxRating ? "text-brand-600" : "text-gray-700")}>{c.rating}</span>
-          </div>
-        );
-      },
-    },
-    {
-      label: "Bid Amount",
-      render: (bid) => (
-        <span className={cn("text-sm font-bold", bid.amount === minAmt ? "text-brand-600" : "text-gray-700")}>
-          {formatCurrency(bid.amount)}
-        </span>
-      ),
-    },
-    {
-      label: "Timeline",
-      render: (bid) => {
-        const weeks = parseFloat(bid.timeline);
-        const allWeeks = jobBids.map((b) => parseFloat(b.timeline));
-        const fastest = Math.min(...allWeeks);
-        return (
-          <span className={cn("text-sm font-semibold", weeks === fastest ? "text-brand-600" : "text-gray-700")}>
-            {bid.timeline}
-          </span>
-        );
-      },
-    },
-    {
-      label: "Experience",
-      render: (bid) => {
-        const c = mockContractors.find((x) => x.id === bid.contractorId)!;
-        return (
-          <span className={cn("text-sm font-bold", c.yearsExperience === maxExp ? "text-brand-600" : "text-gray-700")}>
-            {c.yearsExperience} yrs
-          </span>
-        );
-      },
-    },
-    {
-      label: "Licensed",
-      render: (bid) => <BoolCell value={mockContractors.find((x) => x.id === bid.contractorId)!.licensed} />,
-    },
-    {
-      label: "Insured",
-      render: (bid) => <BoolCell value={mockContractors.find((x) => x.id === bid.contractorId)!.insured} />,
-    },
-    {
-      label: "Verified",
-      render: (bid) => <BoolCell value={mockContractors.find((x) => x.id === bid.contractorId)!.verified} />,
-    },
-  ];
+  const topScore = scored[0];
+  const savingsVsAvg = amounts.reduce((s, a) => s + a, 0) / amounts.length - topScore.bid.amount;
 
   return (
-    <div className="space-y-6">
-      {/* Job selector */}
-      <div className="relative inline-block">
-        <button
-          onClick={() => setDropdownOpen((v) => !v)}
-          className="flex items-center gap-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg px-3 py-2 hover:border-gray-300 transition-colors"
-        >
-          <Scale className="h-4 w-4 text-brand-600" />
-          {selectedJob.label}
-          <ChevronDown className="h-3.5 w-3.5 text-gray-400" />
-        </button>
-        {dropdownOpen && (
-          <div className="absolute left-0 top-full mt-1 z-20 bg-white border border-gray-200 rounded-lg shadow-lg w-72 py-1">
-            {COMPARE_JOBS.map((job) => (
-              <button
-                key={job.id}
-                className={cn(
-                  "w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors",
-                  job.id === selectedJobId ? "text-brand-600 font-semibold" : "text-gray-700"
-                )}
-                onClick={() => { setSelectedJobId(job.id); setDropdownOpen(false); setAcceptedId(null); }}
-              >
-                {job.label}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader className="sr-only">
+          <DialogTitle>Compare Bids</DialogTitle>
+          <DialogDescription>Side-by-side contractor comparison</DialogDescription>
+        </DialogHeader>
 
-      {/* Comparison table */}
-      <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="px-6 pt-6 pb-2">
+          <h2 className="text-lg font-bold text-gray-900">Compare Bids</h2>
+          <p className="text-sm text-gray-500 mt-0.5">Side-by-side comparison to find the best value</p>
+        </div>
+
+        <div className="px-6 overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
               <tr className="border-b border-gray-100">
-                <th className="w-32 bg-gray-50 border-r border-gray-100 px-4 py-4" />
-                {scored.map(({ bid, score }, idx) => {
-                  const contractor = mockContractors.find((c) => c.id === bid.contractorId)!;
+                <th className="w-28 bg-gray-50 border-r border-gray-100 px-3 py-4" />
+                {scored.map(({ bid, contractor, score }, idx) => {
                   const isTop = idx === 0;
                   return (
-                    <th key={bid.id} className={cn("text-center px-4 py-4 min-w-[160px]", isTop && "bg-brand-50")}>
+                    <th key={bid.id} className={cn("text-center px-4 py-4 min-w-[150px]", isTop && "bg-brand-50")}>
                       <div className="flex flex-col items-center gap-2">
                         {isTop && (
                           <span className="inline-flex items-center gap-1 text-[10px] font-bold text-brand-700 bg-brand-100 rounded-full px-2 py-0.5 uppercase tracking-wide">
-                            <Award className="h-3 w-3" />
-                            Best Match
+                            <Award className="h-3 w-3" /> Best Match
                           </span>
                         )}
                         <div
                           className={cn(
-                            "flex h-11 w-11 items-center justify-center rounded-full text-white text-sm font-bold",
+                            "flex h-10 w-10 items-center justify-center rounded-full text-white text-sm font-bold",
                             avatarColor(contractor.id)
                           )}
                         >
@@ -1237,7 +464,7 @@ function CompareTab() {
                         </div>
                         <div>
                           <p className="text-sm font-bold text-gray-900">{contractor.name}</p>
-                          <p className="text-xs text-gray-500 mt-0.5">{contractor.company}</p>
+                          <p className="text-xs text-gray-500">{contractor.company}</p>
                         </div>
                       </div>
                     </th>
@@ -1246,9 +473,9 @@ function CompareTab() {
               </tr>
             </thead>
             <tbody>
-              {TABLE_ROWS.map((row, ri) => (
+              {(compareRows(effectiveBids, minAmt, maxRating, maxExp)).map((row, ri) => (
                 <tr key={row.label} className={cn("border-b border-gray-100 last:border-0", ri % 2 === 0 ? "bg-white" : "bg-gray-50/50")}>
-                  <td className="border-r border-gray-100 px-4 py-3 bg-gray-50">
+                  <td className="border-r border-gray-100 px-3 py-3 bg-gray-50">
                     <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">
                       {row.label}
                     </span>
@@ -1261,24 +488,21 @@ function CompareTab() {
                 </tr>
               ))}
               <tr className="bg-gray-50 border-t border-gray-200">
-                <td className="border-r border-gray-100 px-4 py-4">
+                <td className="border-r border-gray-100 px-3 py-4">
                   <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Action</span>
                 </td>
                 {scored.map(({ bid }, idx) => (
                   <td key={bid.id} className={cn("text-center px-4 py-4", idx === 0 && "bg-brand-50/40")}>
-                    {acceptedId === bid.id ? (
+                    {bid.status === "accepted" ? (
                       <div className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600">
-                        <CheckCircle2 className="h-4 w-4" />
-                        Accepted
+                        <CheckCircle2 className="h-4 w-4" /> Accepted
                       </div>
-                    ) : acceptedId !== null ? (
-                      <span className="text-xs text-gray-400">—</span>
                     ) : (
                       <Button
                         size="sm"
                         variant={idx === 0 ? "default" : "outline"}
                         className="w-full max-w-[130px]"
-                        onClick={() => setAcceptedId(bid.id)}
+                        onClick={() => { onAccept(bid.id); onClose(); }}
                       >
                         Accept Bid
                       </Button>
@@ -1289,78 +513,129 @@ function CompareTab() {
             </tbody>
           </table>
         </div>
-      </Card>
 
-      {/* Recommendation */}
-      {topScore && (
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-start gap-4">
-              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-brand-600 text-white">
-                <Award className="h-5 w-5" />
+        {/* Recommendation */}
+        {topScore && (
+          <div className="mx-6 mb-6 mt-4 rounded-xl border border-brand-100 bg-brand-50/50 p-5">
+            <div className="flex items-start gap-3">
+              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-brand-600 text-white">
+                <Award className="h-4 w-4" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-bold text-brand-600 uppercase tracking-wider mb-1">Our Recommendation</p>
-                {(() => {
-                  const rec = mockContractors.find((c) => c.id === topScore.bid.contractorId)!;
-                  const second = scored[1] ? mockContractors.find((c) => c.id === scored[1].bid.contractorId)! : null;
-                  const savingsVsAvg = amounts.reduce((s, a) => s + a, 0) / amounts.length - topScore.bid.amount;
-                  return (
-                    <>
-                      <h3 className="text-base font-bold text-gray-900">{rec.name} — {rec.company}</h3>
-                      <p className="text-sm text-gray-600 mt-2 leading-relaxed">
-                        {rec.name} scores highest with a{" "}
-                        <span className="font-semibold text-gray-900">{topScore.score}/100</span> composite rating.
-                        Their <span className="font-semibold text-gray-900">{formatCurrency(topScore.bid.amount)}</span> bid is{" "}
-                        {savingsVsAvg > 0 ? (
-                          <span className="font-semibold text-brand-600">{formatCurrency(Math.round(savingsVsAvg))} below average</span>
-                        ) : (
-                          <span className="font-semibold text-gray-900">near the field average</span>
-                        )}{" "}
-                        with a <span className="font-semibold text-gray-900">{rec.rating}-star</span> rating across {rec.reviewCount} reviews.
-                        {second && scored[1].score >= topScore.score - 10
-                          ? ` ${second.name} is a close second worth considering.`
-                          : ""}
+                <p className="text-sm font-bold text-gray-900">{topScore.contractor.name} — {topScore.contractor.company}</p>
+                <p className="text-sm text-gray-600 mt-1 leading-relaxed">
+                  Scores highest with{" "}
+                  <span className="font-semibold text-gray-900">{topScore.score}/100</span>.
+                  Their <span className="font-semibold text-gray-900">{formatCurrency(topScore.bid.amount)}</span> bid is{" "}
+                  {savingsVsAvg > 0 ? (
+                    <span className="font-semibold text-brand-600">{formatCurrency(Math.round(savingsVsAvg))} below average</span>
+                  ) : (
+                    <span className="font-semibold text-gray-900">near the field average</span>
+                  )}{" "}
+                  with a <span className="font-semibold text-gray-900">{topScore.contractor.rating}-star</span> rating.
+                </p>
+                <div className="flex items-center gap-4 mt-3 flex-wrap">
+                  {topScore.breakdown.map((b) => (
+                    <div key={b.label} className="text-center">
+                      <p className="text-xs text-gray-400">{b.label}</p>
+                      <p className="text-sm font-bold text-gray-900">
+                        {b.pts}
+                        <span className="text-xs font-normal text-gray-400">
+                          /{b.label === "Price" ? 35 : b.label === "Rating" ? 30 : b.label === "Experience" ? 20 : 15}
+                        </span>
                       </p>
-                      <div className="flex items-center gap-4 mt-4 flex-wrap">
-                        {topScore.breakdown.map((b) => (
-                          <div key={b.label} className="text-center">
-                            <p className="text-xs text-gray-400">{b.label}</p>
-                            <p className="text-sm font-bold text-gray-900">
-                              {b.pts}
-                              <span className="text-xs font-normal text-gray-400">
-                                /{b.label === "Price" ? 35 : b.label === "Rating" ? 30 : b.label === "Experience" ? 20 : 15}
-                              </span>
-                            </p>
-                          </div>
-                        ))}
-                        <Separator orientation="vertical" className="h-8" />
-                        <div className="text-center">
-                          <p className="text-xs text-gray-400">Overall</p>
-                          <p className="text-lg font-bold text-brand-600">
-                            {topScore.score}<span className="text-xs font-normal text-gray-400">/100</span>
-                          </p>
-                        </div>
-                      </div>
-                    </>
-                  );
-                })()}
-              </div>
-              {acceptedId === null && (
-                <Button className="flex-shrink-0" onClick={() => setAcceptedId(topScore.bid.id)}>
-                  Accept Top Pick
-                </Button>
-              )}
-              {acceptedId === topScore.bid.id && (
-                <div className="flex items-center gap-1.5 text-sm font-semibold text-brand-600 flex-shrink-0">
-                  <CheckCircle2 className="h-4 w-4" />
-                  Accepted
+                    </div>
+                  ))}
+                  <Separator orientation="vertical" className="h-8" />
+                  <div className="text-center">
+                    <p className="text-xs text-gray-400">Overall</p>
+                    <p className="text-lg font-bold text-brand-600">
+                      {topScore.score}<span className="text-xs font-normal text-gray-400">/100</span>
+                    </p>
+                  </div>
                 </div>
-              )}
+              </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ─── Inline Bid Card ──────────────────────────────────────────────────────────
+
+function InlineBidCard({
+  bid,
+  onViewFull,
+  onAccept,
+}: {
+  bid: Bid;
+  onViewFull: () => void;
+  onAccept: () => void;
+}) {
+  const contractor = mockContractors.find((c) => c.id === bid.contractorId);
+  if (!contractor) return null;
+
+  const isAccepted = bid.status === "accepted";
+
+  return (
+    <div className="flex items-start gap-3 p-4 rounded-xl border border-gray-200 bg-white hover:border-gray-300 transition-colors">
+      <div
+        className={cn(
+          "flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-white text-xs font-bold",
+          avatarColor(contractor.id)
+        )}
+      >
+        {getInitials(contractor.name)}
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 flex-wrap">
+          <p className="text-sm font-semibold text-gray-900">{contractor.name}</p>
+          {contractor.verified && (
+            <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-brand-700 bg-brand-50 border border-brand-100 rounded-full px-1.5 py-0.5">
+              <Shield className="h-2.5 w-2.5" /> Verified
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2 mt-0.5">
+          <StarRating rating={contractor.rating} />
+          <span className="text-xs font-medium text-gray-700">{contractor.rating}</span>
+          <span className="text-xs text-gray-400">({contractor.reviewCount})</span>
+        </div>
+
+        <div className="flex items-center gap-4 mt-2">
+          <div className="flex items-center gap-1 text-xs">
+            <DollarSign className="h-3 w-3 text-brand-600" />
+            <span className="font-bold text-gray-900">{formatCurrency(bid.amount)}</span>
+          </div>
+          <div className="flex items-center gap-1 text-xs text-gray-500">
+            <Clock className="h-3 w-3" />
+            {bid.timeline}
+          </div>
+        </div>
+
+        <p className="text-xs text-gray-500 mt-2 line-clamp-2 leading-relaxed">
+          {bid.coverLetter}
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-2 flex-shrink-0">
+        {isAccepted ? (
+          <div className="inline-flex items-center gap-1 text-xs font-semibold text-brand-600 bg-brand-50 border border-brand-200 rounded-full px-2.5 py-1">
+            <CheckCircle2 className="h-3 w-3" /> Accepted
+          </div>
+        ) : (
+          <>
+            <Button size="sm" onClick={onAccept}>Accept</Button>
+            <Button size="sm" variant="outline" className="gap-1" onClick={onViewFull}>
+              View
+            </Button>
+          </>
+        )}
+      </div>
     </div>
   );
 }
@@ -1368,34 +643,218 @@ function CompareTab() {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function JobsPage() {
-  const [activeTab, setActiveTab] = useState("myjobs");
+  const [filter, setFilter] = useState<StatusFilter>("all");
+  const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
+  const [bidStatuses, setBidStatuses] = useState<Record<string, BidStatus>>(() => {
+    const initial: Record<string, BidStatus> = {};
+    MOCK_BIDS.forEach((b) => { initial[b.id] = b.status; });
+    return initial;
+  });
+  const [activeBid, setActiveBid] = useState<Bid | null>(null);
+  const [compareJobId, setCompareJobId] = useState<string | null>(null);
+
+  const handleAccept = (bidId: string) => setBidStatuses((prev) => ({ ...prev, [bidId]: "accepted" }));
+  const handleDecline = (bidId: string) => setBidStatuses((prev) => ({ ...prev, [bidId]: "declined" }));
+
+  const filteredJobs = useMemo(
+    () => JOBS.filter((j) => filter === "all" || j.status === filter),
+    [filter]
+  );
+
+  const getBidsForJob = (jobId: string) =>
+    MOCK_BIDS.filter((b) => b.jobId === jobId).map((b) => ({
+      ...b,
+      status: bidStatuses[b.id] ?? b.status,
+    }));
+
+  const effectiveActiveBid = activeBid
+    ? { ...activeBid, status: bidStatuses[activeBid.id] }
+    : null;
+
+  const compareBids = compareJobId ? getBidsForJob(compareJobId) : [];
+
+  const FILTERS: { value: StatusFilter; label: string }[] = [
+    { value: "all", label: "All" },
+    { value: "open", label: "Open" },
+    { value: "in_progress", label: "In Progress" },
+    { value: "completed", label: "Completed" },
+  ];
 
   return (
-    <div className="p-8">
-      <AppHeader
-        title="My Jobs"
-        subtitle="Track your jobs, review bids, and compare contractors."
-      />
+    <div className="flex flex-col min-h-full bg-surface">
+      {/* Shadow header */}
+      <div className="px-6 pt-5 pb-4 bg-white shadow-[0_4px_16px_-2px_rgba(0,0,0,0.1)] relative z-10">
+        <h1 className="text-[22px] font-semibold text-gray-900 tracking-tight">My Jobs</h1>
+        <p className="text-sm text-gray-500 mt-0.5">Track jobs, review bids, and compare contractors.</p>
+      </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-6">
-          <TabsTrigger value="myjobs">My Jobs</TabsTrigger>
-          <TabsTrigger value="bids">Bids</TabsTrigger>
-          <TabsTrigger value="compare">Compare</TabsTrigger>
-        </TabsList>
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto p-6">
+        {/* Filter pills + count */}
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-2">
+            {FILTERS.map((f) => (
+              <button
+                key={f.value}
+                onClick={() => setFilter(f.value)}
+                className={cn(
+                  "text-sm font-medium rounded-full px-3.5 py-1.5 border transition-colors",
+                  filter === f.value
+                    ? "bg-gray-900 text-white border-gray-900"
+                    : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                )}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+          <span className="text-sm text-gray-500">
+            {filteredJobs.length} job{filteredJobs.length !== 1 ? "s" : ""}
+          </span>
+        </div>
 
-        <TabsContent value="myjobs">
-          <MyJobsTab onSwitchToBids={() => setActiveTab("bids")} />
-        </TabsContent>
+        {/* Job list */}
+        {filteredJobs.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
+              <FileText className="h-7 w-7 text-gray-400" />
+            </div>
+            <p className="text-base font-semibold text-gray-700">No jobs yet.</p>
+            <p className="text-sm text-gray-400 mt-1">
+              Post one from your{" "}
+              <Link href="/homeowner/dashboard" className="text-brand-600 font-medium hover:underline">
+                Dashboard
+              </Link>
+              .
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {filteredJobs.map((job) => {
+              const bids = getBidsForJob(job.id);
+              const isExpanded = expandedJobId === job.id;
+              const statusBadge = STATUS_BADGE[job.status] ?? STATUS_BADGE.open;
+              const comparableBids = bids.filter((b) => b.status !== "declined");
 
-        <TabsContent value="bids">
-          <BidsTab />
-        </TabsContent>
+              return (
+                <div key={job.id} className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+                  {/* Job row */}
+                  <button
+                    onClick={() => setExpandedJobId(isExpanded ? null : job.id)}
+                    className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-gray-50/50 transition-colors"
+                  >
+                    <CategoryIcon category={job.category} />
 
-        <TabsContent value="compare">
-          <CompareTab />
-        </TabsContent>
-      </Tabs>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="text-sm font-semibold text-gray-900 truncate">{job.title}</h3>
+                        <span
+                          className={cn(
+                            "text-[11px] font-medium border rounded-full px-2 py-0.5",
+                            statusBadge.className
+                          )}
+                        >
+                          {statusBadge.label}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
+                        <span>{formatDate(job.postedDate)}</span>
+                        <span className="font-medium text-gray-700">
+                          {bids.length} bid{bids.length !== 1 ? "s" : ""}
+                        </span>
+                        <span>
+                          {formatCurrency(job.budget.min)} – {formatCurrency(job.budget.max)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex-shrink-0 text-gray-400">
+                      {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    </div>
+                  </button>
+
+                  {/* Expanded: description + bids */}
+                  {isExpanded && (
+                    <div className="border-t border-gray-100 px-5 py-4 bg-gray-50/30">
+                      {/* Description */}
+                      <p className="text-sm text-gray-600 leading-relaxed mb-3">{job.description}</p>
+
+                      {/* Photos placeholder */}
+                      {job.photos.length > 0 && (
+                        <div className="flex gap-2 mb-4">
+                          {job.photos.slice(0, 3).map((photo, idx) => (
+                            <div key={idx} className="w-20 h-20 rounded-lg bg-gray-200 border border-gray-300 flex items-center justify-center">
+                              <span className="text-[10px] text-gray-400">Photo</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Bids section header */}
+                      <div className="flex items-center justify-between mb-3">
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                          Bids Received ({bids.length})
+                        </p>
+                        {comparableBids.length >= 2 && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="gap-1.5 text-xs"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setCompareJobId(job.id);
+                            }}
+                          >
+                            <Scale className="h-3.5 w-3.5" />
+                            Compare Bids
+                          </Button>
+                        )}
+                      </div>
+
+                      {bids.length === 0 ? (
+                        <p className="text-sm text-gray-400 py-4 text-center">No bids yet. Check back soon.</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {bids.map((bid) => (
+                            <InlineBidCard
+                              key={bid.id}
+                              bid={bid}
+                              onViewFull={() => setActiveBid(bid)}
+                              onAccept={() => handleAccept(bid.id)}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Bid detail dialog */}
+      {effectiveActiveBid && (
+        <BidDialog
+          bid={effectiveActiveBid as Bid}
+          open={!!activeBid}
+          onClose={() => setActiveBid(null)}
+          onAccept={handleAccept}
+          onDecline={handleDecline}
+        />
+      )}
+
+      {/* Compare modal */}
+      {compareJobId && (
+        <CompareModal
+          open={!!compareJobId}
+          onClose={() => setCompareJobId(null)}
+          bids={compareBids}
+          bidStatuses={bidStatuses}
+          onAccept={handleAccept}
+        />
+      )}
     </div>
   );
 }

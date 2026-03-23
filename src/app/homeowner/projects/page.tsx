@@ -520,6 +520,14 @@ function ChangeOrdersSection({ changeOrders }: { changeOrders: ChangeOrder[] }) 
 
 // ─── Sidebar Project Item ───────────────────────────────────────────────────────
 
+function formatCompact(amount: number): string {
+  if (amount >= 1000) {
+    const val = amount / 1000;
+    return `$${val % 1 === 0 ? val.toFixed(0) : val.toFixed(1)}K`;
+  }
+  return `$${amount}`;
+}
+
 function SidebarProjectItem({
   project,
   selected,
@@ -533,45 +541,36 @@ function SidebarProjectItem({
     <button
       onClick={onClick}
       className={cn(
-        "w-full text-left rounded-xl p-3.5 transition-colors",
-        selected ? "bg-gray-900 text-white" : "bg-white hover:bg-gray-50 border border-gray-200"
+        "w-full text-left rounded-lg p-3.5 transition-colors relative overflow-hidden",
+        selected
+          ? "bg-white border-l-4 border-l-brand-600 border-y border-r border-gray-200"
+          : "bg-white hover:bg-gray-100 border border-transparent"
       )}
     >
-      <div className="flex items-center justify-between gap-2 mb-1">
-        <h3 className={cn("text-sm font-bold truncate", selected ? "text-white" : "text-gray-900")}>
+      <div className="flex items-center gap-2 mb-1">
+        <span
+          className={cn(
+            "h-2 w-2 rounded-full flex-shrink-0",
+            project.status === "in-progress" ? "bg-emerald-500" : "bg-blue-500"
+          )}
+        />
+        <h3 className="text-sm font-bold text-gray-900 truncate">
           {project.title}
         </h3>
-        <Badge
-          className={cn(
-            "text-[10px] flex-shrink-0",
-            project.status === "in-progress"
-              ? selected
-                ? "bg-blue-500/20 text-blue-200 border-transparent"
-                : "bg-blue-50 text-blue-700 border-transparent"
-              : selected
-              ? "bg-emerald-500/20 text-emerald-200 border-transparent"
-              : "bg-emerald-50 text-emerald-700 border-transparent"
-          )}
-        >
-          {project.status === "in-progress" ? "In Progress" : "Completed"}
-        </Badge>
       </div>
-      <p className={cn("text-xs mb-2.5", selected ? "text-gray-300" : "text-gray-500")}>
+      <p className="text-xs text-gray-500 mb-2 ml-4">
         {project.contractor.name}
       </p>
-      <div className="flex items-center justify-between mb-1.5">
-        <div className={cn(
-          "h-1.5 flex-1 rounded-full overflow-hidden mr-3",
-          selected ? "bg-white/20" : "bg-gray-100"
-        )}>
-          <div
-            className={cn("h-full rounded-full", selected ? "bg-white" : "bg-brand-600")}
-            style={{ width: `${project.progress}%` }}
-          />
-        </div>
-        <span className={cn("text-xs font-bold", selected ? "text-white" : "text-brand-600")}>
-          {project.progress}%
-        </span>
+      <p className="text-xs text-gray-400 ml-4">
+        {formatCompact(project.spent)} / {formatCompact(project.budget)}
+      </p>
+
+      {/* Thin progress line at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gray-100">
+        <div
+          className="h-full bg-brand-600 transition-all"
+          style={{ width: `${project.progress}%` }}
+        />
       </div>
     </button>
   );
@@ -583,58 +582,74 @@ export default function HomeownerProjectsPage() {
   const [selectedId, setSelectedId] = useState(PROJECTS[0].id);
   const selected = PROJECTS.find((p) => p.id === selectedId) || PROJECTS[0];
 
+  const totalBudget = PROJECTS.reduce((sum, p) => sum + p.budget, 0);
+  const totalPaid = PROJECTS.reduce((sum, p) => sum + p.spent, 0);
+
   return (
-    <div className="flex flex-col h-full min-h-screen bg-surface">
-      {/* Header */}
-      <div className="px-6 pt-5 pb-4 bg-white shadow-[0_4px_16px_-2px_rgba(0,0,0,0.1)] relative z-10">
-        <h1 className="text-xl font-bold text-gray-900">My Projects</h1>
-        <p className="text-sm text-gray-500 mt-0.5">
-          Track progress, payments, and documents for your active projects.
-        </p>
-      </div>
-
-      {/* Body */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left Sidebar */}
-        <div className="w-72 flex-shrink-0 border-r border-gray-200 bg-white p-4 overflow-y-auto">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-1">
-            {PROJECTS.length} Projects
+    <div className="flex h-full min-h-screen">
+      {/* Left Sidebar */}
+      <aside className="w-80 flex-shrink-0 border-r border-border bg-gray-50 flex flex-col overflow-y-auto">
+        {/* Sidebar Header */}
+        <div className="p-5 pb-4">
+          <h1 className="text-lg font-bold text-gray-900">My Projects</h1>
+          <p className="text-xs text-gray-500 mt-0.5">
+            Track progress, payments, and documents.
           </p>
-          <div className="space-y-2">
-            {PROJECTS.map((project) => (
-              <SidebarProjectItem
-                key={project.id}
-                project={project}
-                selected={project.id === selectedId}
-                onClick={() => setSelectedId(project.id)}
-              />
-            ))}
+        </div>
+
+        {/* Summary Section */}
+        <div className="mx-5 mb-4 rounded-lg border border-gray-200 bg-white p-4">
+          <div className="grid grid-cols-3 gap-3 text-center">
+            <div>
+              <p className="text-lg font-bold text-gray-900">{PROJECTS.length}</p>
+              <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Projects</p>
+            </div>
+            <div>
+              <p className="text-lg font-bold text-gray-900">{formatCompact(totalBudget)}</p>
+              <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Budget</p>
+            </div>
+            <div>
+              <p className="text-lg font-bold text-emerald-700">{formatCompact(totalPaid)}</p>
+              <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Paid</p>
+            </div>
           </div>
         </div>
 
-        {/* Right Content */}
-        <div className="flex-1 overflow-y-auto p-6">
-          <div className="max-w-3xl space-y-5">
-            {/* Status Banner */}
-            <StatusBannerSection banner={selected.banner} />
-
-            {/* Contractor Card */}
-            <ContractorCard contractor={selected.contractor} />
-
-            {/* Progress & Milestones */}
-            <MilestonesSection project={selected} />
-
-            {/* Payments */}
-            <PaymentsSection payments={selected.payments} />
-
-            {/* Documents */}
-            <DocumentsSection documents={selected.documents} />
-
-            {/* Change Orders */}
-            <ChangeOrdersSection changeOrders={selected.changeOrders} />
-          </div>
+        {/* Project List */}
+        <div className="px-5 pb-5 space-y-2 flex-1">
+          {PROJECTS.map((project) => (
+            <SidebarProjectItem
+              key={project.id}
+              project={project}
+              selected={project.id === selectedId}
+              onClick={() => setSelectedId(project.id)}
+            />
+          ))}
         </div>
-      </div>
+      </aside>
+
+      {/* Right Content */}
+      <main className="flex-1 overflow-y-auto p-6">
+        <div className="max-w-3xl space-y-5">
+          {/* Status Banner */}
+          <StatusBannerSection banner={selected.banner} />
+
+          {/* Contractor Card */}
+          <ContractorCard contractor={selected.contractor} />
+
+          {/* Progress & Milestones */}
+          <MilestonesSection project={selected} />
+
+          {/* Payments */}
+          <PaymentsSection payments={selected.payments} />
+
+          {/* Documents */}
+          <DocumentsSection documents={selected.documents} />
+
+          {/* Change Orders */}
+          <ChangeOrdersSection changeOrders={selected.changeOrders} />
+        </div>
+      </main>
     </div>
   );
 }
