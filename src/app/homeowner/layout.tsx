@@ -6,7 +6,6 @@ import Link from "next/link";
 import {
   LayoutDashboard,
   Briefcase,
-  Search,
   FolderOpen,
   Star,
   Settings,
@@ -20,7 +19,6 @@ import { cn } from "@shared/lib/utils";
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/homeowner/dashboard", icon: LayoutDashboard },
   { label: "My Jobs", href: "/homeowner/jobs", icon: Briefcase },
-  { label: "Find Contractors", href: "/homeowner/contractors", icon: Search },
   { label: "Projects", href: "/homeowner/projects", icon: FolderOpen },
   { label: "Reviews", href: "/homeowner/reviews", icon: Star },
   { label: "Settings", href: "/homeowner/settings", icon: Settings },
