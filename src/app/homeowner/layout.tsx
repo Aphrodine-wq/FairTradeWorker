@@ -1,24 +1,57 @@
 "use client";
 
+import React from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import {
   LayoutDashboard,
   Briefcase,
-  Users,
+  Search,
   FolderOpen,
+  Star,
+  Settings,
   MessageSquare,
+  Bell,
   Plus,
 } from "lucide-react";
 import { Sidebar } from "@shared/components/sidebar";
+import { cn } from "@shared/lib/utils";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/homeowner/dashboard", icon: LayoutDashboard },
   { label: "My Jobs", href: "/homeowner/jobs", icon: Briefcase },
-  { label: "Find Contractors", href: "/homeowner/contractors", icon: Users },
+  { label: "Find Contractors", href: "/homeowner/contractors", icon: Search },
   { label: "Projects", href: "/homeowner/projects", icon: FolderOpen },
-  { label: "Messages", href: "/homeowner/messages", icon: MessageSquare },
+  { label: "Reviews", href: "/homeowner/reviews", icon: Star },
+  { label: "Settings", href: "/homeowner/settings", icon: Settings },
 ];
+
+function GlobalTopBar({ pathname }: { pathname: string }) {
+  return (
+    <div className="h-11 flex items-center justify-end gap-2 px-4 bg-white border-b border-gray-200 flex-shrink-0">
+      <Link
+        href="/homeowner/messages"
+        className={cn(
+          "relative w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors",
+          pathname === "/homeowner/messages" && "bg-gray-100"
+        )}
+      >
+        <MessageSquare className="w-[18px] h-[18px] text-gray-500" />
+        <span className="absolute top-1 right-1 w-2 h-2 bg-brand-600 rounded-full" />
+      </Link>
+      <Link
+        href="/homeowner/notifications"
+        className={cn(
+          "relative w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors",
+          pathname === "/homeowner/notifications" && "bg-gray-100"
+        )}
+      >
+        <Bell className="w-[18px] h-[18px] text-gray-500" />
+        <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+      </Link>
+    </div>
+  );
+}
 
 export default function HomeownerLayout({
   children,
@@ -44,6 +77,7 @@ export default function HomeownerLayout({
         }
       />
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+        <GlobalTopBar pathname={pathname} />
         <main className="flex-1 overflow-y-auto">
           {children}
         </main>

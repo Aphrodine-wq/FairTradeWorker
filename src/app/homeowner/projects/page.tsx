@@ -4,641 +4,637 @@ import React, { useState } from "react";
 import {
   Check,
   Circle,
-  ChevronDown,
-  ChevronUp,
   Clock,
   DollarSign,
-  CalendarDays,
   Shield,
-  Plus,
-  Upload,
+  ShieldCheck,
   Phone,
-  Mail,
+  MessageSquare,
   FileText,
-  CheckCircle2,
-  AlertTriangle,
-  XCircle,
-  RefreshCw,
+  Camera,
   ClipboardCheck,
+  Star,
+  ChevronRight,
+  AlertCircle,
+  CheckCircle2,
+  ArrowUpRight,
+  CreditCard,
+  ExternalLink,
 } from "lucide-react";
-import { AppHeader } from "@shared/components/app-header";
 import { Button } from "@shared/ui/button";
 import { Card, CardContent } from "@shared/ui/card";
-import { Input } from "@shared/ui/input";
-import { Textarea } from "@shared/ui/textarea";
 import { Badge } from "@shared/ui/badge";
 import { Progress } from "@shared/ui/progress";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@shared/ui/tabs";
 import { Separator } from "@shared/ui/separator";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@shared/ui/dialog";
 import { cn, formatCurrency, formatDate } from "@shared/lib/utils";
-import { mockProjects, type Project } from "@shared/lib/mock-data";
 
-// ─── Active Tab ────────────────────────────────────────────────────────────────
+// ─── Types ──────────────────────────────────────────────────────────────────────
 
-function ProjectCard({ project }: { project: Project }) {
-  const [expanded, setExpanded] = useState(false);
-  const completedMilestones = project.milestones.filter((m) => m.completed).length;
-  const budgetPct = Math.min(100, Math.round((project.spent / project.budget) * 100));
-  const overBudget = project.spent > project.budget;
-
-  return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-5">
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-0.5">
-              <h3 className="font-semibold text-gray-900 truncate">{project.title}</h3>
-              <Badge variant="info">In Progress</Badge>
-            </div>
-            <p className="text-sm text-gray-500">{project.contractor}</p>
-          </div>
-          <button
-            onClick={() => setExpanded((e) => !e)}
-            className="flex-shrink-0 w-7 h-7 rounded-md hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
-            aria-label={expanded ? "Collapse" : "Expand"}
-          >
-            {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-          </button>
-        </div>
-
-        <div className="mb-4">
-          <div className="flex justify-between items-center mb-1.5">
-            <span className="text-xs text-gray-500">
-              {completedMilestones}/{project.milestones.length} milestones
-            </span>
-            <span className="text-xs font-semibold text-brand-600">{project.progress}%</span>
-          </div>
-          <Progress value={project.progress} className="h-2" />
-        </div>
-
-        <div className="grid grid-cols-3 gap-3 text-center">
-          <div className="p-2 bg-surface rounded-lg">
-            <DollarSign className="h-3.5 w-3.5 text-gray-400 mx-auto mb-0.5" />
-            <p className="text-xs font-semibold text-gray-900">{formatCurrency(project.budget)}</p>
-            <p className="text-xs text-gray-400">Budget</p>
-          </div>
-          <div className="p-2 bg-surface rounded-lg">
-            <CalendarDays className="h-3.5 w-3.5 text-gray-400 mx-auto mb-0.5" />
-            <p className="text-xs font-semibold text-gray-900">{formatDate(project.startDate)}</p>
-            <p className="text-xs text-gray-400">Started</p>
-          </div>
-          <div className="p-2 bg-surface rounded-lg">
-            <Clock className="h-3.5 w-3.5 text-gray-400 mx-auto mb-0.5" />
-            <p className="text-xs font-semibold text-gray-900">{formatDate(project.estimatedEnd)}</p>
-            <p className="text-xs text-gray-400">Est. End</p>
-          </div>
-        </div>
-
-        {expanded && (
-          <>
-            <Separator className="my-4" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-3">Milestones</p>
-                <div className="space-y-2">
-                  {project.milestones.map((milestone, i) => (
-                    <div key={i} className="flex items-center gap-2.5">
-                      {milestone.completed ? (
-                        <div className="w-5 h-5 rounded-full bg-brand-600 flex items-center justify-center flex-shrink-0">
-                          <Check className="h-3 w-3 text-white" />
-                        </div>
-                      ) : (
-                        <div className="w-5 h-5 rounded-full border-2 border-gray-200 flex items-center justify-center flex-shrink-0">
-                          <Circle className="h-2 w-2 text-gray-300" />
-                        </div>
-                      )}
-                      <span className={cn("text-sm", milestone.completed ? "text-gray-700" : "text-gray-400")}>
-                        {milestone.name}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-3">Budget</p>
-                <div>
-                  <div className="flex justify-between text-xs mb-1.5">
-                    <span className="text-gray-500">Usage</span>
-                    <span className={cn("font-semibold", overBudget ? "text-red-500" : "text-gray-900")}>{budgetPct}%</span>
-                  </div>
-                  <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-100">
-                    <div
-                      className={cn("h-full rounded-full", overBudget ? "bg-red-500" : "bg-brand-600")}
-                      style={{ width: `${budgetPct}%` }}
-                    />
-                  </div>
-                  <div className="flex justify-between text-xs mt-1 text-gray-400">
-                    <span>{formatCurrency(project.spent)} spent</span>
-                    <span>{formatCurrency(project.budget)} total</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-      </CardContent>
-    </Card>
-  );
+interface Milestone {
+  name: string;
+  status: "completed" | "in-progress" | "upcoming";
+  date?: string;
+  payment: number;
+  paidDate?: string;
 }
 
-// ─── Warranties Tab ────────────────────────────────────────────────────────────
-
-type CoverageType = "Manufacturer" | "Workmanship" | "Lifetime";
-type WarrantyStatus = "active" | "expiring" | "expired" | "lifetime";
-
-interface Warranty {
-  id: string;
-  item: string;
-  coverageType: CoverageType;
-  expiresYear: number | null;
-  contractor: string;
-  contractorPhone: string;
-  contractorEmail: string;
-  project: string;
-  startDate: string;
+interface Payment {
+  date: string;
   description: string;
-  exclusions: string;
-  claimProcess: string;
-  documentName: string | null;
+  amount: number;
+  status: "paid" | "due" | "upcoming";
 }
 
-const TODAY_YEAR = 2026;
+interface Document {
+  name: string;
+  type: "pdf" | "photo" | "report";
+  badge?: string;
+  badgeVariant?: "success" | "warning";
+  count?: number;
+}
 
-const MOCK_WARRANTIES: Warranty[] = [
+interface ChangeOrder {
+  id: string;
+  description: string;
+  costDifference: number;
+  reason: string;
+  status: "pending" | "approved" | "declined";
+}
+
+interface Contractor {
+  name: string;
+  initials: string;
+  rating: number;
+  reviews: number;
+  verified: boolean;
+}
+
+interface StatusBanner {
+  type: "payment-due" | "input-needed" | "on-track";
+  message: string;
+  actionLabel?: string;
+}
+
+interface HomeownerProject {
+  id: string;
+  title: string;
+  contractor: Contractor;
+  status: "in-progress" | "completed";
+  progress: number;
+  budget: number;
+  spent: number;
+  milestones: Milestone[];
+  payments: Payment[];
+  documents: Document[];
+  changeOrders: ChangeOrder[];
+  banner: StatusBanner;
+}
+
+// ─── Mock Data ──────────────────────────────────────────────────────────────────
+
+const PROJECTS: HomeownerProject[] = [
   {
-    id: "w1", item: "Owens Corning Platinum Roof Warranty", coverageType: "Manufacturer", expiresYear: 2051,
-    contractor: "Mitchell Roofing Co.", contractorPhone: "(512) 555-0142", contractorEmail: "james@mitchellroofing.com",
-    project: "Full Roof Replacement", startDate: "2026-01-14",
-    description: "Owens Corning Platinum Protection limited lifetime warranty covering manufacturing defects in Timberline HDZ shingles, ridge cap, and underlayment system. Labor warranty included through Mitchell Roofing for 25 years.",
-    exclusions: "Does not cover damage from acts of nature (hail, wind exceeding 130 mph), improper modifications, or failure to maintain gutters and ventilation.",
-    claimProcess: "Contact Mitchell Roofing Co. first for labor-related issues. For manufacturer defects, call Owens Corning Warranty at 1-800-438-7465 with warranty registration number OC-2026-TX-44821.",
-    documentName: "OwensCorning_Platinum_Warranty_2026.pdf",
+    id: "proj-1",
+    title: "Kitchen Remodel",
+    status: "in-progress",
+    progress: 65,
+    budget: 38500,
+    spent: 25000,
+    contractor: {
+      name: "Marcus Johnson",
+      initials: "MJ",
+      rating: 4.9,
+      reviews: 23,
+      verified: true,
+    },
+    banner: {
+      type: "payment-due",
+      message:
+        "Marcus Johnson marked Demolition as complete. Payment of $7,700 is due.",
+      actionLabel: "Approve & Pay",
+    },
+    milestones: [
+      { name: "Deposit & Permits", status: "completed", date: "Jan 15, 2026", payment: 5775, paidDate: "Jan 15, 2026" },
+      { name: "Demolition", status: "completed", date: "Feb 3, 2026", payment: 7700, paidDate: "Feb 5, 2026" },
+      { name: "Rough Plumbing & Electrical", status: "completed", date: "Feb 20, 2026", payment: 7700, paidDate: "Feb 22, 2026" },
+      { name: "Cabinet Install", status: "in-progress", payment: 7700 },
+      { name: "Countertops & Backsplash", status: "upcoming", payment: 5775 },
+      { name: "Final Finishes & Walkthrough", status: "upcoming", payment: 3850 },
+    ],
+    payments: [
+      { date: "2026-01-15", description: "Deposit & Permits", amount: 5775, status: "paid" },
+      { date: "2026-02-05", description: "Milestone: Demolition", amount: 7700, status: "paid" },
+      { date: "2026-02-22", description: "Milestone: Rough Plumbing & Electrical", amount: 7700, status: "paid" },
+      { date: "2026-03-20", description: "Milestone: Cabinet Install", amount: 7700, status: "due" },
+      { date: "2026-04-10", description: "Milestone: Countertops & Backsplash", amount: 5775, status: "upcoming" },
+      { date: "2026-05-01", description: "Final Payment", amount: 3850, status: "upcoming" },
+    ],
+    documents: [
+      { name: "Original Estimate", type: "pdf" },
+      { name: "Signed Contract", type: "pdf" },
+      { name: "Change Order #1", type: "pdf", badge: "Pending Approval", badgeVariant: "warning" },
+      { name: "Project Photos", type: "photo", count: 12 },
+      { name: "Inspection Report", type: "report", badge: "Passed", badgeVariant: "success" },
+    ],
+    changeOrders: [
+      {
+        id: "co-1",
+        description: "Upgrade to quartz countertops (from laminate)",
+        costDifference: 2400,
+        reason: "Homeowner requested premium material upgrade during cabinet phase.",
+        status: "pending",
+      },
+    ],
   },
   {
-    id: "w2", item: "Kohler Faucet Limited Lifetime Warranty", coverageType: "Lifetime", expiresYear: null,
-    contractor: "Johnson & Sons Construction", contractorPhone: "(512) 555-0119", contractorEmail: "marcus@johnsonandsons.com",
-    project: "Kitchen Remodel", startDate: "2026-03-01",
-    description: "Kohler limited lifetime warranty on all faucet parts and finishes against defects in materials and workmanship for as long as the original purchaser owns their home.",
-    exclusions: "Does not cover damage from misuse, accident, or repair by anyone other than an authorized Kohler service provider. Finish warranty excludes harsh cleaners.",
-    claimProcess: "Call Kohler Customer Service at 1-800-456-4537 with model number K-99261-VS and proof of purchase.",
-    documentName: "Kohler_Lifetime_Warranty_Card.pdf",
-  },
-  {
-    id: "w3", item: "Quartz Countertop 15-Year Warranty", coverageType: "Manufacturer", expiresYear: 2041,
-    contractor: "Johnson & Sons Construction", contractorPhone: "(512) 555-0119", contractorEmail: "marcus@johnsonandsons.com",
-    project: "Kitchen Remodel", startDate: "2026-03-01",
-    description: "Cambria 15-year limited warranty on Calacatta Laza quartz countertops against cracking, warping, or staining under normal residential use.",
-    exclusions: "Does not cover chips or cracks from impact, heat damage from pots placed directly on surface, or harsh chemicals. Cutting on the surface voids the warranty.",
-    claimProcess: "Document damage with photos. Contact Cambria at 1-866-226-2742 with warranty card number CAM-26-TX-9914.",
-    documentName: "Cambria_15yr_Warranty_2026.pdf",
-  },
-  {
-    id: "w4", item: "HVAC Equipment 10-Year Warranty", coverageType: "Manufacturer", expiresYear: 2036,
-    contractor: "Pending — HVAC Installation", contractorPhone: "—", contractorEmail: "—",
-    project: "HVAC System Replacement", startDate: "2026-03-28",
-    description: "Carrier 10-year parts warranty on the Infinity Series 24-SEER2 heat pump system. Requires annual professional maintenance to maintain warranty validity.",
-    exclusions: "Warranty void if system is not registered within 90 days of installation. Does not cover refrigerant recharge, filters, labor, or damage from improper installation.",
-    claimProcess: "Contact your licensed Carrier dealer first. If unresolved, call Carrier Customer Support at 1-800-227-7437.",
-    documentName: null,
-  },
-  {
-    id: "w5", item: "Interior Paint Workmanship 2-Year", coverageType: "Workmanship", expiresYear: 2028,
-    contractor: "Thompson Painting & Finishes", contractorPhone: "(817) 555-0088", contractorEmail: "lisa@thompsonpainting.com",
-    project: "Interior Painting", startDate: "2026-01-20",
-    description: "Thompson Painting 2-year workmanship warranty covering peeling, blistering, or premature failure of paint adhesion on all interior walls, ceilings, and trim.",
-    exclusions: "Does not cover damage from water leaks, structural movement, or intentional damage. Normal wear and scuffs are not covered.",
-    claimProcess: "Contact Lisa Thompson directly. Send photos of the issue — Thompson Painting will schedule an inspection within 5 business days.",
-    documentName: "Thompson_Painting_Warranty_2026.pdf",
+    id: "proj-2",
+    title: "Bathroom Renovation",
+    status: "in-progress",
+    progress: 30,
+    budget: 15200,
+    spent: 4500,
+    contractor: {
+      name: "Sarah Williams",
+      initials: "SW",
+      rating: 4.8,
+      reviews: 17,
+      verified: true,
+    },
+    banner: {
+      type: "on-track",
+      message: "Everything is on track. Next milestone: Tile & Waterproofing.",
+    },
+    milestones: [
+      { name: "Deposit & Design", status: "completed", date: "Feb 28, 2026", payment: 2280, paidDate: "Feb 28, 2026" },
+      { name: "Demolition & Rough-In", status: "completed", date: "Mar 10, 2026", payment: 3040, paidDate: "Mar 12, 2026" },
+      { name: "Tile & Waterproofing", status: "in-progress", payment: 3800 },
+      { name: "Fixtures & Vanity", status: "upcoming", payment: 3040 },
+      { name: "Final Details & Cleanup", status: "upcoming", payment: 3040 },
+    ],
+    payments: [
+      { date: "2026-02-28", description: "Deposit & Design", amount: 2280, status: "paid" },
+      { date: "2026-03-12", description: "Milestone: Demolition & Rough-In", amount: 3040, status: "paid" },
+      { date: "2026-04-01", description: "Milestone: Tile & Waterproofing", amount: 3800, status: "upcoming" },
+      { date: "2026-04-20", description: "Final Payment", amount: 6080, status: "upcoming" },
+    ],
+    documents: [
+      { name: "Original Estimate", type: "pdf" },
+      { name: "Signed Contract", type: "pdf" },
+      { name: "Project Photos", type: "photo", count: 6 },
+    ],
+    changeOrders: [],
   },
 ];
 
-function getWarrantyStatus(w: Warranty): WarrantyStatus {
-  if (w.expiresYear === null) return "lifetime";
-  if (w.expiresYear < TODAY_YEAR) return "expired";
-  if (w.expiresYear - TODAY_YEAR <= 1) return "expiring";
-  return "active";
-}
+// ─── Status Banner ──────────────────────────────────────────────────────────────
 
-const WARRANTY_STATUS_CONFIG: Record<
-  WarrantyStatus,
-  { label: string; icon: React.FC<{ className?: string }>; bar: string; text: string; badge: string; bg: string }
-> = {
-  active: { label: "Active", icon: CheckCircle2, bar: "bg-brand-600", text: "text-brand-600", badge: "bg-brand-50 text-brand-700 border-brand-200", bg: "bg-brand-50" },
-  expiring: { label: "Expiring Soon", icon: AlertTriangle, bar: "bg-amber-500", text: "text-amber-600", badge: "bg-amber-50 text-amber-700 border-amber-200", bg: "bg-amber-50" },
-  expired: { label: "Expired", icon: XCircle, bar: "bg-red-500", text: "text-red-500", badge: "bg-red-50 text-red-700 border-red-200", bg: "bg-red-50" },
-  lifetime: { label: "Lifetime", icon: Shield, bar: "bg-violet-600", text: "text-violet-600", badge: "bg-violet-50 text-violet-700 border-violet-200", bg: "bg-violet-50" },
-};
-
-const COVERAGE_BADGE: Record<CoverageType, string> = {
-  Manufacturer: "bg-blue-50 text-blue-700 border-blue-200",
-  Workmanship: "bg-gray-100 text-gray-600 border-gray-200",
-  Lifetime: "bg-violet-50 text-violet-700 border-violet-200",
-};
-
-function WarrantyRow({ warranty }: { warranty: Warranty }) {
-  const [expanded, setExpanded] = useState(false);
-  const status = getWarrantyStatus(warranty);
-  const cfg = WARRANTY_STATUS_CONFIG[status];
-  const Icon = cfg.icon;
-  const yrs = warranty.expiresYear ? warranty.expiresYear - TODAY_YEAR : null;
+function StatusBannerSection({ banner }: { banner: StatusBanner }) {
+  const config = {
+    "payment-due": {
+      bg: "bg-amber-50 border-amber-200",
+      icon: <CreditCard className="h-5 w-5 text-amber-600 flex-shrink-0" />,
+      text: "text-amber-900",
+    },
+    "input-needed": {
+      bg: "bg-blue-50 border-blue-200",
+      icon: <AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0" />,
+      text: "text-blue-900",
+    },
+    "on-track": {
+      bg: "bg-emerald-50 border-emerald-200",
+      icon: <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0" />,
+      text: "text-emerald-900",
+    },
+  }[banner.type];
 
   return (
-    <div className="border border-gray-200 rounded-xl bg-white overflow-hidden">
-      <div className={cn("h-0.5", cfg.bar)} />
-      <div
-        className="flex items-start gap-4 px-5 py-4 cursor-pointer hover:bg-gray-50/50 transition-colors"
-        onClick={() => setExpanded((v) => !v)}
-      >
-        <div className={cn("flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg mt-0.5", cfg.bg)}>
-          <Icon className={cn("h-4 w-4", cfg.text)} />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-sm font-bold text-gray-900 leading-snug">{warranty.item}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{warranty.project}</p>
-            </div>
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <span className={cn("text-xs font-medium border rounded-full px-2.5 py-0.5", COVERAGE_BADGE[warranty.coverageType])}>
-                {warranty.coverageType}
-              </span>
-              <span className={cn("text-xs font-medium border rounded-full px-2.5 py-0.5", cfg.badge)}>
-                {cfg.label}
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-            <span className="flex items-center gap-1">
-              <CalendarDays className="h-3 w-3" />
-              {warranty.expiresYear === null
-                ? "Lifetime coverage"
-                : yrs !== null && yrs > 0
-                ? `Expires ${warranty.expiresYear} — ${yrs} yr${yrs !== 1 ? "s" : ""} remaining`
-                : `Expired ${warranty.expiresYear}`}
-            </span>
-            <span>{warranty.contractor}</span>
-          </div>
-        </div>
-        <div className="flex-shrink-0 text-gray-400 mt-1">
-          {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-        </div>
-      </div>
-
-      {expanded && (
-        <div className="border-t border-gray-100 px-5 pb-5 pt-4 space-y-4">
-          <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Coverage</p>
-            <p className="text-sm text-gray-700 leading-relaxed">{warranty.description}</p>
-          </div>
-          <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Exclusions</p>
-            <p className="text-sm text-gray-600 leading-relaxed">{warranty.exclusions}</p>
-          </div>
-          <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">How to File a Claim</p>
-            <p className="text-sm text-gray-700 leading-relaxed">{warranty.claimProcess}</p>
-          </div>
-          <Separator />
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Contractor Contact</p>
-              <p className="text-sm font-semibold text-gray-900">{warranty.contractor}</p>
-              {warranty.contractorPhone !== "—" && (
-                <div className="flex items-center gap-1.5 text-sm text-gray-600 mt-1">
-                  <Phone className="h-3.5 w-3.5 text-gray-400" />
-                  {warranty.contractorPhone}
-                </div>
-              )}
-              {warranty.contractorEmail !== "—" && (
-                <div className="flex items-center gap-1.5 text-sm text-gray-600 mt-0.5">
-                  <Mail className="h-3.5 w-3.5 text-gray-400" />
-                  {warranty.contractorEmail}
-                </div>
-              )}
-            </div>
-            {warranty.documentName && (
-              <button className="flex items-center gap-2 text-sm text-brand-600 font-medium border border-brand-200 bg-brand-50 rounded-lg px-3 py-2 hover:bg-brand-100 transition-colors">
-                <FileText className="h-4 w-4" />
-                {warranty.documentName}
-              </button>
-            )}
-          </div>
-        </div>
+    <div className={cn("flex items-center gap-3 rounded-xl border p-4", config.bg)}>
+      {config.icon}
+      <p className={cn("text-sm font-medium flex-1", config.text)}>{banner.message}</p>
+      {banner.actionLabel && (
+        <Button size="sm" className="flex-shrink-0">
+          {banner.actionLabel}
+        </Button>
       )}
     </div>
   );
 }
 
-function AddWarrantyDialog() {
-  const [open, setOpen] = useState(false);
+// ─── Contractor Card ────────────────────────────────────────────────────────────
+
+function ContractorCard({ contractor }: { contractor: Contractor }) {
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" />
-          Add Warranty
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle>Add Warranty Record</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4 mt-4">
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Item / Product Name</label>
-            <Input placeholder="e.g. Owens Corning Timberline HDZ Shingles" />
+    <Card>
+      <CardContent className="p-5">
+        <div className="flex items-center gap-4">
+          <div className="h-12 w-12 rounded-full bg-brand-600 flex items-center justify-center flex-shrink-0">
+            <span className="text-sm font-bold text-white">{contractor.initials}</span>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Coverage Type</label>
-              <select className="w-full text-sm text-gray-700 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-600">
-                <option>Manufacturer</option>
-                <option>Workmanship</option>
-                <option>Lifetime</option>
-              </select>
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Project</label>
-              <Input placeholder="e.g. Kitchen Remodel" />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Start Date</label>
-              <Input type="date" />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">End Date</label>
-              <Input type="date" placeholder="Leave blank for Lifetime" />
-            </div>
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Contractor</label>
-            <Input placeholder="Company or contractor name" />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Coverage Description</label>
-            <Textarea placeholder="What does this warranty cover?" className="resize-none" rows={3} />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Warranty Document</label>
-            <div className="flex items-center gap-3 border border-dashed border-gray-300 rounded-lg px-4 py-4 bg-gray-50 hover:border-brand-400 hover:bg-brand-50/30 transition-colors cursor-pointer">
-              <Upload className="h-5 w-5 text-gray-400" />
-              <div>
-                <p className="text-sm font-medium text-gray-700">Upload warranty document</p>
-                <p className="text-xs text-gray-400 mt-0.5">PDF, JPG, PNG up to 10MB</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
-          <Button className="flex-1">Save Warranty</Button>
-          <Button variant="outline" className="flex-1" onClick={() => setOpen(false)}>Cancel</Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-// ─── Inspections Tab ───────────────────────────────────────────────────────────
-
-type InspectionStatus = "Passed" | "Failed" | "Scheduled" | "Rescheduled";
-
-interface Inspection {
-  id: string;
-  date: string;
-  type: string;
-  project: string;
-  status: InspectionStatus;
-  inspector: string;
-  notes: string;
-  failItems?: string[];
-}
-
-const MOCK_INSPECTIONS: Inspection[] = [
-  { id: "i1", date: "2026-02-20", type: "Foundation", project: "Kitchen Remodel", status: "Passed", inspector: "City of Austin — Building Dept.", notes: "Foundation slab and subfloor reinforcement approved. No deficiencies noted. Work may proceed to framing." },
-  { id: "i2", date: "2026-02-28", type: "Framing", project: "Kitchen Remodel", status: "Passed", inspector: "City of Austin — Building Dept.", notes: "Framing inspection passed. Soffit removal and load transfer header approved. Joist spans confirmed per plan." },
-  {
-    id: "i3", date: "2026-03-08", type: "Rough Plumbing", project: "Kitchen Remodel", status: "Failed",
-    inspector: "City of Austin — Building Dept.",
-    notes: "Failed — pressure test dropped on island drain connection. Drain slope at dishwasher tie-in insufficient at 1/8\" per foot.",
-    failItems: ["Island drain pressure test failed — re-solder and re-test required", "Dishwasher drain slope insufficient (1/8\"/ft, requires 1/4\"/ft minimum)"],
-  },
-  { id: "i4", date: "2026-03-15", type: "Rough Plumbing (Re-inspection)", project: "Kitchen Remodel", status: "Passed", inspector: "City of Austin — Building Dept.", notes: "Re-inspection passed. Both deficiencies corrected. Pressure test held at 80 PSI for 15 minutes." },
-  { id: "i5", date: "2026-03-12", type: "Rough Electrical", project: "Kitchen Remodel", status: "Passed", inspector: "City of Austin — Building Dept.", notes: "All rough-in wiring approved. Dedicated 20A circuits confirmed. AFCI breakers verified." },
-  { id: "i6", date: "2026-04-10", type: "Final", project: "Kitchen Remodel", status: "Scheduled", inspector: "City of Austin — Building Dept.", notes: "Final inspection scheduled for completion of all finish work." },
-  { id: "i7", date: "2026-03-10", type: "Rough Plumbing", project: "Bathroom Renovation", status: "Rescheduled", inspector: "City of San Antonio — Development Services", notes: "Original date 3/5 rescheduled at inspector's request — department backlog." },
-  { id: "i8", date: "2026-04-15", type: "Final", project: "Bathroom Renovation", status: "Scheduled", inspector: "City of San Antonio — Development Services", notes: "Final inspection pending completion of tile and fixture installation." },
-];
-
-const INSPECTION_STATUS_CONFIG: Record<
-  InspectionStatus,
-  { icon: React.FC<{ className?: string }>; bar: string; bg: string; text: string; badgeBg: string; label: string }
-> = {
-  Passed: { icon: CheckCircle2, bar: "bg-brand-600", bg: "bg-brand-50", text: "text-brand-600", badgeBg: "bg-brand-50 text-brand-700 border-brand-200", label: "Passed" },
-  Failed: { icon: XCircle, bar: "bg-red-500", bg: "bg-red-50", text: "text-red-500", badgeBg: "bg-red-50 text-red-700 border-red-200", label: "Failed" },
-  Scheduled: { icon: Clock, bar: "bg-blue-500", bg: "bg-blue-50", text: "text-blue-500", badgeBg: "bg-blue-50 text-blue-700 border-blue-200", label: "Scheduled" },
-  Rescheduled: { icon: RefreshCw, bar: "bg-amber-500", bg: "bg-amber-50", text: "text-amber-600", badgeBg: "bg-amber-50 text-amber-700 border-amber-200", label: "Rescheduled" },
-};
-
-const INSPECTION_TYPES = ["Foundation", "Framing", "Rough Plumbing", "Rough Electrical", "Insulation", "Drywall", "Final", "Other"];
-
-function InspectionCard({ inspection }: { inspection: Inspection }) {
-  const cfg = INSPECTION_STATUS_CONFIG[inspection.status];
-  const Icon = cfg.icon;
-
-  return (
-    <div className="relative flex gap-4">
-      <div className="flex flex-col items-center">
-        <div className={cn("flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full z-10", cfg.bg)}>
-          <Icon className={cn("h-4 w-4", cfg.text)} />
-        </div>
-      </div>
-      <div className="flex-1 mb-6">
-        <div className="border border-gray-200 rounded-xl bg-white overflow-hidden">
-          <div className={cn("h-0.5", cfg.bar)} />
-          <div className="px-4 py-3.5">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <p className="text-sm font-bold text-gray-900">{inspection.type}</p>
-                  <span className={cn("text-xs font-medium border rounded-full px-2.5 py-0.5", cfg.badgeBg)}>
-                    {cfg.label}
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 mt-0.5">{inspection.project}</p>
-              </div>
-              <div className="flex items-center gap-1.5 text-xs text-gray-500 flex-shrink-0">
-                <CalendarDays className="h-3.5 w-3.5" />
-                {formatDate(inspection.date)}
-              </div>
-            </div>
-
-            {inspection.status === "Failed" && inspection.failItems && (
-              <div className="mt-3 rounded-lg bg-red-50 border border-red-200 px-3 py-2.5">
-                <p className="text-xs font-semibold text-red-700 mb-1.5 flex items-center gap-1.5">
-                  <AlertTriangle className="h-3.5 w-3.5" />
-                  Items Requiring Correction
-                </p>
-                <ul className="space-y-1">
-                  {inspection.failItems.map((item, i) => (
-                    <li key={i} className="text-xs text-red-700 flex items-start gap-1.5">
-                      <span className="mt-1 h-1 w-1 rounded-full bg-red-400 flex-shrink-0" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <p className="text-xs text-gray-600 mt-2.5 leading-relaxed">{inspection.notes}</p>
-            <p className="text-xs text-gray-400 mt-2">{inspection.inspector}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ScheduleInspectionDialog() {
-  const [open, setOpen] = useState(false);
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" />
-          Schedule Inspection
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>Schedule Inspection</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4 mt-4">
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Project</label>
-            <select className="w-full text-sm text-gray-700 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-600">
-              <option>Kitchen Remodel</option>
-              <option>Bathroom Renovation</option>
-            </select>
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Inspection Type</label>
-            <select className="w-full text-sm text-gray-700 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-600">
-              {INSPECTION_TYPES.map((t) => <option key={t}>{t}</option>)}
-            </select>
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Preferred Date</label>
-            <Input type="date" />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Notes</label>
-            <Textarea placeholder="Any relevant notes for the inspection..." className="resize-none" rows={3} />
-          </div>
-        </div>
-        <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
-          <Button className="flex-1">Schedule</Button>
-          <Button variant="outline" className="flex-1" onClick={() => setOpen(false)}>Cancel</Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
-export default function ProjectsPage() {
-  const activeProjects = mockProjects.filter((p) => p.status === "in_progress");
-
-  const inspections = MOCK_INSPECTIONS;
-  const passed = inspections.filter((i) => i.status === "Passed").length;
-  const failed = inspections.filter((i) => i.status === "Failed").length;
-  const scheduled = inspections.filter((i) => i.status === "Scheduled").length;
-  const rescheduled = inspections.filter((i) => i.status === "Rescheduled").length;
-  const total = inspections.length;
-  const inspProjects = Array.from(new Set(inspections.map((i) => i.project)));
-  const grouped = inspProjects.map((p) => ({
-    project: p,
-    items: inspections.filter((i) => i.project === p),
-  }));
-
-  return (
-    <div className="p-8">
-      <AppHeader
-        title="Projects"
-        subtitle="Track your active builds, warranties, and inspections."
-      />
-
-      <Tabs defaultValue="active">
-        <TabsList className="mb-6">
-          <TabsTrigger value="active">Active ({activeProjects.length})</TabsTrigger>
-          <TabsTrigger value="warranties">Warranties</TabsTrigger>
-          <TabsTrigger value="inspections">Inspections</TabsTrigger>
-        </TabsList>
-
-        {/* Active Projects */}
-        <TabsContent value="active" className="space-y-4">
-          {activeProjects.length === 0 ? (
-            <div className="text-center py-16 text-gray-400 text-sm">No active projects.</div>
-          ) : (
-            activeProjects.map((project) => <ProjectCard key={project.id} project={project} />)
-          )}
-        </TabsContent>
-
-        {/* Warranties */}
-        <TabsContent value="warranties">
-          <div className="flex justify-end mb-4">
-            <AddWarrantyDialog />
-          </div>
-          <div className="space-y-3">
-            {MOCK_WARRANTIES.map((w) => <WarrantyRow key={w.id} warranty={w} />)}
-          </div>
-        </TabsContent>
-
-        {/* Inspections */}
-        <TabsContent value="inspections">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <ClipboardCheck className="h-5 w-5 text-brand-600" />
-              <p className="text-sm font-semibold text-gray-900">
-                {passed} of {total} inspection{total !== 1 ? "s" : ""} passed
-                {scheduled > 0 && <span className="font-normal text-gray-600"> — {scheduled} scheduled</span>}
-                {failed > 0 && <span className="font-normal text-red-600"> — {failed} failed</span>}
-              </p>
+              <h3 className="text-sm font-bold text-gray-900">{contractor.name}</h3>
+              {contractor.verified && (
+                <ShieldCheck className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+              )}
             </div>
-            <ScheduleInspectionDialog />
+            <div className="flex items-center gap-1 mt-0.5">
+              <Star className="h-3.5 w-3.5 text-amber-500 fill-amber-500" />
+              <span className="text-xs font-semibold text-gray-900">{contractor.rating}</span>
+              <span className="text-xs text-gray-500">({contractor.reviews} reviews)</span>
+            </div>
           </div>
+        </div>
+        <div className="flex items-center gap-2 mt-4">
+          <Button variant="outline" size="sm" className="flex-1">
+            <MessageSquare className="h-3.5 w-3.5 mr-1.5" />
+            Message
+          </Button>
+          <Button variant="outline" size="sm" className="flex-1">
+            <Phone className="h-3.5 w-3.5 mr-1.5" />
+            Call
+          </Button>
+        </div>
+        <button className="flex items-center gap-1 text-xs text-brand-600 font-medium mt-3 hover:underline">
+          View Profile <ExternalLink className="h-3 w-3" />
+        </button>
+      </CardContent>
+    </Card>
+  );
+}
 
-          <div className="space-y-8">
-            {grouped.map(({ project, items }) => (
-              <div key={project}>
-                <div className="flex items-center gap-3 mb-4">
-                  <h2 className="text-sm font-bold text-gray-900">{project}</h2>
-                  <Separator className="flex-1" />
-                  <span className="text-xs text-gray-400">
-                    {items.filter((i) => i.status === "Passed").length}/{items.length} passed
-                  </span>
+// ─── Milestones Timeline ────────────────────────────────────────────────────────
+
+function MilestonesSection({ project }: { project: HomeownerProject }) {
+  const totalPaid = project.milestones
+    .filter((m) => m.status === "completed")
+    .reduce((sum, m) => sum + m.payment, 0);
+  const remaining = project.budget - totalPaid;
+
+  return (
+    <Card>
+      <CardContent className="p-5">
+        <h3 className="text-sm font-bold text-gray-900 mb-4">Progress & Milestones</h3>
+
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs text-gray-500">Overall Progress</span>
+          <span className="text-xs font-bold text-brand-600">{project.progress}%</span>
+        </div>
+        <Progress value={project.progress} className="h-2.5 mb-6" />
+
+        {/* Timeline */}
+        <div className="space-y-0">
+          {project.milestones.map((milestone, i) => {
+            const isLast = i === project.milestones.length - 1;
+            return (
+              <div key={i} className="flex gap-3">
+                {/* Timeline line + dot */}
+                <div className="flex flex-col items-center">
+                  {milestone.status === "completed" ? (
+                    <div className="h-6 w-6 rounded-full bg-emerald-600 flex items-center justify-center flex-shrink-0">
+                      <Check className="h-3.5 w-3.5 text-white" />
+                    </div>
+                  ) : milestone.status === "in-progress" ? (
+                    <div className="h-6 w-6 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                      <Clock className="h-3.5 w-3.5 text-white" />
+                    </div>
+                  ) : (
+                    <div className="h-6 w-6 rounded-full border-2 border-gray-200 flex items-center justify-center flex-shrink-0">
+                      <Circle className="h-2.5 w-2.5 text-gray-300" />
+                    </div>
+                  )}
+                  {!isLast && (
+                    <div
+                      className={cn(
+                        "w-0.5 flex-1 min-h-[24px]",
+                        milestone.status === "completed" ? "bg-emerald-300" : "bg-gray-200"
+                      )}
+                    />
+                  )}
                 </div>
-                <div className="relative">
-                  <div className="absolute left-[17px] top-4 bottom-10 w-px bg-gray-200 z-0" />
-                  <div className="space-y-0">
-                    {items.map((inspection) => <InspectionCard key={inspection.id} inspection={inspection} />)}
+
+                {/* Content */}
+                <div className={cn("pb-4 flex-1 min-w-0", isLast && "pb-0")}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p
+                        className={cn(
+                          "text-sm font-medium",
+                          milestone.status === "upcoming" ? "text-gray-400" : "text-gray-900"
+                        )}
+                      >
+                        {milestone.name}
+                      </p>
+                      {milestone.date && (
+                        <p className="text-xs text-gray-500 mt-0.5">{milestone.date}</p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span
+                        className={cn(
+                          "text-xs font-semibold",
+                          milestone.status === "upcoming" ? "text-gray-400" : "text-gray-900"
+                        )}
+                      >
+                        {formatCurrency(milestone.payment)}
+                      </span>
+                      {milestone.status === "completed" && (
+                        <Badge variant="success" className="text-[10px]">Paid</Badge>
+                      )}
+                      {milestone.status === "in-progress" && (
+                        <Badge variant="info" className="text-[10px]">In Progress</Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
+            );
+          })}
+        </div>
+
+        <Separator className="my-4" />
+
+        {/* Budget summary */}
+        <div className="grid grid-cols-3 gap-3 text-center">
+          <div className="p-2.5 bg-surface rounded-lg">
+            <p className="text-xs text-gray-500 mb-0.5">Total Budget</p>
+            <p className="text-sm font-bold text-gray-900">{formatCurrency(project.budget)}</p>
+          </div>
+          <div className="p-2.5 bg-surface rounded-lg">
+            <p className="text-xs text-gray-500 mb-0.5">Paid</p>
+            <p className="text-sm font-bold text-emerald-700">{formatCurrency(totalPaid)}</p>
+          </div>
+          <div className="p-2.5 bg-surface rounded-lg">
+            <p className="text-xs text-gray-500 mb-0.5">Remaining</p>
+            <p className="text-sm font-bold text-gray-900">{formatCurrency(remaining)}</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Payments ───────────────────────────────────────────────────────────────────
+
+function PaymentsSection({ payments }: { payments: Payment[] }) {
+  const nextDue = payments.find((p) => p.status === "due");
+
+  return (
+    <Card>
+      <CardContent className="p-5">
+        <h3 className="text-sm font-bold text-gray-900 mb-4">Payments</h3>
+
+        {nextDue && (
+          <div className="flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 p-4 mb-4">
+            <div>
+              <p className="text-xs text-amber-700 font-medium">Payment Due</p>
+              <p className="text-lg font-bold text-amber-900">{formatCurrency(nextDue.amount)}</p>
+              <p className="text-xs text-amber-700 mt-0.5">{nextDue.description}</p>
+            </div>
+            <Button size="sm">
+              <CreditCard className="h-3.5 w-3.5 mr-1.5" />
+              Pay Now
+            </Button>
+          </div>
+        )}
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-100">
+                <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider pb-2">Date</th>
+                <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider pb-2">Description</th>
+                <th className="text-right text-xs font-semibold text-gray-500 uppercase tracking-wider pb-2">Amount</th>
+                <th className="text-right text-xs font-semibold text-gray-500 uppercase tracking-wider pb-2">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {payments.map((payment, i) => (
+                <tr key={i}>
+                  <td className="py-2.5 text-gray-500 text-xs whitespace-nowrap">{formatDate(payment.date)}</td>
+                  <td className="py-2.5 text-gray-900 font-medium text-xs">{payment.description}</td>
+                  <td className="py-2.5 text-gray-900 font-semibold text-xs text-right">{formatCurrency(payment.amount)}</td>
+                  <td className="py-2.5 text-right">
+                    {payment.status === "paid" && <Badge variant="success" className="text-[10px]">Paid</Badge>}
+                    {payment.status === "due" && <Badge variant="warning" className="text-[10px]">Due</Badge>}
+                    {payment.status === "upcoming" && <Badge variant="info" className="text-[10px]">Upcoming</Badge>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Documents ──────────────────────────────────────────────────────────────────
+
+function DocumentsSection({ documents }: { documents: Document[] }) {
+  const iconForType = (type: Document["type"]) => {
+    switch (type) {
+      case "pdf":
+        return <FileText className="h-4 w-4 text-red-500" />;
+      case "photo":
+        return <Camera className="h-4 w-4 text-blue-500" />;
+      case "report":
+        return <ClipboardCheck className="h-4 w-4 text-emerald-600" />;
+    }
+  };
+
+  return (
+    <Card>
+      <CardContent className="p-5">
+        <h3 className="text-sm font-bold text-gray-900 mb-4">Documents</h3>
+        <div className="space-y-1">
+          {documents.map((doc, i) => (
+            <button
+              key={i}
+              className="flex items-center gap-3 w-full rounded-lg p-2.5 hover:bg-gray-50 transition-colors text-left"
+            >
+              <div className="h-8 w-8 rounded-lg bg-surface flex items-center justify-center flex-shrink-0">
+                {iconForType(doc.type)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">{doc.name}</p>
+                {doc.count && (
+                  <p className="text-xs text-gray-500">{doc.count} photos</p>
+                )}
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {doc.badge && (
+                  <Badge variant={doc.badgeVariant || "info"} className="text-[10px]">
+                    {doc.badge}
+                  </Badge>
+                )}
+                <ChevronRight className="h-4 w-4 text-gray-300" />
+              </div>
+            </button>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Change Orders ──────────────────────────────────────────────────────────────
+
+function ChangeOrdersSection({ changeOrders }: { changeOrders: ChangeOrder[] }) {
+  if (changeOrders.length === 0) return null;
+
+  return (
+    <Card>
+      <CardContent className="p-5">
+        <h3 className="text-sm font-bold text-gray-900 mb-4">Change Orders</h3>
+        <div className="space-y-3">
+          {changeOrders.map((order) => (
+            <div
+              key={order.id}
+              className="rounded-lg border border-gray-200 p-4"
+            >
+              <div className="flex items-start justify-between gap-3 mb-2">
+                <p className="text-sm font-medium text-gray-900">{order.description}</p>
+                <span className="text-sm font-bold text-amber-700 flex-shrink-0 whitespace-nowrap">
+                  +{formatCurrency(order.costDifference)}
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 mb-3">{order.reason}</p>
+              {order.status === "pending" ? (
+                <div className="flex items-center gap-2">
+                  <Button size="sm">Approve</Button>
+                  <Button variant="outline" size="sm">Decline</Button>
+                  <Badge variant="warning" className="ml-auto text-[10px]">Pending</Badge>
+                </div>
+              ) : order.status === "approved" ? (
+                <Badge variant="success">Approved</Badge>
+              ) : (
+                <Badge variant="danger">Declined</Badge>
+              )}
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Sidebar Project Item ───────────────────────────────────────────────────────
+
+function SidebarProjectItem({
+  project,
+  selected,
+  onClick,
+}: {
+  project: HomeownerProject;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "w-full text-left rounded-xl p-3.5 transition-colors",
+        selected ? "bg-gray-900 text-white" : "bg-white hover:bg-gray-50 border border-gray-200"
+      )}
+    >
+      <div className="flex items-center justify-between gap-2 mb-1">
+        <h3 className={cn("text-sm font-bold truncate", selected ? "text-white" : "text-gray-900")}>
+          {project.title}
+        </h3>
+        <Badge
+          className={cn(
+            "text-[10px] flex-shrink-0",
+            project.status === "in-progress"
+              ? selected
+                ? "bg-blue-500/20 text-blue-200 border-transparent"
+                : "bg-blue-50 text-blue-700 border-transparent"
+              : selected
+              ? "bg-emerald-500/20 text-emerald-200 border-transparent"
+              : "bg-emerald-50 text-emerald-700 border-transparent"
+          )}
+        >
+          {project.status === "in-progress" ? "In Progress" : "Completed"}
+        </Badge>
+      </div>
+      <p className={cn("text-xs mb-2.5", selected ? "text-gray-300" : "text-gray-500")}>
+        {project.contractor.name}
+      </p>
+      <div className="flex items-center justify-between mb-1.5">
+        <div className={cn(
+          "h-1.5 flex-1 rounded-full overflow-hidden mr-3",
+          selected ? "bg-white/20" : "bg-gray-100"
+        )}>
+          <div
+            className={cn("h-full rounded-full", selected ? "bg-white" : "bg-brand-600")}
+            style={{ width: `${project.progress}%` }}
+          />
+        </div>
+        <span className={cn("text-xs font-bold", selected ? "text-white" : "text-brand-600")}>
+          {project.progress}%
+        </span>
+      </div>
+    </button>
+  );
+}
+
+// ─── Main Page ──────────────────────────────────────────────────────────────────
+
+export default function HomeownerProjectsPage() {
+  const [selectedId, setSelectedId] = useState(PROJECTS[0].id);
+  const selected = PROJECTS.find((p) => p.id === selectedId) || PROJECTS[0];
+
+  return (
+    <div className="flex flex-col h-full min-h-screen bg-surface">
+      {/* Header */}
+      <div className="px-6 pt-5 pb-4 bg-white shadow-[0_4px_16px_-2px_rgba(0,0,0,0.1)] relative z-10">
+        <h1 className="text-xl font-bold text-gray-900">My Projects</h1>
+        <p className="text-sm text-gray-500 mt-0.5">
+          Track progress, payments, and documents for your active projects.
+        </p>
+      </div>
+
+      {/* Body */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left Sidebar */}
+        <div className="w-72 flex-shrink-0 border-r border-gray-200 bg-white p-4 overflow-y-auto">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-1">
+            {PROJECTS.length} Projects
+          </p>
+          <div className="space-y-2">
+            {PROJECTS.map((project) => (
+              <SidebarProjectItem
+                key={project.id}
+                project={project}
+                selected={project.id === selectedId}
+                onClick={() => setSelectedId(project.id)}
+              />
             ))}
           </div>
-        </TabsContent>
-      </Tabs>
+        </div>
+
+        {/* Right Content */}
+        <div className="flex-1 overflow-y-auto p-6">
+          <div className="max-w-3xl space-y-5">
+            {/* Status Banner */}
+            <StatusBannerSection banner={selected.banner} />
+
+            {/* Contractor Card */}
+            <ContractorCard contractor={selected.contractor} />
+
+            {/* Progress & Milestones */}
+            <MilestonesSection project={selected} />
+
+            {/* Payments */}
+            <PaymentsSection payments={selected.payments} />
+
+            {/* Documents */}
+            <DocumentsSection documents={selected.documents} />
+
+            {/* Change Orders */}
+            <ChangeOrdersSection changeOrders={selected.changeOrders} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
