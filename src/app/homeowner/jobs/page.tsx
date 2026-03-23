@@ -1368,26 +1368,21 @@ function CompareTab() {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function JobsPage() {
-  const [activeTab, setActiveTab] = useState("post");
+  const [activeTab, setActiveTab] = useState("myjobs");
 
   return (
     <div className="p-8">
       <AppHeader
-        title="Jobs"
-        subtitle="Post jobs, review bids, and compare contractors."
+        title="My Jobs"
+        subtitle="Track your jobs, review bids, and compare contractors."
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-6">
-          <TabsTrigger value="post">Post a Job</TabsTrigger>
           <TabsTrigger value="myjobs">My Jobs</TabsTrigger>
           <TabsTrigger value="bids">Bids</TabsTrigger>
           <TabsTrigger value="compare">Compare</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="post">
-          <PostJobTab />
-        </TabsContent>
 
         <TabsContent value="myjobs">
           <MyJobsTab onSwitchToBids={() => setActiveTab("bids")} />

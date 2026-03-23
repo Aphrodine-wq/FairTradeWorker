@@ -16,6 +16,7 @@ interface SidebarProps {
   items: NavItem[];
   currentPath: string;
   userRole: "contractor" | "homeowner";
+  topAction?: React.ReactNode;
 }
 
 const MOCK_USER = {
@@ -23,7 +24,7 @@ const MOCK_USER = {
   homeowner: { name: "Michael Brown", email: "michael@brown.com" },
 };
 
-export function Sidebar({ items, currentPath, userRole }: SidebarProps) {
+export function Sidebar({ items, currentPath, userRole, topAction }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const router = useRouter();
   const user = MOCK_USER[userRole];
@@ -52,6 +53,11 @@ export function Sidebar({ items, currentPath, userRole }: SidebarProps) {
           </Link>
         )}
       </div>
+
+      {/* Top Action */}
+      {topAction && !collapsed && (
+        <div className="px-3 pt-4">{topAction}</div>
+      )}
 
       {/* Nav Items */}
       <nav className="flex-1 overflow-y-auto py-5 px-3 space-y-1.5">
