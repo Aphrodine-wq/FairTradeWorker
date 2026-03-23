@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Save,
   Shield,
@@ -21,6 +21,7 @@ import { Card, CardContent } from "@shared/ui/card";
 import { Separator } from "@shared/ui/separator";
 import { Badge } from "@shared/ui/badge";
 import { cn } from "@shared/lib/utils";
+import { fetchSettings, saveSettings } from "@shared/lib/data";
 
 // ─── Shared Components ───────────────────────────────────────────────────────
 
@@ -233,7 +234,32 @@ function NotificationsSection() {
   const [projectUpdates, setProjectUpdates] = useState(true);
   const [paymentReminders, setPaymentReminders] = useState(true);
   const [marketingEmails, setMarketingEmails] = useState(false);
+  const [savedSettings, setSavedSettings] = useState<any>(null);
   const { saved, onSave } = useSave();
+
+  useEffect(() => {
+    fetchSettings().then((s) => {
+      if (s) {
+        setSavedSettings(s);
+        if (s.notifications_new_bids !== undefined) setNewBids(s.notifications_new_bids);
+        if (s.notifications_messages !== undefined) setMessages(s.notifications_messages);
+        if (s.notifications_project_updates !== undefined) setProjectUpdates(s.notifications_project_updates);
+        if (s.notifications_payment_reminders !== undefined) setPaymentReminders(s.notifications_payment_reminders);
+        if (s.notifications_marketing !== undefined) setMarketingEmails(s.notifications_marketing);
+      }
+    });
+  }, []);
+
+  const handleSaveSettings = async () => {
+    await saveSettings({
+      notifications_new_bids: newBids,
+      notifications_messages: messages,
+      notifications_project_updates: projectUpdates,
+      notifications_payment_reminders: paymentReminders,
+      notifications_marketing: marketingEmails,
+    });
+    onSave();
+  };
 
   return (
     <div className="space-y-6">
@@ -275,7 +301,7 @@ function NotificationsSection() {
         />
       </div>
 
-      <SaveBar saved={saved} onSave={onSave} />
+      <SaveBar saved={saved} onSave={handleSaveSettings} />
     </div>
   );
 }

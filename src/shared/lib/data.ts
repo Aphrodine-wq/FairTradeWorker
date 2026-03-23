@@ -103,3 +103,17 @@ export async function fetchReviews(forUserId?: string): Promise<any[]> {
 export async function fetchNotifications(): Promise<any[]> {
   try { return await api.listNotifications(); } catch { return []; }
 }
+
+/**
+ * Fetch settings — real API with null fallback.
+ */
+export async function fetchSettings(): Promise<any> {
+  try { return await api.getSettings(); } catch { return null; }
+}
+
+/**
+ * Save settings — real API with null fallback.
+ */
+export async function saveSettings(settings: Record<string, any>): Promise<any> {
+  try { return await api.updateSettings(settings); } catch { return null; }
+}

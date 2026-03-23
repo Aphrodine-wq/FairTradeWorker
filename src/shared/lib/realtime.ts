@@ -246,6 +246,75 @@ export const api = {
   async markAllNotificationsRead(): Promise<any> {
     return apiFetch("/api/notifications/read-all", { method: "POST" });
   },
+
+  // AI Estimation
+  async getAIEstimate(description: string): Promise<{ estimate: any; raw: string | null }> {
+    return apiFetch("/api/ai/estimate", {
+      method: "POST",
+      body: JSON.stringify({ description }),
+    });
+  },
+
+  // File Uploads
+  async uploadFile(file: File, entityType: string, entityId: string): Promise<any> {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("entity_type", entityType);
+    formData.append("entity_id", entityId);
+
+    const headers: Record<string, string> = {};
+    if (_authToken) {
+      headers["Authorization"] = `Bearer ${_authToken}`;
+    }
+    // Don't set Content-Type — browser sets it with boundary for multipart
+    const res = await fetch(`${API_BASE}/api/uploads`, {
+      method: "POST",
+      headers,
+      body: formData,
+    });
+    if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
+    return res.json();
+  },
+
+  async listUploads(entityType: string, entityId: string): Promise<any[]> {
+    const data = await apiFetch<{ uploads: any[] }>(`/api/uploads?entity_type=${entityType}&entity_id=${entityId}`);
+    return data.uploads;
+  },
+
+  async deleteUpload(id: string): Promise<void> {
+    await apiFetch(`/api/uploads/${id}`, { method: "DELETE" });
+  },
+
+  // Settings
+  async getSettings(): Promise<any> {
+    const data = await apiFetch<{ settings: any }>("/api/settings");
+    return data.settings;
+  },
+
+  async updateSettings(settings: Record<string, any>): Promise<any> {
+    const data = await apiFetch<{ settings: any }>("/api/settings", {
+      method: "PUT",
+      body: JSON.stringify({ settings }),
+    });
+    return data.settings;
+  },
+
+  // Reviews (create + respond)
+  async createReview(attrs: { rating: number; comment: string; reviewed_id: string; job_id?: string }): Promise<any> {
+    const data = await apiFetch<{ review: any }>("/api/reviews", {
+      method: "POST",
+      body: JSON.stringify({ review: attrs }),
+    });
+    return data.review;
+  },
+
+  async respondToReview(reviewId: string, response: string): Promise<any> {
+    const data = await apiFetch<{ review: any }>(`/api/reviews/${reviewId}/respond`, {
+      method: "POST",
+      body: JSON.stringify({ response }),
+    });
+    return data.review;
+  },
 };
 
 // --- WebSocket Client ---

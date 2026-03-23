@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Save,
   Shield,
@@ -31,6 +31,7 @@ import { Separator } from "@shared/ui/separator";
 import { mockContractors } from "@shared/lib/mock-data";
 import { JOB_CATEGORIES } from "@shared/lib/constants";
 import { getInitials, cn } from "@shared/lib/utils";
+import { fetchSettings, saveSettings } from "@shared/lib/data";
 
 const contractor = mockContractors[0];
 
@@ -400,7 +401,38 @@ function NotificationsSection() {
   const [weeklyDigest, setWeeklyDigest] = useState(true);
   const [bidUpdates, setBidUpdates] = useState(true);
   const [reviewAlerts, setReviewAlerts] = useState(true);
+  const [savedSettings, setSavedSettings] = useState<any>(null);
   const { saved, onSave } = useSave();
+
+  useEffect(() => {
+    fetchSettings().then((s) => {
+      if (s) {
+        setSavedSettings(s);
+        if (s.notifications_email_estimates !== undefined) setEmailEstimates(s.notifications_email_estimates);
+        if (s.notifications_email_jobs !== undefined) setEmailJobs(s.notifications_email_jobs);
+        if (s.notifications_sms_alerts !== undefined) setSmsAlerts(s.notifications_sms_alerts);
+        if (s.notifications_push !== undefined) setPushNotifs(s.notifications_push);
+        if (s.notifications_marketing !== undefined) setMarketingEmails(s.notifications_marketing);
+        if (s.notifications_weekly_digest !== undefined) setWeeklyDigest(s.notifications_weekly_digest);
+        if (s.notifications_bid_updates !== undefined) setBidUpdates(s.notifications_bid_updates);
+        if (s.notifications_review_alerts !== undefined) setReviewAlerts(s.notifications_review_alerts);
+      }
+    });
+  }, []);
+
+  const handleSaveSettings = async () => {
+    await saveSettings({
+      notifications_email_estimates: emailEstimates,
+      notifications_email_jobs: emailJobs,
+      notifications_sms_alerts: smsAlerts,
+      notifications_push: pushNotifs,
+      notifications_marketing: marketingEmails,
+      notifications_weekly_digest: weeklyDigest,
+      notifications_bid_updates: bidUpdates,
+      notifications_review_alerts: reviewAlerts,
+    });
+    onSave();
+  };
 
   return (
     <div className="space-y-6">
@@ -431,7 +463,7 @@ function NotificationsSection() {
         </div>
       </div>
 
-      <SaveBar saved={saved} onSave={onSave} />
+      <SaveBar saved={saved} onSave={handleSaveSettings} />
     </div>
   );
 }
