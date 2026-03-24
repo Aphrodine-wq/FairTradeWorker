@@ -1,8 +1,7 @@
 /**
- * Simple auth store for the web app.
- * Stores JWT + user in localStorage, syncs with the realtime client.
+ * Auth store — calls Next.js API routes for auth, syncs token with realtime client.
  */
-import { api, setAuthToken } from "./realtime";
+import { setAuthToken } from "./realtime";
 
 export interface AuthUser {
   id: string;
@@ -38,10 +37,20 @@ function save(state: AuthState) {
   }
 }
 
+async function authFetch<T>(path: string, body: Record<string, unknown>): Promise<T> {
+  const res = await fetch(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `Auth error: ${res.status}`);
+  return data;
+}
+
 let _state = load();
 const _listeners = new Set<() => void>();
 
-// Hydrate the realtime client with the stored token on load
 if (_state.token) {
   setAuthToken(_state.token);
 }
@@ -69,14 +78,17 @@ export const authStore = {
   },
 
   async login(email: string, password: string): Promise<AuthUser> {
-    // Clear any pre-existing session before login to prevent session fixation
     _state = { token: null, user: null };
     save(_state);
     setAuthToken(null);
 
-    const { token, user } = await api.login(email, password);
+    const { token, user } = await authFetch<{ token: string; user: AuthUser }>(
+      "/api/auth/login",
+      { email, password }
+    );
     _state = { token, user };
     save(_state);
+    setAuthToken(token);
     _listeners.forEach((fn) => fn());
     return user;
   },
@@ -86,11 +98,17 @@ export const authStore = {
     password: string;
     name: string;
     role: "homeowner" | "contractor";
-    location?: string;
-  }): Promise<void> {
-    await api.register(attrs);
-    // After registration, log in automatically
-    await authStore.login(attrs.email, attrs.password);
+    phone?: string;
+  }): Promise<AuthUser> {
+    const { token, user } = await authFetch<{ token: string; user: AuthUser }>(
+      "/api/auth/signup",
+      { ...attrs, role: attrs.role.toUpperCase() }
+    );
+    _state = { token, user };
+    save(_state);
+    setAuthToken(token);
+    _listeners.forEach((fn) => fn());
+    return user;
   },
 
   logout() {

@@ -82,6 +82,31 @@ export function middleware(request: NextRequest) {
     return addSecurityHeaders(response);
   }
 
+  // Route protection for authenticated areas
+  if (pathname.startsWith("/contractor") || pathname.startsWith("/homeowner")) {
+    const token = request.cookies.get("ftw-token")?.value;
+    if (!token) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return addSecurityHeaders(NextResponse.redirect(loginUrl));
+    }
+
+    // Check role from JWT payload (full verification in API routes)
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      if (pathname.startsWith("/contractor") && payload.role !== "CONTRACTOR") {
+        return addSecurityHeaders(NextResponse.redirect(new URL("/homeowner/dashboard", request.url)));
+      }
+      if (pathname.startsWith("/homeowner") && payload.role !== "HOMEOWNER") {
+        return addSecurityHeaders(NextResponse.redirect(new URL("/contractor/dashboard", request.url)));
+      }
+    } catch {
+      const resp = NextResponse.redirect(new URL("/login", request.url));
+      resp.cookies.delete("ftw-token");
+      return addSecurityHeaders(resp);
+    }
+  }
+
   // All other routes — pass through with security headers
   const response = NextResponse.next();
   return addSecurityHeaders(response);

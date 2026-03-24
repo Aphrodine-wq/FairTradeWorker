@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Home, HardHat, Eye, EyeOff, ChevronLeft } from "lucide-react";
+import { authStore } from "@shared/lib/auth-store";
 import { Button } from "@shared/ui/button";
 import { Card, CardContent } from "@shared/ui/card";
 import { Input } from "@shared/ui/input";
@@ -29,10 +31,13 @@ const SPECIALTIES = [
 ];
 
 export default function SignupPage() {
+  const router = useRouter();
   const [step, setStep] = useState<1 | 2>(1);
   const [role, setRole] = useState<Role>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // Form state
   const [form, setForm] = useState({
@@ -56,11 +61,36 @@ export default function SignupPage() {
 
   const handleBack = () => {
     setStep(1);
+    setError("");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Auth logic goes here
+    setError("");
+
+    if (form.password !== form.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+    if (form.password.length < 8) {
+      setError("Password must be at least 8 characters");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const user = await authStore.register({
+        email: form.email,
+        password: form.password,
+        name: form.name,
+        role: role as "homeowner" | "contractor",
+      });
+      router.push(user.role === "homeowner" ? "/homeowner/dashboard" : "/contractor/dashboard");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Registration failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -102,6 +132,8 @@ export default function SignupPage() {
                 setShowConfirm={setShowConfirm}
                 onBack={handleBack}
                 onSubmit={handleSubmit}
+                error={error}
+                loading={loading}
               />
             )}
           </CardContent>
@@ -283,6 +315,8 @@ interface StepTwoProps {
   setShowConfirm: (v: boolean) => void;
   onBack: () => void;
   onSubmit: (e: React.FormEvent) => void;
+  error: string;
+  loading: boolean;
 }
 
 function StepTwo({
@@ -295,6 +329,8 @@ function StepTwo({
   setShowConfirm,
   onBack,
   onSubmit,
+  error,
+  loading,
 }: StepTwoProps) {
   const isContractor = role === "contractor";
 
@@ -323,6 +359,11 @@ function StepTwo({
       </div>
 
       <form onSubmit={onSubmit} className="space-y-4">
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+            {error}
+          </div>
+        )}
         {/* Full Name */}
         <Field label="Full name">
           <Input
@@ -428,8 +469,8 @@ function StepTwo({
           />
         </Field>
 
-        <Button type="submit" size="lg" className="w-full mt-2">
-          Create Account
+        <Button type="submit" size="lg" className="w-full mt-2" disabled={loading}>
+          {loading ? "Creating account..." : "Create Account"}
         </Button>
       </form>
 
