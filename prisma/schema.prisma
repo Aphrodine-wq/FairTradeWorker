@@ -1,0 +1,336 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ── Users ────────────────────────────────────────────────────────
+
+enum UserRole {
+  CONTRACTOR
+  HOMEOWNER
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  role          UserRole
+  name          String
+  phone         String?
+  avatar        String?
+  emailVerified Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  contractor    Contractor?
+  homeowner     Homeowner?
+  sentMessages  Message[]     @relation("MessageSender")
+  notifications Notification[]
+
+  @@index([email])
+}
+
+model Contractor {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company          String?
+  bio              String?
+  specialty        String?
+  skills           String[]
+  location         String?
+  serviceRadius    Int?     @default(50)
+  yearsExperience  Int?
+  hourlyRate       Float?
+  verified         Boolean  @default(false)
+  licensed         Boolean  @default(false)
+  insured          Boolean  @default(false)
+  fairTradePromise Boolean  @default(false)
+  rating           Float    @default(0)
+  reviewCount      Int      @default(0)
+  jobsCompleted    Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  licenses         License[]
+  insuranceCerts   InsuranceCert[]
+  bids             Bid[]
+  reviewsReceived  Review[]       @relation("ReviewTarget")
+  reviewsGiven     Review[]       @relation("ReviewAuthor")
+  conversations    ConversationParticipant[]
+  qbConnection     QuickBooksConnection?
+
+  @@index([location])
+  @@index([specialty])
+  @@index([verified])
+}
+
+model Homeowner {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  location  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  jobs          Job[]
+  reviewsGiven  Review[]  @relation("HomeownerReviewAuthor")
+  conversations ConversationParticipant[]
+}
+
+// ── Verification ─────────────────────────────────────────────────
+
+model License {
+  id             String    @id @default(cuid())
+  contractorId   String
+  contractor     Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  licenseNumber  String
+  state          String
+  type           String
+  expirationDate DateTime?
+  verified       Boolean   @default(false)
+  verifiedAt     DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@index([contractorId])
+}
+
+model InsuranceCert {
+  id             String    @id @default(cuid())
+  contractorId   String
+  contractor     Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  provider       String
+  policyNumber   String
+  coverageType   String
+  coverageAmount Float?
+  expirationDate DateTime
+  fileUrl        String?
+  verified       Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+
+  @@index([contractorId])
+}
+
+// ── Jobs & Bidding ───────────────────────────────────────────────
+
+enum JobStatus {
+  DRAFT
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum Urgency {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum PropertyType {
+  RESIDENTIAL
+  COMMERCIAL
+  INDUSTRIAL
+}
+
+model Job {
+  id                 String       @id @default(cuid())
+  homeownerId        String
+  homeowner          Homeowner    @relation(fields: [homeownerId], references: [id], onDelete: Cascade)
+  title              String
+  description        String
+  detailedScope      String?
+  category           String
+  subcategory        String?
+  budgetMin          Float?
+  budgetMax          Float?
+  location           String
+  fullAddress        String?
+  status             JobStatus    @default(OPEN)
+  urgency            Urgency      @default(MEDIUM)
+  propertyType       PropertyType @default(RESIDENTIAL)
+  sqft               Int?
+  yearBuilt          Int?
+  deadline           DateTime?
+  preferredStartDate DateTime?
+  estimatedDuration  String?
+  accessNotes        String?
+  specialInstructions String?
+  materialsProvided  Boolean      @default(false)
+  permitsRequired    Boolean      @default(false)
+  inspectionRequired Boolean      @default(false)
+  insuranceClaim     Boolean      @default(false)
+  tags               String[]
+  viewCount          Int          @default(0)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  photos             JobPhoto[]
+  bids               Bid[]
+  aiEstimate         AiEstimate?
+
+  @@index([homeownerId])
+  @@index([status])
+  @@index([category])
+  @@index([location])
+  @@index([createdAt])
+}
+
+model JobPhoto {
+  id      String @id @default(cuid())
+  jobId   String
+  job     Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  url     String
+  caption String?
+  type    String @default("photo")
+
+  @@index([jobId])
+}
+
+enum BidStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  WITHDRAWN
+}
+
+model Bid {
+  id           String    @id @default(cuid())
+  jobId        String
+  job          Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  contractorId String
+  contractor   Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  amount       Float
+  message      String?
+  timeline     String?
+  status       BidStatus @default(PENDING)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  invoice      Invoice?
+
+  @@unique([jobId, contractorId])
+  @@index([jobId])
+  @@index([contractorId])
+  @@index([status])
+}
+
+// ── AI Estimation ────────────────────────────────────────────────
+
+model AiEstimate {
+  id          String   @id @default(cuid())
+  jobId       String   @unique
+  job         Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  estimateMin Float
+  estimateMax Float
+  confidence  Float
+  breakdown   Json?
+  modelVersion String  @default("constructionai-v1")
+  createdAt   DateTime @default(now())
+}
+
+// ── Messaging ────────────────────────────────────────────────────
+
+model Conversation {
+  id           String   @id @default(cuid())
+  jobId        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  participants ConversationParticipant[]
+  messages     Message[]
+
+  @@index([jobId])
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  contractorId   String?
+  contractor     Contractor?  @relation(fields: [contractorId], references: [id])
+  homeownerId    String?
+  homeowner      Homeowner?   @relation(fields: [homeownerId], references: [id])
+  lastReadAt     DateTime?
+
+  @@unique([conversationId, contractorId])
+  @@unique([conversationId, homeownerId])
+  @@index([conversationId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation("MessageSender", fields: [senderId], references: [id])
+  content        String
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
+}
+
+// ── Reviews ──────────────────────────────────────────────────────
+
+model Review {
+  id                    String      @id @default(cuid())
+  contractorId          String
+  contractor            Contractor  @relation("ReviewTarget", fields: [contractorId], references: [id], onDelete: Cascade)
+  authorContractorId    String?
+  authorContractor      Contractor? @relation("ReviewAuthor", fields: [authorContractorId], references: [id])
+  authorHomeownerId     String?
+  authorHomeowner       Homeowner?  @relation("HomeownerReviewAuthor", fields: [authorHomeownerId], references: [id])
+  rating                Int
+  text                  String?
+  createdAt             DateTime    @default(now())
+
+  @@index([contractorId])
+}
+
+// ── QuickBooks Integration ───────────────────────────────────────
+
+model QuickBooksConnection {
+  id            String    @id @default(cuid())
+  contractorId  String    @unique
+  contractor    Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  realmId       String
+  accessToken   String
+  refreshToken  String
+  tokenExpiry   DateTime
+  companyName   String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Invoice {
+  id             String   @id @default(cuid())
+  bidId          String   @unique
+  bid            Bid      @relation(fields: [bidId], references: [id], onDelete: Cascade)
+  qbInvoiceId    String?
+  amount         Float
+  status         String   @default("draft")
+  paidAt         DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// ── Notifications ────────────────────────────────────────────────
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  body      String?
+  data      Json?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, read])
+  @@index([createdAt])
+}
