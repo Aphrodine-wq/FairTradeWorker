@@ -1,17 +1,46 @@
 # AEON Verification Config — FairTradeWorker
-# Two-sided marketplace: escrow payments, auth, contractor/homeowner flows
-# Backend not built yet — these sinks are pre-configured for when integrations land
-profile: construction
+# Two-sided construction marketplace: QuickBooks payments, escrow, auth,
+# contractor/homeowner flows, bidding, chat, AI estimates
+# PROFILE: cybersecurity — all 22 security engines + construction domain
+profile: cybersecurity
 
 engines:
+  # Construction domain
   symbolic_exec: true
-  taint_analysis: true
-  information_flow: true
   numeric_safety: true
   money_math: true
-  concurrency_check: true
-  framework_rules: true
   construction_domain: true
+  framework_rules: true
+  # Core analysis
+  taint_analysis: true
+  information_flow: true
+  concurrency_check: true
+  cross_file: true
+  error_handling: true
+  # Security Tier 1 (all)
+  api_security: true
+  auth_access_control: true
+  cache_poisoning: true
+  container_security: true
+  crypto_misuse: true
+  data_exposure: true
+  email_security: true
+  file_upload: true
+  http_smuggling: true
+  injection_advanced: true
+  input_validation: true
+  insecure_randomness: true
+  oauth_oidc: true
+  # Security Tier 2 (all)
+  business_logic: true
+  dependency_audit: true
+  prototype_pollution: true
+  race_condition_security: true
+  secret_detection: true
+  security_misconfig: true
+  session_jwt: true
+  supply_chain: true
+  ssrf_advanced: true
 
 severity: warning
 
@@ -39,23 +68,28 @@ custom_taint_sources:
   - "supabase.auth.getUser"
   - "req.nextUrl.searchParams"
   - "req.headers"
+  - "WebSocket.onmessage"
+  - "channel.on"
 
 custom_taint_sinks:
-  # Database (planned: Supabase)
+  # Database (Supabase)
   - "supabase.from"
   - "supabase.rpc"
-  # Payments (planned: Stripe Connect escrow)
-  - "stripe.customers.create"
-  - "stripe.checkout.sessions.create"
-  - "stripe.paymentIntents.create"
-  - "stripe.transfers.create"
-  - "stripe.webhooks.constructEvent"
-  # Voice AI (planned: ElevenLabs)
+  # Payments (QuickBooks Online)
+  - "quickbooks"
+  - "qbo.createInvoice"
+  - "qbo.createPayment"
+  - "qbo.createEstimate"
+  # Voice AI (ElevenLabs)
   - "elevenlabs"
   # Navigation
   - "redirect"
   - "dangerouslySetInnerHTML"
   # External APIs
   - "fetch"
+  # Realtime
+  - "channel.push"
+  - "PubSub.broadcast"
 
 parallel: true
+baseline: .aeon-baseline.json
