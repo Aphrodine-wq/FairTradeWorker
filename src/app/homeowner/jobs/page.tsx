@@ -29,6 +29,11 @@ import {
   XCircle,
   Briefcase,
   MessageSquare,
+  BarChart3,
+  TrendingDown,
+  TrendingUp,
+  Minus,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@shared/ui/button";
 import { Separator } from "@shared/ui/separator";
@@ -122,6 +127,83 @@ function CategoryIcon({ category }: { category: string }) {
   );
 }
 
+// ─── FairPrice Estimation ─────────────────────────────────────────────────────
+
+const FAIR_PRICE_BASES: Record<string, { low: number; high: number }> = {
+  "General Contracting": { low: 3200, high: 5800 },
+  "Plumbing":            { low: 1800, high: 3400 },
+  "Electrical":          { low: 2000, high: 3800 },
+  "HVAC":                { low: 3500, high: 6200 },
+  "Roofing":             { low: 4000, high: 7500 },
+  "Painting":            { low: 1200, high: 2400 },
+  "Flooring":            { low: 2200, high: 4000 },
+  "Landscaping":         { low: 1500, high: 3200 },
+  "Remodeling":          { low: 5000, high: 9000 },
+  "Concrete":            { low: 2800, high: 5200 },
+  "Fencing":             { low: 1800, high: 3600 },
+  "Drywall":             { low: 1500, high: 2800 },
+};
+
+interface FairPriceEstimate {
+  low: number;
+  high: number;
+  midpoint: number;
+}
+
+function getFairPriceForJob(category: string, budgetMin: number, budgetMax: number, location: string): FairPriceEstimate {
+  const base = FAIR_PRICE_BASES[category] ?? { low: 2500, high: 5000 };
+  // Infer project size multiplier from budget midpoint
+  const budgetMid = (budgetMin + budgetMax) / 2;
+  const multiplier = Math.max(1, budgetMid / ((base.low + base.high) / 2));
+
+  // Regional adjustment from location string
+  let regionAdj = 1.0;
+  const loc = location.toLowerCase();
+  if (loc.includes("tx") || loc.includes("texas") || loc.includes("ms") || loc.includes("mississippi")) regionAdj = 0.88;
+  else if (loc.includes("ca") || loc.includes("california")) regionAdj = 1.25;
+  else if (loc.includes("ny") || loc.includes("new york")) regionAdj = 1.30;
+
+  const low = Math.round(base.low * multiplier * regionAdj / 100) * 100;
+  const high = Math.round(base.high * multiplier * regionAdj * 1.05 / 100) * 100;
+  return { low, high, midpoint: Math.round((low + high) / 2) };
+}
+
+function getBidVsFairPrice(bidAmount: number, fairPrice: FairPriceEstimate): {
+  label: string;
+  pct: number;
+  sentiment: "below" | "at" | "above";
+} {
+  const pct = Math.round(((bidAmount - fairPrice.midpoint) / fairPrice.midpoint) * 100);
+  if (pct <= -8) return { label: `${Math.abs(pct)}% below FairPrice`, pct, sentiment: "below" };
+  if (pct >= 8) return { label: `${pct}% above FairPrice`, pct, sentiment: "above" };
+  return { label: "At market rate", pct, sentiment: "at" };
+}
+
+function FairPriceTag({ bidAmount, fairPrice }: { bidAmount: number; fairPrice: FairPriceEstimate }) {
+  const comparison = getBidVsFairPrice(bidAmount, fairPrice);
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 text-[10px] font-semibold rounded-full px-2 py-0.5 border whitespace-nowrap",
+        comparison.sentiment === "below"
+          ? "text-brand-700 bg-brand-50 border-brand-100"
+          : comparison.sentiment === "above"
+          ? "text-amber-700 bg-amber-50 border-amber-100"
+          : "text-gray-600 bg-gray-50 border-gray-200"
+      )}
+    >
+      {comparison.sentiment === "below" ? (
+        <TrendingDown className="h-2.5 w-2.5" />
+      ) : comparison.sentiment === "above" ? (
+        <TrendingUp className="h-2.5 w-2.5" />
+      ) : (
+        <Minus className="h-2.5 w-2.5" />
+      )}
+      {comparison.label}
+    </span>
+  );
+}
+
 // ─── Bid Types & Mock Data ────────────────────────────────────────────────────
 
 type BidStatus = "pending" | "accepted" | "declined";
@@ -203,12 +285,14 @@ function BidDialog({
   onClose,
   onAccept,
   onDecline,
+  fairPrice,
 }: {
   bid: Bid;
   open: boolean;
   onClose: () => void;
   onAccept: (bidId: string) => void;
   onDecline: (bidId: string) => void;
+  fairPrice?: FairPriceEstimate;
 }) {
   const contractor = mockContractors.find((c) => c.id === bid.contractorId);
   if (!contractor) return null;
@@ -283,6 +367,19 @@ function BidDialog({
             </div>
           ))}
         </div>
+
+        {fairPrice && (
+          <div className="mx-6 mt-4 flex items-center gap-3 rounded-xl bg-gray-50 border border-gray-200 px-4 py-3">
+            <BarChart3 className="h-4 w-4 text-brand-600 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold text-gray-500">FairPrice Estimate</p>
+              <p className="text-sm text-gray-900 font-medium">
+                {formatCurrency(fairPrice.low)} – {formatCurrency(fairPrice.high)}
+              </p>
+            </div>
+            <FairPriceTag bidAmount={bid.amount} fairPrice={fairPrice} />
+          </div>
+        )}
 
         <div className="px-6 mt-5">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Cover Letter</p>
@@ -401,12 +498,14 @@ function CompareModal({
   bids,
   bidStatuses,
   onAccept,
+  fairPrice,
 }: {
   open: boolean;
   onClose: () => void;
   bids: Bid[];
   bidStatuses: Record<string, BidStatus>;
   onAccept: (bidId: string) => void;
+  fairPrice?: FairPriceEstimate;
 }) {
   const effectiveBids = bids.map((b) => ({ ...b, status: bidStatuses[b.id] ?? b.status }));
   const scored = effectiveBids
@@ -474,6 +573,23 @@ function CompareModal({
               </tr>
             </thead>
             <tbody>
+              {fairPrice && (
+                <tr className="border-b border-brand-100 bg-brand-50/30">
+                  <td className="border-r border-gray-100 px-3 py-3 bg-brand-50">
+                    <span className="flex items-center gap-1.5 text-xs font-semibold text-brand-700 uppercase tracking-wide whitespace-nowrap">
+                      <BarChart3 className="h-3 w-3" /> FairPrice
+                    </span>
+                  </td>
+                  {scored.map(({ bid }) => {
+                    const comparison = getBidVsFairPrice(bid.amount, fairPrice);
+                    return (
+                      <td key={bid.id} className="text-center px-4 py-3">
+                        <FairPriceTag bidAmount={bid.amount} fairPrice={fairPrice} />
+                      </td>
+                    );
+                  })}
+                </tr>
+              )}
               {(compareRows(effectiveBids, minAmt, maxRating, maxExp)).map((row, ri) => (
                 <tr key={row.label} className={cn("border-b border-gray-100 last:border-0", ri % 2 === 0 ? "bg-white" : "bg-gray-50/50")}>
                   <td className="border-r border-gray-100 px-3 py-3 bg-gray-50">
@@ -571,10 +687,12 @@ function InlineBidCard({
   bid,
   onViewFull,
   onAccept,
+  fairPrice,
 }: {
   bid: Bid;
   onViewFull: () => void;
   onAccept: () => void;
+  fairPrice?: FairPriceEstimate;
 }) {
   const contractor = mockContractors.find((c) => c.id === bid.contractorId);
   if (!contractor) return null;
@@ -607,11 +725,12 @@ function InlineBidCard({
           <span className="text-xs text-gray-400">({contractor.reviewCount})</span>
         </div>
 
-        <div className="flex items-center gap-4 mt-2">
+        <div className="flex items-center gap-3 mt-2 flex-wrap">
           <div className="flex items-center gap-1 text-xs">
             <DollarSign className="h-3 w-3 text-brand-600" />
             <span className="font-bold text-gray-900">{formatCurrency(bid.amount)}</span>
           </div>
+          {fairPrice && <FairPriceTag bidAmount={bid.amount} fairPrice={fairPrice} />}
           <div className="flex items-center gap-1 text-xs text-gray-500">
             <Clock className="h-3 w-3" />
             {bid.timeline}
@@ -746,6 +865,8 @@ export default function JobsPage() {
               const statusBadge = STATUS_BADGE[job.status] ?? STATUS_BADGE.open;
               const comparableBids = bids.filter((b) => b.status !== "declined");
 
+              const fairPrice = getFairPriceForJob(job.category, job.budget.min, job.budget.max, job.location);
+
               return (
                 <div key={job.id} className="rounded-xl border border-gray-200 bg-white overflow-hidden">
                   {/* Job row */}
@@ -789,6 +910,19 @@ export default function JobsPage() {
                       {/* Description */}
                       <p className="text-sm text-gray-600 leading-relaxed mb-3">{job.description}</p>
 
+                      {/* FairScope — detailed scope if available */}
+                      {job.detailedScope && (
+                        <details className="mb-4 rounded-lg border border-gray-200 bg-white overflow-hidden group">
+                          <summary className="flex items-center gap-2 px-3 py-2.5 cursor-pointer text-xs font-semibold text-gray-500 uppercase tracking-wider hover:bg-gray-50 transition-colors">
+                            <Sparkles className="h-3.5 w-3.5 text-brand-600" />
+                            FairScope — Detailed Scope of Work
+                          </summary>
+                          <div className="px-3 py-3 border-t border-gray-100">
+                            <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{job.detailedScope}</p>
+                          </div>
+                        </details>
+                      )}
+
                       {/* Photos placeholder */}
                       {job.photos.length > 0 && (
                         <div className="flex gap-2 mb-4">
@@ -799,6 +933,22 @@ export default function JobsPage() {
                           ))}
                         </div>
                       )}
+
+                      {/* FairPrice estimate banner */}
+                      <div className="flex items-center gap-3 rounded-xl bg-brand-50/50 border border-brand-100 px-4 py-3 mb-4">
+                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-brand-100">
+                          <BarChart3 className="h-4 w-4 text-brand-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] font-bold text-brand-600 uppercase tracking-wider">FairPrice Estimate</p>
+                          <p className="text-sm font-bold text-gray-900">
+                            {formatCurrency(fairPrice.low)} – {formatCurrency(fairPrice.high)}
+                          </p>
+                        </div>
+                        <p className="text-[10px] text-gray-400 max-w-[140px] text-right leading-tight">
+                          AI-estimated market rate for this project
+                        </p>
+                      </div>
 
                       {/* Bids section header */}
                       <div className="flex items-center justify-between mb-3">
@@ -831,6 +981,7 @@ export default function JobsPage() {
                               bid={bid}
                               onViewFull={() => setActiveBid(bid)}
                               onAccept={() => handleAccept(bid.id)}
+                              fairPrice={fairPrice}
                             />
                           ))}
                         </div>
@@ -845,26 +996,40 @@ export default function JobsPage() {
       </div>
 
       {/* Bid detail dialog */}
-      {effectiveActiveBid && (
-        <BidDialog
-          bid={effectiveActiveBid as Bid}
-          open={!!activeBid}
-          onClose={() => setActiveBid(null)}
-          onAccept={handleAccept}
-          onDecline={handleDecline}
-        />
-      )}
+      {effectiveActiveBid && (() => {
+        const bidJob = jobs.find((j) => j.id === effectiveActiveBid.jobId);
+        const bidFairPrice = bidJob
+          ? getFairPriceForJob(bidJob.category, bidJob.budget.min, bidJob.budget.max, bidJob.location)
+          : undefined;
+        return (
+          <BidDialog
+            bid={effectiveActiveBid as Bid}
+            open={!!activeBid}
+            onClose={() => setActiveBid(null)}
+            onAccept={handleAccept}
+            onDecline={handleDecline}
+            fairPrice={bidFairPrice}
+          />
+        );
+      })()}
 
       {/* Compare modal */}
-      {compareJobId && (
-        <CompareModal
-          open={!!compareJobId}
-          onClose={() => setCompareJobId(null)}
-          bids={compareBids}
-          bidStatuses={bidStatuses}
-          onAccept={handleAccept}
-        />
-      )}
+      {compareJobId && (() => {
+        const cmpJob = jobs.find((j) => j.id === compareJobId);
+        const cmpFairPrice = cmpJob
+          ? getFairPriceForJob(cmpJob.category, cmpJob.budget.min, cmpJob.budget.max, cmpJob.location)
+          : undefined;
+        return (
+          <CompareModal
+            open={!!compareJobId}
+            onClose={() => setCompareJobId(null)}
+            bids={compareBids}
+            bidStatuses={bidStatuses}
+            onAccept={handleAccept}
+            fairPrice={cmpFairPrice}
+          />
+        );
+      })()}
     </div>
   );
 }

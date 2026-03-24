@@ -27,12 +27,15 @@ import {
   Bookmark,
   Send,
   TrendingUp,
+  TrendingDown,
+  Minus,
   Lightbulb,
   Zap,
   Droplets,
   Thermometer,
   Layers,
   MessageSquare,
+  BarChart3,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -48,6 +51,49 @@ import { Badge } from "@shared/ui/badge";
 import { Button } from "@shared/ui/button";
 import { type Job, type JobPhoto } from "@shared/lib/mock-data";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
+
+// ─── FairPrice ───────────────────────────────────────────────────────────────
+
+const FAIR_PRICE_BASES: Record<string, { low: number; high: number }> = {
+  "General Contracting": { low: 3200, high: 5800 },
+  "Plumbing": { low: 1800, high: 3400 },
+  "Electrical": { low: 2000, high: 3800 },
+  "HVAC": { low: 3500, high: 6200 },
+  "Roofing": { low: 4000, high: 7500 },
+  "Painting": { low: 1200, high: 2400 },
+  "Flooring": { low: 2200, high: 4000 },
+  "Landscaping": { low: 1500, high: 3200 },
+  "Remodeling": { low: 5000, high: 9000 },
+  "Concrete": { low: 2800, high: 5200 },
+  "Fencing": { low: 1800, high: 3600 },
+  "Drywall": { low: 1500, high: 2800 },
+};
+
+function getFairPrice(category: string, budgetMin: number, budgetMax: number, location: string) {
+  const base = FAIR_PRICE_BASES[category] ?? { low: 2500, high: 5000 };
+  const multiplier = Math.max(1, (budgetMin + budgetMax) / 2 / ((base.low + base.high) / 2));
+  let regionAdj = 1.0;
+  const loc = location.toLowerCase();
+  if (loc.includes("tx") || loc.includes("texas") || loc.includes("ms")) regionAdj = 0.88;
+  else if (loc.includes("ca") || loc.includes("california")) regionAdj = 1.25;
+  else if (loc.includes("ny") || loc.includes("new york")) regionAdj = 1.30;
+  const low = Math.round(base.low * multiplier * regionAdj / 100) * 100;
+  const high = Math.round(base.high * multiplier * regionAdj * 1.05 / 100) * 100;
+  return { low, high };
+}
+
+function FairPriceRange({ job }: { job: Job }) {
+  const fp = getFairPrice(job.category, job.budget.min, job.budget.max, job.location);
+  return (
+    <div className="flex items-center gap-1.5 text-[11px]">
+      <BarChart3 className="w-3 h-3 text-brand-600" />
+      <span className="text-gray-500">FairPrice:</span>
+      <span className="font-semibold text-gray-700 tabular-nums">
+        {formatCurrency(fp.low)}&ndash;{formatCurrency(fp.high)}
+      </span>
+    </div>
+  );
+}
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -280,6 +326,11 @@ function JobModalContent({ job }: { job: Job }) {
               <span className="font-semibold text-gray-900">{job.bidsCount}</span>{" "}
               bids
             </div>
+          </div>
+          {/* FairPrice context for contractor */}
+          <div className="flex items-center gap-2 mt-2 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200">
+            <BarChart3 className="w-4 h-4 text-brand-600 flex-shrink-0" />
+            <FairPriceRange job={job} />
           </div>
         </div>
 
@@ -786,8 +837,11 @@ export function JobCard({ job }: { job: Job }) {
               </span>
             </div>
 
+            {/* FairPrice market rate */}
+            <FairPriceRange job={job} />
+
             {/* Info grid */}
-            <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs text-gray-500 mb-3">
+            <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs text-gray-500 mb-3 mt-3">
               <span className="flex items-center gap-1">
                 <MapPin className="w-3 h-3 text-gray-400" />
                 {job.location}

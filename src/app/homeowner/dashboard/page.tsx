@@ -39,6 +39,7 @@ import {
   Users,
   Key,
   SlidersHorizontal,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@shared/ui/button";
 import { Card, CardContent } from "@shared/ui/card";
@@ -76,6 +77,41 @@ const AREAS = [
   "Yard / Landscape", "Driveway", "Roof", "Other",
 ];
 
+// ─── FairScope: mock scope generator ──────────────────────────────────────────
+
+const SCOPE_TEMPLATES: Record<string, (areas: string[], matPref: string) => string> = {
+  "General Contracting": (a, m) => `Demo and removal of existing finishes in ${a.join(", ") || "specified areas"}. Framing repairs as needed. Install new drywall, tape, mud, and finish. ${m.includes("Premium") ? "Premium" : m.includes("Budget") ? "Builder-grade" : "Mid-range"} trim and finish carpentry. Paint all new surfaces (2 coats). Final cleanup and debris haul-off included.`,
+  "Plumbing": (a, m) => `Shut off and cap existing supply lines. Demo existing fixtures in ${a.join(", ") || "specified areas"}. Rough-in new supply and drain lines to code (IPC). Install new fixtures: ${m.includes("Premium") ? "Kohler/Moen premium" : "standard-grade"} faucets, valves, and trim. Pressure test all new lines. Final connection and leak check.`,
+  "Electrical": (a, m) => `De-energize and remove existing circuits as needed. Install new 20A dedicated circuits per NEC 2023. ${a.includes("Kitchen") ? "GFCI protection on all countertop receptacles (NEC 210.8). " : ""}${a.includes("Bathroom") ? "GFCI protection required (NEC 210.8). Exhaust fan circuit. " : ""}Install ${m.includes("Premium") ? "Lutron Caseta smart switches and dimmers" : "standard switches and receptacles"}. All work to pass rough and final inspection.`,
+  "HVAC": (a, m) => `Evaluate existing ductwork and equipment. ${m.includes("Premium") ? "Install high-efficiency variable-speed system (18+ SEER2)" : "Install standard efficiency system (15 SEER2)"}. New refrigerant lines, condensate drain, and disconnect. Ductwork modifications as needed for ${a.join(", ") || "specified areas"}. System startup, refrigerant charge, and performance verification. 10-year manufacturer warranty registration.`,
+  "Roofing": (_a, m) => `Strip existing roofing to decking. Inspect and replace damaged decking/sheathing (est. 5-10% replacement). Install synthetic underlayment (ice & water shield at eaves and valleys). Install ${m.includes("Premium") ? "architectural dimensional shingles (Certainteed Landmark Pro or equiv.)" : "3-tab asphalt shingles"}. New drip edge, step flashing, and ridge vent. Debris removal and magnetic nail sweep.`,
+  "Painting": (a, m) => `Prep all surfaces in ${a.join(", ") || "specified areas"}: fill holes, sand, caulk gaps, prime stains. ${m.includes("Premium") ? "Benjamin Moore Regal Select or Sherwin-Williams Emerald" : "Sherwin-Williams ProMar 200 or equivalent"}. Walls: 2 coats. Trim and doors: 2 coats semi-gloss. Ceilings: 1 coat flat. Protect floors, fixtures, and furniture. Touch-up walkthrough included.`,
+  "Flooring": (a, m) => `Remove existing flooring in ${a.join(", ") || "specified areas"}. Prep subfloor: level, patch, and clean. ${m.includes("Premium") ? "Install 3/4\" solid hardwood (white oak or equiv.) with satin polyurethane finish" : m.includes("Budget") ? "Install luxury vinyl plank (LVP) with click-lock installation" : "Install engineered hardwood with factory finish"}. Install transitions, baseboards, and quarter round. Final clean.`,
+  "Landscaping": (_a, m) => `Clear and grade designated areas. ${m.includes("Premium") ? "Install natural stone retaining wall and flagstone walkways" : "Install concrete edging and mulched beds"}. Plant selection: native, drought-tolerant species appropriate for USDA zone. Irrigation: drip system for beds, rotary heads for turf. Sod or seed for lawn areas. 90-day plant warranty.`,
+  "Remodeling": (a, m) => `Full remodel of ${a.join(", ") || "specified areas"}. Phase 1 — Demo: remove existing fixtures, finishes, and non-structural elements. Haul-off included. Phase 2 — Rough: framing modifications, plumbing rough-in, electrical rough-in. All permits and inspections. Phase 3 — Finishes: ${m.includes("Premium") ? "quartz countertops, custom cabinetry, porcelain tile" : m.includes("Budget") ? "laminate counters, stock cabinets, vinyl flooring" : "solid surface counters, semi-custom cabinets, ceramic tile"}. Phase 4 — Final: fixtures, trim, paint (2 coats), hardware, final clean. Punch list walkthrough.`,
+  "Concrete": (_a, m) => `Excavate and grade to proper depth and slope. Compact subgrade, install 4\" gravel base. Form work with expansion joints at 10' intervals. ${m.includes("Premium") ? "6\" reinforced slab with fiber mesh and rebar" : "4\" standard slab with fiber mesh"}. Pour, screed, float, and broom finish. Cure for 7 days minimum. Form removal and backfill.`,
+  "Fencing": (_a, m) => `Mark property lines (homeowner to confirm boundary). Set posts in concrete at 8' intervals, 36\" depth. ${m.includes("Premium") ? "Western red cedar, dog-ear style, 6' height" : m.includes("Budget") ? "Pressure-treated pine, 6' privacy" : "Cedar or composite, 6' privacy"}. Install rails, pickets, and post caps. One walk gate and one drive gate included. Final plumb and level check.`,
+  "Drywall": (a, _m) => `Hang 1/2\" drywall in ${a.join(", ") || "specified areas"} (5/8\" moisture-resistant in wet areas). Tape all joints with paper tape. Three coats of mud: tape, block, and skim. Sand smooth to Level 4 finish. Prime all new drywall (1 coat PVA primer). Ready for paint.`,
+};
+
+function generateMockScope(category: string, title: string, areas: string[], materialPref: string, sqft: string): string {
+  const template = SCOPE_TEMPLATES[category];
+  const base = template ? template(areas, materialPref) : `Complete ${category.toLowerCase()} work in specified areas. All materials and labor included. Work to meet local building codes. Final cleanup and debris removal. Punch list walkthrough upon completion.`;
+
+  const lines = [
+    `Scope of Work: ${title || category}`,
+    "",
+    base,
+    "",
+    sqft ? `Estimated area: ${sqft} sq ft.` : "",
+    "All work to comply with applicable local building codes and permit requirements.",
+    "Contractor to verify all measurements on-site before ordering materials.",
+    "Homeowner to select final material colors/styles before work begins.",
+  ].filter(Boolean);
+
+  return lines.join("\n");
+}
+
 export default function HomeownerDashboardPage() {
   const [projects, setProjects] = useState<Project[]>(mockProjects);
   const [notificationCount, setNotificationCount] = useState(0);
@@ -111,6 +147,8 @@ export default function HomeownerDashboardPage() {
   const [priority, setPriority] = useState("");
   const [contact, setContact] = useState<string[]>(["app"]);
   const [access, setAccess] = useState("");
+  const [generatedScope, setGeneratedScope] = useState("");
+  const [scopeLoading, setScopeLoading] = useState(false);
 
   function reset() {
     setSelectedCategory(null); setStep(1); setShowSuccess(false);
@@ -118,6 +156,7 @@ export default function HomeownerDashboardPage() {
     setSqft(""); setYearBuilt(""); setAreas([]); setCondition("");
     setMaterialPref(""); setNotes(""); setTimeline(""); setBudget("");
     setBidCount("5"); setPriority(""); setContact(["app"]); setAccess("");
+    setGeneratedScope(""); setScopeLoading(false);
   }
 
   function post() {
@@ -469,6 +508,54 @@ export default function HomeownerDashboardPage() {
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-brand-50 border border-brand-100">
                     <Shield className="h-4 w-4 text-brand-600 flex-shrink-0" />
                     <p className="text-xs text-brand-700">Only verified, licensed, and background-checked contractors can bid. Your info stays private until you accept.</p>
+                  </div>
+
+                  {/* FairScope */}
+                  <div className="rounded-xl border border-border bg-white overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-border">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="h-4 w-4 text-brand-600" />
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900">FairScope</p>
+                          <p className="text-[11px] text-gray-400">AI-generated scope of work so every contractor bids on the same spec</p>
+                        </div>
+                      </div>
+                      {!generatedScope && !scopeLoading && (
+                        <button
+                          onClick={() => {
+                            setScopeLoading(true);
+                            setTimeout(() => {
+                              setGeneratedScope(
+                                generateMockScope(selectedCategory!, title, areas, materialPref, sqft)
+                              );
+                              setScopeLoading(false);
+                            }, 1500);
+                          }}
+                          className="text-xs font-semibold text-brand-600 hover:text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-200 rounded-lg px-3 py-1.5 transition-colors"
+                        >
+                          Generate Scope
+                        </button>
+                      )}
+                    </div>
+                    <div className="px-4 py-3">
+                      {scopeLoading ? (
+                        <div className="flex items-center gap-2 py-4 justify-center">
+                          <span className="w-4 h-4 border-2 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
+                          <span className="text-sm text-gray-500">Generating detailed scope...</span>
+                        </div>
+                      ) : generatedScope ? (
+                        <textarea
+                          value={generatedScope}
+                          onChange={(e) => setGeneratedScope(e.target.value)}
+                          rows={8}
+                          className="w-full text-sm text-gray-700 leading-relaxed border border-border rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600 resize-none"
+                        />
+                      ) : (
+                        <p className="text-sm text-gray-400 py-2">
+                          Optional — generate a detailed scope so all contractors bid on identical specs. You can edit it before posting.
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}

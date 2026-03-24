@@ -27,6 +27,10 @@ import {
   Crown,
   Image as ImageIcon,
   Users,
+  BarChart3,
+  TrendingDown,
+  TrendingUp,
+  Minus,
 } from "lucide-react";
 import { Button } from "@shared/ui/button";
 import { Badge } from "@shared/ui/badge";
@@ -51,6 +55,31 @@ const STATUS_STYLE: Record<
   declined: { label: "Declined", variant: "danger" },
   expired: { label: "Expired", variant: "default" },
 };
+
+// ─── FairPrice Market Context ────────────────────────────────────────────────
+
+const FAIR_PRICE_BASES: Record<string, { low: number; high: number }> = {
+  "Remodeling": { low: 5000, high: 9000 },
+  "Electrical": { low: 2000, high: 3800 },
+  "Plumbing": { low: 1800, high: 3400 },
+  "Roofing": { low: 4000, high: 7500 },
+  "HVAC": { low: 3500, high: 6200 },
+  "Painting": { low: 1200, high: 2400 },
+  "Flooring": { low: 2200, high: 4000 },
+  "Concrete": { low: 2800, high: 5200 },
+  "Fencing": { low: 1800, high: 3600 },
+};
+
+function getEstimateFairPrice(category: string, total: number) {
+  const base = FAIR_PRICE_BASES[category];
+  if (!base || total <= 0) return null;
+  const multiplier = Math.max(1, total / ((base.low + base.high) / 2));
+  const low = Math.round(base.low * multiplier * 0.88 / 100) * 100;
+  const high = Math.round(base.high * multiplier * 0.88 * 1.05 / 100) * 100;
+  const mid = (low + high) / 2;
+  const pct = Math.round(((total - mid) / mid) * 100);
+  return { low, high, pct };
+}
 
 const TIMELINE_OPTIONS = [
   { value: "1-week", label: "1 week" },
@@ -471,6 +500,34 @@ function NewEstimateTab() {
             </div>
           </div>
         </div>
+
+        {/* FairPrice market context */}
+        {category && grandTotal > 0 && (() => {
+          const fp = getEstimateFairPrice(category, grandTotal);
+          if (!fp) return null;
+          const isBelow = fp.pct <= -8;
+          const isAbove = fp.pct >= 8;
+          return (
+            <div className="flex items-center gap-3 rounded-xl bg-gray-50 border border-gray-200 px-4 py-3">
+              <BarChart3 className="w-5 h-5 text-brand-600 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">FairPrice Market Rate</p>
+                <p className="text-sm font-bold text-gray-900 tabular-nums">
+                  {formatCurrency(fp.low)} &ndash; {formatCurrency(fp.high)}
+                </p>
+              </div>
+              <span className={cn(
+                "inline-flex items-center gap-1 text-[11px] font-semibold rounded-full px-2.5 py-1 border whitespace-nowrap",
+                isBelow ? "text-brand-700 bg-brand-50 border-brand-100"
+                  : isAbove ? "text-amber-700 bg-amber-50 border-amber-100"
+                  : "text-gray-600 bg-white border-gray-200"
+              )}>
+                {isBelow ? <TrendingDown className="w-3 h-3" /> : isAbove ? <TrendingUp className="w-3 h-3" /> : <Minus className="w-3 h-3" />}
+                {isBelow ? `${Math.abs(fp.pct)}% below market` : isAbove ? `${fp.pct}% above market` : "At market rate"}
+              </span>
+            </div>
+          );
+        })()}
 
         {/* Terms */}
         <div>

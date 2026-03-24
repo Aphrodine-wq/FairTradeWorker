@@ -14,6 +14,7 @@ export function Navbar() {
             <a href="#features" className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150">Features</a>
             <a href="#how-it-works" className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150">How It Works</a>
             <a href="#pricing" className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150">Pricing</a>
+            <Link href="/fairprice" className="text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors duration-150">FairPrice</Link>
             <Link href="/about" className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150">About</Link>
             <Link href="/faq" className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150">FAQ</Link>
             <Link href="/contact" className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150">Contact</Link>
