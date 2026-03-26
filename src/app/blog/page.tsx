@@ -12,6 +12,7 @@ import { Separator } from "@shared/ui/separator";
 const POSTS = [
   {
     title: "Why We're Killing Lead Fees",
+    slug: "/blog/killing-lead-fees",
     date: "Mar 15, 2026",
     category: "Company",
     excerpt:
@@ -19,6 +20,7 @@ const POSTS = [
   },
   {
     title: "Voice AI: How Hunter Builds Estimates in 3 Minutes",
+    slug: "/blog/hunter-voice-ai",
     date: "Mar 8, 2026",
     category: "Product",
     excerpt:
@@ -26,6 +28,7 @@ const POSTS = [
   },
   {
     title: "Escrow Payments: What Contractors Need to Know",
+    slug: "/blog/escrow-payments-guide",
     date: "Feb 28, 2026",
     category: "Guides",
     excerpt:
@@ -33,6 +36,7 @@ const POSTS = [
   },
   {
     title: "Mississippi Launch: Building Density Market by Market",
+    slug: "/blog/mississippi-launch",
     date: "Feb 15, 2026",
     category: "News",
     excerpt:
@@ -70,7 +74,7 @@ export default function BlogPage() {
             {POSTS.map((post) => (
               <Link
                 key={post.title}
-                href="#"
+                href={post.slug}
                 className="group block border border-gray-100 rounded-xl p-7 hover:border-gray-200 hover:shadow-sm transition-all duration-150"
               >
                 <div className="flex items-center gap-3 mb-4">

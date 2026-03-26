@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Toaster } from "@shared/ui/toaster";
+import { CookieConsent } from "@shared/components/cookie-consent";
 import "@/styles/globals.css";
 
 export const metadata: Metadata = {
@@ -39,6 +40,7 @@ export default function RootLayout({
       <body className="antialiased">
         {children}
         <Toaster />
+        <CookieConsent />
       </body>
     </html>
   );

@@ -4,6 +4,10 @@ import {
   DollarSign,
   Shield,
   ArrowRight,
+  ShieldCheck,
+  Lock,
+  BadgeCheck,
+  CreditCard,
 } from "lucide-react";
 import { Navbar } from "@marketplace/components/navbar";
 import { Hero } from "@marketplace/components/hero";
@@ -205,6 +209,66 @@ export default function HomePage() {
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* Trust & integrations */}
+        <section className="bg-surface py-16 border-b border-border">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p className="text-center text-sm font-bold text-gray-400 uppercase tracking-widest mb-10">
+              Built on tools you already trust
+            </p>
+
+            {/* Integration logos */}
+            <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 mb-12">
+              <div className="flex items-center gap-2 text-gray-400">
+                <CreditCard className="w-5 h-5" />
+                <span className="text-sm font-semibold tracking-wide">QuickBooks</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-400">
+                <BadgeCheck className="w-5 h-5" />
+                <span className="text-sm font-semibold tracking-wide">Persona ID</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-400">
+                <ShieldCheck className="w-5 h-5" />
+                <span className="text-sm font-semibold tracking-wide">Checkr</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-400">
+                <Lock className="w-5 h-5" />
+                <span className="text-sm font-semibold tracking-wide">256-bit SSL</span>
+              </div>
+            </div>
+
+            {/* Trust badges */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <div className="text-center">
+                <ShieldCheck className="w-8 h-8 text-brand-600 mx-auto mb-3" />
+                <h4 className="text-sm font-bold text-gray-900 mb-1">
+                  Every contractor verified
+                </h4>
+                <p className="text-xs text-gray-500">
+                  License, insurance, and background checks before they can bid.
+                </p>
+              </div>
+              <div className="text-center">
+                <Lock className="w-8 h-8 text-brand-600 mx-auto mb-3" />
+                <h4 className="text-sm font-bold text-gray-900 mb-1">
+                  Escrow-protected payments
+                </h4>
+                <p className="text-xs text-gray-500">
+                  Funds held securely until work is verified. No chasing invoices.
+                </p>
+              </div>
+              <div className="text-center">
+                <BadgeCheck className="w-8 h-8 text-brand-600 mx-auto mb-3" />
+                <h4 className="text-sm font-bold text-gray-900 mb-1">
+                  FairTrade Promise
+                </h4>
+                <p className="text-xs text-gray-500">
+                  Zero lead fees. Transparent pricing. The best contractor wins the job.
+                </p>
+              </div>
             </div>
           </div>
         </section>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Button } from "@shared/ui/button";
+import { MobileNav } from "./mobile-nav";
 
 export function Navbar() {
   return (
@@ -23,9 +24,10 @@ export function Navbar() {
             <Link href="/login" className="hidden md:block text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150">
               Log In
             </Link>
-            <Button size="sm" asChild>
+            <Button size="sm" asChild className="hidden md:inline-flex">
               <Link href="/signup">Get Started</Link>
             </Button>
+            <MobileNav />
           </div>
         </div>
       </div>

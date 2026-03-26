@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { Navbar } from "@marketplace/components/navbar";
 import { Footer } from "@marketplace/components/footer";
 import { Button } from "@shared/ui/button";
@@ -24,10 +25,25 @@ export default function ContactPage() {
   const [message, setMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [sending, setSending] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Form submission logic goes here
-    setSubmitted(true);
+    setSending(true);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, subject, message }),
+      });
+      if (!res.ok) throw new Error("Failed to send");
+      setSubmitted(true);
+      toast.success("Message sent");
+    } catch {
+      toast.error("Failed to send message. Please try again.");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -145,8 +161,8 @@ export default function ContactPage() {
                     />
                   </div>
 
-                  <Button type="submit" size="lg">
-                    Send Message
+                  <Button type="submit" size="lg" disabled={sending}>
+                    {sending ? "Sending..." : "Send Message"}
                   </Button>
                 </form>
               )}
