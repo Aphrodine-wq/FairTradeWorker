@@ -26,7 +26,7 @@ const POSTS = [
       "Getting paid on time is one of the biggest problems in construction. Escrow doesn't just protect homeowners — it gives contractors leverage too. Here's how it works.",
   },
   {
-    title: "Texas Launch: 1,000 Contractors in 30 Days",
+    title: "Mississippi Launch: Building Density Market by Market",
     date: "Feb 15, 2026",
     category: "News",
     excerpt:

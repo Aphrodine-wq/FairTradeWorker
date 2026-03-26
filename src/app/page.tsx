@@ -193,7 +193,7 @@ export default function HomePage() {
                 </blockquote>
                 <p className="mt-6 text-sm text-gray-500">
                   &mdash; Marcus Johnson, Johnson &amp; Sons Construction,
-                  Austin TX
+                  Oxford MS
                 </p>
               </div>
             </div>

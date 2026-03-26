@@ -4,7 +4,7 @@ const testimonials = [
       "No lead fees, quality homeowners, and the Voice AI estimator saves me hours every week. I've grown my business 40% since joining.",
     name: "Marcus Johnson",
     company: "Johnson & Sons Construction",
-    location: "Austin, TX",
+    location: "Oxford, MS",
     role: "General Contractor",
   },
   {
@@ -59,7 +59,7 @@ export function Testimonials() {
             What People Are Saying
           </p>
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
-            Trusted by contractors and homeowners across Texas.
+            Trusted by contractors and homeowners across Mississippi.
           </h2>
         </div>
 

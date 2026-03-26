@@ -89,7 +89,7 @@ export default function LoginPage() {
               &ldquo;I&apos;ve grown my business 40% since joining.&rdquo;
             </p>
             <p className="text-xs text-gray-400 mt-1">
-              Marcus Johnson, Austin TX
+              Marcus Johnson, Oxford MS
             </p>
           </div>
         </div>

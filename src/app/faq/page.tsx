@@ -43,7 +43,7 @@ const FAQ_CATEGORIES = [
     items: [
       {
         q: "Do I need a license to join?",
-        a: "Requirements vary by trade and location. We verify license status during onboarding for trades that require it in Texas. You'll need to provide your license number and we confirm it against state records. Unlicensed trades (handyman, general labor, etc.) are also welcome — they go through identity and insurance verification instead.",
+        a: "Requirements vary by trade and location. We verify license status during onboarding for trades that require it in Mississippi. You'll need to provide your license number and we confirm it against state records. Unlicensed trades (handyman, general labor, etc.) are also welcome — they go through identity and insurance verification instead.",
       },
       {
         q: "How does contractor verification work?",
@@ -109,8 +109,8 @@ const FAQ_CATEGORIES = [
     title: "Platform and Availability",
     items: [
       {
-        q: "Can I use FairTradeWorker outside of Texas?",
-        a: "Right now we're focused on Texas — it's where we're building density and proving our model market by market. We're planning to expand to the broader Southwest in late 2026. If you're outside Texas, you can sign up on the waitlist and we'll notify you when your area goes live.",
+        q: "Can I use FairTradeWorker outside of Mississippi?",
+        a: "Right now we're focused on Mississippi — starting in North Mississippi and expanding statewide. We're planning to open neighboring states in the Southeast by late 2026. If you're outside our area, sign up on the waitlist and we'll notify you when your market goes live.",
       },
       {
         q: "How do I cancel my subscription?",

@@ -57,7 +57,7 @@ export function Footer() {
                 hello@fairtradeworker.com
               </a>
             </p>
-            <p className="text-sm text-gray-300 mt-1">Austin, TX</p>
+            <p className="text-sm text-gray-300 mt-1">Oxford, MS</p>
           </div>
 
           {/* Link columns */}

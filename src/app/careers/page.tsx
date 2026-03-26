@@ -8,21 +8,21 @@ import { Separator } from "@shared/ui/separator";
 const OPENINGS = [
   {
     title: "Senior Full-Stack Engineer",
-    location: "Austin, TX (Remote OK)",
+    location: "Oxford, MS (Remote OK)",
     type: "Full-time",
     description:
       "Own product features end-to-end. We're a Next.js + Node shop, but we care more about how you think than what stack you know.",
   },
   {
     title: "Head of Contractor Growth",
-    location: "Austin, TX",
+    location: "Oxford, MS",
     type: "Full-time",
     description:
-      "Own contractor acquisition and retention in Texas. You know the trades industry, you're relentless, and you don't need a playbook to get started.",
+      "Own contractor acquisition and retention in Mississippi. You know the trades industry, you're relentless, and you don't need a playbook to get started.",
   },
   {
     title: "Customer Success Lead",
-    location: "Austin, TX (Remote OK)",
+    location: "Oxford, MS (Remote OK)",
     type: "Full-time",
     description:
       "Be the person contractors and homeowners call when something goes sideways. You fix problems fast and make people feel heard.",
@@ -43,7 +43,7 @@ export default function CareersPage() {
           </h1>
 
           <p className="mt-6 text-lg text-gray-600 leading-relaxed max-w-2xl">
-            We&apos;re a small team in Austin building the marketplace the construction
+            We&apos;re a small team in Oxford, MS building the marketplace the construction
             industry deserves. If you&apos;re tired of working on things that don&apos;t
             matter, let&apos;s talk.
           </p>

@@ -135,11 +135,11 @@ export default function AboutPage() {
           {/* Team */}
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Built in Texas. By people who&apos;ve swung a hammer.
+              Built in Mississippi. By people who&apos;ve swung a hammer.
             </h2>
             <div className="space-y-4 text-gray-600 leading-relaxed max-w-3xl">
               <p>
-                We&apos;re a small team based in Austin. Some of us came from
+                We&apos;re a small team based in Oxford, Mississippi. Some of us came from
                 construction — years on job sites, running crews, dealing with
                 the same broken platforms we&apos;re replacing. Some of us came
                 from software — building products at scale, shipping things that
@@ -147,11 +147,12 @@ export default function AboutPage() {
                 get exploited by bad marketplaces.
               </p>
               <p>
-                We&apos;re starting in Texas because it&apos;s what we know.
-                It&apos;s where the construction market is booming, where the
-                trades are underserved by technology, and where we can build
-                density market by market before we expand. We&apos;re planning
-                to open the broader Southwest in late 2026.
+                We&apos;re starting in Mississippi because it&apos;s what we
+                know. Small markets where contractors know each other, where
+                reputation actually matters, and where the trades are
+                completely underserved by technology. We&apos;re building
+                density market by market — North Mississippi first, then
+                the rest of the state, then the Southeast.
               </p>
             </div>
           </section>
