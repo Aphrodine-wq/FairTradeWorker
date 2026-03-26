@@ -1,19 +1,20 @@
 /**
  * FTW Realtime Client
  *
- * Connects the Next.js frontend to the Elixir/Phoenix backend
- * via WebSockets (Phoenix Channels) and REST API.
+ * Connects the Next.js frontend to the Spring Boot backend
+ * via WebSockets (STOMP/SockJS) and REST API.
  *
  * Usage:
  *   import { realtimeClient } from "@shared/lib/realtime"
  *   realtimeClient.connect(jwtToken)
  */
-import { Socket, Channel } from "phoenix";
+import { Client, IMessage, StompSubscription } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
 
 const API_BASE = process.env.NEXT_PUBLIC_REALTIME_URL || "http://localhost:4000";
-const WS_URL = API_BASE.replace(/^http/, "ws") + "/socket";
+const WS_URL = `${API_BASE}/ws`;
 
-// --- Types matching the Elixir backend serializers ---
+// --- Types matching the backend serializers ---
 
 export interface RealtimeUser {
   id: string;
@@ -351,19 +352,24 @@ export const api = {
   },
 };
 
-// --- WebSocket Client ---
+// --- WebSocket Client (STOMP over SockJS) ---
+
+interface StompEvent {
+  event: string;
+  data: any;
+}
 
 class RealtimeClient {
-  private socket: Socket | null = null;
-  private channels: Map<string, Channel> = new Map();
+  private client: Client | null = null;
+  private subscriptions: Map<string, StompSubscription> = new Map();
   private _connected = false;
 
   /**
-   * Connect to the Phoenix WebSocket with a JWT token.
-   * The token is verified server-side — no anonymous connections allowed.
+   * Connect to the Spring Boot WebSocket via STOMP/SockJS.
+   * The token is verified server-side on CONNECT — no anonymous connections allowed.
    */
   connect(token?: string) {
-    if (this.socket?.isConnected()) return;
+    if (this._connected) return;
 
     const authToken = token || _authToken;
     if (!authToken) {
@@ -371,36 +377,73 @@ class RealtimeClient {
       return;
     }
 
-    this.socket = new Socket(WS_URL, {
-      params: { token: authToken },
-      reconnectAfterMs: (tries: number) => [1000, 2000, 5000, 10000][Math.min(tries - 1, 3)],
+    this.client = new Client({
+      webSocketFactory: () => new SockJS(WS_URL) as any,
+      connectHeaders: { token: authToken },
+      reconnectDelay: 2000,
+      heartbeatIncoming: 10000,
+      heartbeatOutgoing: 10000,
+      onConnect: () => {
+        this._connected = true;
+      },
+      onDisconnect: () => {
+        this._connected = false;
+      },
+      onStompError: (frame) => {
+        this._connected = false;
+        console.error("[FTW Realtime] STOMP error:", frame.headers?.message);
+      },
     });
 
-    this.socket.onOpen(() => {
-      this._connected = true;
-    });
-
-    this.socket.onClose(() => {
-      this._connected = false;
-    });
-
-    this.socket.onError(() => {
-      this._connected = false;
-    });
-
-    this.socket.connect();
+    this.client.activate();
   }
 
   disconnect() {
-    this.channels.forEach((ch) => ch.leave());
-    this.channels.clear();
-    this.socket?.disconnect();
-    this.socket = null;
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
+    this.subscriptions.clear();
+    this.client?.deactivate();
+    this.client = null;
     this._connected = false;
   }
 
   get isConnected() {
     return this._connected;
+  }
+
+  private subscribe(topic: string, callback: (event: StompEvent) => void): () => void {
+    if (!this.client) this.connect();
+    if (!this.client) return () => {};
+
+    const doSubscribe = () => {
+      const sub = this.client!.subscribe(topic, (msg: IMessage) => {
+        try {
+          const parsed = JSON.parse(msg.body) as StompEvent;
+          callback(parsed);
+        } catch {
+          // If the message isn't a StompEvent envelope, wrap it
+          callback({ event: "message", data: JSON.parse(msg.body) });
+        }
+      });
+      this.subscriptions.set(topic, sub);
+    };
+
+    if (this._connected) {
+      doSubscribe();
+    } else {
+      // Wait for connection
+      const interval = setInterval(() => {
+        if (this._connected) {
+          clearInterval(interval);
+          doSubscribe();
+        }
+      }, 100);
+      setTimeout(() => clearInterval(interval), 10000);
+    }
+
+    return () => {
+      this.subscriptions.get(topic)?.unsubscribe();
+      this.subscriptions.delete(topic);
+    };
   }
 
   // Subscribe to the live job feed
@@ -409,35 +452,19 @@ class RealtimeClient {
     onJobPosted?: JobCallback;
     onJobUpdated?: JobCallback;
   }): () => void {
-    if (!this.socket) this.connect();
-    if (!this.socket) return () => {};
-
-    const channel = this.socket.channel("jobs:feed", {});
-
-    channel.on("jobs:list", (payload: { jobs: RealtimeJob[] }) => {
-      callbacks.onJobsList?.(payload.jobs);
+    return this.subscribe("/topic/jobs.feed", (msg) => {
+      switch (msg.event) {
+        case "jobs:list":
+          callbacks.onJobsList?.(msg.data.jobs);
+          break;
+        case "job:posted":
+          callbacks.onJobPosted?.(msg.data);
+          break;
+        case "job:updated":
+          callbacks.onJobUpdated?.(msg.data);
+          break;
+      }
     });
-
-    channel.on("job:posted", (job: RealtimeJob) => {
-      callbacks.onJobPosted?.(job);
-    });
-
-    channel.on("job:updated", (job: RealtimeJob) => {
-      callbacks.onJobUpdated?.(job);
-    });
-
-    channel
-      .join()
-      .receive("error", (resp) => {
-        console.error("[FTW Realtime] Failed to join jobs:feed", resp);
-      });
-
-    this.channels.set("jobs:feed", channel);
-
-    return () => {
-      channel.leave();
-      this.channels.delete("jobs:feed");
-    };
   }
 
   // Subscribe to bids on a specific job
@@ -449,36 +476,19 @@ class RealtimeClient {
       onBidAccepted?: BidCallback;
     }
   ): () => void {
-    if (!this.socket) this.connect();
-    if (!this.socket) return () => {};
-
-    const topic = `job:${jobId}`;
-    const channel = this.socket.channel(topic, {});
-
-    channel.on("job:details", (data: { job: RealtimeJob; bids: RealtimeBid[] }) => {
-      callbacks.onJobDetails?.(data);
+    return this.subscribe(`/topic/job.${jobId}`, (msg) => {
+      switch (msg.event) {
+        case "job:details":
+          callbacks.onJobDetails?.(msg.data);
+          break;
+        case "bid:placed":
+          callbacks.onBidPlaced?.(msg.data);
+          break;
+        case "bid:accepted":
+          callbacks.onBidAccepted?.(msg.data);
+          break;
+      }
     });
-
-    channel.on("bid:placed", (bid: RealtimeBid) => {
-      callbacks.onBidPlaced?.(bid);
-    });
-
-    channel.on("bid:accepted", (bid: RealtimeBid) => {
-      callbacks.onBidAccepted?.(bid);
-    });
-
-    channel
-      .join()
-      .receive("error", (resp) => {
-        console.error(`[FTW Realtime] Failed to join ${topic}`, resp);
-      });
-
-    this.channels.set(topic, channel);
-
-    return () => {
-      channel.leave();
-      this.channels.delete(topic);
-    };
   }
 
   // Subscribe to a chat conversation
@@ -490,40 +500,23 @@ class RealtimeClient {
       onPresence?: (presences: Record<string, unknown>) => void;
     }
   ): () => void {
-    if (!this.socket) this.connect();
-    if (!this.socket) return () => {};
-
-    const topic = `chat:${conversationId}`;
-    const channel = this.socket.channel(topic, {});
-
-    channel.on("messages:list", (payload: { messages: RealtimeMessage[] }) => {
-      callbacks.onMessagesList?.(payload.messages);
+    return this.subscribe(`/topic/chat.${conversationId}`, (msg) => {
+      switch (msg.event) {
+        case "messages:list":
+          callbacks.onMessagesList?.(msg.data.messages);
+          break;
+        case "message:new":
+          callbacks.onNewMessage?.(msg.data);
+          break;
+        case "typing":
+          callbacks.onPresence?.(msg.data);
+          break;
+        case "presence_state":
+        case "presence_diff":
+          callbacks.onPresence?.(msg.data);
+          break;
+      }
     });
-
-    channel.on("message:new", (message: RealtimeMessage) => {
-      callbacks.onNewMessage?.(message);
-    });
-
-    channel.on("presence_state", (state) => {
-      callbacks.onPresence?.(state);
-    });
-
-    channel.on("presence_diff", (diff) => {
-      callbacks.onPresence?.(diff);
-    });
-
-    channel
-      .join()
-      .receive("error", (resp) => {
-        console.error(`[FTW Realtime] Failed to join ${topic}`, resp);
-      });
-
-    this.channels.set(topic, channel);
-
-    return () => {
-      channel.leave();
-      this.channels.delete(topic);
-    };
   }
 
   // Subscribe to user notifications
@@ -534,62 +527,46 @@ class RealtimeClient {
       onPresence?: (presences: Record<string, unknown>) => void;
     }
   ): () => void {
-    if (!this.socket) this.connect();
-    if (!this.socket) return () => {};
-
-    const topic = `user:${userId}`;
-    const channel = this.socket.channel(topic, {});
-
-    channel.on("notification", (payload) => {
-      callbacks.onNotification?.(payload);
+    return this.subscribe(`/topic/user.${userId}`, (msg) => {
+      switch (msg.event) {
+        case "notification":
+          callbacks.onNotification?.(msg.data);
+          break;
+        case "presence_state":
+          callbacks.onPresence?.(msg.data);
+          break;
+      }
     });
-
-    channel.on("presence_state", (state) => {
-      callbacks.onPresence?.(state);
-    });
-
-    channel
-      .join()
-      .receive("error", (resp) => {
-        console.error(`[FTW Realtime] Failed to join ${topic}`, resp);
-      });
-
-    this.channels.set(topic, channel);
-
-    return () => {
-      channel.leave();
-      this.channels.delete(topic);
-    };
   }
 
-  // Send a message through the chat channel (server uses socket auth for sender_id)
+  // Send a message through the chat channel
   sendViaChannel(conversationId: string, attrs: { body: string }) {
-    const channel = this.channels.get(`chat:${conversationId}`);
-    if (channel) {
-      return channel.push("send_message", attrs);
-    }
+    this.client?.publish({
+      destination: `/app/chat.${conversationId}.send`,
+      body: JSON.stringify(attrs),
+    });
   }
 
   // Send typing indicator
   sendTyping(conversationId: string, typing: boolean) {
-    const channel = this.channels.get(`chat:${conversationId}`);
-    if (channel) {
-      channel.push("typing", { typing });
-    }
+    this.client?.publish({
+      destination: `/app/chat.${conversationId}.typing`,
+      body: JSON.stringify({ typing }),
+    });
   }
 
-  // Place a bid through the bid channel (server uses socket auth for contractor_id)
+  // Place a bid through the WebSocket
   placeBidViaChannel(
     jobId: string,
     attrs: { amount: number; message: string; timeline: string }
   ) {
-    const channel = this.channels.get(`job:${jobId}`);
-    if (channel) {
-      return channel.push("place_bid", attrs);
-    }
+    this.client?.publish({
+      destination: `/app/job.${jobId}.bid`,
+      body: JSON.stringify(attrs),
+    });
   }
 
-  // Post a job through the feed channel (server uses socket auth for homeowner_id)
+  // Post a job through the feed channel
   postJobViaChannel(attrs: {
     title: string;
     description: string;
@@ -598,10 +575,10 @@ class RealtimeClient {
     budget_max: number;
     location: string;
   }) {
-    const channel = this.channels.get("jobs:feed");
-    if (channel) {
-      return channel.push("post_job", attrs);
-    }
+    this.client?.publish({
+      destination: "/app/jobs.feed.post",
+      body: JSON.stringify(attrs),
+    });
   }
 }
 
