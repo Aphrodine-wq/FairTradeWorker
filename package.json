@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "dev:electron": "concurrently \"next dev --turbopack\" \"wait-on http://localhost:3000 && electron .\"",
