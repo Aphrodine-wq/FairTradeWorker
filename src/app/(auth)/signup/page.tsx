@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Home, HardHat, Eye, EyeOff, ChevronLeft } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Home, HardHat, Eye, EyeOff, ChevronLeft, Check } from "lucide-react";
 import { authStore } from "@shared/lib/auth-store";
+import { track, identify } from "@shared/lib/analytics";
 import { Button } from "@shared/ui/button";
 import { Card, CardContent } from "@shared/ui/card";
 import { Input } from "@shared/ui/input";
@@ -30,16 +31,33 @@ const SPECIALTIES = [
   "Other",
 ];
 
+const VALUE_PROPS = [
+  "No lead fees — flat subscription, keep what you earn",
+  "Escrow payments on every job",
+  "AI-powered estimates in minutes",
+  "Verified contractors only",
+  "Free plan available for both sides",
+];
+
 export default function SignupPage() {
+  return (
+    <Suspense>
+      <SignupContent />
+    </Suspense>
+  );
+}
+
+function SignupContent() {
   const router = useRouter();
-  const [step, setStep] = useState<1 | 2>(1);
-  const [role, setRole] = useState<Role>(null);
+  const searchParams = useSearchParams();
+  const initialRole = searchParams.get("role") as Role;
+  const [step, setStep] = useState<1 | 2>(initialRole ? 2 : 1);
+  const [role, setRole] = useState<Role>(initialRole);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Form state
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -51,8 +69,10 @@ export default function SignupPage() {
     licenseNumber: "",
   });
 
-  const update = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setForm((prev) => ({ ...prev, [field]: e.target.value }));
+  const update =
+    (field: keyof typeof form) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+      setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
   const handleRoleSelect = (selected: Role) => {
     setRole(selected);
@@ -85,7 +105,17 @@ export default function SignupPage() {
         name: form.name,
         role: role as "homeowner" | "contractor",
       });
-      router.push(user.role === "homeowner" ? "/homeowner/dashboard" : "/contractor/dashboard");
+      identify(user.id, {
+        email: user.email,
+        role: user.role,
+        name: form.name,
+      });
+      track("signup", { role: user.role });
+      router.push(
+        user.role === "homeowner"
+          ? "/homeowner/onboarding"
+          : "/contractor/onboarding"
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed");
     } finally {
@@ -94,64 +124,136 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF8] flex flex-col items-center justify-center px-4 py-12">
-      <div className="w-full max-w-[480px]">
-        {/* Brand */}
-        <div className="text-center mb-8">
+    <div className="min-h-screen bg-[#FDFBF8] flex">
+      {/* Left panel — value prop */}
+      <div className="hidden lg:flex lg:w-[45%] bg-dark flex-col justify-between p-12">
+        <div>
           <Link href="/" className="inline-block">
-            <span className="text-2xl font-extrabold tracking-tight text-gray-900">
-              Fair<span className="text-brand-600">Trade</span>Worker
+            <span className="text-xl font-extrabold tracking-tight text-white">
+              Fair<span className="text-brand-500">Trade</span>Worker
             </span>
           </Link>
-          <p className="text-sm text-gray-400 mt-1">The fair way to find and hire contractors</p>
         </div>
 
-        <Card className="shadow-md">
-          <CardContent className="p-8">
-            {/* Step indicator */}
-            <div className="flex items-center justify-center gap-2 mb-7">
-              <StepDot active={step === 1} completed={step > 1} label="Role" />
-              <div
-                className={cn(
-                  "h-px flex-1 max-w-[48px] transition-colors duration-300",
-                  step > 1 ? "bg-brand-600" : "bg-border"
-                )}
-              />
-              <StepDot active={step === 2} completed={false} label="Details" />
+        <div className="space-y-12">
+          <h2 className="text-3xl font-bold text-white leading-tight">
+            Join the fair
+            <br />
+            <span className="text-brand-500">marketplace.</span>
+          </h2>
+
+          <ul className="space-y-3">
+            {VALUE_PROPS.map((prop) => (
+              <li key={prop} className="flex items-start gap-3">
+                <Check className="w-4 h-4 text-brand-500 mt-0.5 flex-shrink-0" />
+                <span className="text-sm text-gray-300">{prop}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <p className="text-2xl font-bold text-white tabular-nums">12,800+</p>
+              <p className="text-xs text-gray-400">Jobs</p>
             </div>
+            <div>
+              <p className="text-2xl font-bold text-white tabular-nums">3,200+</p>
+              <p className="text-xs text-gray-400">Contractors</p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-white tabular-nums">98%</p>
+              <p className="text-xs text-gray-400">Satisfaction</p>
+            </div>
+          </div>
 
-            {step === 1 && <StepOne onSelect={handleRoleSelect} selected={role} />}
-            {step === 2 && role && (
-              <StepTwo
-                role={role}
-                form={form}
-                update={update}
-                showPassword={showPassword}
-                setShowPassword={setShowPassword}
-                showConfirm={showConfirm}
-                setShowConfirm={setShowConfirm}
-                onBack={handleBack}
-                onSubmit={handleSubmit}
-                error={error}
-                loading={loading}
-              />
-            )}
-          </CardContent>
-        </Card>
+          <div className="border-l-2 border-brand-600 pl-4">
+            <p className="text-sm text-gray-300 italic">
+              &ldquo;Landed three jobs in my first two weeks.&rdquo;
+            </p>
+            <p className="text-xs text-gray-400 mt-1">
+              David Ramirez, San Antonio TX
+            </p>
+          </div>
+        </div>
 
-        {/* Legal */}
-        <p className="mt-6 text-center text-xs text-gray-400">
-          By creating an account, you agree to our{" "}
-          <Link href="/terms" className="underline hover:text-gray-600 transition-colors">Terms</Link>
-          {" "}and{" "}
-          <Link href="/privacy" className="underline hover:text-gray-600 transition-colors">Privacy Policy</Link>.
+        <p className="text-xs text-gray-500">
+          &copy; {new Date().getFullYear()} FairTradeWorker
         </p>
+      </div>
+
+      {/* Right panel — form */}
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
+        <div className="w-full max-w-[480px]">
+          {/* Mobile brand */}
+          <div className="text-center mb-8 lg:hidden">
+            <Link href="/" className="inline-block">
+              <span className="text-2xl font-extrabold tracking-tight text-gray-900">
+                Fair<span className="text-brand-600">Trade</span>Worker
+              </span>
+            </Link>
+          </div>
+
+          <Card className="shadow-md">
+            <CardContent className="p-8">
+              {/* Step indicator */}
+              <div className="flex items-center justify-center gap-2 mb-7">
+                <StepDot
+                  active={step === 1}
+                  completed={step > 1}
+                  label="Role"
+                />
+                <div
+                  className={cn(
+                    "h-px flex-1 max-w-[48px] transition-colors duration-300",
+                    step > 1 ? "bg-brand-600" : "bg-border"
+                  )}
+                />
+                <StepDot active={step === 2} completed={false} label="Details" />
+              </div>
+
+              {step === 1 && (
+                <StepOne onSelect={handleRoleSelect} selected={role} />
+              )}
+              {step === 2 && role && (
+                <StepTwo
+                  role={role}
+                  form={form}
+                  update={update}
+                  showPassword={showPassword}
+                  setShowPassword={setShowPassword}
+                  showConfirm={showConfirm}
+                  setShowConfirm={setShowConfirm}
+                  onBack={handleBack}
+                  onSubmit={handleSubmit}
+                  error={error}
+                  loading={loading}
+                />
+              )}
+            </CardContent>
+          </Card>
+
+          <p className="mt-6 text-center text-xs text-gray-400">
+            By creating an account, you agree to our{" "}
+            <Link
+              href="/terms"
+              className="underline hover:text-gray-600 transition-colors"
+            >
+              Terms
+            </Link>{" "}
+            and{" "}
+            <Link
+              href="/privacy"
+              className="underline hover:text-gray-600 transition-colors"
+            >
+              Privacy Policy
+            </Link>
+            .
+          </p>
+        </div>
       </div>
     </div>
   );
 }
-
-// ─── Step Dot ────────────────────────────────────────────────────────────────
 
 function StepDot({
   active,
@@ -175,8 +277,18 @@ function StepDot({
         )}
       >
         {completed ? (
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2.5}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5 13l4 4L19 7"
+            />
           </svg>
         ) : label === "Role" ? (
           "1"
@@ -196,8 +308,6 @@ function StepDot({
   );
 }
 
-// ─── Step 1: Role Selection ───────────────────────────────────────────────────
-
 function StepOne({
   onSelect,
   selected,
@@ -211,21 +321,23 @@ function StepOne({
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
           Create your account
         </h1>
-        <p className="text-sm text-gray-500 mt-1">How will you use FairTradeWorker?</p>
+        <p className="text-sm text-gray-500 mt-1">
+          How will you use FairTradeWorker?
+        </p>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <RoleCard
           icon={<Home className="w-7 h-7" />}
           title="I'm a Homeowner"
-          description="Post projects, get competitive bids, hire verified contractors."
+          description="Post projects, get bids, hire verified contractors."
           selected={selected === "homeowner"}
           onClick={() => onSelect("homeowner")}
         />
         <RoleCard
           icon={<HardHat className="w-7 h-7" />}
           title="I'm a Contractor"
-          description="Find local jobs, bid on projects, grow your business."
+          description="Find jobs, bid on projects, grow your business."
           selected={selected === "contractor"}
           onClick={() => onSelect("contractor")}
         />
@@ -268,11 +380,20 @@ function RoleCard({
           : "border-border bg-white hover:border-gray-300 hover:bg-gray-50"
       )}
     >
-      {/* Selected indicator */}
       {selected && (
         <span className="absolute top-3 right-3 w-4 h-4 rounded-full bg-brand-600 flex items-center justify-center">
-          <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          <svg
+            className="w-2.5 h-2.5 text-white"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={3}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5 13l4 4L19 7"
+            />
           </svg>
         </span>
       )}
@@ -294,8 +415,6 @@ function RoleCard({
   );
 }
 
-// ─── Step 2: Registration Form ────────────────────────────────────────────────
-
 interface StepTwoProps {
   role: NonNullable<Role>;
   form: {
@@ -308,7 +427,17 @@ interface StepTwoProps {
     yearsExperience: string;
     licenseNumber: string;
   };
-  update: (field: "name" | "email" | "password" | "confirmPassword" | "companyName" | "specialty" | "yearsExperience" | "licenseNumber") => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  update: (
+    field:
+      | "name"
+      | "email"
+      | "password"
+      | "confirmPassword"
+      | "companyName"
+      | "specialty"
+      | "yearsExperience"
+      | "licenseNumber"
+  ) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   showPassword: boolean;
   setShowPassword: (v: boolean) => void;
   showConfirm: boolean;
@@ -336,7 +465,6 @@ function StepTwo({
 
   return (
     <div>
-      {/* Back button + heading row */}
       <div className="flex items-center gap-3 mb-6">
         <button
           type="button"
@@ -364,19 +492,18 @@ function StepTwo({
             {error}
           </div>
         )}
-        {/* Full Name */}
+
         <Field label="Full name">
           <Input
             type="text"
             autoComplete="name"
-            placeholder="James Walton"
+            placeholder="Your full name"
             value={form.name}
             onChange={update("name")}
             required
           />
         </Field>
 
-        {/* Email */}
         <Field label="Email address">
           <Input
             type="email"
@@ -388,14 +515,13 @@ function StepTwo({
           />
         </Field>
 
-        {/* Contractor-only fields */}
         {isContractor && (
           <>
             <Field label="Company name">
               <Input
                 type="text"
                 autoComplete="organization"
-                placeholder="Walton Construction LLC"
+                placeholder="Your company name"
                 value={form.companyName}
                 onChange={update("companyName")}
                 required
@@ -445,7 +571,6 @@ function StepTwo({
           </>
         )}
 
-        {/* Password */}
         <Field label="Password">
           <PasswordInput
             value={form.password}
@@ -457,7 +582,6 @@ function StepTwo({
           />
         </Field>
 
-        {/* Confirm Password */}
         <Field label="Confirm password">
           <PasswordInput
             value={form.confirmPassword}
@@ -469,7 +593,12 @@ function StepTwo({
           />
         </Field>
 
-        <Button type="submit" size="lg" className="w-full mt-2" disabled={loading}>
+        <Button
+          type="submit"
+          size="lg"
+          className="w-full mt-2"
+          disabled={loading}
+        >
           {loading ? "Creating account..." : "Create Account"}
         </Button>
       </form>
@@ -486,8 +615,6 @@ function StepTwo({
     </div>
   );
 }
-
-// ─── Shared sub-components ────────────────────────────────────────────────────
 
 function Field({
   label,

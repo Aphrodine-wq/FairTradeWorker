@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import {
+  Award,
   Check,
   Circle,
   Clock,
+  Copy,
   DollarSign,
   Shield,
   ShieldCheck,
@@ -182,6 +184,44 @@ const PROJECTS: HomeownerProject[] = [
       { name: "Original Estimate", type: "pdf" },
       { name: "Signed Contract", type: "pdf" },
       { name: "Project Photos", type: "photo", count: 6 },
+    ],
+    changeOrders: [],
+  },
+  {
+    id: "proj-3",
+    title: "Interior Painting",
+    status: "completed",
+    progress: 100,
+    budget: 4200,
+    spent: 4200,
+    contractor: {
+      name: "Marcus Johnson",
+      initials: "MJ",
+      rating: 4.9,
+      reviews: 127,
+      verified: true,
+    },
+    banner: {
+      type: "on-track",
+      message: "Project completed on Jan 18, 2026. FairRecord has been generated.",
+    },
+    milestones: [
+      { name: "Prep & Priming", status: "completed", date: "Jan 12, 2026", payment: 1260, paidDate: "Jan 12, 2026" },
+      { name: "First Coat", status: "completed", date: "Jan 14, 2026", payment: 1260, paidDate: "Jan 14, 2026" },
+      { name: "Second Coat", status: "completed", date: "Jan 16, 2026", payment: 1260, paidDate: "Jan 16, 2026" },
+      { name: "Touch-ups & Cleanup", status: "completed", date: "Jan 18, 2026", payment: 420, paidDate: "Jan 18, 2026" },
+    ],
+    payments: [
+      { date: "2026-01-12", description: "Milestone: Prep & Priming", amount: 1260, status: "paid" },
+      { date: "2026-01-14", description: "Milestone: First Coat", amount: 1260, status: "paid" },
+      { date: "2026-01-16", description: "Milestone: Second Coat", amount: 1260, status: "paid" },
+      { date: "2026-01-18", description: "Final Payment", amount: 420, status: "paid" },
+    ],
+    documents: [
+      { name: "Original Estimate", type: "pdf" },
+      { name: "Signed Contract", type: "pdf" },
+      { name: "Project Photos", type: "photo", count: 8 },
+      { name: "FairRecord Certificate", type: "pdf", badge: "Verified", badgeVariant: "success" },
     ],
     changeOrders: [],
   },
@@ -519,6 +559,82 @@ function ChangeOrdersSection({ changeOrders }: { changeOrders: ChangeOrder[] }) 
   );
 }
 
+// ─── FairRecord Section ─────────────────────────────────────────────────────────
+
+function FairRecordSection({ project }: { project: HomeownerProject }) {
+  if (project.status !== "completed") return null;
+
+  const [copied, setCopied] = useState(false);
+  const publicId = "FR-A3X9K2"; // In production, fetched from API
+  const budgetAccuracy = project.budget > 0
+    ? Math.round((1 - Math.abs(project.spent - project.budget) / project.budget) * 100)
+    : 0;
+
+  const copyLink = () => {
+    navigator.clipboard.writeText(`${window.location.origin}/record/${publicId}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <Card>
+      <CardContent className="p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Award className="w-5 h-5 text-brand-600" />
+            <h3 className="text-sm font-bold text-gray-900">FairRecord</h3>
+            <Badge variant="success" className="text-[10px]">Verified</Badge>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={copyLink} className="text-[12px] gap-1">
+              {copied ? (
+                <><CheckCircle2 className="w-3 h-3" /> Copied</>
+              ) : (
+                <><Copy className="w-3 h-3" /> Share Link</>
+              )}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => window.open(`/record/${publicId}`, "_blank")}
+              className="text-[12px] gap-1"
+            >
+              <ExternalLink className="w-3 h-3" /> View Certificate
+            </Button>
+          </div>
+        </div>
+
+        <p className="text-[13px] text-gray-500 mb-4">
+          This project has a verified FairRecord. Share it with future contractors
+          or reference it for similar projects.
+        </p>
+
+        <div className="grid grid-cols-3 gap-3 text-center">
+          <div className="p-3 bg-surface rounded-lg">
+            <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium mb-0.5">Budget Accuracy</p>
+            <p className="text-lg font-bold text-emerald-700">{budgetAccuracy}%</p>
+          </div>
+          <div className="p-3 bg-surface rounded-lg">
+            <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium mb-0.5">Timeline</p>
+            <p className="text-lg font-bold text-emerald-700">On Time</p>
+          </div>
+          <div className="p-3 bg-surface rounded-lg">
+            <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium mb-0.5">Disputes</p>
+            <p className="text-lg font-bold text-emerald-700">0</p>
+          </div>
+        </div>
+
+        <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
+          <span className="text-[11px] text-gray-400 font-mono">{publicId}</span>
+          <span className="text-[11px] text-gray-400">
+            Confirmed by homeowner on Jan 19, 2026
+          </span>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 // ─── Sidebar Project Item ───────────────────────────────────────────────────────
 
 function formatCompact(amount: number): string {
@@ -526,7 +642,7 @@ function formatCompact(amount: number): string {
     const val = amount / 1000;
     return `$${val % 1 === 0 ? val.toFixed(0) : val.toFixed(1)}K`;
   }
-  return `$${amount}`;
+  return `$${amount || 0}`;
 }
 
 function SidebarProjectItem({
@@ -659,6 +775,9 @@ export default function HomeownerProjectsPage() {
 
           {/* Change Orders */}
           <ChangeOrdersSection changeOrders={selected.changeOrders} />
+
+          {/* FairRecord (completed projects only) */}
+          <FairRecordSection project={selected} />
         </div>
       </main>
     </div>

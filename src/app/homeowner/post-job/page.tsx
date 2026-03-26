@@ -25,6 +25,8 @@ import { Badge } from "@shared/ui/badge";
 import { cn } from "@shared/lib/utils";
 import { JOB_CATEGORIES } from "@shared/lib/constants";
 import { authStore } from "@shared/lib/auth-store";
+import { api } from "@shared/lib/realtime";
+import { track } from "@shared/lib/analytics";
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -110,36 +112,21 @@ export default function PostJobPage() {
     setError("");
     setSubmitting(true);
 
-    const token = authStore.getToken();
     try {
-      const res = await fetch("/api/jobs", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({
-          ...form,
-          budgetMin: form.budgetMin ? parseFloat(form.budgetMin) : null,
-          budgetMax: form.budgetMax ? parseFloat(form.budgetMax) : null,
-          sqft: form.sqft ? parseInt(form.sqft) : null,
-          yearBuilt: form.yearBuilt ? parseInt(form.yearBuilt) : null,
-        }),
+      // Post job via Elixir backend (realtime API)
+      const job = await api.postJob({
+        title: form.title || `${form.category} Project`,
+        description: form.description,
+        category: form.category,
+        budget_min: form.budgetMin ? parseFloat(form.budgetMin) : 0,
+        budget_max: form.budgetMax ? parseFloat(form.budgetMax) : 0,
+        location: form.location || "Texas",
       });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to post job");
-      }
-
-      const { job } = await res.json();
-
       // Request AI estimate in the background
-      fetch(`/api/jobs/${job.id}/estimate`, {
-        method: "POST",
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      }).catch(() => {});
+      api.getAIEstimate(form.description).catch(() => {});
 
+      track("job_posted", { category: form.category });
       router.push("/homeowner/jobs");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");

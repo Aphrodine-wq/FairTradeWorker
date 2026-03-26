@@ -14,6 +14,8 @@ import {
   Bell,
   Users,
   Settings,
+  Award,
+  Wallet,
 } from "lucide-react";
 import { Sidebar } from "@shared/components/sidebar";
 import { cn } from "@shared/lib/utils";
@@ -26,7 +28,9 @@ const NAV_ITEMS = [
   { label: "Estimates",      href: "/contractor/estimates",       icon: FileText },
   { label: "Projects",       href: "/contractor/projects",       icon: FolderOpen },
   { label: "Invoices",       href: "/contractor/invoices",       icon: Receipt },
+  { label: "Payments",       href: "/contractor/payments",       icon: Wallet },
   { label: "Clients",        href: "/contractor/clients",        icon: Users },
+  { label: "FairRecord",    href: "/contractor/records",        icon: Award },
   { label: "Settings",       href: "/contractor/settings",       icon: Settings },
 ];
 

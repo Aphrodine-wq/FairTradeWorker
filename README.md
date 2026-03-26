@@ -1,29 +1,28 @@
 # FairTradeWorker
 
-Two-sided construction marketplace connecting homeowners with verified contractors. Voice AI estimation, escrow payments, zero lead fees.
+Two-sided construction marketplace connecting homeowners with verified contractors. AI estimation via ConstructionAI, QuickBooks-native payments, zero lead fees.
 
 ## Status
 
-Frontend-complete with mock data. Realtime client layer built and wired to the Elixir/Phoenix backend (`ftw-realtime`). No auth, no live database yet. All UI data is client-side mock.
+Frontend pages built with mock data fallback. Backend API routes implemented for auth, jobs, bids, AI estimation, and QuickBooks integration. Prisma schema defined with PostgreSQL. Middleware handles auth protection and rate limiting. Pages use a data layer (`data.ts`) that tries the real API first and falls back to mock data. Realtime client layer wired to the Elixir/Phoenix backend (`ftw-realtime`).
 
 ## Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Framework | Next.js 15.3.2 (App Router, static export) |
-| UI | React 19.1, Tailwind CSS 3.4, Radix UI primitives |
+| Framework | Next.js 15 (App Router, server deployment) |
+| UI | React 19, Tailwind CSS 3.4, Radix UI primitives |
 | Icons | Lucide React |
+| Analytics | PostHog (`posthog-js`) |
+| Database | PostgreSQL via Prisma 7 (`@prisma/adapter-pg` + `pg`) |
+| Auth | JWT (`jsonwebtoken`) + bcrypt (`bcryptjs`) + middleware route protection |
+| Payments | QuickBooks Online API (direct Intuit OAuth2, no Stripe Connect) |
+| AI Estimation | ConstructionAI FastAPI service (custom fine-tuned model) |
 | Realtime | Phoenix Channels (`phoenix` npm package) |
 | Desktop | Electron 33.4 (macOS dmg) |
-| Language | TypeScript 5.8 |
+| Language | TypeScript 5.8+ |
 | Package Manager | pnpm |
-| Testing | Vitest |
-
-### Planned (not yet integrated)
-
-- **Supabase** — Postgres, Auth, Edge Functions, Storage
-- **QuickBooks Online API** — Payments and invoice sync (node-quickbooks)
-- **ElevenLabs** — Voice AI for live estimate transcription
+| Testing | Vitest 4 |
 
 ## Getting Started
 
@@ -33,15 +32,17 @@ pnpm dev              # Next.js dev server on localhost:3000
 pnpm dev:electron     # Dev server + Electron app
 ```
 
+Requires `DATABASE_URL` pointing to a PostgreSQL instance for API routes to function. Without it, pages fall back to mock data.
+
 ## Scripts
 
 | Command | Description |
 |---------|-------------|
 | `pnpm dev` | Start dev server with Turbopack |
-| `pnpm build` | Static export to `/out/` |
+| `pnpm build` | Production build |
 | `pnpm start` | Serve production build |
 | `pnpm lint` | ESLint check |
-| `pnpm test` | Run Vitest test suite |
+| `pnpm test` | Run Vitest test suite (`vitest run`) |
 | `pnpm dev:electron` | Dev server + Electron window |
 | `pnpm build:electron` | Build macOS dmg |
 
@@ -49,59 +50,199 @@ pnpm dev:electron     # Dev server + Electron app
 
 | Variable | Default | Description |
 |----------|---------|-------------|
+| `DATABASE_URL` | — (required for API) | PostgreSQL connection string |
+| `JWT_SECRET` | `ftw-dev-secret-change-in-production` | Secret for signing auth JWTs |
 | `NEXT_PUBLIC_REALTIME_URL` | `http://localhost:4000` | URL of the Elixir/Phoenix realtime backend |
+| `CONSTRUCTIONAI_API_URL` | `http://localhost:8000/api/estimate` | ConstructionAI FastAPI endpoint |
+| `NEXT_PUBLIC_POSTHOG_KEY` | — | PostHog project API key |
+| `NEXT_PUBLIC_POSTHOG_HOST` | `https://us.i.posthog.com` | PostHog ingest host |
+| `QB_CLIENT_ID` | — | Intuit OAuth2 client ID |
+| `QB_CLIENT_SECRET` | — | Intuit OAuth2 client secret |
+| `QB_REDIRECT_URI` | — | OAuth2 callback URL for QuickBooks |
+| `QB_SANDBOX` | `false` | Set to `"true"` to use Intuit sandbox API |
+| `QB_WEBHOOK_VERIFIER_TOKEN` | — | HMAC secret for verifying Intuit webhook signatures |
 
 ## Project Structure
 
 ```
 src/
-  app/                        # Next.js App Router (27 pages)
-    (auth)/                   # Login, Signup
-    contractor/               # 10 contractor pages
-      dashboard/              # Bento grid dashboard
-      work/                   # Browse job marketplace
-      estimates/              # Estimates + voice recorder agent
-      projects/               # Active projects
-      invoices/               # Payment history
-      clients/                # CRM
-      messages/               # Chat interface
-      notifications/          # Alert center
-      reviews/                # Ratings & feedback
-      settings/               # 12-section settings panel
-    homeowner/                # 5 homeowner pages
-      dashboard/              # KPI cards + projects
-      jobs/                   # Posted jobs
-      contractors/            # Search contractors
-      projects/               # Active projects
-      messages/               # Chat interface
-    pricing/                  # Pricing page
+  app/                           # Next.js App Router
+    (auth)/                      # Login, Signup
+    contractor/                  # 13 contractor pages
+      dashboard/                 # Bento grid dashboard
+      work/                      # Browse job marketplace
+      estimates/                 # Estimates + voice recorder agent
+      projects/                  # Active projects
+      invoices/                  # Invoice history
+      payments/                  # Payment history + payouts
+      clients/                   # CRM
+      messages/                  # Chat interface
+      notifications/             # Alert center
+      reviews/                   # Ratings & feedback
+      settings/                  # 12-section settings panel
+      onboarding/                # Multi-step contractor onboarding
+      records/                   # FairRecord history
+    homeowner/                   # 11 homeowner pages (+ 3 planned empty dirs)
+      dashboard/                 # KPI cards + projects
+      jobs/                      # Posted jobs
+      post-job/                  # Multi-step job posting form
+      bids/                      # Review incoming bids
+      projects/                  # Active projects
+      payments/                  # Payment history
+      messages/                  # Chat interface
+      notifications/             # Alert center
+      reviews/                   # Ratings & feedback
+      settings/                  # Account settings
+      onboarding/                # Homeowner onboarding
+      compare/                   # (planned) Compare contractors
+      inspections/               # (planned) Inspection tracking
+      warranties/                # (planned) Warranty management
+    fairprice/                   # Public FairPrice estimator landing
+    record/[id]/                 # Public FairRecord detail page
+    api/                         # API routes (see below)
+    pricing/                     # Pricing page
+    features/                    # Features page
+    how-it-works/                # How It Works page
+    testimonials/                # Testimonials page
     about/ blog/ careers/ contact/ faq/
-    page.tsx                  # Landing page
-  domains/                    # Domain-specific components
-    contractor/components/    # VoiceRecorder, EstimateCard, JobCard, BidDialog, StatCard
-    homeowner/components/     # ContractorCard, ContractorProfileDialog
-    marketplace/components/   # Navbar, Hero, Features, HowItWorks, StatsBar,
-                              #   Testimonials, PricingSection, CtaSection, Footer
+    page.tsx                     # Landing page
+  domains/                       # Domain-specific components
+    contractor/components/       # VoiceRecorder, EstimateCard, JobCard, BidDialog, StatCard
+    marketplace/components/      # Navbar, Hero, Features, HowItWorks, StatsBar,
+                                 #   Testimonials, PricingSection, CtaSection, Footer
   shared/
-    components/               # Sidebar, AppHeader
+    components/                  # Sidebar, AppHeader, AiEstimateCard
     hooks/
-      use-realtime.ts         # useRealtimeJobs, useRealtimeBids, useRealtimeChat
-    ui/                       # Button, Badge, Card, Dialog, Input, Textarea,
-                              #   Tabs, Progress, Separator
+      use-realtime.ts            # useRealtimeJobs, useRealtimeBids, useRealtimeChat
+      use-estimate.ts            # useJobEstimate, useBidSuggestion (AI-powered)
+    ui/                          # Button, Badge, Card, Dialog, Input, Textarea,
+                                 #   Tabs, Progress, Separator
     lib/
-      utils.ts                # cn(), formatCurrency(), formatDate(), getInitials()
-      constants.ts            # Brand config, nav links, pricing tiers, categories
-      mock-data.ts            # All types + mock data
-      realtime.ts             # Phoenix Channels client + REST api wrapper
-  __tests__/                  # Vitest unit tests (utils, constants, mock-data)
-backend/                      # Placeholder READMEs (no code yet)
-  contractor/                 # Planned Supabase Edge Functions
-  homeowner/                  # Planned Supabase Edge Functions
-  marketplace/                # Planned shared services
-electron/                     # Electron main + preload (TypeScript)
-docs/
-  business-intelligence.md    # Revenue model and BI notes
+      utils.ts                   # cn(), formatCurrency(), formatDate(), getInitials()
+      constants.ts               # Brand config, nav links, pricing tiers, categories
+      mock-data.ts               # All types + mock data
+      data.ts                    # Data layer — tries real API, falls back to mock
+      realtime.ts                # Phoenix Channels client + full REST API wrapper
+      db.ts                      # Prisma client singleton (PrismaClient + pg pool)
+      auth.ts                    # JWT helpers: hash, verify, createToken, getAuthUser
+      auth-store.ts              # Client-side auth state (localStorage + realtime sync)
+      quickbooks.ts              # Intuit OAuth2, QB API calls, invoice/estimate sync
+      analytics.ts               # PostHog analytics (init, identify, track, reset)
+      rate-limit.ts              # In-memory rate limiter for middleware
+  middleware.ts                  # Auth route protection + rate limiting + security headers
+  generated/prisma/              # Generated Prisma client + model types
+  __tests__/                     # Vitest unit tests (utils, constants, mock-data)
+  styles/globals.css             # Global styles
+prisma/
+  schema.prisma                  # 15 models (see Database section)
+backend/                         # Placeholder READMEs (no code yet)
+  contractor/                    # Planned edge functions
+  homeowner/                     # Planned edge functions
+  marketplace/                   # Planned shared services
+electron/                        # Electron main + preload (TypeScript)
+docs/                            # Business intelligence + research
+  01-market/                     # Market analysis (8 files)
+  02-competition/                # Competitive analysis (5 files)
+  03-product/                    # Product design (5 files)
+  04-go-to-market/               # GTM strategy (5 files)
+  05-legal-compliance/           # Legal/compliance (5 files)
+  06-financials/                 # Financials + grants (4 files)
+  07-infrastructure/             # Infrastructure cost model
+  08-strategy/                   # Strategy + risk (4 files)
+  pdf/                           # PDF exports of all docs
 ```
+
+## API Routes
+
+### Auth
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/auth/signup` | Create account (creates User + Contractor/Homeowner) |
+| POST | `/api/auth/login` | Login, returns JWT + sets `ftw-token` cookie |
+
+### Jobs
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/jobs` | List open jobs (paginated, filterable by category/location/status) |
+| POST | `/api/jobs` | Create job (homeowner only, auth required) |
+| GET | `/api/jobs/[id]` | Get job details |
+| POST | `/api/jobs/[id]/bids` | Place bid on a job (contractor, auth required) |
+| POST | `/api/jobs/[id]/estimate` | Generate AI estimate via ConstructionAI |
+
+### Bids
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/bids/[id]/accept` | Accept a bid (homeowner only) |
+
+### Contractor
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET/PUT | `/api/contractor/profile` | Contractor profile management |
+| GET/POST | `/api/contractor/licenses` | License management |
+| GET/POST | `/api/contractor/insurance` | Insurance cert management |
+| GET/POST | `/api/contractor/estimates` | List or generate standalone estimates |
+| GET/DELETE | `/api/contractor/estimates/[id]` | Single estimate detail or delete |
+| GET | `/api/contractor/estimates/[id]/pdf` | Download or regenerate estimate PDF |
+
+### Homeowner
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET/PUT | `/api/homeowner/property` | Homeowner property management |
+
+### QuickBooks Integration
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/integrations/quickbooks/connect` | Initiate Intuit OAuth2 flow |
+| GET | `/api/integrations/quickbooks/callback` | OAuth2 callback handler |
+| POST | `/api/integrations/quickbooks/disconnect` | Revoke QB connection |
+| GET | `/api/integrations/quickbooks/status` | Check connection status |
+| POST | `/api/integrations/quickbooks/create-invoice` | Create invoice in QB |
+| POST | `/api/integrations/quickbooks/sync-estimate` | Sync estimate to QB |
+| POST | `/api/integrations/quickbooks/payout` | Execute contractor payout via QB Bill |
+| GET | `/api/integrations/quickbooks/receipt` | Generate payment receipt |
+| POST | `/api/integrations/quickbooks/webhook` | Intuit webhook receiver |
+
+## Middleware
+
+`src/middleware.ts` runs on all routes (except static assets):
+
+- **Auth protection**: `/contractor/*` and `/homeowner/*` require `ftw-token` cookie. Redirects to `/login` if missing. Checks JWT role to prevent cross-role access.
+- **Rate limiting**: Auth paths (`/login`, `/signup`, `/api/auth/*`) limited to 10 req/min per IP (in-memory fixed-window counter).
+- **Security headers**: X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Referrer-Policy, Permissions-Policy on all responses.
+
+## Database
+
+Prisma schema (`prisma/schema.prisma`) with PostgreSQL, 19 models:
+
+| Model | Description |
+|-------|-------------|
+| `User` | Base user with email/password, role enum (CONTRACTOR/HOMEOWNER) |
+| `Contractor` | Profile: company, bio, specialty, skills, rating, verification flags |
+| `Homeowner` | Profile: location |
+| `License` | Contractor licenses with verification status |
+| `InsuranceCert` | Insurance certs with coverage details |
+| `Job` | Posted jobs with full property details, budget range, urgency, tags |
+| `JobPhoto` | Job photos/videos |
+| `Bid` | Contractor bids on jobs (unique per job+contractor) |
+| `AiEstimate` | AI-generated cost estimates linked to jobs |
+| `SavedEstimate` | Contractor standalone estimates (not tied to a job) |
+| `Conversation` | Chat conversations (optionally linked to a job) |
+| `ConversationParticipant` | Links contractors/homeowners to conversations |
+| `Message` | Chat messages within conversations |
+| `Review` | Ratings from homeowners or contractors |
+| `QuickBooksConnection` | OAuth2 tokens per contractor |
+| `Invoice` | Invoices linked to accepted bids, synced with QB |
+| `Payout` | Contractor payouts via QB Bill/BillPayment |
+| `Receipt` | Payment receipts for completed transactions |
+| `Notification` | User notifications with type, read status |
+
+Prisma client is generated to `src/generated/prisma/` using `@prisma/adapter-pg` with a `pg.Pool` connection.
 
 ## Routes
 
@@ -111,6 +252,11 @@ docs/
 |------|-------------|
 | `/` | Landing page |
 | `/pricing` | 3-tier pricing (Starter $0, Pro $49/mo, Enterprise $149/mo) |
+| `/fairprice` | Public FairPrice estimator |
+| `/record/[id]` | Public FairRecord detail page |
+| `/features` | Features page |
+| `/how-it-works` | How It Works page |
+| `/testimonials` | Testimonials page |
 | `/about` | About page |
 | `/blog` | Blog (placeholder) |
 | `/careers` | Careers |
@@ -127,14 +273,17 @@ docs/
 | `/contractor/work` | Browse job marketplace with filters |
 | `/contractor/estimates` | Estimates with tabs: all, agent (voice recorder), my-estimates |
 | `/contractor/projects` | Active projects with timelines |
-| `/contractor/invoices` | Payment history |
+| `/contractor/invoices` | Invoice history |
+| `/contractor/payments` | Payment history + payouts |
 | `/contractor/clients` | Client CRM |
 | `/contractor/messages` | Messaging (top bar shortcut) |
 | `/contractor/notifications` | Notifications (top bar shortcut) |
 | `/contractor/reviews` | Ratings & feedback |
 | `/contractor/settings` | 12-section settings panel |
+| `/contractor/onboarding` | Multi-step onboarding flow |
+| `/contractor/records` | FairRecord history |
 
-Contractor sidebar nav: Dashboard, Browse Jobs, Estimates, Projects, Invoices, Clients, Settings. Messages and Notifications are accessible via the global top bar. Reviews are accessible by direct URL.
+Contractor sidebar nav: Dashboard, Browse Jobs, Estimates, Projects, Invoices, Payments, Clients, Settings. Messages and Notifications are accessible via the global top bar. Reviews and Records are accessible by direct URL.
 
 ### Homeowner Dashboard
 
@@ -142,32 +291,53 @@ Contractor sidebar nav: Dashboard, Browse Jobs, Estimates, Projects, Invoices, C
 |------|-------------|
 | `/homeowner/dashboard` | KPI cards + active projects |
 | `/homeowner/jobs` | Posted jobs management |
-| `/homeowner/contractors` | Search & filter contractors |
+| `/homeowner/post-job` | Multi-step job posting form |
+| `/homeowner/bids` | Review incoming bids |
 | `/homeowner/projects` | Active projects with milestones |
+| `/homeowner/payments` | Payment history |
 | `/homeowner/messages` | Messaging |
+| `/homeowner/notifications` | Notifications |
+| `/homeowner/reviews` | Ratings & feedback |
+| `/homeowner/settings` | Account settings |
+| `/homeowner/onboarding` | Homeowner onboarding flow |
 
 ## Realtime Layer
 
-The `phoenix` npm package is installed and a full client is implemented in `src/shared/lib/realtime.ts`. It connects to the Elixir backend (`ftw-realtime`) via Phoenix Channels over WebSocket and exposes a REST fallback via `api.*`.
+The `phoenix` npm package is installed and a full client is implemented in `src/shared/lib/realtime.ts`. It connects to the Elixir backend (`ftw-realtime`) via Phoenix Channels over WebSocket and exposes a comprehensive REST fallback via `api.*`.
 
-Three React hooks wrap the client:
+### WebSocket Channels
+
+| Channel | Description |
+|---------|-------------|
+| `jobs:feed` | Live job feed — new jobs push in as they're posted |
+| `job:<id>` | Live bids on a specific job, bid accepted events |
+| `chat:<id>` | Live chat messages, typing indicators, presence |
+| `user:<id>` | User-level notifications |
+
+Channel methods support pushing events back: `sendViaChannel`, `sendTyping`, `placeBidViaChannel`, `postJobViaChannel`.
+
+### REST API Wrapper
+
+The `api` object in `realtime.ts` wraps the Elixir backend REST endpoints for: auth, jobs, bids, chat, estimates, invoices, projects, clients, reviews, notifications, AI estimation, file uploads, settings, verification, and FairRecords.
+
+### React Hooks
 
 | Hook | Channel | Description |
 |------|---------|-------------|
 | `useRealtimeJobs()` | `jobs:feed` | Live job feed — new jobs push in as they're posted |
 | `useRealtimeBids(jobId)` | `job:<id>` | Live bids on a specific job |
 | `useRealtimeChat(conversationId)` | `chat:<id>` | Live chat messages |
-
-The hooks are not yet wired into pages — pages still render from mock data. Connect them when the Elixir backend is running.
+| `useJobEstimate(jobId)` | — (REST) | Fetch AI estimate for a job |
+| `useBidSuggestion(jobId)` | — (REST) | AI-powered bid suggestion based on estimate |
 
 ## Path Aliases
 
 ```
-@/*            → src/*
-@contractor/*  → src/domains/contractor/*
-@homeowner/*   → src/domains/homeowner/*
-@marketplace/* → src/domains/marketplace/*
-@shared/*      → src/shared/*
+@/*            -> src/*
+@contractor/*  -> src/domains/contractor/*
+@homeowner/*   -> src/domains/homeowner/*
+@marketplace/* -> src/domains/marketplace/*
+@shared/*      -> src/shared/*
 ```
 
 ## Design System
@@ -185,13 +355,18 @@ The hooks are not yet wired into pages — pages still render from mock data. Co
 
 All defined in `src/shared/lib/mock-data.ts`:
 
-- `Contractor` — id, name, company, rating, reviewCount, specialty, location, yearsExperience, jobsCompleted, hourlyRate, verified, licensed, insured, bio, skills
-- `Homeowner` — id, name, location, memberSince, projectsPosted
-- `Job` — id, title, category, budget, status, propertyType, sqft, yearBuilt, photos, requirements, propertyDetails, urgency, tags
+- `Contractor` — id, name, company, avatar, rating, reviewCount, specialty, location, yearsExperience, jobsCompleted, hourlyRate, verified, licensed, insured, bio, skills
+- `Job` — id, title, description, detailedScope, category, subcategory, budget (min/max), location, fullAddress, postedBy, status, bidsCount, urgency, propertyType, sqft, yearBuilt, photos, requirements, tags, property (PropertyDetails)
+- `JobPhoto` — url, caption, type
+- `JobRequirement` — label, met
+- `PropertyDetails` — stories, foundation, exterior, roofType, roofAge, garage, lotSize, hoa, heating, cooling, waterHeater, plumbing, electrical, sewer, knownIssues, recentWork
 - `Estimate` — id, jobTitle, clientName, amount, status, lineItems[]
-- `Project` — id, title, status, progress, budget, spent, milestones[]
 - `Review` — id, authorName, rating, text, role
+- `Project` — id, title, contractor, status, progress, budget, spent, milestones[]
+- `FairRecord` — id, publicId, projectId, contractorId, homeownerId, category, scopeSummary, estimatedBudget, finalCost, budgetAccuracyPct, onTime, avgRating, photos, homeownerConfirmed
+
+Prisma models in `prisma/schema.prisma` define the database-level types (see Database section above).
 
 ## Deployment
 
-Deployed to Vercel. `vercel.json` sets security headers (X-Frame-Options, HSTS, CSP) and long-lived cache headers for static assets. Build output is a static export (`/out/`).
+Deployed to Vercel as a server-side Next.js app (not static export). `vercel.json` sets security headers (X-Frame-Options, HSTS, Referrer-Policy) and long-lived cache headers for static assets. `next.config.ts` adds CSP and Permissions-Policy headers.

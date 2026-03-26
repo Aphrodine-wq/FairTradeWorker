@@ -3,7 +3,7 @@
  * Pages import from here instead of mock-data directly.
  */
 import { api, type RealtimeJob, type RealtimeBid } from "./realtime";
-import { mockJobs, mockEstimates, type Job, type Estimate } from "./mock-data";
+import { mockJobs, mockEstimates, mockFairRecords, type Job, type Estimate, type FairRecord } from "./mock-data";
 
 // Convert a RealtimeJob from the API to the mock Job shape pages expect
 function toJob(rj: RealtimeJob): Job {
@@ -116,4 +116,51 @@ export async function fetchSettings(): Promise<any> {
  */
 export async function saveSettings(settings: Record<string, any>): Promise<any> {
   try { return await api.updateSettings(settings); } catch { return null; }
+}
+
+/**
+ * Fetch verification status — real API with default fallback.
+ */
+export async function fetchVerificationStatus(): Promise<any> {
+  try { return await api.getVerificationStatus(); } catch { return null; }
+}
+
+/**
+ * Submit a verification step — real API.
+ */
+export async function submitVerification(step: string, data: Record<string, any>): Promise<any> {
+  return api.submitVerificationStep(step, data);
+}
+
+/**
+ * Fetch FairRecords for a contractor — real API with mock fallback.
+ */
+export async function fetchFairRecords(contractorId?: string): Promise<{ records: FairRecord[]; stats: any }> {
+  try {
+    const data = await api.listFairRecords(contractorId || "me");
+    if (data.records.length > 0) return data;
+  } catch {
+    // Backend not available — fall through to mock
+  }
+  return {
+    records: mockFairRecords,
+    stats: {
+      total: mockFairRecords.length,
+      avg_budget_accuracy: 96.8,
+      on_time_rate: 80.0,
+      avg_rating: 4.9,
+    },
+  };
+}
+
+/**
+ * Fetch a single FairRecord by public ID — real API with mock fallback.
+ */
+export async function fetchPublicRecord(publicId: string): Promise<FairRecord | null> {
+  try {
+    return await api.getPublicRecord(publicId);
+  } catch {
+    // Fall through to mock
+  }
+  return mockFairRecords.find((r) => r.publicId === publicId) || null;
 }

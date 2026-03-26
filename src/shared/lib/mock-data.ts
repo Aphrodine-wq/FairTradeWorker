@@ -120,6 +120,36 @@ export interface Project {
   milestones: { name: string; completed: boolean }[];
 }
 
+export interface FairRecord {
+  id: string;
+  publicId: string;
+  projectId: string;
+  contractorId: string;
+  homeownerId: string;
+  category: string;
+  locationCity: string;
+  scopeSummary: string;
+  estimatedBudget: number;
+  finalCost: number;
+  budgetAccuracyPct: number;
+  onBudget: boolean;
+  estimatedEndDate: string;
+  actualCompletionDate: string;
+  onTime: boolean;
+  qualityScoreAtCompletion: number;
+  avgRating: number;
+  reviewCount: number;
+  disputeCount: number;
+  photos: string[];
+  homeownerConfirmed: boolean;
+  confirmedAt: string | null;
+  contractorName: string;
+  contractorCompany: string;
+  contractorRating: number;
+  contractorJobsCompleted: number;
+  projectTitle: string;
+}
+
 export const mockContractors: Contractor[] = [
   {
     id: "c1",
@@ -1091,6 +1121,154 @@ export const mockProjects: Project[] = [
       { name: "Second Coat", completed: true },
       { name: "Touch-ups & Cleanup", completed: true },
     ],
+  },
+];
+
+export const mockFairRecords: FairRecord[] = [
+  {
+    id: "fr1",
+    publicId: "FR-A3X9K2",
+    projectId: "p3",
+    contractorId: "c1",
+    homeownerId: "h1",
+    category: "Painting",
+    locationCity: "Austin",
+    scopeSummary: "Full interior painting — 4 bedrooms, 2 bathrooms, living area, hallways. Walls prepped, primed (2 coats), painted with Sherwin-Williams Cashmere. Ceiling paint in all rooms. Trim and baseboards painted semi-gloss white.",
+    estimatedBudget: 4200,
+    finalCost: 4200,
+    budgetAccuracyPct: 100,
+    onBudget: true,
+    estimatedEndDate: "2026-01-20",
+    actualCompletionDate: "2026-01-18",
+    onTime: true,
+    qualityScoreAtCompletion: 94,
+    avgRating: 4.9,
+    reviewCount: 127,
+    disputeCount: 0,
+    photos: [],
+    homeownerConfirmed: true,
+    confirmedAt: "2026-01-19T14:30:00Z",
+    contractorName: "Marcus Johnson",
+    contractorCompany: "Johnson & Sons Construction",
+    contractorRating: 4.9,
+    contractorJobsCompleted: 127,
+    projectTitle: "Interior Painting",
+  },
+  {
+    id: "fr2",
+    publicId: "FR-B7M4P1",
+    projectId: "p4",
+    contractorId: "c1",
+    homeownerId: "h2",
+    category: "Remodeling",
+    locationCity: "Austin",
+    scopeSummary: "Complete kitchen remodel — demo existing cabinets, new custom shaker cabinets, quartz countertops, subway tile backsplash, plumbing rough-in for relocated sink, electrical for under-cabinet lighting and new appliance circuits.",
+    estimatedBudget: 38500,
+    finalCost: 36800,
+    budgetAccuracyPct: 95.6,
+    onBudget: true,
+    estimatedEndDate: "2026-02-28",
+    actualCompletionDate: "2026-03-02",
+    onTime: false,
+    qualityScoreAtCompletion: 92,
+    avgRating: 4.9,
+    reviewCount: 128,
+    disputeCount: 0,
+    photos: [],
+    homeownerConfirmed: true,
+    confirmedAt: "2026-03-03T10:15:00Z",
+    contractorName: "Marcus Johnson",
+    contractorCompany: "Johnson & Sons Construction",
+    contractorRating: 4.9,
+    contractorJobsCompleted: 128,
+    projectTitle: "Kitchen Remodel",
+  },
+  {
+    id: "fr3",
+    publicId: "FR-C2J8N5",
+    projectId: "p5",
+    contractorId: "c1",
+    homeownerId: "h3",
+    category: "Electrical",
+    locationCity: "Round Rock",
+    scopeSummary: "200A electrical panel upgrade — replaced Federal Pacific panel with Square D Homeline. New grounding rod, updated service entrance cable, 20 circuit breakers reorganized and labeled. Whole-house surge protector installed.",
+    estimatedBudget: 4800,
+    finalCost: 5100,
+    budgetAccuracyPct: 93.8,
+    onBudget: true,
+    estimatedEndDate: "2026-01-15",
+    actualCompletionDate: "2026-01-14",
+    onTime: true,
+    qualityScoreAtCompletion: 91,
+    avgRating: 4.8,
+    reviewCount: 125,
+    disputeCount: 0,
+    photos: [],
+    homeownerConfirmed: true,
+    confirmedAt: "2026-01-15T09:00:00Z",
+    contractorName: "Marcus Johnson",
+    contractorCompany: "Johnson & Sons Construction",
+    contractorRating: 4.9,
+    contractorJobsCompleted: 125,
+    projectTitle: "Electrical Panel Upgrade",
+  },
+  {
+    id: "fr4",
+    publicId: "FR-D5R3W8",
+    projectId: "p6",
+    contractorId: "c1",
+    homeownerId: "h4",
+    category: "Roofing",
+    locationCity: "Cedar Park",
+    scopeSummary: "Full roof replacement — tear-off existing composition shingles, inspect and replace damaged decking (4 sheets OSB replaced), new GAF Timberline HDZ shingles (Charcoal), new flashing at all penetrations, ridge vent installation.",
+    estimatedBudget: 12500,
+    finalCost: 13200,
+    budgetAccuracyPct: 94.4,
+    onBudget: true,
+    estimatedEndDate: "2025-12-20",
+    actualCompletionDate: "2025-12-19",
+    onTime: true,
+    qualityScoreAtCompletion: 93,
+    avgRating: 4.9,
+    reviewCount: 122,
+    disputeCount: 0,
+    photos: [],
+    homeownerConfirmed: true,
+    confirmedAt: "2025-12-20T16:00:00Z",
+    contractorName: "Marcus Johnson",
+    contractorCompany: "Johnson & Sons Construction",
+    contractorRating: 4.9,
+    contractorJobsCompleted: 122,
+    projectTitle: "Roof Replacement",
+  },
+  {
+    id: "fr5",
+    publicId: "FR-E9T6L3",
+    projectId: "p7",
+    contractorId: "c1",
+    homeownerId: "h5",
+    category: "Concrete",
+    locationCity: "Pflugerville",
+    scopeSummary: "Driveway replacement — removed and hauled existing cracked concrete (680 sqft), graded and compacted base, poured 6-inch reinforced concrete with fiber mesh, stamped finish (Ashlar Slate pattern), sealed with acrylic sealer.",
+    estimatedBudget: 8500,
+    finalCost: 8500,
+    budgetAccuracyPct: 100,
+    onBudget: true,
+    estimatedEndDate: "2025-11-15",
+    actualCompletionDate: "2025-11-14",
+    onTime: true,
+    qualityScoreAtCompletion: 90,
+    avgRating: 4.8,
+    reviewCount: 119,
+    disputeCount: 0,
+    photos: [],
+    homeownerConfirmed: true,
+    confirmedAt: "2025-11-15T11:30:00Z",
+    contractorName: "Marcus Johnson",
+    contractorCompany: "Johnson & Sons Construction",
+    contractorRating: 4.9,
+    contractorJobsCompleted: 119,
+    projectTitle: "Concrete Driveway Replace",
   },
 ];
 

@@ -63,6 +63,8 @@ model Contractor {
   reviewsGiven     Review[]       @relation("ReviewAuthor")
   conversations    ConversationParticipant[]
   qbConnection     QuickBooksConnection?
+  payouts          Payout[]
+  savedEstimates   SavedEstimate[]
 
   @@index([location])
   @@index([specialty])
@@ -73,13 +75,15 @@ model Homeowner {
   id        String   @id @default(cuid())
   userId    String   @unique
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  location  String?
-  createdAt DateTime @default(now())
+  location     String?
+  propertyType String?
+  createdAt    DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   jobs          Job[]
   reviewsGiven  Review[]  @relation("HomeownerReviewAuthor")
   conversations ConversationParticipant[]
+  receipts      Receipt[]
 }
 
 // ── Verification ─────────────────────────────────────────────────
@@ -212,6 +216,7 @@ model Bid {
   updatedAt    DateTime  @updatedAt
 
   invoice      Invoice?
+  payout       Payout?
 
   @@unique([jobId, contractorId])
   @@index([jobId])
@@ -222,15 +227,56 @@ model Bid {
 // ── AI Estimation ────────────────────────────────────────────────
 
 model AiEstimate {
-  id          String   @id @default(cuid())
-  jobId       String   @unique
-  job         Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  estimateMin Float
-  estimateMax Float
-  confidence  Float
-  breakdown   Json?
-  modelVersion String  @default("constructionai-v1")
-  createdAt   DateTime @default(now())
+  id              String   @id @default(cuid())
+  jobId           String   @unique
+  job             Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  estimateNumber  String   @unique
+  estimateMin     Float
+  estimateMax     Float
+  estimateMid     Float
+  confidence      Float
+  breakdown       Json?
+  lineItems       Json?
+  materials       Json?
+  laborHours      Float?
+  laborCost       Float?
+  materialCost    Float?
+  equipmentCost   Float?
+  subtotal        Float?
+  overheadPercent Float?   @default(0.12)
+  profitPercent   Float?   @default(0.15)
+  contingencyPct  Float?   @default(0.08)
+  total           Float?
+  exclusions      String[]
+  notes           String[]
+  timelineWeeks   Int?
+  pdfUrl          String?
+  modelVersion    String   @default("constructionai-v4")
+  regionFactor    Float?   @default(1.0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  savedEstimates  SavedEstimate[]
+}
+
+model SavedEstimate {
+  id              String      @id @default(cuid())
+  contractorId    String
+  contractor      Contractor  @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  aiEstimateId    String?
+  aiEstimate      AiEstimate? @relation(fields: [aiEstimateId], references: [id])
+  title           String
+  projectType     String
+  location        String
+  sqft            Int?
+  quality         String?     @default("mid-range")
+  estimateData    Json
+  pdfUrl          String?
+  notes           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([contractorId])
 }
 
 // ── Messaging ────────────────────────────────────────────────────
@@ -316,6 +362,51 @@ model Invoice {
   paidAt         DateTime?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+
+  receipt        Receipt?
+}
+
+model Payout {
+  id              String   @id @default(cuid())
+  bidId           String   @unique
+  bid             Bid      @relation(fields: [bidId], references: [id], onDelete: Cascade)
+  contractorId    String
+  contractor      Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  grossAmount     Float
+  platformFee     Float
+  netAmount       Float
+  feePercent      Float    @default(5.0)
+  qbVendorId      String?
+  qbBillId        String?
+  qbBillPaymentId String?
+  status          String   @default("queued")
+  failureReason   String?
+  paidAt          DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([contractorId])
+  @@index([status])
+}
+
+model Receipt {
+  id             String   @id @default(cuid())
+  invoiceId      String   @unique
+  invoice        Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  homeownerId    String
+  homeowner      Homeowner @relation(fields: [homeownerId], references: [id], onDelete: Cascade)
+  receiptNumber  String   @unique
+  grossAmount    Float
+  platformFee    Float
+  totalCharged   Float
+  jobTitle       String
+  contractorName String
+  homeownerName  String
+  lineItems      Json
+  paidAt         DateTime
+  createdAt      DateTime @default(now())
+
+  @@index([homeownerId])
 }
 
 // ── Notifications ────────────────────────────────────────────────

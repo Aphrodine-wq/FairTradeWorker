@@ -12,6 +12,7 @@ import {
   MessageSquare,
   Bell,
   Plus,
+  Wallet,
 } from "lucide-react";
 import { Sidebar } from "@shared/components/sidebar";
 import { cn } from "@shared/lib/utils";
@@ -22,6 +23,7 @@ const NAV_ITEMS = [
   { label: "Dashboard", href: "/homeowner/dashboard", icon: LayoutDashboard },
   { label: "My Jobs", href: "/homeowner/jobs", icon: Briefcase },
   { label: "Projects", href: "/homeowner/projects", icon: FolderOpen },
+  { label: "Payments", href: "/homeowner/payments", icon: Wallet },
   { label: "Reviews", href: "/homeowner/reviews", icon: Star },
   { label: "Settings", href: "/homeowner/settings", icon: Settings },
 ];

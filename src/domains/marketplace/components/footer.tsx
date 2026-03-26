@@ -2,34 +2,65 @@ import Link from "next/link";
 
 const footerLinks = {
   Product: [
-    { label: "Features", href: "#features" },
+    { label: "Features", href: "/features" },
+    { label: "How It Works", href: "/how-it-works" },
     { label: "Pricing", href: "/pricing" },
+    { label: "FairPrice Estimator", href: "/fairprice" },
     { label: "FAQ", href: "/faq" },
     { label: "Blog", href: "/blog" },
+  ],
+  "For Contractors": [
+    { label: "Find Work", href: "/signup?role=contractor" },
+    { label: "AI Estimation", href: "/fairprice" },
+    { label: "Voice AI (Hunter)", href: "/pricing" },
+    { label: "Escrow Payments", href: "/faq" },
+    { label: "Contractor Plans", href: "/pricing" },
+  ],
+  "For Homeowners": [
+    { label: "Post a Job", href: "/signup?role=homeowner" },
+    { label: "How Escrow Works", href: "/faq" },
+    { label: "Homeowner Plans", href: "/pricing" },
+    { label: "Contractor Verification", href: "/faq" },
   ],
   Company: [
     { label: "About", href: "/about" },
     { label: "Careers", href: "/careers" },
     { label: "Contact", href: "/contact" },
-  ],
-  Legal: [
-    { label: "Privacy", href: "/privacy" },
-    { label: "Terms", href: "/terms" },
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Terms of Service", href: "/terms" },
   ],
 } as const;
 
 export function Footer() {
   return (
     <footer style={{ backgroundColor: "#0F1419" }} className="border-t border-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Main footer content */}
+        <div className="py-14 grid grid-cols-2 md:grid-cols-5 gap-10">
+          {/* Brand column */}
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="text-base font-bold text-white hover:text-gray-200 transition-colors duration-150">
+            <Link
+              href="/"
+              className="text-lg font-bold text-white hover:text-gray-200 transition-colors duration-150"
+            >
               FairTradeWorker
             </Link>
-            <p className="mt-2 text-sm text-gray-500">Fair work. Fair pay.</p>
+            <p className="mt-3 text-sm text-gray-300 leading-relaxed">
+              The fair way to find and hire contractors. Flat-rate subscriptions,
+              zero lead fees, escrow on every job.
+            </p>
+            <p className="mt-4 text-sm text-gray-300">
+              <a
+                href="mailto:hello@fairtradeworker.com"
+                className="hover:text-white transition-colors duration-150"
+              >
+                hello@fairtradeworker.com
+              </a>
+            </p>
+            <p className="text-sm text-gray-300 mt-1">Austin, TX</p>
           </div>
 
+          {/* Link columns */}
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
               <h4 className="text-xs font-bold text-white uppercase tracking-widest mb-4">
@@ -40,7 +71,7 @@ export function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm text-gray-500 hover:text-gray-300 transition-colors duration-150"
+                      className="text-sm text-gray-300 hover:text-white transition-colors duration-150"
                     >
                       {link.label}
                     </Link>
@@ -51,8 +82,32 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="mt-10 pt-6 border-t border-gray-800">
-          <p className="text-sm text-gray-500">&copy; 2026 FairTradeWorker</p>
+        {/* Bottom bar */}
+        <div className="py-6 border-t border-gray-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <p className="text-sm text-gray-300">
+            &copy; {new Date().getFullYear()} FairTradeWorker. All rights
+            reserved.
+          </p>
+          <div className="flex items-center gap-6">
+            <Link
+              href="/privacy"
+              className="text-sm text-gray-300 hover:text-white transition-colors duration-150"
+            >
+              Privacy
+            </Link>
+            <Link
+              href="/terms"
+              className="text-sm text-gray-300 hover:text-white transition-colors duration-150"
+            >
+              Terms
+            </Link>
+            <Link
+              href="/contact"
+              className="text-sm text-gray-300 hover:text-white transition-colors duration-150"
+            >
+              Contact
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

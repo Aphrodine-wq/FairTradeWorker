@@ -40,6 +40,7 @@ import { Textarea } from "@shared/ui/textarea";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@shared/ui/tabs";
 import { mockEstimates, type Estimate } from "@shared/lib/mock-data";
 import { fetchEstimates } from "@shared/lib/data";
+import { api } from "@shared/lib/realtime";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
 
 // ─── Status Config ───────────────────────────────────────────────────────────
@@ -1241,10 +1242,10 @@ function EstimateAgentTab() {
 
   const now = () => new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 
-  const simulateAgent = (userMsg: string) => {
+  const callAgent = async (userMsg: string) => {
     setIsThinking(true);
 
-    // Simulate tool call based on keywords
+    // Detect tool call from keywords for UI indicator
     const lowerMsg = userMsg.toLowerCase();
     let toolName = "";
     if (lowerMsg.includes("estimate") || lowerMsg.includes("price") || lowerMsg.includes("cost") || lowerMsg.includes("how much")) {
@@ -1265,41 +1266,30 @@ function EstimateAgentTab() {
       toolName = "generate_proposal";
     }
 
+    // Show tool indicator
     if (toolName) {
-      setTimeout(() => {
-        setMessages((prev) => [...prev, {
-          id: `tool-${Date.now()}`,
-          role: "tool",
-          content: TOOL_LABELS[toolName]?.label || "Processing",
-          timestamp: now(),
-          toolName,
-          toolStatus: "running",
-        }]);
-      }, 800);
+      setMessages((prev) => [...prev, {
+        id: `tool-${Date.now()}`,
+        role: "tool",
+        content: TOOL_LABELS[toolName]?.label || "Processing",
+        timestamp: now(),
+        toolName,
+        toolStatus: "running",
+      }]);
+    }
 
-      setTimeout(() => {
+    try {
+      // Call ConstructionAI via Elixir backend (FairGate → RunPod)
+      const { estimate, raw } = await api.getAIEstimate(userMsg);
+      const response = raw || (estimate ? JSON.stringify(estimate, null, 2) : "I couldn't generate a response. Could you provide more details about the project?");
+
+      // Mark tool as complete
+      if (toolName) {
         setMessages((prev) => prev.map((m) =>
           m.toolName === toolName && m.toolStatus === "running"
             ? { ...m, toolStatus: "complete" as const }
             : m
         ));
-      }, 2500);
-    }
-
-    setTimeout(() => {
-      setIsThinking(false);
-      let response = "";
-
-      if (toolName === "generate_estimate_pdf") {
-        response = "I've put together a detailed estimate based on your project description. Here's the breakdown:\n\n**Kitchen Remodel — 200 sqft, Full Gut**\n\nDiv 02 — Demo & Disposal: $3,200\nDiv 06 — Cabinets & Millwork: $12,800\nDiv 09 — Countertops (Quartz, 42 SF): $3,570\nDiv 09 — Backsplash Tile: $1,350\nDiv 09 — Flooring (LVP): $1,600\nDiv 22 — Plumbing Rough-in: $2,800\nDiv 26 — Electrical: $2,450\nDiv 01 — General Conditions: $1,800\n\n**Subtotal:** $29,570\nOverhead (12%): $3,548\nProfit (15%): $4,436\nContingency (10%): $2,957\n\n**Total: $40,511**\n\nThis is based on current Austin, TX pricing. Want me to adjust anything, add line items, or convert this into a formal PDF estimate?";
-      } else if (toolName === "calculate_material_takeoff") {
-        response = "Here's your material takeoff:\n\n**Roofing — 30 Squares**\n\nArchitectural Shingles (30 sq + 10% waste): 33 squares — $3,960\nSynthetic Underlayment: 33 squares — $825\nIce & Water Shield: 6 squares — $330\nDrip Edge (200 LF): $340\nRidge Vent (40 LF): $320\nFlashing Kit: $280\nNails (6 boxes): $180\nStarter Strip: $165\n\n**Total Materials: $6,400**\n\nSupplier note: ABC Supply in Austin typically has 2-day delivery on shingle orders over 20 squares. Want me to add labor costs to build a full estimate?";
-      } else if (toolName === "lookup_building_code") {
-        response = "**IRC R507 — Decks (2021 IRC)**\n\nKey requirements for residential decks in Texas:\n\n1. **Footings** — Must extend below frost line (12\" min in Central TX). Minimum 7\" diameter for concrete piers.\n2. **Ledger Board** — Must be positively attached to house framing with 1/2\" lag screws or through-bolts at 16\" o.c. Flashing required.\n3. **Guardrails** — Required at 30\"+ above grade. 36\" minimum height (42\" for commercial). Balusters max 4\" spacing.\n4. **Stairs** — Max 7-3/4\" riser, min 10\" tread. Graspable handrail required on one side.\n5. **Structural** — 2x8 min joists at 16\" o.c. for 40 PSF live load. Beam spans per Table R507.5.\n\nCommon inspection failures: missing joist hangers, improper ledger flashing, undersized footings.\n\nWant me to generate a full estimate for this deck project?";
-      } else if (toolName === "calculate_markup_margin") {
-        response = "**Pricing Analysis — $45,000 Job**\n\nDirect costs: $45,000\nOverhead (12%): $5,400\nBreakeven: $50,400\nProfit (15% margin): $8,894\n\n**Sell Price: $59,294**\n\nMarkup on cost: 31.8%\nGross margin: 24.1%\n\nNote: A 15% net margin on a $45K job means you need to sell at ~$59.3K. Many contractors confuse markup with margin — 15% markup is only 13% margin. I've calculated true margin here.\n\nAt 20 jobs/year with $120K annual overhead, your overhead per job is $6,000 — so your real breakeven is $51K, not $45K.";
-      } else {
-        response = "Got it. Let me know more details about the project — the scope, location, square footage, and any specific materials or finishes the client has in mind. The more detail you give me, the more accurate the estimate will be.\n\nYou can also upload photos, handwritten notes, or scope documents and I'll extract the details from them.";
       }
 
       setMessages((prev) => [...prev, {
@@ -1308,7 +1298,25 @@ function EstimateAgentTab() {
         content: response,
         timestamp: now(),
       }]);
-    }, toolName ? 3200 : 1500);
+    } catch {
+      // Fallback — API not available
+      if (toolName) {
+        setMessages((prev) => prev.map((m) =>
+          m.toolName === toolName && m.toolStatus === "running"
+            ? { ...m, toolStatus: "complete" as const }
+            : m
+        ));
+      }
+
+      setMessages((prev) => [...prev, {
+        id: `agent-${Date.now()}`,
+        role: "agent",
+        content: "I'm having trouble connecting to ConstructionAI right now. Please try again in a moment, or provide more details about your project and I'll generate the estimate as soon as the connection is restored.",
+        timestamp: now(),
+      }]);
+    } finally {
+      setIsThinking(false);
+    }
   };
 
   const handleSend = () => {
@@ -1321,7 +1329,7 @@ function EstimateAgentTab() {
       attachments: uploadedFiles.length > 0 ? [...uploadedFiles] : undefined,
     };
     setMessages((prev) => [...prev, userMsg]);
-    simulateAgent(input.trim());
+    callAgent(input.trim());
     setInput("");
     setUploadedFiles([]);
   };

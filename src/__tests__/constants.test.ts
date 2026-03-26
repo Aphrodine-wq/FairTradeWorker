@@ -2,7 +2,8 @@ import { describe, it, expect } from "vitest";
 import {
   BRAND,
   NAV_LINKS,
-  PLAN_TIERS,
+  CONTRACTOR_TIERS,
+  HOMEOWNER_TIERS,
   STATS,
   JOB_CATEGORIES,
   ESTIMATE_STATUSES,
@@ -49,32 +50,74 @@ describe("NAV_LINKS", () => {
   });
 });
 
-describe("PLAN_TIERS", () => {
-  it("has exactly 3 tiers", () => {
-    expect(PLAN_TIERS.length).toBe(3);
+describe("CONTRACTOR_TIERS", () => {
+  it("has exactly 4 tiers", () => {
+    expect(CONTRACTOR_TIERS.length).toBe(4);
   });
 
   it("exactly one tier is featured", () => {
-    const featured = PLAN_TIERS.filter((t) => t.featured);
+    const featured = CONTRACTOR_TIERS.filter((t) => t.featured);
     expect(featured.length).toBe(1);
   });
 
-  it("prices are non-negative", () => {
-    for (const tier of PLAN_TIERS) {
-      expect(tier.price).toBeGreaterThanOrEqual(0);
+  it("monthly prices are non-negative", () => {
+    for (const tier of CONTRACTOR_TIERS) {
+      expect(tier.monthlyPrice).toBeGreaterThanOrEqual(0);
     }
   });
 
-  it("each tier has a cta and features list", () => {
-    for (const tier of PLAN_TIERS) {
+  it("yearly price is less than 12x monthly", () => {
+    for (const tier of CONTRACTOR_TIERS) {
+      if (tier.monthlyPrice > 0) {
+        expect(tier.yearlyPrice).toBeLessThan(tier.monthlyPrice * 12);
+      }
+    }
+  });
+
+  it("each tier has a cta, href, idealFor, and features list", () => {
+    for (const tier of CONTRACTOR_TIERS) {
       expect(tier.cta.length).toBeGreaterThan(0);
+      expect(tier.href.length).toBeGreaterThan(0);
+      expect(tier.idealFor.length).toBeGreaterThan(0);
       expect(tier.features.length).toBeGreaterThan(0);
     }
   });
 
   it("free tier has price 0", () => {
-    const starter = PLAN_TIERS.find((t) => t.name === "Starter");
-    expect(starter?.price).toBe(0);
+    const free = CONTRACTOR_TIERS.find((t) => t.name === "Free");
+    expect(free?.monthlyPrice).toBe(0);
+    expect(free?.yearlyPrice).toBe(0);
+  });
+});
+
+describe("HOMEOWNER_TIERS", () => {
+  it("has exactly 2 tiers", () => {
+    expect(HOMEOWNER_TIERS.length).toBe(2);
+  });
+
+  it("exactly one tier is featured", () => {
+    const featured = HOMEOWNER_TIERS.filter((t) => t.featured);
+    expect(featured.length).toBe(1);
+  });
+
+  it("free tier has price 0", () => {
+    const free = HOMEOWNER_TIERS.find((t) => t.name === "Free");
+    expect(free?.monthlyPrice).toBe(0);
+    expect(free?.yearlyPrice).toBe(0);
+  });
+
+  it("plus tier yearly is less than 12x monthly", () => {
+    const plus = HOMEOWNER_TIERS.find((t) => t.name === "Plus");
+    expect(plus).toBeDefined();
+    expect(plus!.yearlyPrice).toBeLessThan(plus!.monthlyPrice * 12);
+  });
+
+  it("each tier has a cta, href, and features list", () => {
+    for (const tier of HOMEOWNER_TIERS) {
+      expect(tier.cta.length).toBeGreaterThan(0);
+      expect(tier.href.length).toBeGreaterThan(0);
+      expect(tier.features.length).toBeGreaterThan(0);
+    }
   });
 });
 

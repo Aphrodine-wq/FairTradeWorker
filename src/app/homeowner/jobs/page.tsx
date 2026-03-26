@@ -47,6 +47,7 @@ import {
 import { cn, formatCurrency, formatDate, getInitials } from "@shared/lib/utils";
 import { mockContractors, mockJobs, type Job } from "@shared/lib/mock-data";
 import { fetchJobs } from "@shared/lib/data";
+import { useRealtimeJobs } from "@shared/hooks/use-realtime";
 import type { LucideIcon } from "lucide-react";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -767,13 +768,31 @@ export default function JobsPage() {
   const [filter, setFilter] = useState<StatusFilter>("all");
   const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
 
+  // Live job updates via WebSocket (falls back to REST internally)
+  const { jobs: realtimeJobs, connected: wsConnected } = useRealtimeJobs();
+
   useEffect(() => {
-    fetchJobs().then((apiJobs) => {
-      if (apiJobs.length > 0) {
-        setJobs(apiJobs);
-      }
-    });
-  }, []);
+    if (wsConnected && realtimeJobs.length > 0) {
+      // Map realtime jobs to the shape pages expect
+      setJobs(realtimeJobs.map((rj) => ({
+        ...mockJobs[0],
+        id: rj.id,
+        title: rj.title,
+        description: rj.description,
+        detailedScope: rj.description,
+        category: rj.category,
+        budget: { min: rj.budget_min, max: rj.budget_max },
+        location: rj.location,
+        status: rj.status as Job["status"],
+        bidsCount: rj.bid_count,
+        postedDate: rj.posted_at,
+      })));
+    } else {
+      fetchJobs().then((apiJobs) => {
+        if (apiJobs.length > 0) setJobs(apiJobs);
+      });
+    }
+  }, [realtimeJobs, wsConnected]);
   const [bidStatuses, setBidStatuses] = useState<Record<string, BidStatus>>(() => {
     const initial: Record<string, BidStatus> = {};
     MOCK_BIDS.forEach((b) => { initial[b.id] = b.status; });

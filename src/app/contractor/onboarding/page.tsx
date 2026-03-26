@@ -20,6 +20,7 @@ import { Input } from "@shared/ui/input";
 import { Badge } from "@shared/ui/badge";
 import { cn } from "@shared/lib/utils";
 import { authStore } from "@shared/lib/auth-store";
+import { submitVerification } from "@shared/lib/data";
 
 const SPECIALTIES = [
   "General Contracting", "Electrical", "Plumbing", "HVAC", "Roofing",
@@ -135,6 +136,28 @@ export default function ContractorOnboarding() {
             expirationDate,
           }),
         });
+      }
+
+      // Submit verification steps to Elixir backend (FairTrust pipeline)
+      try {
+        if (licenseNumber) {
+          await submitVerification("license", {
+            license_number: licenseNumber,
+            state: licenseState,
+            type: licenseType,
+          });
+        }
+        if (insuranceProvider && policyNumber) {
+          await submitVerification("insurance", {
+            provider: insuranceProvider,
+            policy_number: policyNumber,
+            coverage_type: coverageType,
+            coverage_amount: coverageAmount ? parseFloat(coverageAmount) : null,
+            expiration_date: expirationDate,
+          });
+        }
+      } catch {
+        // Verification submission is best-effort during onboarding
       }
 
       router.push("/contractor/dashboard");

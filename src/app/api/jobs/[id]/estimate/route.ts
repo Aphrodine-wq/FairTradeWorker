@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@shared/lib/db";
+import type { Prisma } from "@/generated/prisma/client";
 
-const CONSTRUCTIONAI_URL = process.env.CONSTRUCTIONAI_URL || "http://localhost:11434/api/generate";
-const CONSTRUCTIONAI_MODEL = process.env.CONSTRUCTIONAI_MODEL || "constructionai:latest";
+const CONSTRUCTIONAI_API_URL =
+  process.env.CONSTRUCTIONAI_API_URL || "http://localhost:8000/api/estimate";
 
 // POST /api/jobs/[id]/estimate — generate AI estimate for a job
 export async function POST(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: jobId } = await params;
+  const { force } = await req.json().catch(() => ({ force: false }));
 
   const job = await prisma.job.findUnique({
     where: { id: jobId },
@@ -19,24 +21,32 @@ export async function POST(
     return NextResponse.json({ error: "Job not found" }, { status: 404 });
   }
 
-  // Check for existing estimate
-  const existing = await prisma.aiEstimate.findUnique({ where: { jobId } });
-  if (existing) {
-    return NextResponse.json({ estimate: existing });
+  // Return cached estimate unless force-regenerate requested
+  if (!force) {
+    const existing = await prisma.aiEstimate.findUnique({ where: { jobId } });
+    if (existing) {
+      return NextResponse.json({ estimate: existing });
+    }
   }
 
-  // Build prompt for ConstructionAI
-  const prompt = buildEstimatePrompt(job);
-
   try {
-    const response = await fetch(CONSTRUCTIONAI_URL, {
+    const response = await fetch(CONSTRUCTIONAI_API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: CONSTRUCTIONAI_MODEL,
-        prompt,
-        stream: false,
-        format: "json",
+        project_type: job.category,
+        subcategory: job.subcategory || undefined,
+        description: job.description,
+        detailed_scope: job.detailedScope || undefined,
+        sqft: job.sqft || undefined,
+        location: job.location,
+        property_type: job.propertyType,
+        year_built: job.yearBuilt || undefined,
+        materials_provided: job.materialsProvided,
+        urgency: job.urgency,
+        permits_required: job.permitsRequired,
+        quality: "mid-range",
+        format: "full",
       }),
     });
 
@@ -48,15 +58,61 @@ export async function POST(
     }
 
     const result = await response.json();
-    const parsed = parseEstimateResponse(result.response);
+    const parsed = parseConstructionAIResponse(result);
 
-    const estimate = await prisma.aiEstimate.create({
-      data: {
+    // Generate a unique estimate number
+    const estimateNumber = `EST-${Date.now().toString(36).toUpperCase()}`;
+
+    // Upsert — handles both new and force-regenerate cases
+    const estimate = await prisma.aiEstimate.upsert({
+      where: { jobId },
+      create: {
         jobId,
-        estimateMin: parsed.min,
-        estimateMax: parsed.max,
+        estimateNumber,
+        estimateMin: parsed.estimateMin,
+        estimateMax: parsed.estimateMax,
+        estimateMid: parsed.estimateMid,
         confidence: parsed.confidence,
-        breakdown: parsed.breakdown ?? undefined,
+        breakdown: (parsed.breakdown ?? undefined) as Prisma.InputJsonValue | undefined,
+        lineItems: (parsed.lineItems ?? undefined) as Prisma.InputJsonValue | undefined,
+        materials: (parsed.materials ?? undefined) as Prisma.InputJsonValue | undefined,
+        laborHours: parsed.laborHours,
+        laborCost: parsed.laborCost,
+        materialCost: parsed.materialCost,
+        equipmentCost: parsed.equipmentCost,
+        subtotal: parsed.subtotal,
+        overheadPercent: parsed.overheadPercent,
+        profitPercent: parsed.profitPercent,
+        contingencyPct: parsed.contingencyPct,
+        total: parsed.total,
+        exclusions: parsed.exclusions,
+        notes: parsed.notes,
+        timelineWeeks: parsed.timelineWeeks,
+        pdfUrl: parsed.pdfUrl,
+        regionFactor: parsed.regionFactor,
+      },
+      update: {
+        estimateMin: parsed.estimateMin,
+        estimateMax: parsed.estimateMax,
+        estimateMid: parsed.estimateMid,
+        confidence: parsed.confidence,
+        breakdown: (parsed.breakdown ?? undefined) as Prisma.InputJsonValue | undefined,
+        lineItems: (parsed.lineItems ?? undefined) as Prisma.InputJsonValue | undefined,
+        materials: (parsed.materials ?? undefined) as Prisma.InputJsonValue | undefined,
+        laborHours: parsed.laborHours,
+        laborCost: parsed.laborCost,
+        materialCost: parsed.materialCost,
+        equipmentCost: parsed.equipmentCost,
+        subtotal: parsed.subtotal,
+        overheadPercent: parsed.overheadPercent,
+        profitPercent: parsed.profitPercent,
+        contingencyPct: parsed.contingencyPct,
+        total: parsed.total,
+        exclusions: parsed.exclusions,
+        notes: parsed.notes,
+        timelineWeeks: parsed.timelineWeeks,
+        pdfUrl: parsed.pdfUrl,
+        regionFactor: parsed.regionFactor,
       },
     });
 
@@ -69,45 +125,62 @@ export async function POST(
   }
 }
 
-function buildEstimatePrompt(job: {
-  title: string;
-  description: string;
-  detailedScope: string | null;
-  category: string;
-  subcategory: string | null;
-  sqft: number | null;
-  yearBuilt: number | null;
-  location: string;
-  propertyType: string;
-  materialsProvided: boolean;
-}): string {
-  return `Estimate this construction job:
-Title: ${job.title}
-Category: ${job.category}${job.subcategory ? ` / ${job.subcategory}` : ""}
-Description: ${job.description}
-${job.detailedScope ? `Detailed Scope: ${job.detailedScope}` : ""}
-Property: ${job.propertyType}, ${job.sqft ? `${job.sqft} sqft` : "unknown sqft"}${job.yearBuilt ? `, built ${job.yearBuilt}` : ""}
-Location: ${job.location}
-Materials provided: ${job.materialsProvided ? "yes" : "no"}
-
-Respond with JSON: {"min": number, "max": number, "confidence": 0-1, "breakdown": [{"item": string, "cost": number}]}`;
+interface ConstructionAIParsed {
+  estimateMin: number;
+  estimateMax: number;
+  estimateMid: number;
+  confidence: number;
+  breakdown: Record<string, unknown>[] | null;
+  lineItems: Record<string, unknown>[] | null;
+  materials: Record<string, unknown>[] | null;
+  laborHours: number | null;
+  laborCost: number | null;
+  materialCost: number | null;
+  equipmentCost: number | null;
+  subtotal: number | null;
+  overheadPercent: number | null;
+  profitPercent: number | null;
+  contingencyPct: number | null;
+  total: number | null;
+  exclusions: string[];
+  notes: string[];
+  timelineWeeks: number | null;
+  pdfUrl: string | null;
+  regionFactor: number | null;
 }
 
-function parseEstimateResponse(raw: string): {
-  min: number;
-  max: number;
-  confidence: number;
-  breakdown: { item: string; cost: number }[] | null;
-} {
-  try {
-    const data = JSON.parse(raw);
-    return {
-      min: Number(data.min) || 0,
-      max: Number(data.max) || 0,
-      confidence: Math.min(1, Math.max(0, Number(data.confidence) || 0.5)),
-      breakdown: Array.isArray(data.breakdown) ? data.breakdown : null,
-    };
-  } catch {
-    return { min: 0, max: 0, confidence: 0, breakdown: null };
-  }
+function parseConstructionAIResponse(raw: Record<string, unknown>): ConstructionAIParsed {
+  const n = (v: unknown) => (typeof v === "number" ? v : null);
+  const nRequired = (v: unknown, fallback: number) =>
+    typeof v === "number" ? v : fallback;
+
+  const min = nRequired(raw.estimate_min ?? raw.min, 0);
+  const max = nRequired(raw.estimate_max ?? raw.max, 0);
+  // Safe midpoint: guard against potential division issues (divisor is constant 2, but guarded for safety)
+  const midFallback = min + max !== 0 ? (min + max) / 2 : 0;
+  const mid = nRequired(raw.estimate_mid ?? raw.midpoint, midFallback);
+
+  return {
+    estimateMin: min,
+    estimateMax: max,
+    estimateMid: mid,
+    confidence: Math.min(1, Math.max(0, nRequired(raw.confidence, 0.5))),
+    breakdown: Array.isArray(raw.breakdown) ? raw.breakdown : null,
+    lineItems: Array.isArray(raw.line_items) ? raw.line_items : null,
+    materials: Array.isArray(raw.materials) ? raw.materials : null,
+    laborHours: n(raw.labor_hours),
+    laborCost: n(raw.labor_cost),
+    materialCost: n(raw.material_cost),
+    equipmentCost: n(raw.equipment_cost),
+    subtotal: n(raw.subtotal),
+    overheadPercent: n(raw.overhead_percent) ?? 0.12,
+    profitPercent: n(raw.profit_percent) ?? 0.15,
+    contingencyPct: n(raw.contingency_percent) ?? 0.08,
+    total: n(raw.total),
+    exclusions: Array.isArray(raw.exclusions) ? raw.exclusions : [],
+    notes: Array.isArray(raw.notes) ? raw.notes : [],
+    timelineWeeks: n(raw.timeline_weeks) ? Math.round(raw.timeline_weeks as number) : null,
+    pdfUrl: typeof raw.pdf_url === "string" ? raw.pdf_url : null,
+    regionFactor: n(raw.region_factor) ?? 1.0,
+  };
 }

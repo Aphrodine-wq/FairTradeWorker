@@ -20,7 +20,9 @@ function useCountUp(target: number, duration: number, active: boolean) {
       if (progress < 1) frameRef.current = requestAnimationFrame(tick);
     };
     frameRef.current = requestAnimationFrame(tick);
-    return () => { if (frameRef.current !== null) cancelAnimationFrame(frameRef.current); };
+    return () => {
+      if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
+    };
   }, [active, target, duration]);
 
   return count;
@@ -28,29 +30,64 @@ function useCountUp(target: number, duration: number, active: boolean) {
 
 interface StatItemProps {
   label: string;
+  sublabel: string;
   value: number;
   suffix: string;
   prefix?: string;
   active: boolean;
 }
 
-function StatItem({ label, value, suffix, prefix, active }: StatItemProps) {
+function StatItem({
+  label,
+  sublabel,
+  value,
+  suffix,
+  prefix,
+  active,
+}: StatItemProps) {
   const count = useCountUp(value, 1800, active);
   return (
     <div className="text-center px-4 py-2">
       <div className="text-3xl font-bold text-white tabular-nums">
-        {prefix}{count.toLocaleString()}{suffix}
+        {prefix}
+        {count.toLocaleString()}
+        {suffix}
       </div>
-      <div className="mt-1 text-sm text-white/70">{label}</div>
+      <div className="mt-1 text-sm font-medium text-white/90">{label}</div>
+      <div className="text-xs text-white/60">{sublabel}</div>
     </div>
   );
 }
 
 const STATS = [
-  { label: "jobs",       value: 12847, suffix: "",  prefix: ""  },
-  { label: "pros",       value: 3200,  suffix: "+", prefix: ""  },
-  { label: "happy",      value: 98,    suffix: "%", prefix: ""  },
-  { label: "fees",       value: 0,     suffix: "",  prefix: "$" },
+  {
+    label: "Jobs Completed",
+    sublabel: "and counting",
+    value: 12847,
+    suffix: "+",
+    prefix: "",
+  },
+  {
+    label: "Verified Contractors",
+    sublabel: "licensed and insured",
+    value: 3200,
+    suffix: "+",
+    prefix: "",
+  },
+  {
+    label: "Homeowner Satisfaction",
+    sublabel: "across all projects",
+    value: 98,
+    suffix: "%",
+    prefix: "",
+  },
+  {
+    label: "Lead Fees",
+    sublabel: "on every plan, forever",
+    value: 0,
+    suffix: "",
+    prefix: "$",
+  },
 ] as const;
 
 export function StatsBar() {
@@ -61,7 +98,12 @@ export function StatsBar() {
     const el = ref.current;
     if (!el) return;
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setActive(true); observer.disconnect(); } },
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setActive(true);
+          observer.disconnect();
+        }
+      },
       { threshold: 0.3 }
     );
     observer.observe(el);
@@ -76,6 +118,7 @@ export function StatsBar() {
             <StatItem
               key={stat.label}
               label={stat.label}
+              sublabel={stat.sublabel}
               value={stat.value}
               suffix={stat.suffix}
               prefix={stat.prefix}

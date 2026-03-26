@@ -315,6 +315,40 @@ export const api = {
     });
     return data.review;
   },
+
+  // FairRecords
+  async listFairRecords(contractorId: string): Promise<{ records: any[]; stats: any }> {
+    return apiFetch(`/api/contractors/${contractorId}/records`);
+  },
+
+  async getPublicRecord(publicId: string): Promise<any> {
+    const data = await apiFetch<{ record: any }>(`/api/records/${publicId}`);
+    return data.record;
+  },
+
+  async getProjectRecord(projectId: string): Promise<any> {
+    const data = await apiFetch<{ record: any }>(`/api/projects/${projectId}/record`);
+    return data.record;
+  },
+
+  async confirmFairRecord(recordId: string): Promise<any> {
+    const data = await apiFetch<{ record: any }>(`/api/records/${recordId}/confirm`, {
+      method: "POST",
+    });
+    return data.record;
+  },
+
+  // Verification
+  async getVerificationStatus(): Promise<any> {
+    return apiFetch("/api/contractor/verification");
+  },
+
+  async submitVerificationStep(step: string, data: Record<string, unknown>): Promise<any> {
+    return apiFetch(`/api/contractor/verification/${step}`, {
+      method: "POST",
+      body: JSON.stringify({ data }),
+    });
+  },
 };
 
 // --- WebSocket Client ---

@@ -27,8 +27,11 @@ import {
   type Job,
   type Contractor,
 } from "@shared/lib/mock-data";
+import { fetchJobs, fetchBidsForJob } from "@shared/lib/data";
+import { api } from "@shared/lib/realtime";
+import { useRealtimeBids } from "@shared/hooks/use-realtime";
 
-// Mock bids for now — will be replaced with API calls
+// Bid shape — matches API response or mock
 interface Bid {
   id: string;
   jobId: string;
@@ -62,20 +65,69 @@ function generateMockBids(): Bid[] {
 }
 
 export default function BidsPage() {
-  const [bids] = useState<Bid[]>(generateMockBids);
+  const [bids, setBids] = useState<Bid[]>(generateMockBids);
+  const [jobs, setJobs] = useState<Job[]>(mockJobs.filter((j) => j.status === "open").slice(0, 3));
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [acceptingBid, setAcceptingBid] = useState<string | null>(null);
 
-  const jobs = mockJobs.filter((j) => j.status === "open").slice(0, 3);
+  useEffect(() => {
+    fetchJobs().then((apiJobs) => {
+      const openJobs = apiJobs.filter((j) => j.status === "open").slice(0, 5);
+      if (openJobs.length > 0) setJobs(openJobs);
+    });
+  }, []);
+
   const activeJob = selectedJobId || jobs[0]?.id;
+
+  // Live bids via WebSocket (falls back to REST internally)
+  const { bids: realtimeBids, acceptBid: wsAcceptBid } = useRealtimeBids(activeJob || null);
+
+  useEffect(() => {
+    if (realtimeBids.length > 0) {
+      setBids(realtimeBids.map((b) => ({
+        id: b.id,
+        jobId: activeJob!,
+        contractor: mockContractors.find((c) => c.id === b.contractor?.id) || {
+          ...mockContractors[0],
+          name: b.contractor?.name || "Contractor",
+          rating: b.contractor?.rating || 4.5,
+        },
+        amount: (b.amount || 0) / 100,
+        message: b.message,
+        timeline: b.timeline,
+        status: b.status as Bid["status"],
+        createdAt: b.placed_at,
+      })));
+    } else if (activeJob) {
+      // Fallback to REST
+      fetchBidsForJob(activeJob).then((apiBids) => {
+        if (apiBids.length > 0) {
+          setBids(apiBids.map((b) => ({
+            id: b.id,
+            jobId: activeJob,
+            contractor: mockContractors.find((c) => c.id === b.contractor?.id) || mockContractors[0],
+            amount: (b.amount || 0) / 100,
+            message: b.message,
+            timeline: b.timeline,
+            status: b.status as Bid["status"],
+            createdAt: b.placed_at,
+          })));
+        }
+      });
+    }
+  }, [realtimeBids, activeJob]);
+
   const jobBids = bids.filter((b) => b.jobId === activeJob);
   const currentJob = jobs.find((j) => j.id === activeJob);
 
   const handleAccept = async (bidId: string) => {
     setAcceptingBid(bidId);
-    // In production, calls POST /api/bids/[id]/accept
-    // For now, simulated delay
-    await new Promise((r) => setTimeout(r, 1000));
+    try {
+      if (activeJob) await api.acceptBid(activeJob, bidId);
+    } catch {
+      // API not available — mock delay
+      await new Promise((r) => setTimeout(r, 1000));
+    }
     setAcceptingBid(null);
   };
 

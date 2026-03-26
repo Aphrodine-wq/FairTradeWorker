@@ -28,7 +28,7 @@ import {
   type Job,
   type Estimate,
 } from "@shared/lib/mock-data";
-import { fetchJobs, fetchEstimates } from "@shared/lib/data";
+import { fetchJobs, fetchEstimates, fetchReviews } from "@shared/lib/data";
 import { formatCurrency, cn } from "@shared/lib/utils";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -171,10 +171,14 @@ function TileHeader({ title, count, linkHref, linkLabel }: { title: string; coun
 export default function ContractorDashboardPage() {
   const [jobs, setJobs] = useState<Job[]>(mockJobs);
   const [estimates, setEstimates] = useState<Estimate[]>(mockEstimates);
+  const [reviews, setReviews] = useState(mockReviews);
 
   useEffect(() => {
     fetchJobs().then(setJobs);
     fetchEstimates().then(setEstimates);
+    fetchReviews().then((apiReviews) => {
+      if (apiReviews.length > 0) setReviews(apiReviews);
+    });
   }, []);
 
   const { activeJobs, monthlyRevenue, estimatesSent, estimatesAccepted, revenueChange, avgRating, responseTime } = contractorDashboardStats;
@@ -276,7 +280,7 @@ export default function ContractorDashboardPage() {
                 <div className="text-right">
                   <p className="text-[12px] text-gray-400">Rating</p>
                   <p className="text-[26px] font-bold text-gray-900 tabular-nums leading-none mt-0.5">{avgRating}</p>
-                  <p className="text-[11px] text-gray-400">{mockReviews.length} reviews</p>
+                  <p className="text-[11px] text-gray-400">{reviews.length} reviews</p>
                 </div>
               </div>
 

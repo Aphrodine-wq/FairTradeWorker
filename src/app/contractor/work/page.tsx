@@ -53,7 +53,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@shared/ui/dialog";
-import { mockJobs, mockEstimates, mockContractors, type Estimate, type Job } from "@shared/lib/mock-data";
+import { mockJobs, mockEstimates, type Estimate, type Job } from "@shared/lib/mock-data";
 import { JOB_CATEGORIES } from "@shared/lib/constants";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
 import { type BadgeProps } from "@shared/ui/badge";

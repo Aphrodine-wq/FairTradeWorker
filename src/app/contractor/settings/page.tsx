@@ -635,11 +635,65 @@ function InsuranceSection() {
 }
 
 function IntegrationsSection() {
-  const integrations = [
-    { name: "QuickBooks", desc: "Sync estimates and invoices", connected: true, icon: "QB" },
-    { name: "Google Calendar", desc: "Sync project schedule", connected: true, icon: "GC" },
-    { name: "Stripe Connect", desc: "Receive escrow payments", connected: false, icon: "SC" },
-    { name: "CompanyCam", desc: "Auto-upload job site photos", connected: false, icon: "CC" },
+  const [qbStatus, setQbStatus] = useState<{
+    connected: boolean;
+    companyName?: string;
+    connectedAt?: string;
+  }>({ connected: false });
+  const [qbLoading, setQbLoading] = useState(true);
+  const [qbConnecting, setQbConnecting] = useState(false);
+  const [qbDisconnecting, setQbDisconnecting] = useState(false);
+
+  // Check for OAuth redirect result
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const qbResult = params.get("qb");
+    if (qbResult === "connected") {
+      // Clean up URL
+      const url = new URL(window.location.href);
+      url.searchParams.delete("qb");
+      window.history.replaceState({}, "", url.pathname + url.search);
+    }
+  }, []);
+
+  // Fetch QuickBooks connection status
+  useEffect(() => {
+    fetch("/api/integrations/quickbooks/status")
+      .then((res) => res.json())
+      .then((data) => setQbStatus(data))
+      .catch(() => setQbStatus({ connected: false }))
+      .finally(() => setQbLoading(false));
+  }, []);
+
+  async function connectQuickBooks() {
+    setQbConnecting(true);
+    try {
+      const res = await fetch("/api/integrations/quickbooks/connect");
+      const data = await res.json();
+      if (data.authUrl) {
+        window.location.href = data.authUrl;
+      }
+    } catch {
+      setQbConnecting(false);
+    }
+  }
+
+  async function disconnectQuickBooks() {
+    setQbDisconnecting(true);
+    try {
+      await fetch("/api/integrations/quickbooks/disconnect", { method: "POST" });
+      setQbStatus({ connected: false });
+    } catch {
+      // Silently fail — user can retry
+    } finally {
+      setQbDisconnecting(false);
+    }
+  }
+
+  const futureIntegrations = [
+    { name: "Google Calendar", desc: "Sync project schedule", icon: "GC" },
+    { name: "Stripe Connect", desc: "Receive escrow payments", icon: "SC" },
+    { name: "CompanyCam", desc: "Auto-upload job site photos", icon: "CC" },
   ];
 
   return (
@@ -650,7 +704,44 @@ function IntegrationsSection() {
       </div>
 
       <div className="space-y-3">
-        {integrations.map((int) => (
+        {/* QuickBooks — real integration */}
+        <div className="flex items-center justify-between p-4 bg-white border border-border rounded-xl">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-xs font-bold text-emerald-700">QB</div>
+            <div>
+              <p className="text-sm font-semibold text-gray-900">QuickBooks</p>
+              <p className="text-xs text-gray-400">
+                {qbLoading
+                  ? "Checking connection..."
+                  : qbStatus.connected
+                    ? `Connected to ${qbStatus.companyName || "QuickBooks"}`
+                    : "Sync estimates and invoices"}
+              </p>
+            </div>
+          </div>
+          {qbLoading ? (
+            <div className="w-20 h-8 bg-gray-100 rounded animate-pulse" />
+          ) : qbStatus.connected ? (
+            <div className="flex items-center gap-2">
+              <Badge variant="success" className="text-[10px]">Connected</Badge>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={disconnectQuickBooks}
+                disabled={qbDisconnecting}
+              >
+                {qbDisconnecting ? "..." : "Disconnect"}
+              </Button>
+            </div>
+          ) : (
+            <Button size="sm" onClick={connectQuickBooks} disabled={qbConnecting}>
+              {qbConnecting ? "Connecting..." : "Connect"}
+            </Button>
+          )}
+        </div>
+
+        {/* Future integrations — still mock */}
+        {futureIntegrations.map((int) => (
           <div key={int.name} className="flex items-center justify-between p-4 bg-white border border-border rounded-xl">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500">{int.icon}</div>
@@ -659,14 +750,7 @@ function IntegrationsSection() {
                 <p className="text-xs text-gray-400">{int.desc}</p>
               </div>
             </div>
-            {int.connected ? (
-              <div className="flex items-center gap-2">
-                <Badge variant="success" className="text-[10px]">Connected</Badge>
-                <Button variant="outline" size="sm">Disconnect</Button>
-              </div>
-            ) : (
-              <Button size="sm">Connect</Button>
-            )}
+            <Button size="sm" variant="outline" disabled>Coming Soon</Button>
           </div>
         ))}
       </div>
