@@ -32,6 +32,7 @@ import { mockContractors } from "@shared/lib/mock-data";
 import { JOB_CATEGORIES } from "@shared/lib/constants";
 import { getInitials, cn } from "@shared/lib/utils";
 import { fetchSettings, saveSettings } from "@shared/lib/data";
+import { toast } from "sonner";
 
 const contractor = mockContractors[0];
 
@@ -106,7 +107,7 @@ function SaveBar({ saved, onSave, label = "Save Changes" }: { saved: boolean; on
 
 function useSave() {
   const [saved, setSaved] = useState(false);
-  const onSave = () => { setSaved(true); setTimeout(() => setSaved(false), 2000); };
+  const onSave = () => { setSaved(true); toast.success("Settings saved"); setTimeout(() => setSaved(false), 2000); };
   return { saved, onSave };
 }
 
@@ -421,17 +422,21 @@ function NotificationsSection() {
   }, []);
 
   const handleSaveSettings = async () => {
-    await saveSettings({
-      notifications_email_estimates: emailEstimates,
-      notifications_email_jobs: emailJobs,
-      notifications_sms_alerts: smsAlerts,
-      notifications_push: pushNotifs,
-      notifications_marketing: marketingEmails,
-      notifications_weekly_digest: weeklyDigest,
-      notifications_bid_updates: bidUpdates,
-      notifications_review_alerts: reviewAlerts,
-    });
-    onSave();
+    try {
+      await saveSettings({
+        notifications_email_estimates: emailEstimates,
+        notifications_email_jobs: emailJobs,
+        notifications_sms_alerts: smsAlerts,
+        notifications_push: pushNotifs,
+        notifications_marketing: marketingEmails,
+        notifications_weekly_digest: weeklyDigest,
+        notifications_bid_updates: bidUpdates,
+        notifications_review_alerts: reviewAlerts,
+      });
+      onSave();
+    } catch {
+      toast.error("Failed to save settings");
+    }
   };
 
   return (

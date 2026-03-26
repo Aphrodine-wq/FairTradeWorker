@@ -21,6 +21,7 @@ import {
 import { Button } from "@shared/ui/button";
 import { Badge } from "@shared/ui/badge";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
+import { toast } from "sonner";
 import { fetchInvoices } from "@shared/lib/data";
 
 // ─── Mock Data ───────────────────────────────────────────────────────────────
@@ -329,19 +330,19 @@ export default function InvoicesPage() {
                 {/* Actions bar */}
                 <div className="flex gap-2 mb-3">
                   {selected.status === "draft" && (
-                    <Button className="flex-1 gap-2">
+                    <Button onClick={() => toast.success("Invoice sent")} className="flex-1 gap-2">
                       <Send className="w-4 h-4" />
                       Send Invoice
                     </Button>
                   )}
                   {selected.status === "sent" && (
-                    <Button className="flex-1 gap-2">
+                    <Button onClick={() => toast.success("Invoice marked as paid")} className="flex-1 gap-2">
                       <DollarSign className="w-4 h-4" />
                       Mark as Paid
                     </Button>
                   )}
                   {selected.status === "overdue" && (
-                    <Button className="flex-1 gap-2 bg-red-600 hover:bg-red-700">
+                    <Button onClick={() => toast.success("Reminder sent")} className="flex-1 gap-2 bg-red-600 hover:bg-red-700">
                       <Send className="w-4 h-4" />
                       Send Reminder
                     </Button>

@@ -30,6 +30,7 @@ import {
 import { fetchJobs, fetchBidsForJob } from "@shared/lib/data";
 import { api } from "@shared/lib/realtime";
 import { useRealtimeBids } from "@shared/hooks/use-realtime";
+import { toast } from "sonner";
 
 // Bid shape — matches API response or mock
 interface Bid {
@@ -124,11 +125,24 @@ export default function BidsPage() {
     setAcceptingBid(bidId);
     try {
       if (activeJob) await api.acceptBid(activeJob, bidId);
+      toast.success("Bid accepted");
     } catch {
       // API not available — mock delay
       await new Promise((r) => setTimeout(r, 1000));
+      toast.error("Failed to accept bid");
     }
     setAcceptingBid(null);
+  };
+
+  const handleDecline = async (bidId: string) => {
+    try {
+      setBids((prev) =>
+        prev.map((b) => (b.id === bidId ? { ...b, status: "declined" as const } : b))
+      );
+      toast.success("Bid declined");
+    } catch {
+      toast.error("Failed to decline bid");
+    }
   };
 
   return (
@@ -261,7 +275,7 @@ export default function BidsPage() {
                     <MessageSquare className="w-3.5 h-3.5 mr-1" />
                     Message
                   </Button>
-                  <Button variant="outline" size="sm" className="text-gray-500">
+                  <Button variant="outline" size="sm" className="text-gray-500" onClick={() => handleDecline(bid.id)}>
                     Decline
                   </Button>
                 </div>

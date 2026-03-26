@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Shield, DollarSign, Mic } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@shared/ui/button";
 import { Card, CardContent } from "@shared/ui/card";
 import { Input } from "@shared/ui/input";
@@ -12,7 +13,17 @@ import { authStore } from "@shared/lib/auth-store";
 import { track, identify } from "@shared/lib/analytics";
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
+  );
+}
+
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const expired = searchParams.get("expired") === "true";
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,6 +41,7 @@ export default function LoginPage() {
       router.push(user.role === "homeowner" ? "/homeowner/dashboard" : "/contractor/dashboard");
     } catch {
       setError("Invalid email or password");
+      toast.error("Invalid email or password");
     } finally {
       setLoading(false);
     }
@@ -121,6 +133,12 @@ export default function LoginPage() {
                   Sign in to your account
                 </p>
               </div>
+
+              {expired && (
+                <div className="rounded-lg bg-blue-50 border border-blue-200 p-3 text-sm text-blue-700 mb-5">
+                  Your session has expired. Please sign in again.
+                </div>
+              )}
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 {error && (

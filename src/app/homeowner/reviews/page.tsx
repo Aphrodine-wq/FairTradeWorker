@@ -5,6 +5,7 @@ import { Star, MessageSquare } from "lucide-react";
 import { Button } from "@shared/ui/button";
 import { fetchReviews } from "@shared/lib/data";
 import { cn } from "@shared/lib/utils";
+import { toast } from "sonner";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -243,6 +244,7 @@ export default function HomeownerReviewsPage() {
   function submitReview(projectId: string) {
     setSubmitted((prev) => [...prev, projectId]);
     closeForm();
+    toast.success("Review submitted");
   }
 
   function formatDate(date: string) {

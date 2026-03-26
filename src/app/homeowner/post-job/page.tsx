@@ -27,6 +27,7 @@ import { JOB_CATEGORIES } from "@shared/lib/constants";
 import { authStore } from "@shared/lib/auth-store";
 import { api } from "@shared/lib/realtime";
 import { track } from "@shared/lib/analytics";
+import { toast } from "sonner";
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -127,9 +128,11 @@ export default function PostJobPage() {
       api.getAIEstimate(form.description).catch(() => {});
 
       track("job_posted", { category: form.category });
+      toast.success("Job posted successfully");
       router.push("/homeowner/jobs");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
+      toast.error("Failed to post job");
     } finally {
       setSubmitting(false);
     }

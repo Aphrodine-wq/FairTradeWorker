@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Navbar } from "@marketplace/components/navbar";
+
+export const metadata: Metadata = {
+  title: "About",
+  description: "FairTradeWorker is building a fairer construction marketplace. No lead fees, no hidden costs, just honest connections between homeowners and contractors.",
+};
 import { Footer } from "@marketplace/components/footer";
 import { Button } from "@shared/ui/button";
 import { Separator } from "@shared/ui/separator";

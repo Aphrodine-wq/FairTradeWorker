@@ -102,6 +102,13 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   });
 
   if (!res.ok) {
+    if (res.status === 401 && typeof window !== "undefined") {
+      // Session expired — clear auth and redirect
+      setAuthToken(null);
+      localStorage.removeItem("ftw-auth");
+      window.location.href = "/login?expired=true";
+      throw new Error("Session expired");
+    }
     const body = await res.json().catch(() => ({}));
     throw new Error(body.error || `API error: ${res.status}`);
   }

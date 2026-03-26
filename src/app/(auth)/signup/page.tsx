@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Home, HardHat, Eye, EyeOff, ChevronLeft, Check } from "lucide-react";
 import { authStore } from "@shared/lib/auth-store";
 import { track, identify } from "@shared/lib/analytics";
+import { toast } from "sonner";
 import { Button } from "@shared/ui/button";
 import { Card, CardContent } from "@shared/ui/card";
 import { Input } from "@shared/ui/input";
@@ -111,13 +112,16 @@ function SignupContent() {
         name: form.name,
       });
       track("signup", { role: user.role });
+      toast.success("Account created!");
       router.push(
         user.role === "homeowner"
           ? "/homeowner/onboarding"
           : "/contractor/onboarding"
       );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Registration failed");
+      const message = err instanceof Error ? err.message : "Registration failed";
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }

@@ -22,6 +22,7 @@ import { Separator } from "@shared/ui/separator";
 import { Badge } from "@shared/ui/badge";
 import { cn } from "@shared/lib/utils";
 import { fetchSettings, saveSettings } from "@shared/lib/data";
+import { toast } from "sonner";
 
 // ─── Shared Components ───────────────────────────────────────────────────────
 
@@ -61,7 +62,7 @@ function SaveBar({ saved, onSave, label = "Save Changes" }: { saved: boolean; on
 
 function useSave() {
   const [saved, setSaved] = useState(false);
-  const onSave = () => { setSaved(true); setTimeout(() => setSaved(false), 2000); };
+  const onSave = () => { setSaved(true); toast.success("Settings saved"); setTimeout(() => setSaved(false), 2000); };
   return { saved, onSave };
 }
 
@@ -251,14 +252,18 @@ function NotificationsSection() {
   }, []);
 
   const handleSaveSettings = async () => {
-    await saveSettings({
-      notifications_new_bids: newBids,
-      notifications_messages: messages,
-      notifications_project_updates: projectUpdates,
-      notifications_payment_reminders: paymentReminders,
-      notifications_marketing: marketingEmails,
-    });
-    onSave();
+    try {
+      await saveSettings({
+        notifications_new_bids: newBids,
+        notifications_messages: messages,
+        notifications_project_updates: projectUpdates,
+        notifications_payment_reminders: paymentReminders,
+        notifications_marketing: marketingEmails,
+      });
+      onSave();
+    } catch {
+      toast.error("Failed to save settings");
+    }
   };
 
   return (

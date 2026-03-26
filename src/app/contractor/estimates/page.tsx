@@ -42,6 +42,8 @@ import { mockEstimates, type Estimate } from "@shared/lib/mock-data";
 import { fetchEstimates } from "@shared/lib/data";
 import { api } from "@shared/lib/realtime";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
+import { toast } from "sonner";
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "@shared/ui/alert-dialog";
 
 // ─── Status Config ───────────────────────────────────────────────────────────
 
@@ -134,13 +136,27 @@ function EstimateRow({ est }: { est: Estimate }) {
           >
             {style.label}
           </Badge>
-          <button
-            onClick={(e) => { e.stopPropagation(); }}
-            className="text-gray-300 hover:text-red-500 transition-colors"
-            title="Delete estimate"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button
+                onClick={(e) => { e.stopPropagation(); }}
+                className="text-gray-300 hover:text-red-500 transition-colors"
+                title="Delete estimate"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete estimate</AlertDialogTitle>
+                <AlertDialogDescription>This estimate will be permanently deleted. This action cannot be undone.</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => { toast.success("Estimate deleted"); }}>Delete</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           {open ? (
             <ChevronUp className="w-4 h-4 text-gray-400" />
           ) : (
@@ -563,11 +579,11 @@ function NewEstimateTab() {
 
         {/* Actions */}
         <div className="flex items-center gap-3 pt-2 pb-8">
-          <Button className="gap-2 h-11 px-6 text-[14px]">
+          <Button onClick={() => toast.success("Estimate created")} className="gap-2 h-11 px-6 text-[14px]">
             <Send className="w-4 h-4" />
             Send Estimate
           </Button>
-          <Button variant="outline" className="h-11 px-6 text-[14px]">Save as Draft</Button>
+          <Button onClick={() => toast.success("Estimate saved as draft")} variant="outline" className="h-11 px-6 text-[14px]">Save as Draft</Button>
         </div>
       </div>
 

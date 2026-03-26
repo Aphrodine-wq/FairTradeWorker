@@ -15,6 +15,7 @@ import { Input } from "@shared/ui/input";
 import { Textarea } from "@shared/ui/textarea";
 import { type Job } from "@shared/lib/mock-data";
 import { formatCurrency, cn } from "@shared/lib/utils";
+import { toast } from "sonner";
 
 const TIMELINE_OPTIONS = [
   { value: "1-week", label: "1 week" },
@@ -52,7 +53,12 @@ export function BidDialog({ job, trigger }: BidDialogProps) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!canSubmit) return;
-    setSubmitted(true);
+    try {
+      setSubmitted(true);
+      toast.success("Bid placed successfully");
+    } catch {
+      toast.error("Failed to place bid");
+    }
   }
 
   function handleOpenChange(val: boolean) {

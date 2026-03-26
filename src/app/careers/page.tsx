@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Careers",
+  description: "Join FairTradeWorker and help build a fairer construction marketplace.",
+};
 import { Navbar } from "@marketplace/components/navbar";
 import { Footer } from "@marketplace/components/footer";
 import { Button } from "@shared/ui/button";

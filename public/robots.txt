@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /contractor/
+Disallow: /homeowner/
+
+Sitemap: https://fairtradeworker.com/sitemap.xml

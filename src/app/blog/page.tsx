@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Navbar } from "@marketplace/components/navbar";
+
+export const metadata: Metadata = {
+  title: "Blog",
+  description: "Tips, guides, and insights for homeowners and contractors on the FairTradeWorker blog.",
+};
 import { Footer } from "@marketplace/components/footer";
 import { Separator } from "@shared/ui/separator";
 
