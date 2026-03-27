@@ -1,23 +1,23 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
 import {
   DollarSign,
   Shield,
   Lock,
   ArrowUpRight,
-  ArrowDownRight,
   ChevronDown,
   Check,
   Clock,
   CreditCard,
-  Building2,
   FileText,
   Download,
   Search,
-  Filter,
   Eye,
   EyeOff,
+  Circle,
+  ExternalLink,
 } from "lucide-react";
 import { Badge } from "@shared/ui/badge";
 import { Button } from "@shared/ui/button";
@@ -26,84 +26,71 @@ import { formatCurrency, cn } from "@shared/lib/utils";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type TransactionType = "escrow_funded" | "milestone_released" | "service_fee" | "refund";
-type TransactionStatus = "completed" | "pending" | "processing";
+type MilestoneStatus = "paid" | "approved" | "submitted" | "in_progress" | "pending";
 
-interface Transaction {
+interface PaymentMilestone {
   id: string;
-  type: TransactionType;
-  status: TransactionStatus;
+  label: string;
   amount: number;
-  description: string;
-  project: string;
-  contractor: string;
-  milestone?: string;
-  date: string;
-  reference: string;
+  status: MilestoneStatus;
+  paidDate?: string;
+  approvedDate?: string;
+  submittedDate?: string;
+  reference?: string;
+  platformFee?: number;
 }
 
-interface EscrowAccount {
-  projectId: string;
-  projectName: string;
+interface ProjectPayment {
+  id: string;
+  name: string;
   contractor: string;
   contractValue: number;
-  funded: number;
-  released: number;
-  held: number;
-  milestonesTotal: number;
-  milestonesPaid: number;
+  milestones: PaymentMilestone[];
 }
 
 // ─── Mock Data ───────────────────────────────────────────────────────────────
 
-const ESCROW_ACCOUNTS: EscrowAccount[] = [
+const PROJECTS: ProjectPayment[] = [
   {
-    projectId: "j1",
-    projectName: "Kitchen Remodel - Full Gut",
+    id: "j1",
+    name: "Kitchen Remodel - Full Gut",
     contractor: "Johnson & Sons Construction",
     contractValue: 38500,
-    funded: 38500,
-    released: 13500,
-    held: 25000,
-    milestonesTotal: 6,
-    milestonesPaid: 2,
+    milestones: [
+      { id: "m1", label: "Demo complete", amount: 5000, status: "paid", paidDate: "2026-03-14", approvedDate: "2026-03-14", reference: "FTW-PAY-260314-A1", platformFee: 150 },
+      { id: "m2", label: "Rough-in (plumb/elec)", amount: 8500, status: "paid", paidDate: "2026-03-19", approvedDate: "2026-03-19", reference: "FTW-PAY-260319-B2", platformFee: 255 },
+      { id: "m3", label: "Cabinet install", amount: 7000, status: "approved", approvedDate: "2026-03-24", reference: "FTW-PAY-260324-C3", platformFee: 210 },
+      { id: "m4", label: "Countertops", amount: 6500, status: "submitted", submittedDate: "2026-03-26" },
+      { id: "m5", label: "Tile & flooring", amount: 7500, status: "in_progress" },
+      { id: "m6", label: "Final walkthrough", amount: 4000, status: "pending" },
+    ],
   },
   {
-    projectId: "j2",
-    projectName: "Bathroom Reno",
+    id: "j2",
+    name: "Bathroom Reno",
     contractor: "Johnson & Sons Construction",
     contractValue: 15200,
-    funded: 15200,
-    released: 2500,
-    held: 12700,
-    milestonesTotal: 5,
-    milestonesPaid: 1,
+    milestones: [
+      { id: "m7", label: "Demo complete", amount: 2500, status: "paid", paidDate: "2026-03-17", approvedDate: "2026-03-17", reference: "FTW-PAY-260317-D4", platformFee: 75 },
+      { id: "m8", label: "Plumbing rough-in", amount: 3500, status: "approved", approvedDate: "2026-03-21", reference: "FTW-PAY-260321-E5", platformFee: 105 },
+      { id: "m9", label: "Tile & waterproofing", amount: 4200, status: "in_progress" },
+      { id: "m10", label: "Vanity & fixtures", amount: 3000, status: "pending" },
+      { id: "m11", label: "Final walkthrough", amount: 2000, status: "pending" },
+    ],
   },
   {
-    projectId: "j4",
-    projectName: "Roof Replacement",
+    id: "j4",
+    name: "Roof Replacement",
     contractor: "Apex Roofing Co",
     contractValue: 13500,
-    funded: 13500,
-    released: 6500,
-    held: 7000,
-    milestonesTotal: 5,
-    milestonesPaid: 2,
+    milestones: [
+      { id: "m12", label: "Tear-off complete", amount: 3000, status: "paid", paidDate: "2026-03-16", approvedDate: "2026-03-16", reference: "FTW-PAY-260316-F6", platformFee: 90 },
+      { id: "m13", label: "OSB & underlayment", amount: 3500, status: "paid", paidDate: "2026-03-17", approvedDate: "2026-03-17", reference: "FTW-PAY-260317-G7", platformFee: 105 },
+      { id: "m14", label: "Shingles", amount: 4000, status: "approved", approvedDate: "2026-03-19", reference: "FTW-PAY-260319-H8", platformFee: 120 },
+      { id: "m15", label: "Flashings & ridge", amount: 2000, status: "in_progress" },
+      { id: "m16", label: "Final inspection", amount: 1000, status: "pending" },
+    ],
   },
-];
-
-const TRANSACTIONS: Transaction[] = [
-  { id: "t1", type: "milestone_released", status: "completed", amount: 5000, description: "Demo complete", project: "Kitchen Remodel", contractor: "Johnson & Sons", milestone: "Milestone 1 of 6", date: "2026-03-14", reference: "FTW-TXN-260314-A1" },
-  { id: "t2", type: "service_fee", status: "completed", amount: 150, description: "Platform fee (3%)", project: "Kitchen Remodel", contractor: "Johnson & Sons", date: "2026-03-14", reference: "FTW-FEE-260314-A1" },
-  { id: "t3", type: "milestone_released", status: "completed", amount: 8500, description: "Rough-in (plumb/elec)", project: "Kitchen Remodel", contractor: "Johnson & Sons", milestone: "Milestone 2 of 6", date: "2026-03-19", reference: "FTW-TXN-260319-B2" },
-  { id: "t4", type: "service_fee", status: "completed", amount: 255, description: "Platform fee (3%)", project: "Kitchen Remodel", contractor: "Johnson & Sons", date: "2026-03-19", reference: "FTW-FEE-260319-B2" },
-  { id: "t5", type: "milestone_released", status: "processing", amount: 7000, description: "Cabinet install", project: "Kitchen Remodel", contractor: "Johnson & Sons", milestone: "Milestone 3 of 6", date: "2026-03-24", reference: "FTW-TXN-260324-C3" },
-  { id: "t6", type: "escrow_funded", status: "completed", amount: 38500, description: "Escrow funded — Kitchen Remodel", project: "Kitchen Remodel", contractor: "Johnson & Sons", date: "2026-03-08", reference: "FTW-ESC-260308-K1" },
-  { id: "t7", type: "milestone_released", status: "completed", amount: 2500, description: "Demo complete", project: "Bathroom Reno", contractor: "Johnson & Sons", milestone: "Milestone 1 of 5", date: "2026-03-17", reference: "FTW-TXN-260317-D4" },
-  { id: "t8", type: "escrow_funded", status: "completed", amount: 15200, description: "Escrow funded — Bathroom Reno", project: "Bathroom Reno", contractor: "Johnson & Sons", date: "2026-03-12", reference: "FTW-ESC-260312-B1" },
-  { id: "t9", type: "milestone_released", status: "completed", amount: 3000, description: "Tear-off complete", project: "Roof Replacement", contractor: "Apex Roofing", milestone: "Milestone 1 of 5", date: "2026-03-16", reference: "FTW-TXN-260316-E5" },
-  { id: "t10", type: "milestone_released", status: "completed", amount: 3500, description: "OSB & underlayment", project: "Roof Replacement", contractor: "Apex Roofing", milestone: "Milestone 2 of 5", date: "2026-03-17", reference: "FTW-TXN-260317-F6" },
-  { id: "t11", type: "escrow_funded", status: "completed", amount: 13500, description: "Escrow funded — Roof Replacement", project: "Roof Replacement", contractor: "Apex Roofing", date: "2026-03-14", reference: "FTW-ESC-260314-R1" },
 ];
 
 const PAYMENT_METHOD = {
@@ -113,41 +100,29 @@ const PAYMENT_METHOD = {
   name: "Michael Brown",
 };
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-const TXN_CONFIG: Record<TransactionType, { label: string; icon: typeof DollarSign; color: string; sign: "+" | "-" }> = {
-  escrow_funded:      { label: "Escrow Funded",     icon: Lock,         color: "text-blue-600",    sign: "-" },
-  milestone_released: { label: "Milestone Released", icon: ArrowUpRight, color: "text-emerald-600", sign: "-" },
-  service_fee:        { label: "Service Fee",        icon: FileText,     color: "text-gray-500",    sign: "-" },
-  refund:             { label: "Refund",             icon: ArrowDownRight, color: "text-blue-600",  sign: "+" },
-};
-
-const STATUS_BADGE: Record<TransactionStatus, { label: string; className: string }> = {
-  completed:  { label: "Completed",  className: "bg-emerald-50 text-emerald-700 border-emerald-200" },
-  pending:    { label: "Pending",    className: "bg-amber-50 text-amber-700 border-amber-200" },
-  processing: { label: "Processing", className: "bg-blue-50 text-blue-700 border-blue-200" },
+const STATUS_CONFIG: Record<MilestoneStatus, { label: string; color: string; bg: string }> = {
+  paid:        { label: "Paid",         color: "text-emerald-700", bg: "bg-emerald-100 border-emerald-300" },
+  approved:    { label: "Processing",   color: "text-blue-700",    bg: "bg-blue-100 border-blue-300" },
+  submitted:   { label: "Awaiting Review", color: "text-amber-700", bg: "bg-amber-100 border-amber-300" },
+  in_progress: { label: "In Progress",  color: "text-gray-600",    bg: "bg-gray-100 border-gray-200" },
+  pending:     { label: "Upcoming",     color: "text-gray-400",    bg: "bg-gray-50 border-gray-200" },
 };
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function HomeownerPaymentsPage() {
-  const [transactions] = useState<Transaction[]>(TRANSACTIONS);
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<"all" | TransactionType>("all");
-  const [expandedTxn, setExpandedTxn] = useState<string | null>(null);
+  const [expandedProject, setExpandedProject] = useState<string | null>("j1");
+  const [expandedMilestone, setExpandedMilestone] = useState<string | null>(null);
   const [showBalances, setShowBalances] = useState(true);
+  const [search, setSearch] = useState("");
 
-  const totalEscrowHeld = useMemo(() => ESCROW_ACCOUNTS.reduce((s, a) => s + a.held, 0), []);
-  const totalReleased = useMemo(() => ESCROW_ACCOUNTS.reduce((s, a) => s + a.released, 0), []);
-  const totalFunded = useMemo(() => ESCROW_ACCOUNTS.reduce((s, a) => s + a.funded, 0), []);
-  const totalFees = useMemo(() => transactions.filter((t) => t.type === "service_fee" && t.status === "completed").reduce((s, t) => s + t.amount, 0), [transactions]);
-
-  const sortedTransactions = useMemo(() => {
-    let filtered = transactions;
-    if (filter !== "all") filtered = filtered.filter((t) => t.type === filter);
-    if (search) filtered = filtered.filter((t) => t.description.toLowerCase().includes(search.toLowerCase()) || t.project.toLowerCase().includes(search.toLowerCase()) || t.contractor.toLowerCase().includes(search.toLowerCase()));
-    return [...filtered].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }, [transactions, filter, search]);
+  const allMilestones = PROJECTS.flatMap((p) => p.milestones);
+  const totalFunded = PROJECTS.reduce((s, p) => s + p.contractValue, 0);
+  const totalPaid = allMilestones.filter((m) => m.status === "paid").reduce((s, m) => s + m.amount, 0);
+  const totalProcessing = allMilestones.filter((m) => m.status === "approved").reduce((s, m) => s + m.amount, 0);
+  const totalHeld = totalFunded - totalPaid - totalProcessing;
+  const totalFees = allMilestones.reduce((s, m) => s + (m.platformFee || 0), 0);
+  const awaitingReview = allMilestones.filter((m) => m.status === "submitted").length;
 
   return (
     <div className="flex flex-col min-h-full bg-surface">
@@ -156,15 +131,24 @@ export default function HomeownerPaymentsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-gray-900">Payments</h1>
-            <p className="text-[13px] text-gray-400 mt-0.5">Escrow balances, transactions, and receipts</p>
+            <p className="text-[13px] text-gray-400 mt-0.5">Escrow balances and milestone payments</p>
           </div>
           <div className="flex items-center gap-2">
+            {awaitingReview > 0 && (
+              <Link
+                href="/homeowner/milestones"
+                className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-amber-50 border border-amber-200 text-[12px] font-semibold text-amber-700 hover:bg-amber-100 transition-colors"
+              >
+                <Clock className="w-3.5 h-3.5" />
+                {awaitingReview} awaiting review
+              </Link>
+            )}
             <button
               onClick={() => setShowBalances(!showBalances)}
               className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border text-[12px] font-medium text-gray-600 hover:bg-gray-50 transition-colors"
             >
               {showBalances ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-              {showBalances ? "Hide" : "Show"} balances
+              {showBalances ? "Hide" : "Show"}
             </button>
           </div>
         </div>
@@ -175,163 +159,185 @@ export default function HomeownerPaymentsPage() {
         <div className="grid grid-cols-4 gap-4 mb-6">
           <div className="bg-white rounded-xl border border-border p-5">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Total in Escrow</p>
-              <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-                <Lock className="w-4 h-4 text-blue-600" />
-              </div>
+              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">In Escrow</p>
+              <Lock className="w-4 h-4 text-blue-600" />
             </div>
-            <p className="text-2xl font-bold text-gray-900 tabular-nums">{showBalances ? formatCurrency(totalEscrowHeld) : "****"}</p>
-            <p className="text-[11px] text-gray-400 mt-1">Held across {ESCROW_ACCOUNTS.length} projects</p>
+            <p className="text-2xl font-bold text-gray-900 tabular-nums">{showBalances ? formatCurrency(totalHeld) : "****"}</p>
+            <p className="text-[11px] text-gray-400 mt-1">Held until milestones approved</p>
           </div>
-
           <div className="bg-white rounded-xl border border-border p-5">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Total Released</p>
-              <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
-                <ArrowUpRight className="w-4 h-4 text-emerald-600" />
-              </div>
+              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Paid Out</p>
+              <Check className="w-4 h-4 text-emerald-600" />
             </div>
-            <p className="text-2xl font-bold text-emerald-600 tabular-nums">{showBalances ? formatCurrency(totalReleased) : "****"}</p>
-            <p className="text-[11px] text-gray-400 mt-1">Paid to contractors</p>
+            <p className="text-2xl font-bold text-emerald-700 tabular-nums">{showBalances ? formatCurrency(totalPaid) : "****"}</p>
+            <p className="text-[11px] text-gray-400 mt-1">Released to contractors</p>
           </div>
-
           <div className="bg-white rounded-xl border border-border p-5">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Total Funded</p>
-              <div className="w-8 h-8 rounded-lg bg-brand-50 flex items-center justify-center">
-                <DollarSign className="w-4 h-4 text-brand-600" />
-              </div>
+              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Processing</p>
+              <Clock className="w-4 h-4 text-blue-600" />
             </div>
-            <p className="text-2xl font-bold text-gray-900 tabular-nums">{showBalances ? formatCurrency(totalFunded) : "****"}</p>
-            <p className="text-[11px] text-gray-400 mt-1">Across all projects</p>
+            <p className="text-2xl font-bold text-blue-700 tabular-nums">{showBalances ? formatCurrency(totalProcessing) : "****"}</p>
+            <p className="text-[11px] text-gray-400 mt-1">Approved, releasing soon</p>
           </div>
-
           <div className="bg-white rounded-xl border border-border p-5">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Platform Fees</p>
-              <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center">
-                <FileText className="w-4 h-4 text-gray-500" />
-              </div>
+              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Fees Paid</p>
+              <FileText className="w-4 h-4 text-gray-400" />
             </div>
             <p className="text-2xl font-bold text-gray-900 tabular-nums">{showBalances ? formatCurrency(totalFees) : "****"}</p>
-            <p className="text-[11px] text-gray-400 mt-1">3% service fee</p>
+            <p className="text-[11px] text-gray-400 mt-1">3% platform fee</p>
           </div>
         </div>
 
         <div className="grid grid-cols-3 gap-5">
-          {/* Left — Transaction history (2 cols) */}
+          {/* Left — Project milestone payments (2 cols) */}
           <div className="col-span-2 space-y-4">
-            <div className="bg-white rounded-xl border border-border overflow-hidden">
-              {/* Filters */}
-              <div className="px-5 py-4 border-b border-border">
-                <div className="flex items-center gap-3">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <Input
-                      type="text"
-                      placeholder="Search transactions..."
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      className="pl-9 h-9 text-[13px]"
-                    />
-                  </div>
-                  <div className="flex items-center gap-1">
-                    {(["all", "milestone_released", "escrow_funded", "service_fee"] as const).map((f) => (
-                      <button
-                        key={f}
-                        onClick={() => setFilter(f)}
-                        className={cn(
-                          "h-8 px-3 rounded-lg text-[12px] font-medium transition-colors",
-                          filter === f
-                            ? "bg-gray-900 text-white"
-                            : "text-gray-500 hover:bg-gray-50"
-                        )}
-                      >
-                        {f === "all" ? "All" : f === "milestone_released" ? "Milestones" : f === "escrow_funded" ? "Escrow" : "Fees"}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
+            {PROJECTS.map((project) => {
+              const isExpanded = expandedProject === project.id;
+              const paid = project.milestones.filter((m) => m.status === "paid").reduce((s, m) => s + m.amount, 0);
+              const pct = project.contractValue > 0 ? Math.round((paid / project.contractValue) * 100) : 0;
+              const nextAction = project.milestones.find((m) => m.status === "submitted");
 
-              {/* Transaction list */}
-              <div>
-                {sortedTransactions.length === 0 ? (
-                  <div className="py-12 text-center">
-                    <p className="text-sm text-gray-400">No transactions found</p>
-                  </div>
-                ) : (
-                  sortedTransactions.map((txn) => {
-                    const cfg = TXN_CONFIG[txn.type];
-                    const statusCfg = STATUS_BADGE[txn.status];
-                    const Icon = cfg.icon;
-                    const isExpanded = expandedTxn === txn.id;
-
-                    return (
-                      <div key={txn.id} className="border-b border-border last:border-0">
-                        <button
-                          onClick={() => setExpandedTxn(isExpanded ? null : txn.id)}
-                          className="w-full flex items-center gap-4 px-5 py-4 hover:bg-gray-50/50 transition-colors text-left"
-                        >
-                          <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0",
-                            txn.type === "escrow_funded" ? "bg-blue-50" : txn.type === "milestone_released" ? "bg-emerald-50" : "bg-gray-50"
-                          )}>
-                            <Icon className={cn("w-4 h-4", cfg.color)} />
-                          </div>
-
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[14px] font-medium text-gray-900 truncate">{txn.description}</p>
-                            <p className="text-[12px] text-gray-400 truncate">{txn.project} &middot; {txn.contractor}</p>
-                          </div>
-
-                          <div className="text-right shrink-0">
-                            <p className={cn("text-[14px] font-bold tabular-nums", cfg.color)}>
-                              {cfg.sign}{formatCurrency(txn.amount)}
-                            </p>
-                            <p className="text-[11px] text-gray-400">{txn.date}</p>
-                          </div>
-
-                          <ChevronDown className={cn("w-4 h-4 text-gray-300 shrink-0 transition-transform", isExpanded && "rotate-180")} />
-                        </button>
-
-                        {isExpanded && (
-                          <div className="px-5 pb-4 bg-gray-50/50">
-                            <div className="grid grid-cols-2 gap-x-8 gap-y-3 py-3">
-                              <div>
-                                <p className="text-[11px] text-gray-400 uppercase tracking-wider">Reference</p>
-                                <p className="text-[13px] font-mono text-gray-700 mt-0.5">{txn.reference}</p>
-                              </div>
-                              <div>
-                                <p className="text-[11px] text-gray-400 uppercase tracking-wider">Status</p>
-                                <Badge className={cn("text-[11px] font-semibold mt-0.5 border", statusCfg.className)}>{statusCfg.label}</Badge>
-                              </div>
-                              <div>
-                                <p className="text-[11px] text-gray-400 uppercase tracking-wider">Type</p>
-                                <p className="text-[13px] text-gray-700 mt-0.5">{cfg.label}</p>
-                              </div>
-                              {txn.milestone && (
-                                <div>
-                                  <p className="text-[11px] text-gray-400 uppercase tracking-wider">Milestone</p>
-                                  <p className="text-[13px] text-gray-700 mt-0.5">{txn.milestone}</p>
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex gap-2 pt-2 border-t border-border">
-                              <button className="flex items-center gap-1.5 text-[12px] font-medium text-gray-500 hover:text-gray-900 transition-colors">
-                                <Download className="w-3.5 h-3.5" /> Download receipt
-                              </button>
-                            </div>
-                          </div>
+              return (
+                <div key={project.id} className="bg-white rounded-xl border border-border overflow-hidden">
+                  {/* Project header */}
+                  <button
+                    onClick={() => setExpandedProject(isExpanded ? null : project.id)}
+                    className="w-full flex items-center gap-4 px-5 py-4 hover:bg-gray-50/50 transition-colors text-left"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="text-[15px] font-semibold text-gray-900">{project.name}</p>
+                        {nextAction && (
+                          <span className="text-[10px] font-bold uppercase tracking-wide text-amber-700 bg-amber-100 border border-amber-300 px-1.5 py-0.5 rounded">
+                            Review needed
+                          </span>
                         )}
                       </div>
-                    );
-                  })
-                )}
-              </div>
-            </div>
+                      <p className="text-[12px] text-gray-400 mt-0.5">{project.contractor}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-[15px] font-bold text-gray-900 tabular-nums">{formatCurrency(project.contractValue)}</p>
+                      <p className="text-[11px] text-gray-400">{pct}% paid</p>
+                    </div>
+                    <ChevronDown className={cn("w-4 h-4 text-gray-400 shrink-0 transition-transform", isExpanded && "rotate-180")} />
+                  </button>
+
+                  {/* Expanded milestone list */}
+                  {isExpanded && (
+                    <div className="border-t border-border">
+                      {/* Progress bar */}
+                      <div className="px-5 py-3 bg-gray-50/50">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-[11px] font-medium text-gray-500">Escrow progress</span>
+                          <span className="text-[11px] font-bold text-gray-900 tabular-nums">{formatCurrency(paid)} / {formatCurrency(project.contractValue)}</span>
+                        </div>
+                        <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden flex">
+                          {(() => {
+                            const paidPct = (project.milestones.filter((m) => m.status === "paid").reduce((s, m) => s + m.amount, 0) / project.contractValue) * 100;
+                            const approvedPct = (project.milestones.filter((m) => m.status === "approved").reduce((s, m) => s + m.amount, 0) / project.contractValue) * 100;
+                            return (
+                              <>
+                                {paidPct > 0 && <div className="bg-emerald-600" style={{ width: `${paidPct}%` }} />}
+                                {approvedPct > 0 && <div className="bg-blue-600" style={{ width: `${approvedPct}%` }} />}
+                              </>
+                            );
+                          })()}
+                        </div>
+                      </div>
+
+                      {/* Milestones */}
+                      {project.milestones.map((m) => {
+                        const cfg = STATUS_CONFIG[m.status];
+                        const isDetailOpen = expandedMilestone === m.id;
+                        const hasDetail = m.status === "paid" || m.status === "approved";
+
+                        return (
+                          <div key={m.id} className={cn("border-t border-border", m.status === "submitted" && "bg-amber-50/30")}>
+                            <div
+                              className={cn("flex items-center gap-4 px-5 py-3.5", hasDetail && "cursor-pointer hover:bg-gray-50/50")}
+                              onClick={() => hasDetail && setExpandedMilestone(isDetailOpen ? null : m.id)}
+                            >
+                              {/* Status dot */}
+                              <div className={cn(
+                                "w-6 h-6 rounded-lg flex items-center justify-center shrink-0",
+                                m.status === "paid" ? "bg-emerald-100" : m.status === "approved" ? "bg-blue-100" : m.status === "submitted" ? "bg-amber-100" : "bg-gray-50"
+                              )}>
+                                {m.status === "paid" && <Check className="w-3.5 h-3.5 text-emerald-700" strokeWidth={2.5} />}
+                                {m.status === "approved" && <Clock className="w-3.5 h-3.5 text-blue-700" />}
+                                {m.status === "submitted" && <Clock className="w-3.5 h-3.5 text-amber-700" />}
+                                {m.status === "in_progress" && <div className="w-2 h-2 rounded-full bg-gray-400" />}
+                                {m.status === "pending" && <Circle className="w-3.5 h-3.5 text-gray-300" />}
+                              </div>
+
+                              {/* Label */}
+                              <div className="flex-1 min-w-0">
+                                <p className={cn("text-[13px] font-medium", m.status === "pending" ? "text-gray-400" : "text-gray-900")}>{m.label}</p>
+                                <span className={cn("text-[10px] font-semibold px-1.5 py-0.5 rounded border inline-block mt-0.5", cfg.bg, cfg.color)}>{cfg.label}</span>
+                              </div>
+
+                              {/* Amount */}
+                              <p className={cn("text-[14px] font-bold tabular-nums shrink-0", m.status === "paid" ? "text-emerald-700" : "text-gray-900")}>
+                                {formatCurrency(m.amount)}
+                              </p>
+
+                              {/* Action or chevron */}
+                              <div className="w-24 flex justify-end shrink-0">
+                                {m.status === "submitted" && (
+                                  <Link
+                                    href="/homeowner/milestones"
+                                    className="text-[11px] font-semibold text-amber-700 bg-amber-100 hover:bg-amber-200 border border-amber-300 px-2.5 py-1 rounded-lg transition-colors"
+                                  >
+                                    Review
+                                  </Link>
+                                )}
+                                {hasDetail && (
+                                  <ChevronDown className={cn("w-4 h-4 text-gray-300 transition-transform", isDetailOpen && "rotate-180")} />
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Payment detail */}
+                            {isDetailOpen && hasDetail && (
+                              <div className="px-5 pb-4 bg-gray-50/50">
+                                <div className="grid grid-cols-2 gap-x-8 gap-y-2 py-3 border-t border-border">
+                                  <div>
+                                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">Reference</p>
+                                    <p className="text-[12px] font-mono text-gray-700 mt-0.5">{m.reference}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">{m.status === "paid" ? "Paid" : "Approved"}</p>
+                                    <p className="text-[12px] text-gray-700 mt-0.5">{m.paidDate || m.approvedDate}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">Milestone amount</p>
+                                    <p className="text-[12px] font-semibold text-gray-900 mt-0.5 tabular-nums">{formatCurrency(m.amount)}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">Platform fee (3%)</p>
+                                    <p className="text-[12px] text-gray-700 mt-0.5 tabular-nums">{formatCurrency(m.platformFee || 0)}</p>
+                                  </div>
+                                </div>
+                                <div className="flex gap-2 pt-2">
+                                  <button className="flex items-center gap-1.5 text-[11px] font-medium text-gray-500 hover:text-gray-900 transition-colors">
+                                    <Download className="w-3 h-3" /> Receipt
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
-          {/* Right — Sidebar */}
+          {/* Right sidebar */}
           <div className="space-y-4">
             {/* Payment method */}
             <div className="bg-white rounded-xl border border-border p-5">
@@ -350,31 +356,36 @@ export default function HomeownerPaymentsPage() {
               </button>
             </div>
 
-            {/* Escrow accounts */}
+            {/* Quick actions */}
             <div className="bg-white rounded-xl border border-border p-5">
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-[12px] font-semibold text-gray-900 uppercase tracking-wider">Escrow Accounts</p>
-                <Shield className="w-4 h-4 text-brand-600" />
-              </div>
-              <div className="space-y-3">
-                {ESCROW_ACCOUNTS.map((account) => {
-                  const releasedPct = account.funded > 0 ? Math.round((account.released / account.funded) * 100) : 0;
-                  return (
-                    <div key={account.projectId} className="p-3 rounded-lg border border-border">
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="text-[13px] font-semibold text-gray-900 truncate">{account.projectName}</p>
-                      </div>
-                      <p className="text-[11px] text-gray-400 mb-2">{account.contractor}</p>
-                      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden mb-2 flex">
-                        <div className="bg-emerald-500" style={{ width: `${releasedPct}%` }} />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[11px] text-gray-400">{account.milestonesPaid}/{account.milestonesTotal} milestones</span>
-                        <span className="text-[12px] font-bold text-gray-900 tabular-nums">{showBalances ? formatCurrency(account.held) : "****"} held</span>
-                      </div>
-                    </div>
-                  );
-                })}
+              <p className="text-[12px] font-semibold text-gray-900 uppercase tracking-wider mb-3">Quick Actions</p>
+              <div className="space-y-2">
+                <Link
+                  href="/homeowner/milestones"
+                  className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-gray-50 transition-colors"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
+                    <Clock className="w-4 h-4 text-amber-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-[13px] font-medium text-gray-900">Review Milestones</p>
+                    <p className="text-[11px] text-gray-400">{awaitingReview} awaiting approval</p>
+                  </div>
+                  <ExternalLink className="w-3.5 h-3.5 text-gray-300" />
+                </Link>
+                <Link
+                  href="/homeowner/projects"
+                  className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-gray-50 transition-colors"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-brand-50 flex items-center justify-center shrink-0">
+                    <FileText className="w-4 h-4 text-brand-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-[13px] font-medium text-gray-900">View Projects</p>
+                    <p className="text-[11px] text-gray-400">{PROJECTS.length} active</p>
+                  </div>
+                  <ExternalLink className="w-3.5 h-3.5 text-gray-300" />
+                </Link>
               </div>
             </div>
 
