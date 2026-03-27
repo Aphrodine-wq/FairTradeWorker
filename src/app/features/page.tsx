@@ -19,6 +19,30 @@ export const metadata: Metadata = {
     "Discover how FairTradeWorker helps homeowners find verified contractors and helps contractors grow their business with AI-powered tools.",
 };
 
+const TOP_FEATURES = [
+  {
+    icon: Mic,
+    title: "Hunter Voice AI",
+    description: "Walk the job site. Describe the scope out loud. Hunter builds a line-item estimate in three minutes — materials, labor, markup.",
+    points: ["Works on your phone, no laptop", "CSI-division breakdowns", "Learns your pricing over time", "Edit before sending"],
+    stat: { value: "3 min", label: "average estimate time" },
+  },
+  {
+    icon: DollarSign,
+    title: "Zero Lead Fees",
+    description: "Other platforms charge $50\u2013$100 per lead, win or lose. We charge a flat subscription. No commissions, no per-lead charges.",
+    points: ["Save $6,000+/year on average", "No percentage cut on revenue", "No caps on core features", "Lower bids \u2014 no lead cost to pad"],
+    stat: { value: "$0", label: "per lead, every plan" },
+  },
+  {
+    icon: Shield,
+    title: "Escrow on Every Job",
+    description: "Homeowners fund milestones upfront. Contractors get paid when work is verified. No chasing invoices, no bounced checks.",
+    points: ["Milestone-based payments", "Contractors paid when verified", "5-day dispute resolution", "Full payment history + receipts"],
+    stat: null,
+  },
+] as const;
+
 export default function FeaturesPage() {
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
@@ -43,98 +67,42 @@ export default function FeaturesPage() {
           </div>
         </section>
 
-        {/* Top 3 features — card grid */}
+        {/* Top 3 features — centered card grid */}
         <section className="py-16 sm:py-20">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {/* Hunter Voice AI */}
-              <div className="bg-white rounded-2xl border border-border p-7 flex flex-col">
-                <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center mb-5">
-                  <Mic className="w-5 h-5 text-brand-600" />
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-1">
-                  Hunter Voice AI
-                </h3>
-                <p className="text-sm text-gray-500 leading-relaxed mb-5 flex-1">
-                  Walk the job site. Describe the scope out loud. Hunter builds a
-                  line-item estimate in three minutes — materials, labor, markup.
-                </p>
-                <ul className="space-y-2">
-                  {[
-                    "Works on your phone, no laptop",
-                    "CSI-division breakdowns",
-                    "Learns your pricing over time",
-                    "Edit before sending",
-                  ].map((d) => (
-                    <li key={d} className="flex items-start gap-2 text-xs text-gray-500">
-                      <Check className="w-4 h-4 text-brand-600 mt-0.5 shrink-0" strokeWidth={2.5} />
-                      {d}
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-6 pt-5 border-t border-border">
-                  <p className="text-3xl font-bold text-gray-900 tabular-nums">3 min</p>
-                  <p className="text-xs text-gray-400">average estimate time</p>
-                </div>
-              </div>
-
-              {/* Zero Lead Fees */}
-              <div className="bg-white rounded-2xl border border-border p-7 flex flex-col">
-                <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center mb-5">
-                  <DollarSign className="w-5 h-5 text-brand-600" />
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-1">
-                  Zero Lead Fees
-                </h3>
-                <p className="text-sm text-gray-500 leading-relaxed mb-5 flex-1">
-                  Other platforms charge $50–$100 per lead, win or lose. We charge
-                  a flat subscription. No commissions, no per-lead charges.
-                </p>
-                <ul className="space-y-2">
-                  {[
-                    "Save $6,000+/year on average",
-                    "No percentage cut on revenue",
-                    "No caps on core features",
-                    "Lower bids — no lead cost to pad",
-                  ].map((d) => (
-                    <li key={d} className="flex items-start gap-2 text-xs text-gray-500">
-                      <Check className="w-4 h-4 text-brand-600 mt-0.5 shrink-0" strokeWidth={2.5} />
-                      {d}
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-6 pt-5 border-t border-border">
-                  <p className="text-3xl font-bold text-gray-900 tabular-nums">$0</p>
-                  <p className="text-xs text-gray-400">per lead, every plan</p>
-                </div>
-              </div>
-
-              {/* Escrow */}
-              <div className="bg-white rounded-2xl border border-border p-7 flex flex-col">
-                <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center mb-5">
-                  <Shield className="w-5 h-5 text-brand-600" />
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-1">
-                  Escrow on Every Job
-                </h3>
-                <p className="text-sm text-gray-500 leading-relaxed mb-5 flex-1">
-                  Homeowners fund milestones upfront. Contractors get paid when
-                  work is verified. No chasing invoices, no bounced checks.
-                </p>
-                <ul className="space-y-2">
-                  {[
-                    "Milestone-based payments",
-                    "Contractors paid when verified",
-                    "5-day dispute resolution",
-                    "Full payment history + receipts",
-                  ].map((d) => (
-                    <li key={d} className="flex items-start gap-2 text-xs text-gray-500">
-                      <Check className="w-4 h-4 text-brand-600 mt-0.5 shrink-0" strokeWidth={2.5} />
-                      {d}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {TOP_FEATURES.map((feature) => {
+                const Icon = feature.icon;
+                return (
+                  <div key={feature.title} className="bg-white rounded-2xl border border-border p-8 flex flex-col text-center">
+                    <div className="w-12 h-12 rounded-xl bg-brand-50 flex items-center justify-center mx-auto mb-5">
+                      <Icon className="w-5 h-5 text-brand-600" />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">
+                      {feature.title}
+                    </h3>
+                    <p className="text-sm text-gray-500 leading-relaxed mb-6 flex-1">
+                      {feature.description}
+                    </p>
+                    <ul className="space-y-2.5 text-left mx-auto">
+                      {feature.points.map((d) => (
+                        <li key={d} className="flex items-center gap-2.5 text-sm text-gray-600">
+                          <div className="w-5 h-5 rounded-full bg-brand-50 flex items-center justify-center shrink-0">
+                            <Check className="w-3 h-3 text-brand-600" strokeWidth={3} />
+                          </div>
+                          {d}
+                        </li>
+                      ))}
+                    </ul>
+                    {feature.stat && (
+                      <div className="mt-6 pt-5 border-t border-border text-center">
+                        <p className="text-3xl font-bold text-gray-900 tabular-nums">{feature.stat.value}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{feature.stat.label}</p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -144,7 +112,7 @@ export default function FeaturesPage() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
-                <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center mb-5">
+                <div className="w-12 h-12 rounded-xl bg-brand-50 flex items-center justify-center mb-5">
                   <BarChart3 className="w-5 h-5 text-brand-600" />
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight mb-3">
@@ -161,15 +129,16 @@ export default function FeaturesPage() {
                     "Team productivity on Team plans",
                     "QuickBooks-ready report exports",
                   ].map((d) => (
-                    <li key={d} className="flex items-start gap-3 text-sm text-gray-600">
-                      <Check className="w-4 h-4 text-brand-600 mt-0.5 shrink-0" strokeWidth={2.5} />
+                    <li key={d} className="flex items-center gap-2.5 text-sm text-gray-600">
+                      <div className="w-5 h-5 rounded-full bg-brand-50 flex items-center justify-center shrink-0">
+                        <Check className="w-3 h-3 text-brand-600" strokeWidth={3} />
+                      </div>
                       {d}
                     </li>
                   ))}
                 </ul>
               </div>
 
-              {/* Stat preview */}
               <div className="grid grid-cols-2 gap-4">
                 {[
                   { label: "Win Rate", value: "34%", sub: "+8% this month" },
@@ -177,9 +146,9 @@ export default function FeaturesPage() {
                   { label: "Response Time", value: "2.1 hr", sub: "faster than 90%" },
                   { label: "Revenue MTD", value: "$47,200", sub: "+23% vs last month" },
                 ].map((s) => (
-                  <div key={s.label} className="bg-[#FAFAFA] rounded-xl border border-border p-5">
-                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">{s.label}</p>
-                    <p className="text-2xl font-bold text-gray-900 tabular-nums mt-1">{s.value}</p>
+                  <div key={s.label} className="bg-[#FAFAFA] rounded-xl border border-border p-5 text-center">
+                    <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-1">{s.label}</p>
+                    <p className="text-2xl font-bold text-gray-900 tabular-nums">{s.value}</p>
                     <p className="text-xs text-gray-400 mt-1">{s.sub}</p>
                   </div>
                 ))}
@@ -192,61 +161,45 @@ export default function FeaturesPage() {
         <section className="py-16 sm:py-20">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-              {/* Team */}
-              <div className="bg-white rounded-2xl border border-border p-7">
-                <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center mb-5">
-                  <Users className="w-5 h-5 text-brand-600" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  Built for crews.
-                </h3>
-                <p className="text-sm text-gray-500 leading-relaxed mb-6">
-                  Shared projects, assignments, and status updates from the field.
-                  No more group texts. Team plans support up to 5 members,
-                  Enterprise is unlimited.
-                </p>
-                <ul className="space-y-2.5">
-                  {[
-                    "Shared project dashboard",
-                    "Assignment and scope tracking",
-                    "Team activity feed",
-                    "Role-based access for field and office",
-                  ].map((d) => (
-                    <li key={d} className="flex items-start gap-2.5 text-sm text-gray-600">
-                      <Check className="w-4 h-4 text-brand-600 mt-0.5 shrink-0" strokeWidth={2.5} />
-                      {d}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Branded Estimates */}
-              <div className="bg-white rounded-2xl border border-border p-7">
-                <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center mb-5">
-                  <FileText className="w-5 h-5 text-brand-600" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  Estimates that close.
-                </h3>
-                <p className="text-sm text-gray-500 leading-relaxed mb-6">
-                  Branded PDF estimates with your logo and line-item breakdowns.
-                  Build manually, generate with AI, or reuse templates from past jobs.
-                </p>
-                <ul className="space-y-2.5">
-                  {[
-                    "Your branding on every estimate",
-                    "Reusable templates from past jobs",
-                    "PDF generation and direct sharing",
-                    "Materials, labor, and markup detail",
-                  ].map((d) => (
-                    <li key={d} className="flex items-start gap-2.5 text-sm text-gray-600">
-                      <Check className="w-4 h-4 text-brand-600 mt-0.5 shrink-0" strokeWidth={2.5} />
-                      {d}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {[
+                {
+                  icon: Users,
+                  title: "Built for crews.",
+                  description: "Shared projects, assignments, and status updates from the field. No more group texts. Team plans support up to 5 members, Enterprise is unlimited.",
+                  points: ["Shared project dashboard", "Assignment and scope tracking", "Team activity feed", "Role-based access for field and office"],
+                },
+                {
+                  icon: FileText,
+                  title: "Estimates that close.",
+                  description: "Branded PDF estimates with your logo and line-item breakdowns. Build manually, generate with AI, or reuse templates from past jobs.",
+                  points: ["Your branding on every estimate", "Reusable templates from past jobs", "PDF generation and direct sharing", "Materials, labor, and markup detail"],
+                },
+              ].map((feature) => {
+                const Icon = feature.icon;
+                return (
+                  <div key={feature.title} className="bg-white rounded-2xl border border-border p-8">
+                    <div className="w-12 h-12 rounded-xl bg-brand-50 flex items-center justify-center mb-5">
+                      <Icon className="w-5 h-5 text-brand-600" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      {feature.title}
+                    </h3>
+                    <p className="text-sm text-gray-500 leading-relaxed mb-6">
+                      {feature.description}
+                    </p>
+                    <ul className="space-y-2.5">
+                      {feature.points.map((d) => (
+                        <li key={d} className="flex items-center gap-2.5 text-sm text-gray-600">
+                          <div className="w-5 h-5 rounded-full bg-brand-50 flex items-center justify-center shrink-0">
+                            <Check className="w-3 h-3 text-brand-600" strokeWidth={3} />
+                          </div>
+                          {d}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>
