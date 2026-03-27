@@ -489,26 +489,35 @@ function NewEstimateTab() {
             </div>
           </div>
 
-          {/* Category tabs */}
-          <div className="flex items-center gap-1.5 mb-3">
-            {(["Materials", "Labor", "Equipment", "Other"] as LineItemCategory[]).map((g) => {
-              const count = lineItems.filter((li) => li.group === g && li.description).length;
-              return (
-                <button
-                  key={g}
-                  onClick={() => setActiveGroup(g)}
-                  className={cn(
-                    "h-8 px-3 rounded-lg text-[12px] font-semibold transition-colors",
-                    activeGroup === g ? "bg-gray-900 text-white" : "text-gray-500 hover:bg-gray-100"
-                  )}
-                >
-                  {g}{count > 0 && <span className="ml-1.5 opacity-60">{count}</span>}
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="rounded-xl overflow-hidden bg-white ring-1 ring-gray-200">
+          <div className="overflow-hidden bg-white ring-1 ring-gray-200">
+            {/* Category tabs — top nav */}
+            <div className="flex border-b border-gray-200">
+              {(["Materials", "Labor", "Equipment", "Other"] as LineItemCategory[]).map((g) => {
+                const count = lineItems.filter((li) => li.group === g && li.description).length;
+                return (
+                  <button
+                    key={g}
+                    onClick={() => setActiveGroup(g)}
+                    className={cn(
+                      "flex items-center gap-1.5 px-5 py-3 text-[13px] font-medium transition-colors border-b-2 -mb-px",
+                      activeGroup === g
+                        ? "border-gray-900 text-gray-900"
+                        : "border-transparent text-gray-400 hover:text-gray-600"
+                    )}
+                  >
+                    {g}
+                    {count > 0 && (
+                      <span className={cn(
+                        "text-[10px] font-bold rounded-full px-1.5 py-0.5 min-w-[18px] text-center",
+                        activeGroup === g ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-500"
+                      )}>
+                        {count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
             {/* Table header */}
             <div className="grid grid-cols-[1fr_80px_110px_100px_40px] gap-3 px-5 py-3 bg-gray-50">
               <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Description</span>
