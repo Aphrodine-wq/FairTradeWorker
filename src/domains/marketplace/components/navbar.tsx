@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Button } from "@shared/ui/button";
+import { BrandMark } from "@shared/components/brand-mark";
 import { MobileNav } from "./mobile-nav";
 
 export function Navbar() {
@@ -7,8 +8,9 @@ export function Navbar() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#FDFBF8]/95 backdrop-blur-sm border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link href="/" className="text-xl font-bold text-gray-900 hover:text-gray-700 transition-colors duration-150 flex-shrink-0">
-            FairTradeWorker
+          <Link href="/" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity duration-150 flex-shrink-0">
+            <BrandMark className="w-8 h-8" />
+            <span className="text-xl font-bold text-gray-900">FairTradeWorker</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-6">

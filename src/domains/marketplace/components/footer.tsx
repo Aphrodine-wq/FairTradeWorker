@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandMark } from "@shared/components/brand-mark";
 
 const footerLinks = {
   Product: [
@@ -41,9 +42,10 @@ export function Footer() {
           <div className="col-span-2 md:col-span-1">
             <Link
               href="/"
-              className="text-lg font-bold text-white hover:text-gray-200 transition-colors duration-150"
+              className="flex items-center gap-2.5 hover:opacity-80 transition-opacity duration-150"
             >
-              FairTradeWorker
+              <BrandMark className="w-7 h-7" />
+              <span className="text-lg font-bold text-white">FairTradeWorker</span>
             </Link>
             <p className="mt-3 text-sm text-gray-300 leading-relaxed">
               The fair way to find and hire contractors. Flat-rate subscriptions,
