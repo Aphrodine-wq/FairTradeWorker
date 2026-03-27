@@ -873,25 +873,38 @@ const JOB_TEMPLATES: Record<string, { sections: { name: string; items: { desc: s
         { desc: "Demo existing cabinets & counters", qty: "1", unit: "job", unitCost: "2500" },
         { desc: "Haul-off & disposal", qty: "1", unit: "job", unitCost: "800" },
         { desc: "Floor protection", qty: "1", unit: "job", unitCost: "200" },
+        { desc: "Dumpster rental (10 yd)", qty: "1", unit: "ea", unitCost: "450" },
       ]},
       { name: "Cabinets & Countertops", items: [
         { desc: "Cabinets (stock/semi-custom)", qty: "1", unit: "set", unitCost: "8000" },
+        { desc: "Cabinet hardware (knobs & pulls)", qty: "30", unit: "ea", unitCost: "12" },
         { desc: "Countertops — quartz", qty: "40", unit: "sqft", unitCost: "85" },
         { desc: "Backsplash tile", qty: "30", unit: "sqft", unitCost: "18" },
+        { desc: "Cabinet painting / refinishing", qty: "1", unit: "job", unitCost: "1200" },
       ]},
       { name: "Plumbing", items: [
         { desc: "Rough-in (sink relocation)", qty: "1", unit: "job", unitCost: "1800" },
         { desc: "Sink + faucet install", qty: "1", unit: "ea", unitCost: "450" },
         { desc: "Dishwasher hookup", qty: "1", unit: "ea", unitCost: "250" },
+        { desc: "Under-sink plumbing (supply & drain)", qty: "1", unit: "ea", unitCost: "350" },
+        { desc: "Garbage disposal install", qty: "1", unit: "ea", unitCost: "275" },
       ]},
       { name: "Electrical", items: [
         { desc: "New circuits (GFCI outlets)", qty: "4", unit: "ea", unitCost: "175" },
         { desc: "Under-cabinet lighting", qty: "1", unit: "job", unitCost: "600" },
         { desc: "Recessed lights", qty: "6", unit: "ea", unitCost: "125" },
+        { desc: "Range hood install & venting", qty: "1", unit: "ea", unitCost: "650" },
+      ]},
+      { name: "Appliances", items: [
+        { desc: "Appliance allowance (fridge, range, DW, micro)", qty: "1", unit: "set", unitCost: "4500" },
       ]},
       { name: "Flooring", items: [
         { desc: "Tile / LVP flooring", qty: "150", unit: "sqft", unitCost: "8" },
         { desc: "Floor prep & leveling", qty: "1", unit: "job", unitCost: "400" },
+      ]},
+      { name: "Finishing", items: [
+        { desc: "Touch-up paint (walls & trim)", qty: "1", unit: "job", unitCost: "350" },
+        { desc: "Final clean", qty: "1", unit: "job", unitCost: "300" },
       ]},
       { name: "Labor", items: [
         { desc: "General labor", qty: "120", unit: "hr", unitCost: "65" },
@@ -912,16 +925,24 @@ const JOB_TEMPLATES: Record<string, { sections: { name: string; items: { desc: s
         { desc: "Shower tile (walls)", qty: "80", unit: "sqft", unitCost: "14" },
         { desc: "Floor tile", qty: "50", unit: "sqft", unitCost: "10" },
         { desc: "Waterproofing membrane", qty: "1", unit: "job", unitCost: "450" },
+        { desc: "Caulking & grout sealing", qty: "1", unit: "job", unitCost: "200" },
       ]},
       { name: "Fixtures & Finishes", items: [
         { desc: "Vanity + mirror", qty: "1", unit: "ea", unitCost: "1800" },
         { desc: "Shower door (frameless)", qty: "1", unit: "ea", unitCost: "900" },
         { desc: "Hardware & accessories", qty: "1", unit: "set", unitCost: "350" },
+        { desc: "Towel bar & accessories install", qty: "1", unit: "set", unitCost: "175" },
+        { desc: "Medicine cabinet", qty: "1", unit: "ea", unitCost: "350" },
+        { desc: "Heated floor mat", qty: "50", unit: "sqft", unitCost: "15" },
       ]},
       { name: "Electrical", items: [
         { desc: "GFCI outlets", qty: "2", unit: "ea", unitCost: "150" },
         { desc: "Exhaust fan", qty: "1", unit: "ea", unitCost: "280" },
         { desc: "Vanity lighting", qty: "1", unit: "ea", unitCost: "200" },
+      ]},
+      { name: "Finishing", items: [
+        { desc: "Paint touch-up (walls & ceiling)", qty: "1", unit: "job", unitCost: "300" },
+        { desc: "Final clean", qty: "1", unit: "job", unitCost: "200" },
       ]},
       { name: "Labor", items: [
         { desc: "General labor", qty: "60", unit: "hr", unitCost: "65" },
@@ -933,6 +954,7 @@ const JOB_TEMPLATES: Record<string, { sections: { name: string; items: { desc: s
       { name: "Tear-Off", items: [
         { desc: "Remove existing shingles", qty: "30", unit: "sq", unitCost: "75" },
         { desc: "Disposal / dumpster", qty: "1", unit: "job", unitCost: "600" },
+        { desc: "Inspect & replace damaged decking", qty: "4", unit: "ea", unitCost: "85" },
       ]},
       { name: "Materials", items: [
         { desc: "Architectural shingles", qty: "30", unit: "sq", unitCost: "120" },
@@ -940,10 +962,20 @@ const JOB_TEMPLATES: Record<string, { sections: { name: string; items: { desc: s
         { desc: "Ice & water shield", qty: "6", unit: "sq", unitCost: "55" },
         { desc: "Ridge vent", qty: "40", unit: "lf", unitCost: "8" },
         { desc: "Drip edge & flashing", qty: "1", unit: "job", unitCost: "450" },
+        { desc: "Pipe boot replacement", qty: "4", unit: "ea", unitCost: "45" },
+        { desc: "Skylight flashing kit", qty: "1", unit: "ea", unitCost: "250" },
+        { desc: "Expansion joint material", qty: "20", unit: "lf", unitCost: "6" },
+      ]},
+      { name: "Ventilation & Extras", items: [
+        { desc: "Attic ventilation check & repair", qty: "1", unit: "job", unitCost: "350" },
+        { desc: "Gutter re-hang & re-seal", qty: "120", unit: "lf", unitCost: "6" },
       ]},
       { name: "Labor", items: [
         { desc: "Roofing crew", qty: "30", unit: "sq", unitCost: "85" },
         { desc: "Cleanup", qty: "1", unit: "job", unitCost: "300" },
+      ]},
+      { name: "Documentation", items: [
+        { desc: "Warranty documentation & registration", qty: "1", unit: "job", unitCost: "150" },
       ]},
     ],
   },
@@ -952,15 +984,29 @@ const JOB_TEMPLATES: Record<string, { sections: { name: string; items: { desc: s
       { name: "Prep", items: [
         { desc: "Wall prep (patch, sand, prime)", qty: "1", unit: "job", unitCost: "600" },
         { desc: "Masking & protection", qty: "1", unit: "job", unitCost: "200" },
+        { desc: "Caulk gaps & cracks", qty: "1", unit: "job", unitCost: "175" },
       ]},
       { name: "Materials", items: [
         { desc: "Paint (premium)", qty: "12", unit: "gal", unitCost: "55" },
+        { desc: "Ceiling paint", qty: "4", unit: "gal", unitCost: "45" },
         { desc: "Primer", qty: "4", unit: "gal", unitCost: "35" },
         { desc: "Supplies (rollers, tape, etc.)", qty: "1", unit: "set", unitCost: "120" },
+      ]},
+      { name: "Walls & Ceilings", items: [
+        { desc: "Wall painting (2 coats)", qty: "1800", unit: "sqft", unitCost: "1.50" },
+        { desc: "Ceiling painting", qty: "900", unit: "sqft", unitCost: "1.25" },
+        { desc: "Accent wall", qty: "2", unit: "ea", unitCost: "150" },
+      ]},
+      { name: "Trim & Detail", items: [
+        { desc: "Door painting (per door)", qty: "8", unit: "ea", unitCost: "85" },
+        { desc: "Baseboard painting", qty: "200", unit: "lf", unitCost: "2.50" },
+        { desc: "Cabinet painting", qty: "1", unit: "job", unitCost: "1200" },
+        { desc: "Window trim painting", qty: "10", unit: "ea", unitCost: "45" },
       ]},
       { name: "Labor", items: [
         { desc: "Painting labor", qty: "40", unit: "hr", unitCost: "55" },
         { desc: "Trim & detail work", qty: "12", unit: "hr", unitCost: "65" },
+        { desc: "Final touch-up walk", qty: "4", unit: "hr", unitCost: "55" },
       ]},
     ],
   },
@@ -976,9 +1022,360 @@ const JOB_TEMPLATES: Record<string, { sections: { name: string; items: { desc: s
         { desc: "Rebar / wire mesh", qty: "800", unit: "sqft", unitCost: "1.25" },
         { desc: "Forms & stakes", qty: "1", unit: "job", unitCost: "400" },
         { desc: "Finishing (broom / stamp)", qty: "800", unit: "sqft", unitCost: "2" },
+        { desc: "Saw cuts / control joints", qty: "120", unit: "lf", unitCost: "3.50" },
+        { desc: "Expansion joint material", qty: "60", unit: "lf", unitCost: "4" },
+        { desc: "Sealer application", qty: "800", unit: "sqft", unitCost: "0.75" },
       ]},
       { name: "Labor", items: [
         { desc: "Concrete crew", qty: "24", unit: "hr", unitCost: "75" },
+        { desc: "Cleanup & haul-off", qty: "1", unit: "job", unitCost: "400" },
+      ]},
+    ],
+  },
+  deck: {
+    sections: [
+      { name: "Footings & Foundation", items: [
+        { desc: "Layout & string lines", qty: "1", unit: "job", unitCost: "150" },
+        { desc: "Sonotube footings (12\" dia, 36\" deep)", qty: "9", unit: "ea", unitCost: "85" },
+        { desc: "Concrete for footings", qty: "1.5", unit: "cuyd", unitCost: "165" },
+        { desc: "Post bases (Simpson PBS44A)", qty: "9", unit: "ea", unitCost: "18" },
+        { desc: "Ledger board + flashing", qty: "16", unit: "lf", unitCost: "12" },
+      ]},
+      { name: "Framing", items: [
+        { desc: "6x6 pressure treated posts", qty: "9", unit: "ea", unitCost: "42" },
+        { desc: "2x10 PT joists (16\" OC)", qty: "24", unit: "ea", unitCost: "28" },
+        { desc: "2x10 PT beam (doubled)", qty: "32", unit: "lf", unitCost: "6" },
+        { desc: "Joist hangers & hardware", qty: "1", unit: "set", unitCost: "175" },
+        { desc: "Blocking & bridging", qty: "1", unit: "job", unitCost: "120" },
+      ]},
+      { name: "Decking", items: [
+        { desc: "Composite decking (Trex or equiv)", qty: "320", unit: "sqft", unitCost: "8.50" },
+        { desc: "Hidden fastener system", qty: "320", unit: "sqft", unitCost: "1.25" },
+        { desc: "Fascia board (composite)", qty: "60", unit: "lf", unitCost: "5" },
+      ]},
+      { name: "Railing & Stairs", items: [
+        { desc: "Composite railing system", qty: "56", unit: "lf", unitCost: "35" },
+        { desc: "Stair stringers (3-tread)", qty: "3", unit: "ea", unitCost: "45" },
+        { desc: "Stair treads (composite)", qty: "3", unit: "ea", unitCost: "65" },
+        { desc: "Post caps", qty: "12", unit: "ea", unitCost: "22" },
+      ]},
+      { name: "Finishing", items: [
+        { desc: "Post trim wraps", qty: "9", unit: "ea", unitCost: "35" },
+        { desc: "Under-deck cleanup & grading", qty: "1", unit: "job", unitCost: "250" },
+        { desc: "Permit fees", qty: "1", unit: "ea", unitCost: "350" },
+      ]},
+      { name: "Labor", items: [
+        { desc: "Deck build crew", qty: "48", unit: "hr", unitCost: "70" },
+        { desc: "Final inspection prep", qty: "2", unit: "hr", unitCost: "70" },
+      ]},
+    ],
+  },
+  fencing: {
+    sections: [
+      { name: "Site Prep", items: [
+        { desc: "Survey / locate property pins", qty: "1", unit: "job", unitCost: "200" },
+        { desc: "Call 811 utility locate", qty: "1", unit: "job", unitCost: "0" },
+        { desc: "Clear fence line (brush removal)", qty: "200", unit: "lf", unitCost: "2" },
+        { desc: "Remove existing fence (if applicable)", qty: "200", unit: "lf", unitCost: "3" },
+        { desc: "Disposal / haul-off", qty: "1", unit: "job", unitCost: "350" },
+      ]},
+      { name: "Materials", items: [
+        { desc: "4x4 pressure treated posts (8 ft)", qty: "25", unit: "ea", unitCost: "18" },
+        { desc: "2x4 PT rails (top & bottom)", qty: "50", unit: "ea", unitCost: "9" },
+        { desc: "6 ft cedar or PT pickets", qty: "400", unit: "ea", unitCost: "4.50" },
+        { desc: "Post caps", qty: "25", unit: "ea", unitCost: "8" },
+        { desc: "Concrete (post set)", qty: "25", unit: "ea", unitCost: "6" },
+        { desc: "Gate kit (single walk gate)", qty: "1", unit: "ea", unitCost: "185" },
+        { desc: "Gate kit (double drive gate)", qty: "1", unit: "ea", unitCost: "375" },
+      ]},
+      { name: "Hardware", items: [
+        { desc: "Galvanized screws (5 lb box)", qty: "4", unit: "ea", unitCost: "32" },
+        { desc: "Gate hinges (heavy duty)", qty: "2", unit: "set", unitCost: "28" },
+        { desc: "Gate latch hardware", qty: "2", unit: "ea", unitCost: "22" },
+        { desc: "Post brackets (if needed)", qty: "4", unit: "ea", unitCost: "12" },
+      ]},
+      { name: "Labor", items: [
+        { desc: "Post hole digging & setting", qty: "25", unit: "ea", unitCost: "35" },
+        { desc: "Rail & picket install", qty: "200", unit: "lf", unitCost: "8" },
+        { desc: "Gate hang & adjust", qty: "2", unit: "ea", unitCost: "150" },
+        { desc: "Stain / seal application", qty: "200", unit: "lf", unitCost: "2.50" },
+      ]},
+    ],
+  },
+  flooring: {
+    sections: [
+      { name: "Demo & Prep", items: [
+        { desc: "Remove existing flooring", qty: "800", unit: "sqft", unitCost: "2" },
+        { desc: "Remove baseboards (save for reinstall)", qty: "200", unit: "lf", unitCost: "1.50" },
+        { desc: "Disposal & haul-off", qty: "1", unit: "job", unitCost: "400" },
+        { desc: "Floor leveling compound", qty: "800", unit: "sqft", unitCost: "0.75" },
+        { desc: "Moisture testing", qty: "1", unit: "job", unitCost: "150" },
+      ]},
+      { name: "Underlayment", items: [
+        { desc: "Underlayment (foam or cork)", qty: "800", unit: "sqft", unitCost: "0.65" },
+        { desc: "Vapor barrier (if on slab)", qty: "800", unit: "sqft", unitCost: "0.30" },
+      ]},
+      { name: "Materials", items: [
+        { desc: "LVP / hardwood / tile (material)", qty: "880", unit: "sqft", unitCost: "5.50" },
+        { desc: "Waste factor (10%)", qty: "80", unit: "sqft", unitCost: "5.50" },
+        { desc: "Adhesive (if glue-down)", qty: "4", unit: "gal", unitCost: "38" },
+      ]},
+      { name: "Transitions & Trim", items: [
+        { desc: "Transition strips (T-mold, reducer)", qty: "6", unit: "ea", unitCost: "28" },
+        { desc: "Quarter round / shoe mold", qty: "200", unit: "lf", unitCost: "1.75" },
+        { desc: "Stair nosing", qty: "3", unit: "ea", unitCost: "35" },
+        { desc: "Threshold plates", qty: "4", unit: "ea", unitCost: "18" },
+        { desc: "Reinstall baseboards", qty: "200", unit: "lf", unitCost: "2" },
+      ]},
+      { name: "Labor", items: [
+        { desc: "Flooring installation", qty: "800", unit: "sqft", unitCost: "3.50" },
+        { desc: "Stair installation", qty: "3", unit: "ea", unitCost: "120" },
+        { desc: "Final clean & inspection", qty: "1", unit: "job", unitCost: "200" },
+      ]},
+    ],
+  },
+  hvac: {
+    sections: [
+      { name: "Equipment", items: [
+        { desc: "AC condenser unit (3 ton, 16 SEER)", qty: "1", unit: "ea", unitCost: "3200" },
+        { desc: "Air handler / furnace", qty: "1", unit: "ea", unitCost: "2400" },
+        { desc: "Evaporator coil", qty: "1", unit: "ea", unitCost: "850" },
+        { desc: "Refrigerant line set", qty: "30", unit: "lf", unitCost: "12" },
+        { desc: "Condensate drain line & pump", qty: "1", unit: "ea", unitCost: "175" },
+        { desc: "Filter rack & filters", qty: "1", unit: "ea", unitCost: "85" },
+      ]},
+      { name: "Ductwork", items: [
+        { desc: "Flex duct (6-10 in)", qty: "150", unit: "lf", unitCost: "8" },
+        { desc: "Sheet metal trunk line", qty: "40", unit: "lf", unitCost: "22" },
+        { desc: "Supply registers", qty: "10", unit: "ea", unitCost: "25" },
+        { desc: "Return air grilles", qty: "3", unit: "ea", unitCost: "35" },
+        { desc: "Duct sealing (mastic & tape)", qty: "1", unit: "job", unitCost: "350" },
+        { desc: "Duct insulation", qty: "150", unit: "lf", unitCost: "3" },
+      ]},
+      { name: "Electrical", items: [
+        { desc: "Disconnect box (outdoor)", qty: "1", unit: "ea", unitCost: "85" },
+        { desc: "Whip & conduit to condenser", qty: "1", unit: "ea", unitCost: "120" },
+        { desc: "Breaker (30-60 amp)", qty: "1", unit: "ea", unitCost: "65" },
+      ]},
+      { name: "Controls", items: [
+        { desc: "Programmable thermostat", qty: "1", unit: "ea", unitCost: "250" },
+        { desc: "Thermostat wiring", qty: "50", unit: "lf", unitCost: "2.50" },
+        { desc: "Zone dampers (if multi-zone)", qty: "2", unit: "ea", unitCost: "185" },
+      ]},
+      { name: "Labor", items: [
+        { desc: "HVAC install crew", qty: "24", unit: "hr", unitCost: "85" },
+        { desc: "System startup & charge", qty: "4", unit: "hr", unitCost: "95" },
+        { desc: "Duct leak testing", qty: "1", unit: "job", unitCost: "250" },
+      ]},
+      { name: "Permits & Inspections", items: [
+        { desc: "Mechanical permit", qty: "1", unit: "ea", unitCost: "250" },
+        { desc: "EPA refrigerant disposal", qty: "1", unit: "ea", unitCost: "75" },
+        { desc: "Equipment warranty registration", qty: "1", unit: "ea", unitCost: "0" },
+      ]},
+    ],
+  },
+  electrical: {
+    sections: [
+      { name: "Panel & Breakers", items: [
+        { desc: "200A main panel (Square D / Eaton)", qty: "1", unit: "ea", unitCost: "1800" },
+        { desc: "Panel mounting & bonding", qty: "1", unit: "job", unitCost: "350" },
+        { desc: "Main breaker (200A)", qty: "1", unit: "ea", unitCost: "120" },
+        { desc: "Branch breakers (15-50A)", qty: "20", unit: "ea", unitCost: "18" },
+        { desc: "AFCI breakers", qty: "8", unit: "ea", unitCost: "45" },
+        { desc: "Grounding rod & wire", qty: "2", unit: "ea", unitCost: "65" },
+      ]},
+      { name: "Wiring", items: [
+        { desc: "14/2 Romex (15A circuits)", qty: "500", unit: "lf", unitCost: "0.55" },
+        { desc: "12/2 Romex (20A circuits)", qty: "300", unit: "lf", unitCost: "0.75" },
+        { desc: "10/3 wire (dryer / range)", qty: "50", unit: "lf", unitCost: "2.25" },
+        { desc: "6/3 wire (subpanel / large loads)", qty: "30", unit: "lf", unitCost: "4.50" },
+        { desc: "Wire staples, connectors, boxes", qty: "1", unit: "set", unitCost: "250" },
+      ]},
+      { name: "Fixtures & Devices", items: [
+        { desc: "Standard outlets", qty: "30", unit: "ea", unitCost: "8" },
+        { desc: "GFCI outlets", qty: "6", unit: "ea", unitCost: "22" },
+        { desc: "Light switches (single pole)", qty: "15", unit: "ea", unitCost: "6" },
+        { desc: "3-way switches", qty: "4", unit: "ea", unitCost: "12" },
+        { desc: "Dimmer switches", qty: "3", unit: "ea", unitCost: "28" },
+        { desc: "Recessed light cans", qty: "12", unit: "ea", unitCost: "35" },
+        { desc: "Smoke / CO detectors (hardwired)", qty: "6", unit: "ea", unitCost: "38" },
+        { desc: "Outdoor weatherproof box & cover", qty: "2", unit: "ea", unitCost: "25" },
+      ]},
+      { name: "Labor", items: [
+        { desc: "Electrician (journeyman)", qty: "40", unit: "hr", unitCost: "90" },
+        { desc: "Electrician helper", qty: "40", unit: "hr", unitCost: "45" },
+        { desc: "Final testing & labeling", qty: "4", unit: "hr", unitCost: "90" },
+      ]},
+      { name: "Permits & Inspections", items: [
+        { desc: "Electrical permit", qty: "1", unit: "ea", unitCost: "275" },
+        { desc: "Utility coordination / meter pull", qty: "1", unit: "job", unitCost: "200" },
+      ]},
+    ],
+  },
+  plumbing: {
+    sections: [
+      { name: "Pipe & Fittings", items: [
+        { desc: "PEX tubing (3/4\" main)", qty: "100", unit: "lf", unitCost: "2.25" },
+        { desc: "PEX tubing (1/2\" branches)", qty: "200", unit: "lf", unitCost: "1.50" },
+        { desc: "PEX fittings & crimp rings", qty: "1", unit: "set", unitCost: "175" },
+        { desc: "Manifold (hot & cold)", qty: "1", unit: "ea", unitCost: "120" },
+        { desc: "Shut-off valves (quarter turn)", qty: "12", unit: "ea", unitCost: "15" },
+        { desc: "ABS/PVC drain pipe (2-4\")", qty: "80", unit: "lf", unitCost: "4.50" },
+        { desc: "Drain fittings (wyes, elbows, cleanouts)", qty: "1", unit: "set", unitCost: "200" },
+        { desc: "Pipe hangers & supports", qty: "1", unit: "set", unitCost: "85" },
+      ]},
+      { name: "Fixtures", items: [
+        { desc: "Kitchen faucet", qty: "1", unit: "ea", unitCost: "280" },
+        { desc: "Bathroom faucets", qty: "2", unit: "ea", unitCost: "180" },
+        { desc: "Toilet (comfort height)", qty: "2", unit: "ea", unitCost: "275" },
+        { desc: "Shower valve & trim kit", qty: "1", unit: "ea", unitCost: "350" },
+        { desc: "Hose bibbs (outdoor)", qty: "2", unit: "ea", unitCost: "65" },
+      ]},
+      { name: "Water Heater", items: [
+        { desc: "50 gal tank water heater", qty: "1", unit: "ea", unitCost: "1200" },
+        { desc: "Expansion tank", qty: "1", unit: "ea", unitCost: "85" },
+        { desc: "Water heater pan & drain", qty: "1", unit: "ea", unitCost: "45" },
+        { desc: "Gas line / connector (if gas)", qty: "1", unit: "ea", unitCost: "120" },
+        { desc: "Flue / venting", qty: "1", unit: "ea", unitCost: "150" },
+      ]},
+      { name: "Labor", items: [
+        { desc: "Licensed plumber", qty: "32", unit: "hr", unitCost: "95" },
+        { desc: "Plumber helper", qty: "32", unit: "hr", unitCost: "45" },
+        { desc: "Pressure test & inspection", qty: "4", unit: "hr", unitCost: "95" },
+      ]},
+      { name: "Permits & Inspections", items: [
+        { desc: "Plumbing permit", qty: "1", unit: "ea", unitCost: "250" },
+        { desc: "Water meter turn-on fee", qty: "1", unit: "ea", unitCost: "75" },
+      ]},
+    ],
+  },
+  siding: {
+    sections: [
+      { name: "Demo", items: [
+        { desc: "Remove existing siding", qty: "1500", unit: "sqft", unitCost: "1.50" },
+        { desc: "Remove & reset trim pieces", qty: "1", unit: "job", unitCost: "400" },
+        { desc: "Disposal & dumpster", qty: "1", unit: "job", unitCost: "500" },
+        { desc: "Inspect sheathing / repair rot", qty: "1", unit: "job", unitCost: "600" },
+      ]},
+      { name: "Materials", items: [
+        { desc: "Vinyl / fiber cement siding", qty: "1650", unit: "sqft", unitCost: "4.50" },
+        { desc: "House wrap (Tyvek)", qty: "1650", unit: "sqft", unitCost: "0.50" },
+        { desc: "Starter strip", qty: "150", unit: "lf", unitCost: "1.25" },
+        { desc: "J-channel", qty: "200", unit: "lf", unitCost: "1.50" },
+        { desc: "Inside / outside corners", qty: "16", unit: "ea", unitCost: "18" },
+        { desc: "Nails & fasteners", qty: "1", unit: "set", unitCost: "120" },
+      ]},
+      { name: "Trim & Flashing", items: [
+        { desc: "Window trim / casing", qty: "12", unit: "ea", unitCost: "55" },
+        { desc: "Door trim", qty: "3", unit: "ea", unitCost: "75" },
+        { desc: "Soffit panels", qty: "100", unit: "sqft", unitCost: "5" },
+        { desc: "Fascia board", qty: "120", unit: "lf", unitCost: "6" },
+        { desc: "Flashing (step & kick-out)", qty: "1", unit: "job", unitCost: "350" },
+        { desc: "Caulk & sealant", qty: "12", unit: "ea", unitCost: "8" },
+      ]},
+      { name: "Labor", items: [
+        { desc: "Siding install crew", qty: "48", unit: "hr", unitCost: "70" },
+        { desc: "Trim & detail work", qty: "16", unit: "hr", unitCost: "75" },
+        { desc: "Cleanup", qty: "1", unit: "job", unitCost: "250" },
+      ]},
+    ],
+  },
+  drywall: {
+    sections: [
+      { name: "Materials", items: [
+        { desc: "Drywall sheets (4x8, 1/2\")", qty: "60", unit: "ea", unitCost: "14" },
+        { desc: "Drywall sheets (4x12, 1/2\")", qty: "20", unit: "ea", unitCost: "18" },
+        { desc: "Moisture-resistant (green board)", qty: "8", unit: "ea", unitCost: "18" },
+        { desc: "Drywall screws (25 lb box)", qty: "2", unit: "ea", unitCost: "35" },
+        { desc: "Corner bead (metal / vinyl)", qty: "20", unit: "ea", unitCost: "4" },
+        { desc: "Joint compound (5 gal)", qty: "6", unit: "ea", unitCost: "18" },
+        { desc: "Joint tape (paper)", qty: "4", unit: "ea", unitCost: "5" },
+        { desc: "Mesh tape (for patches)", qty: "2", unit: "ea", unitCost: "8" },
+      ]},
+      { name: "Taping & Finishing", items: [
+        { desc: "First coat (tape & bed)", qty: "2400", unit: "sqft", unitCost: "0.50" },
+        { desc: "Second coat (skim)", qty: "2400", unit: "sqft", unitCost: "0.40" },
+        { desc: "Final coat & sand", qty: "2400", unit: "sqft", unitCost: "0.35" },
+        { desc: "Texture application (knockdown / orange peel)", qty: "2400", unit: "sqft", unitCost: "0.45" },
+        { desc: "Prime (PVA primer)", qty: "2400", unit: "sqft", unitCost: "0.20" },
+      ]},
+      { name: "Labor", items: [
+        { desc: "Hang drywall", qty: "2400", unit: "sqft", unitCost: "0.75" },
+        { desc: "Lift rental (if needed)", qty: "2", unit: "day", unitCost: "85" },
+        { desc: "Cleanup & dust control", qty: "1", unit: "job", unitCost: "250" },
+      ]},
+    ],
+  },
+  landscaping: {
+    sections: [
+      { name: "Site Prep", items: [
+        { desc: "Clear & grub existing vegetation", qty: "1", unit: "job", unitCost: "1200" },
+        { desc: "Rough grading", qty: "2000", unit: "sqft", unitCost: "0.75" },
+        { desc: "Topsoil import (screened)", qty: "8", unit: "cuyd", unitCost: "55" },
+        { desc: "Fine grading & leveling", qty: "2000", unit: "sqft", unitCost: "0.50" },
+        { desc: "Haul-off debris", qty: "1", unit: "job", unitCost: "400" },
+      ]},
+      { name: "Hardscape", items: [
+        { desc: "Paver patio", qty: "200", unit: "sqft", unitCost: "14" },
+        { desc: "Paver base (crushed stone + sand)", qty: "200", unit: "sqft", unitCost: "3" },
+        { desc: "Retaining wall (segmental block)", qty: "50", unit: "sqft", unitCost: "28" },
+        { desc: "Walkway pavers", qty: "80", unit: "sqft", unitCost: "12" },
+        { desc: "Edging (steel or aluminum)", qty: "150", unit: "lf", unitCost: "4.50" },
+      ]},
+      { name: "Plantings", items: [
+        { desc: "Shade trees (2\" caliper)", qty: "2", unit: "ea", unitCost: "350" },
+        { desc: "Ornamental trees", qty: "3", unit: "ea", unitCost: "185" },
+        { desc: "Shrubs (3-5 gal)", qty: "20", unit: "ea", unitCost: "45" },
+        { desc: "Perennials (1 gal)", qty: "40", unit: "ea", unitCost: "12" },
+        { desc: "Sod (Bermuda / St. Augustine)", qty: "1200", unit: "sqft", unitCost: "0.85" },
+        { desc: "Mulch (hardwood, 3\" deep)", qty: "8", unit: "cuyd", unitCost: "55" },
+      ]},
+      { name: "Irrigation", items: [
+        { desc: "Irrigation controller (8-zone)", qty: "1", unit: "ea", unitCost: "250" },
+        { desc: "Sprinkler heads (pop-up)", qty: "24", unit: "ea", unitCost: "18" },
+        { desc: "Drip line (planter beds)", qty: "200", unit: "lf", unitCost: "1.50" },
+        { desc: "PVC main line & valves", qty: "1", unit: "job", unitCost: "450" },
+        { desc: "Backflow preventer", qty: "1", unit: "ea", unitCost: "175" },
+      ]},
+      { name: "Labor", items: [
+        { desc: "Landscape crew", qty: "48", unit: "hr", unitCost: "55" },
+        { desc: "Hardscape crew", qty: "24", unit: "hr", unitCost: "65" },
+        { desc: "Irrigation install", qty: "16", unit: "hr", unitCost: "70" },
+        { desc: "Final cleanup & walkthrough", qty: "4", unit: "hr", unitCost: "55" },
+      ]},
+    ],
+  },
+  demo: {
+    sections: [
+      { name: "Interior Demo", items: [
+        { desc: "Drywall removal", qty: "1500", unit: "sqft", unitCost: "1.75" },
+        { desc: "Flooring removal (tile / hardwood / carpet)", qty: "800", unit: "sqft", unitCost: "2" },
+        { desc: "Cabinet & fixture removal", qty: "1", unit: "job", unitCost: "800" },
+        { desc: "Ceiling removal (drywall / drop tile)", qty: "500", unit: "sqft", unitCost: "1.50" },
+        { desc: "Door & trim removal", qty: "12", unit: "ea", unitCost: "35" },
+        { desc: "Insulation removal", qty: "500", unit: "sqft", unitCost: "1.25" },
+      ]},
+      { name: "Structural", items: [
+        { desc: "Non-bearing wall removal", qty: "3", unit: "ea", unitCost: "450" },
+        { desc: "Bearing wall removal (w/ temp shoring)", qty: "1", unit: "ea", unitCost: "2500" },
+        { desc: "Concrete / slab cutting", qty: "20", unit: "lf", unitCost: "12" },
+        { desc: "Deck / porch tear-down", qty: "1", unit: "job", unitCost: "1200" },
+      ]},
+      { name: "Haul-Off", items: [
+        { desc: "Dumpster rental (20 yd roll-off)", qty: "2", unit: "ea", unitCost: "550" },
+        { desc: "Additional dump runs", qty: "1", unit: "ea", unitCost: "350" },
+        { desc: "Hazmat testing (asbestos / lead)", qty: "1", unit: "job", unitCost: "400" },
+        { desc: "Recycling / salvage credit", qty: "1", unit: "job", unitCost: "-200" },
+      ]},
+      { name: "Labor", items: [
+        { desc: "Demo crew", qty: "40", unit: "hr", unitCost: "55" },
+        { desc: "Equipment rental (skid steer / jackhammer)", qty: "2", unit: "day", unitCost: "350" },
+        { desc: "Site cleanup & broom sweep", qty: "8", unit: "hr", unitCost: "45" },
+      ]},
+      { name: "Permits & Safety", items: [
+        { desc: "Demolition permit", qty: "1", unit: "ea", unitCost: "300" },
+        { desc: "Utility disconnect (gas / water / electric)", qty: "1", unit: "job", unitCost: "250" },
+        { desc: "Dust barrier / containment setup", qty: "1", unit: "job", unitCost: "350" },
       ]},
     ],
   },
@@ -2131,7 +2528,7 @@ function EstimatesPageContent() {
 
       {/* Sidebar + Content */}
       <div className="flex flex-1 min-h-0">
-        <nav className="w-44 flex-shrink-0 bg-white border-r border-border py-3 px-2 overflow-y-auto">
+        <nav className="w-48 flex-shrink-0 bg-white border-r border-border py-3 px-2 overflow-y-auto">
           {ESTIMATES_NAV.map((item) => {
             const Icon = item.icon;
             const isActive = activeSection === item.id;

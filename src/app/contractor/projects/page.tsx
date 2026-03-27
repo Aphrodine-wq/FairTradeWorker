@@ -2337,7 +2337,7 @@ export default function ProjectsPage() {
       {/* Sidebar + Content */}
       <div className="flex flex-1 min-h-0">
         {/* Project list sidebar */}
-        <div className="w-44 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-y-auto">
+        <div className="w-48 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-y-auto">
           <div className="py-3 px-2 space-y-0.5">
             {projects.map((p) => {
               const isSelected = p.id === selectedProjectId;

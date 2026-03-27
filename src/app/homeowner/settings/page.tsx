@@ -471,7 +471,7 @@ export default function HomeownerSettingsPage() {
       {/* Sidebar + Content */}
       <div className="flex flex-1 min-h-0">
         {/* Settings sidebar */}
-        <nav className="w-44 flex-shrink-0 bg-white border-r border-border py-3 px-2 overflow-y-auto">
+        <nav className="w-48 flex-shrink-0 bg-white border-r border-border py-3 px-2 overflow-y-auto">
           {NAV_SECTIONS.map((section) => {
             const Icon = section.icon;
             const isActive = active === section.id;

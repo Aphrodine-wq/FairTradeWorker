@@ -21,8 +21,8 @@ interface SidebarProps {
 }
 
 const MOCK_USER = {
-  contractor: { name: "Marcus Johnson", email: "marcus@johnson.com" },
-  homeowner: { name: "Michael Brown", email: "michael@brown.com" },
+  contractor: { name: "Marcus Johnson", email: "marcus@johnson.com", rating: 4.8 },
+  homeowner: { name: "Michael Brown", email: "michael@brown.com", rating: 4.9 },
 };
 
 export function Sidebar({ items, currentPath, userRole, topAction }: SidebarProps) {
@@ -110,6 +110,10 @@ export function Sidebar({ items, currentPath, userRole, topAction }: SidebarProp
             {!collapsed && (
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold text-gray-900 truncate">{user.name}</p>
+                <p className="text-[11px] leading-tight mt-0.5">
+                  <span className="text-amber-500">&#9733;</span>{" "}
+                  <span className="font-semibold text-gray-600">{user.rating}</span>
+                </p>
                 <p className="text-xs text-gray-500 truncate">{user.email}</p>
               </div>
             )}
