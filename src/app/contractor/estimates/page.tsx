@@ -335,10 +335,13 @@ function MyEstimatesTab({ estimates }: { estimates: Estimate[] }) {
 
 // ─── New Estimate Tab ────────────────────────────────────────────────────────
 
+type LineItemCategory = "Materials" | "Labor" | "Equipment" | "Other";
+
 interface LineItem {
   description: string;
   quantity: string;
   unitPrice: string;
+  group: LineItemCategory;
 }
 
 function NewEstimateTab() {
@@ -355,7 +358,7 @@ function NewEstimateTab() {
   const [notes, setNotes] = useState("");
   const [exclusions, setExclusions] = useState("");
   const [lineItems, setLineItems] = useState<LineItem[]>([
-    { description: "", quantity: "1", unitPrice: "" },
+    { description: "", quantity: "1", unitPrice: "", group: "Materials" },
   ]);
 
   const updateLine = (idx: number, field: keyof LineItem, value: string) => {
@@ -364,8 +367,10 @@ function NewEstimateTab() {
     );
   };
 
-  const addLine = () =>
-    setLineItems((prev) => [...prev, { description: "", quantity: "1", unitPrice: "" }]);
+  const [activeGroup, setActiveGroup] = useState<LineItemCategory>("Materials");
+
+  const addLine = (group?: LineItemCategory) =>
+    setLineItems((prev) => [...prev, { description: "", quantity: "1", unitPrice: "", group: group || activeGroup }]);
 
   const removeLine = (idx: number) =>
     setLineItems((prev) => prev.filter((_, i) => i !== idx));
@@ -483,36 +488,119 @@ function NewEstimateTab() {
               <p className="text-[12px] text-gray-400">Materials, labor, and other charges</p>
             </div>
           </div>
+
+          {/* Category tabs */}
+          <div className="flex items-center gap-1.5 mb-3">
+            {(["Materials", "Labor", "Equipment", "Other"] as LineItemCategory[]).map((g) => {
+              const count = lineItems.filter((li) => li.group === g && li.description).length;
+              return (
+                <button
+                  key={g}
+                  onClick={() => setActiveGroup(g)}
+                  className={cn(
+                    "h-8 px-3 rounded-lg text-[12px] font-semibold transition-colors",
+                    activeGroup === g ? "bg-gray-900 text-white" : "text-gray-500 hover:bg-gray-100"
+                  )}
+                >
+                  {g}{count > 0 && <span className="ml-1.5 opacity-60">{count}</span>}
+                </button>
+              );
+            })}
+          </div>
+
           <div className="rounded-xl overflow-hidden bg-white ring-1 ring-gray-200">
-            <div className="grid grid-cols-[1fr_65px_90px_85px_36px] gap-2 px-4 py-2.5 bg-gray-50">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Description</span>
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider text-right">Qty</span>
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider text-right">Rate</span>
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider text-right">Total</span>
+            {/* Table header */}
+            <div className="grid grid-cols-[1fr_80px_110px_100px_40px] gap-3 px-5 py-3 bg-gray-50">
+              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Description</span>
+              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider text-right">Qty</span>
+              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider text-right">Rate</span>
+              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider text-right">Amount</span>
               <span />
             </div>
-            {lineItems.map((item, i) => (
-              <div key={i} className="grid grid-cols-[1fr_65px_90px_85px_36px] gap-2 px-4 py-2 items-center border-t border-gray-100">
-                <input value={item.description} onChange={(e) => updateLine(i, "description", e.target.value)} placeholder="Description..." className="h-9 rounded-lg border border-gray-200 bg-white px-3 text-[13px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent" />
-                <input type="number" min="0" value={item.quantity} onChange={(e) => updateLine(i, "quantity", e.target.value)} className="h-9 rounded-lg border border-gray-200 bg-white px-2 text-[13px] text-gray-900 text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent" />
-                <div className="relative">
-                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-300 text-[12px]">$</span>
-                  <input type="number" min="0" step="0.01" value={item.unitPrice} onChange={(e) => updateLine(i, "unitPrice", e.target.value)} className="h-9 w-full rounded-lg border border-gray-200 bg-white pl-6 pr-2 text-[13px] text-gray-900 text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent" />
+
+            {/* Line items for active group */}
+            {lineItems.map((item, i) => {
+              if (item.group !== activeGroup) return null;
+              return (
+                <div key={i} className="grid grid-cols-[1fr_80px_110px_100px_40px] gap-3 px-5 py-3 items-center border-t border-gray-100">
+                  <input
+                    value={item.description}
+                    onChange={(e) => updateLine(i, "description", e.target.value)}
+                    placeholder="What was done or supplied..."
+                    className="h-10 rounded-lg border border-gray-200 bg-white px-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
+                  />
+                  <input
+                    type="number"
+                    min="0"
+                    value={item.quantity}
+                    onChange={(e) => updateLine(i, "quantity", e.target.value)}
+                    className="h-10 rounded-lg border border-gray-200 bg-white px-2 text-[14px] text-gray-900 text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
+                  />
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-[13px]">$</span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={item.unitPrice}
+                      onChange={(e) => updateLine(i, "unitPrice", e.target.value)}
+                      className="h-10 w-full rounded-lg border border-gray-200 bg-white pl-7 pr-2 text-[14px] text-gray-900 text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
+                    />
+                  </div>
+                  <span className="text-[14px] font-semibold text-gray-900 text-right tabular-nums">
+                    {lineTotal(item) > 0 ? formatCurrency(lineTotal(item)) : "—"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => removeLine(i)}
+                    disabled={lineItems.length === 1}
+                    className="w-9 h-9 flex items-center justify-center rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
-                <span className="text-[13px] font-semibold text-gray-900 text-right tabular-nums">{lineTotal(item) > 0 ? formatCurrency(lineTotal(item)) : "—"}</span>
-                <button type="button" onClick={() => removeLine(i)} disabled={lineItems.length === 1} className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-20 disabled:cursor-not-allowed">
-                  <Trash2 className="w-3.5 h-3.5" />
+              );
+            })}
+
+            {/* Ghost row — type to add */}
+            <div className="grid grid-cols-[1fr_80px_110px_100px_40px] gap-3 px-5 py-3 items-center border-t border-dashed border-gray-200 bg-gray-50/30">
+              <input
+                placeholder={`Add ${activeGroup.toLowerCase()} item...`}
+                className="h-10 rounded-lg border border-dashed border-gray-200 bg-transparent px-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent focus:bg-white focus:border-solid"
+                onFocus={() => {
+                  // If there isn't already an empty item for this group, add one
+                  const hasEmpty = lineItems.some((li) => li.group === activeGroup && !li.description);
+                  if (!hasEmpty) addLine(activeGroup);
+                }}
+                onChange={(e) => {
+                  // Find or create the empty item for this group and update it
+                  const emptyIdx = lineItems.findIndex((li) => li.group === activeGroup && !li.description);
+                  if (emptyIdx >= 0) {
+                    updateLine(emptyIdx, "description", e.target.value);
+                  }
+                }}
+                value=""
+              />
+              <span className="text-[13px] text-gray-300 text-right">—</span>
+              <span className="text-[13px] text-gray-300 text-right">—</span>
+              <span className="text-[13px] text-gray-300 text-right">—</span>
+              <span />
+            </div>
+
+            {/* Footer — total */}
+            <div className="flex items-center justify-between px-5 py-4 border-t border-gray-200 bg-gray-50">
+              <div className="flex items-center gap-4">
+                <button type="button" onClick={() => addLine(activeGroup)} className="text-[13px] font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1.5 transition-colors">
+                  <Plus className="w-3.5 h-3.5" />
+                  Add Row
                 </button>
+                <span className="text-[11px] text-gray-400">
+                  {lineItems.filter((li) => li.description).length} items across {new Set(lineItems.filter((li) => li.description).map((li) => li.group)).size} categories
+                </span>
               </div>
-            ))}
-            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-gray-50">
-              <button type="button" onClick={addLine} className="text-[13px] font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1.5 transition-colors">
-                <Plus className="w-3.5 h-3.5" />
-                Add Line Item
-              </button>
               <div className="flex items-baseline gap-3">
-                <span className="text-[12px] text-gray-400">Total</span>
-                <span className="text-[22px] font-bold text-gray-900 tabular-nums">{formatCurrency(grandTotal)}</span>
+                <span className="text-[12px] text-gray-400 font-medium">Total</span>
+                <span className="text-[24px] font-bold text-gray-900 tabular-nums">{formatCurrency(grandTotal)}</span>
               </div>
             </div>
           </div>
@@ -588,9 +676,9 @@ function NewEstimateTab() {
       </div>
 
       {/* Right: Live PDF Preview */}
-      <div className="w-[380px] flex-shrink-0 sticky top-0">
+      <div className="w-[440px] flex-shrink-0 sticky top-0">
         <p className="text-[12px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Live Preview</p>
-        <div className="bg-white rounded-lg shadow-[0_4px_30px_-6px_rgba(0,0,0,0.15)] ring-1 ring-gray-200/80 overflow-hidden transform scale-[0.85] origin-top-right">
+        <div className="bg-white rounded-lg shadow-[0_4px_30px_-6px_rgba(0,0,0,0.15)] ring-1 ring-gray-200/80 overflow-hidden transform scale-[0.90] origin-top-right">
           {/* Accent bar */}
           <div className="h-1.5 bg-brand-600" />
           <div className="px-6 pt-4 pb-5">
