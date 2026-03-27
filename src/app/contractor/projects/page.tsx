@@ -36,6 +36,7 @@ import {
   Pencil,
   MapPin,
   Check,
+  ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
 import { AppHeader } from "@shared/components/app-header";
@@ -1813,6 +1814,8 @@ function MilestonesTab({
   const [newLabel, setNewLabel] = useState("");
   const [newAmount, setNewAmount] = useState("");
   const [showAdd, setShowAdd] = useState(false);
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const [submitNote, setSubmitNote] = useState("");
   const milestones = project.milestones as Milestone[];
 
   const totalAmount = milestones.reduce((s, m) => s + m.amount, 0);
@@ -1822,8 +1825,10 @@ function MilestonesTab({
   const pct = totalAmount > 0 ? Math.round((releasedAmount / totalAmount) * 100) : 0;
 
   function submitMilestone(index: number) {
-    const updated = milestones.map((m, i) => i === index ? { ...m, done: true, status: "submitted" as MilestoneStatus, completedDate: new Date().toISOString().split("T")[0] } : m);
+    const updated = milestones.map((m, i) => i === index ? { ...m, done: true, status: "submitted" as MilestoneStatus, completedDate: new Date().toISOString().split("T")[0], note: submitNote || undefined } : m);
     onUpdate(updated);
+    setExpandedIndex(null);
+    setSubmitNote("");
   }
 
   function addMilestone() {
@@ -1837,6 +1842,11 @@ function MilestonesTab({
 
   function removeMilestone(index: number) {
     onUpdate(milestones.filter((_, i) => i !== index));
+  }
+
+  function toggleExpand(index: number) {
+    setExpandedIndex(expandedIndex === index ? null : index);
+    setSubmitNote(milestones[index]?.note || "");
   }
 
   return (
@@ -1864,26 +1874,13 @@ function MilestonesTab({
           <span className="text-[13px] font-bold text-gray-900 tabular-nums">{pct}%</span>
         </div>
         <div className="h-2 bg-gray-100 rounded-full overflow-hidden flex">
-          {paidAmount > 0 && (
-            <div className="bg-emerald-500 transition-all duration-500" style={{ width: `${(paidAmount / totalAmount) * 100}%` }} />
-          )}
-          {approvedAmount > 0 && (
-            <div className="bg-blue-400 transition-all duration-500" style={{ width: `${(approvedAmount / totalAmount) * 100}%` }} />
-          )}
+          {paidAmount > 0 && <div className="bg-emerald-500 transition-all duration-500" style={{ width: `${(paidAmount / totalAmount) * 100}%` }} />}
+          {approvedAmount > 0 && <div className="bg-blue-400 transition-all duration-500" style={{ width: `${(approvedAmount / totalAmount) * 100}%` }} />}
         </div>
         <div className="flex items-center gap-4 mt-2">
-          <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span className="text-[11px] text-gray-400">Paid</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-blue-400" />
-            <span className="text-[11px] text-gray-400">Approved</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-gray-200" />
-            <span className="text-[11px] text-gray-400">Remaining</span>
-          </div>
+          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-500" /><span className="text-[11px] text-gray-400">Paid</span></div>
+          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-400" /><span className="text-[11px] text-gray-400">Approved</span></div>
+          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-gray-200" /><span className="text-[11px] text-gray-400">Remaining</span></div>
         </div>
       </div>
 
@@ -1891,17 +1888,21 @@ function MilestonesTab({
       <div className="space-y-2 mb-4">
         {milestones.map((m, i) => {
           const cfg = STATUS_CONFIG[m.status];
-          const isActionable = m.status === "in_progress";
+          const isExpanded = expandedIndex === i;
+          const canExpand = m.status !== "pending";
           return (
             <div
               key={`${m.label}-${i}`}
               className={cn(
                 "group rounded-xl border bg-white transition-all",
-                isActionable ? "border-brand-200 shadow-sm" : "border-border"
+                m.status === "in_progress" ? "border-brand-200 shadow-sm" : m.status === "submitted" ? "border-amber-200" : "border-border"
               )}
             >
-              <div className="flex items-center gap-4 px-5 py-4">
-                {/* Status indicator */}
+              {/* Row */}
+              <div
+                className={cn("flex items-center gap-4 px-5 py-4", canExpand && "cursor-pointer")}
+                onClick={() => canExpand && toggleExpand(i)}
+              >
                 <div className={cn(
                   "w-7 h-7 rounded-lg flex items-center justify-center shrink-0",
                   m.status === "paid" || m.status === "approved" ? "bg-emerald-50" : m.status === "submitted" ? "bg-amber-50" : m.status === "in_progress" ? "bg-brand-50" : "bg-gray-50"
@@ -1912,54 +1913,113 @@ function MilestonesTab({
                   {m.status === "pending" && <Circle className="w-4 h-4 text-gray-300" />}
                 </div>
 
-                {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <p className={cn(
-                    "text-[15px] font-medium leading-tight",
-                    m.status === "paid" ? "text-gray-400" : "text-gray-900"
-                  )}>
-                    {m.label}
-                  </p>
+                  <p className={cn("text-[15px] font-medium leading-tight", m.status === "paid" ? "text-gray-400" : "text-gray-900")}>{m.label}</p>
                   <div className="flex items-center gap-2 mt-0.5">
-                    <span className={cn("text-[11px] font-semibold px-1.5 py-0.5 rounded border", cfg.bg, cfg.color)}>
-                      {cfg.label}
-                    </span>
-                    {m.completedDate && (
-                      <span className="text-[11px] text-gray-400">{m.completedDate}</span>
-                    )}
+                    <span className={cn("text-[11px] font-semibold px-1.5 py-0.5 rounded border", cfg.bg, cfg.color)}>{cfg.label}</span>
+                    {m.completedDate && <span className="text-[11px] text-gray-400">{m.completedDate}</span>}
                   </div>
                 </div>
 
-                {/* Amount */}
-                <div className="text-right shrink-0">
-                  <p className={cn(
-                    "text-[15px] font-bold tabular-nums",
-                    m.status === "paid" ? "text-emerald-600" : "text-gray-900"
-                  )}>
-                    {formatCurrency(m.amount)}
-                  </p>
-                </div>
+                <p className={cn("text-[15px] font-bold tabular-nums shrink-0", m.status === "paid" ? "text-emerald-600" : "text-gray-900")}>{formatCurrency(m.amount)}</p>
 
-                {/* Actions */}
-                <div className="shrink-0 w-20 flex justify-end">
-                  {isActionable && (
-                    <button
-                      onClick={() => submitMilestone(i)}
-                      className="text-[12px] font-semibold text-white bg-brand-600 hover:bg-brand-700 px-3 py-1.5 rounded-lg transition-colors"
-                    >
-                      Submit
-                    </button>
+                <div className="shrink-0 w-8 flex justify-end">
+                  {canExpand && (
+                    <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform", isExpanded && "rotate-180")} />
                   )}
                   {m.status === "pending" && (
                     <button
-                      onClick={() => removeMilestone(i)}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-red-50 text-gray-300 hover:text-red-500"
+                      onClick={(e) => { e.stopPropagation(); removeMilestone(i); }}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-red-50 text-gray-300 hover:text-red-500"
                     >
                       <X className="w-4 h-4" />
                     </button>
                   )}
                 </div>
               </div>
+
+              {/* Expanded detail */}
+              {isExpanded && (
+                <div className="px-5 pb-5 border-t border-border">
+                  {/* Photos section */}
+                  <div className="mt-4 mb-4">
+                    <p className="text-[12px] font-semibold text-gray-900 uppercase tracking-wider mb-2">Photos</p>
+                    <div className="grid grid-cols-4 gap-2">
+                      {(m.status === "paid" || m.status === "approved" || m.status === "submitted") ? (
+                        <>
+                          {[1, 2, 3].map((n) => (
+                            <div key={n} className="aspect-square rounded-lg bg-gray-100 border border-border flex items-center justify-center">
+                              <Camera className="w-5 h-5 text-gray-300" />
+                            </div>
+                          ))}
+                        </>
+                      ) : (
+                        <>
+                          <button className="aspect-square rounded-lg border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-1 hover:border-brand-400 hover:bg-brand-50/30 transition-colors">
+                            <Upload className="w-5 h-5 text-gray-300" />
+                            <span className="text-[10px] text-gray-400">Upload</span>
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Note */}
+                  {(m.status === "paid" || m.status === "approved" || m.status === "submitted") && m.note && (
+                    <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                      <p className="text-[12px] font-semibold text-gray-900 uppercase tracking-wider mb-1">Contractor note</p>
+                      <p className="text-[13px] text-gray-600">{m.note}</p>
+                    </div>
+                  )}
+
+                  {/* Submit form for in_progress */}
+                  {m.status === "in_progress" && (
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-[12px] font-semibold text-gray-900 uppercase tracking-wider mb-2">Add a note for the homeowner</p>
+                        <textarea
+                          value={submitNote}
+                          onChange={(e) => setSubmitNote(e.target.value)}
+                          placeholder="Describe what was completed, any changes, or things to note..."
+                          rows={3}
+                          className="w-full rounded-lg border border-border px-3 py-2 text-[13px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-1 resize-none"
+                        />
+                      </div>
+                      <button
+                        onClick={() => submitMilestone(i)}
+                        className="w-full h-10 rounded-lg bg-brand-600 text-white text-[13px] font-semibold hover:bg-brand-700 transition-colors flex items-center justify-center gap-2"
+                      >
+                        Submit for Homeowner Review
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Waiting message for submitted */}
+                  {m.status === "submitted" && (
+                    <div className="flex items-center gap-2 p-3 bg-amber-50 rounded-lg border border-amber-100">
+                      <Clock className="w-4 h-4 text-amber-600 shrink-0" />
+                      <p className="text-[13px] text-amber-700">Waiting for {project.client} to review and approve this milestone.</p>
+                    </div>
+                  )}
+
+                  {/* Paid confirmation */}
+                  {m.status === "paid" && (
+                    <div className="flex items-center gap-2 p-3 bg-emerald-50 rounded-lg border border-emerald-100">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <p className="text-[13px] text-emerald-700">Payment of {formatCurrency(m.amount)} released to your account.</p>
+                    </div>
+                  )}
+
+                  {/* Approved message */}
+                  {m.status === "approved" && (
+                    <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                      <Check className="w-4 h-4 text-blue-600 shrink-0" />
+                      <p className="text-[13px] text-blue-700">Approved by {project.client}. Payment processing.</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           );
         })}
@@ -1976,36 +2036,11 @@ function MilestonesTab({
         </button>
       ) : (
         <div className="rounded-xl border border-brand-200 bg-white p-4 space-y-3">
-          <input
-            type="text"
-            value={newLabel}
-            onChange={(e) => setNewLabel(e.target.value)}
-            placeholder="Milestone name"
-            className="w-full h-10 rounded-lg border border-border px-3 text-[14px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-1"
-            autoFocus
-          />
-          <input
-            type="text"
-            inputMode="numeric"
-            value={newAmount}
-            onChange={(e) => setNewAmount(e.target.value.replace(/\D/g, ""))}
-            placeholder="Amount ($)"
-            className="w-full h-10 rounded-lg border border-border px-3 text-[14px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-1"
-          />
+          <input type="text" value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder="Milestone name" className="w-full h-10 rounded-lg border border-border px-3 text-[14px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-1" autoFocus />
+          <input type="text" inputMode="numeric" value={newAmount} onChange={(e) => setNewAmount(e.target.value.replace(/\D/g, ""))} placeholder="Amount ($)" className="w-full h-10 rounded-lg border border-border px-3 text-[14px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-1" />
           <div className="flex gap-2">
-            <button
-              onClick={addMilestone}
-              disabled={!newLabel.trim()}
-              className="flex-1 h-9 rounded-lg bg-brand-600 text-white text-[13px] font-semibold hover:bg-brand-700 transition-colors disabled:opacity-40"
-            >
-              Add Milestone
-            </button>
-            <button
-              onClick={() => { setShowAdd(false); setNewLabel(""); setNewAmount(""); }}
-              className="h-9 px-4 rounded-lg border border-border text-[13px] font-medium text-gray-600 hover:bg-gray-50 transition-colors"
-            >
-              Cancel
-            </button>
+            <button onClick={addMilestone} disabled={!newLabel.trim()} className="flex-1 h-9 rounded-lg bg-brand-600 text-white text-[13px] font-semibold hover:bg-brand-700 transition-colors disabled:opacity-40">Add Milestone</button>
+            <button onClick={() => { setShowAdd(false); setNewLabel(""); setNewAmount(""); }} className="h-9 px-4 rounded-lg border border-border text-[13px] font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancel</button>
           </div>
         </div>
       )}
