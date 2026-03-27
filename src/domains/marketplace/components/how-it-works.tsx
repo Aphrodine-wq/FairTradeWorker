@@ -72,7 +72,7 @@ export function HowItWorks() {
             </h3>
             <div className="space-y-10">
               {contractorSteps.map((step) => (
-                <div key={step.number} className="flex gap-5">
+                <div key={step.number} className="flex items-start gap-5">
                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center">
                     <span className="text-sm font-bold text-white">
                       {step.number}
@@ -98,7 +98,7 @@ export function HowItWorks() {
             </h3>
             <div className="space-y-10">
               {homeownerSteps.map((step) => (
-                <div key={step.number} className="flex gap-5">
+                <div key={step.number} className="flex items-start gap-5">
                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
                     <span className="text-sm font-bold text-white">
                       {step.number}

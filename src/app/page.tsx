@@ -38,7 +38,7 @@ export default function HomePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="border border-border rounded-xl p-8">
-                <div className="w-10 h-10 rounded-lg bg-brand-50 flex items-center justify-center mb-4">
+                <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center mb-4">
                   <DollarSign className="w-5 h-5 text-brand-600" />
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">
@@ -51,7 +51,7 @@ export default function HomePage() {
               </div>
 
               <div className="border border-border rounded-xl p-8">
-                <div className="w-10 h-10 rounded-lg bg-brand-50 flex items-center justify-center mb-4">
+                <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center mb-4">
                   <Shield className="w-5 h-5 text-brand-600" />
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">
@@ -64,7 +64,7 @@ export default function HomePage() {
               </div>
 
               <div className="border border-border rounded-xl p-8">
-                <div className="w-10 h-10 rounded-lg bg-brand-50 flex items-center justify-center mb-4">
+                <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center mb-4">
                   <Mic className="w-5 h-5 text-brand-600" />
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">
@@ -106,24 +106,24 @@ export default function HomePage() {
                   For Contractors
                 </h3>
                 <ol className="space-y-4">
-                  <li className="flex gap-4">
-                    <span className="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center flex-shrink-0">
+                  <li className="flex items-start gap-4">
+                    <span className="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center flex-shrink-0">
                       <span className="text-xs font-bold text-white">1</span>
                     </span>
                     <p className="text-sm text-gray-600">
                       Sign up, get verified, start browsing jobs in your area.
                     </p>
                   </li>
-                  <li className="flex gap-4">
-                    <span className="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center flex-shrink-0">
+                  <li className="flex items-start gap-4">
+                    <span className="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center flex-shrink-0">
                       <span className="text-xs font-bold text-white">2</span>
                     </span>
                     <p className="text-sm text-gray-600">
                       Bid on projects with detailed estimates. Win the job.
                     </p>
                   </li>
-                  <li className="flex gap-4">
-                    <span className="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center flex-shrink-0">
+                  <li className="flex items-start gap-4">
+                    <span className="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center flex-shrink-0">
                       <span className="text-xs font-bold text-white">3</span>
                     </span>
                     <p className="text-sm text-gray-600">
@@ -138,24 +138,24 @@ export default function HomePage() {
                   For Homeowners
                 </h3>
                 <ol className="space-y-4">
-                  <li className="flex gap-4">
-                    <span className="w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
+                  <li className="flex items-start gap-4">
+                    <span className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
                       <span className="text-xs font-bold text-white">1</span>
                     </span>
                     <p className="text-sm text-gray-600">
                       Post your project. Takes two minutes.
                     </p>
                   </li>
-                  <li className="flex gap-4">
-                    <span className="w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
+                  <li className="flex items-start gap-4">
+                    <span className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
                       <span className="text-xs font-bold text-white">2</span>
                     </span>
                     <p className="text-sm text-gray-600">
                       Review bids from verified contractors. Compare and message.
                     </p>
                   </li>
-                  <li className="flex gap-4">
-                    <span className="w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
+                  <li className="flex items-start gap-4">
+                    <span className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
                       <span className="text-xs font-bold text-white">3</span>
                     </span>
                     <p className="text-sm text-gray-600">
@@ -243,7 +243,9 @@ export default function HomePage() {
             {/* Trust badges */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <div className="text-center">
-                <ShieldCheck className="w-8 h-8 text-brand-600 mx-auto mb-3" />
+                <div className="w-12 h-12 rounded-xl bg-brand-50 flex items-center justify-center mx-auto mb-3">
+                  <ShieldCheck className="w-6 h-6 text-brand-600" />
+                </div>
                 <h4 className="text-sm font-bold text-gray-900 mb-1">
                   Every contractor verified
                 </h4>
@@ -252,7 +254,9 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="text-center">
-                <Lock className="w-8 h-8 text-brand-600 mx-auto mb-3" />
+                <div className="w-12 h-12 rounded-xl bg-brand-50 flex items-center justify-center mx-auto mb-3">
+                  <Lock className="w-6 h-6 text-brand-600" />
+                </div>
                 <h4 className="text-sm font-bold text-gray-900 mb-1">
                   Escrow-protected payments
                 </h4>
@@ -261,7 +265,9 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="text-center">
-                <BadgeCheck className="w-8 h-8 text-brand-600 mx-auto mb-3" />
+                <div className="w-12 h-12 rounded-xl bg-brand-50 flex items-center justify-center mx-auto mb-3">
+                  <BadgeCheck className="w-6 h-6 text-brand-600" />
+                </div>
                 <h4 className="text-sm font-bold text-gray-900 mb-1">
                   FairTrade Promise
                 </h4>

@@ -71,7 +71,7 @@ export function Hero() {
             <div className="relative z-10" style={{ transform: "rotate(-30deg)" }}>
               <HammerIcon className="w-48 h-auto lg:w-60" />
             </div>
-            <div className="absolute bottom-2 right-2 lg:bottom-4 lg:right-4 bg-white border border-border rounded-lg px-4 py-3 shadow-sm z-20">
+            <div className="absolute bottom-4 right-4 lg:bottom-6 lg:right-6 bg-white border border-border rounded-xl px-5 py-3 shadow-sm z-20 text-center">
               <div className="text-2xl font-bold text-gray-900 tabular-nums">$0</div>
               <div className="text-xs text-gray-400">per lead. ever.</div>
             </div>

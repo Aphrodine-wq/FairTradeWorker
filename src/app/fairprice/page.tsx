@@ -333,7 +333,7 @@ export default function FairPricePage() {
                         ].map((item) => (
                           <div key={item.label}>
                             <div className="flex items-center gap-1.5 mb-1">
-                              <div className={cn("w-2 h-2 rounded-full", item.color)} />
+                              <div className={cn("w-2.5 h-2.5 rounded-full", item.color)} />
                               <span className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">{item.label}</span>
                             </div>
                             <p className="text-base font-bold text-gray-900 tabular-nums">{formatUSD(item.value)}</p>
@@ -450,8 +450,8 @@ export default function FairPricePage() {
                 { icon: TrendingUp, title: "Gets Smarter Over Time", description: "Every bid on FairTradeWorker feeds back into the model. More data means better estimates for everyone." },
               ].map((item) => (
                 <div key={item.title} className="text-center">
-                  <div className="w-12 h-12 rounded-xl bg-brand-50 flex items-center justify-center mx-auto mb-4">
-                    <item.icon className="w-6 h-6 text-brand-600" />
+                  <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center mx-auto mb-4">
+                    <item.icon className="w-5 h-5 text-brand-600" />
                   </div>
                   <h3 className="text-base font-bold text-gray-900">{item.title}</h3>
                   <p className="text-sm text-gray-500 mt-2 leading-relaxed">{item.description}</p>

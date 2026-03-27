@@ -67,7 +67,7 @@ export default function FeaturesPage() {
                     "Edit before sending",
                   ].map((d) => (
                     <li key={d} className="flex items-start gap-2 text-xs text-gray-500">
-                      <Check className="w-3.5 h-3.5 text-brand-600 mt-0.5 shrink-0" strokeWidth={2.5} />
+                      <Check className="w-4 h-4 text-brand-600 mt-0.5 shrink-0" strokeWidth={2.5} />
                       {d}
                     </li>
                   ))}
@@ -98,7 +98,7 @@ export default function FeaturesPage() {
                     "Lower bids — no lead cost to pad",
                   ].map((d) => (
                     <li key={d} className="flex items-start gap-2 text-xs text-gray-500">
-                      <Check className="w-3.5 h-3.5 text-brand-600 mt-0.5 shrink-0" strokeWidth={2.5} />
+                      <Check className="w-4 h-4 text-brand-600 mt-0.5 shrink-0" strokeWidth={2.5} />
                       {d}
                     </li>
                   ))}
@@ -129,7 +129,7 @@ export default function FeaturesPage() {
                     "Full payment history + receipts",
                   ].map((d) => (
                     <li key={d} className="flex items-start gap-2 text-xs text-gray-500">
-                      <Check className="w-3.5 h-3.5 text-brand-600 mt-0.5 shrink-0" strokeWidth={2.5} />
+                      <Check className="w-4 h-4 text-brand-600 mt-0.5 shrink-0" strokeWidth={2.5} />
                       {d}
                     </li>
                   ))}

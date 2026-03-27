@@ -64,7 +64,7 @@ export function StatsBar() {
             return (
               <React.Fragment key={stat.label}>
                 {i > 0 && <div className="hidden sm:block w-px h-8 bg-border" />}
-                <div className="flex items-baseline gap-2 px-2">
+                <div className="flex items-center gap-2 px-2">
                   <span className="text-2xl font-bold text-gray-900 tabular-nums">
                     {stat.prefix}{count.toLocaleString()}{stat.suffix}
                   </span>
