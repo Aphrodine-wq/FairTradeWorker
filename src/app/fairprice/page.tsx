@@ -13,6 +13,10 @@ import {
   Users,
   Check,
   Info,
+  Clock,
+  AlertTriangle,
+  ArrowUpRight,
+  ArrowDownRight,
 } from "lucide-react";
 import { Navbar } from "@marketplace/components/navbar";
 import { Footer } from "@marketplace/components/footer";
@@ -29,19 +33,24 @@ const PROJECT_SIZES = [
   { label: "Major — $50K+", value: "major", multiplier: 15 },
 ] as const;
 
-const BASE_ESTIMATES: Record<string, { low: number; high: number; materials: number; labor: number }> = {
-  "General Contracting": { low: 3200, high: 5800, materials: 0.35, labor: 0.50 },
-  "Plumbing": { low: 1800, high: 3400, materials: 0.30, labor: 0.55 },
-  "Electrical": { low: 2000, high: 3800, materials: 0.25, labor: 0.60 },
-  "HVAC": { low: 3500, high: 6200, materials: 0.40, labor: 0.45 },
-  "Roofing": { low: 4000, high: 7500, materials: 0.45, labor: 0.40 },
-  "Painting": { low: 1200, high: 2400, materials: 0.30, labor: 0.55 },
-  "Flooring": { low: 2200, high: 4000, materials: 0.45, labor: 0.40 },
-  "Landscaping": { low: 1500, high: 3200, materials: 0.35, labor: 0.50 },
-  "Remodeling": { low: 5000, high: 9000, materials: 0.40, labor: 0.45 },
-  "Concrete": { low: 2800, high: 5200, materials: 0.40, labor: 0.45 },
-  "Fencing": { low: 1800, high: 3600, materials: 0.45, labor: 0.40 },
-  "Drywall": { low: 1500, high: 2800, materials: 0.30, labor: 0.55 },
+const BASE_ESTIMATES: Record<string, {
+  low: number; high: number; materials: number; labor: number;
+  timelineWeeks: [number, number]; // [small, major] — interpolated by size
+  nationalAvgMultiplier: number;
+  tips: string[];
+}> = {
+  "General Contracting": { low: 3200, high: 5800, materials: 0.35, labor: 0.50, timelineWeeks: [1, 12], nationalAvgMultiplier: 1.0, tips: ["Get at least 3 bids for any project over $5K", "Verify the GC carries general liability and workers comp", "Ask for a detailed scope of work before signing"] },
+  "Plumbing": { low: 1800, high: 3400, materials: 0.30, labor: 0.55, timelineWeeks: [1, 6], nationalAvgMultiplier: 1.0, tips: ["Permits are typically required for new lines or rerouting", "Ask about warranty on both parts and labor", "Camera inspection before major sewer work saves money long-term"] },
+  "Electrical": { low: 2000, high: 3800, materials: 0.25, labor: 0.60, timelineWeeks: [1, 5], nationalAvgMultiplier: 1.0, tips: ["All electrical work should be permitted and inspected", "Panel upgrades require utility coordination — plan 2+ weeks", "Ask if they pull their own permits"] },
+  "HVAC": { low: 3500, high: 6200, materials: 0.40, labor: 0.45, timelineWeeks: [1, 4], nationalAvgMultiplier: 1.0, tips: ["Get a Manual J load calculation before sizing equipment", "Equipment brand matters less than install quality", "Ask about SEER ratings — higher efficiency costs more upfront but saves monthly"] },
+  "Roofing": { low: 4000, high: 7500, materials: 0.45, labor: 0.40, timelineWeeks: [2, 6], nationalAvgMultiplier: 1.0, tips: ["Check if tear-off is included or if they're going over existing", "Ask about ice and water shield in valleys and eaves", "Verify they carry roofing-specific liability insurance"] },
+  "Painting": { low: 1200, high: 2400, materials: 0.30, labor: 0.55, timelineWeeks: [1, 4], nationalAvgMultiplier: 1.0, tips: ["Prep work is 80% of a good paint job — ask what's included", "Two coats minimum on color changes", "Exterior painting is weather-dependent — build in buffer time"] },
+  "Flooring": { low: 2200, high: 4000, materials: 0.45, labor: 0.40, timelineWeeks: [1, 5], nationalAvgMultiplier: 1.0, tips: ["Subfloor condition can add 20-30% to the project cost", "Acclimate hardwood 3-5 days before install", "Ask what happens to baseboards and transitions"] },
+  "Landscaping": { low: 1500, high: 3200, materials: 0.35, labor: 0.50, timelineWeeks: [1, 6], nationalAvgMultiplier: 1.0, tips: ["Irrigation should be planned before hardscape", "Grading and drainage are the foundation — don't skip them", "Native plants reduce long-term maintenance costs significantly"] },
+  "Remodeling": { low: 5000, high: 9000, materials: 0.40, labor: 0.45, timelineWeeks: [3, 16], nationalAvgMultiplier: 1.0, tips: ["Budget 15-20% contingency for hidden issues behind walls", "Get change order terms in writing before starting", "Permits are required for any structural, plumbing, or electrical changes"] },
+  "Concrete": { low: 2800, high: 5200, materials: 0.40, labor: 0.45, timelineWeeks: [1, 4], nationalAvgMultiplier: 1.0, tips: ["Concrete needs 28 days to fully cure — plan accordingly", "Rebar and proper base prep are non-negotiable for driveways", "Get the finish type in writing (broom, stamped, exposed aggregate)"] },
+  "Fencing": { low: 1800, high: 3600, materials: 0.45, labor: 0.40, timelineWeeks: [1, 3], nationalAvgMultiplier: 1.0, tips: ["Verify property lines before installation — survey if unsure", "Check local codes for height restrictions and setbacks", "Post depth matters more than post thickness for longevity"] },
+  "Drywall": { low: 1500, high: 2800, materials: 0.30, labor: 0.55, timelineWeeks: [1, 3], nationalAvgMultiplier: 1.0, tips: ["Level 5 finish is only needed for high-gloss paint or direct lighting", "Moisture-resistant board is required in bathrooms and kitchens", "Taping and mudding quality determines the final look more than anything"] },
 };
 
 interface EstimateResult {
@@ -57,11 +66,18 @@ interface EstimateResult {
   category: string;
   zip: string;
   size: string;
+  sizeValue: string;
   regionLabel: string;
+  regionMultiplier: number;
+  nationalLow: number;
+  nationalHigh: number;
+  timelineMin: number;
+  timelineMax: number;
+  tips: string[];
 }
 
 function generateEstimate(category: string, zip: string, size: string): EstimateResult {
-  const base = BASE_ESTIMATES[category] ?? { low: 2500, high: 5000, materials: 0.35, labor: 0.50 };
+  const base = BASE_ESTIMATES[category] ?? BASE_ESTIMATES["General Contracting"];
   const sizeConfig = PROJECT_SIZES.find((s) => s.value === size);
   const multiplier = sizeConfig?.multiplier ?? 1;
 
@@ -77,10 +93,18 @@ function generateEstimate(category: string, zip: string, size: string): Estimate
 
   const low = Math.round(base.low * multiplier * regionMultiplier / 100) * 100;
   const high = Math.round(base.high * multiplier * regionMultiplier / 100) * 100;
+  const nationalLow = Math.round(base.low * multiplier / 100) * 100;
+  const nationalHigh = Math.round(base.high * multiplier / 100) * 100;
   const midpoint = (low + high) / 2;
   const materials = Math.round(midpoint * base.materials);
   const labor = Math.round(midpoint * base.labor);
   const overhead = Math.round(midpoint * (1 - base.materials - base.labor));
+
+  // Timeline interpolation based on size
+  const sizeIndex = size === "small" ? 0 : size === "medium" ? 0.33 : size === "large" ? 0.66 : 1;
+  const timelineRange = base.timelineWeeks[1] - base.timelineWeeks[0];
+  const timelineMin = Math.max(1, Math.round(base.timelineWeeks[0] + timelineRange * sizeIndex * 0.8));
+  const timelineMax = Math.max(timelineMin + 1, Math.round(base.timelineWeeks[0] + timelineRange * sizeIndex * 1.2));
 
   return {
     low, high, materials, labor, overhead,
@@ -90,7 +114,14 @@ function generateEstimate(category: string, zip: string, size: string): Estimate
     confidence: multiplier <= 2.5 ? "high" : multiplier <= 6 ? "medium" : "low",
     category, zip,
     size: sizeConfig?.label ?? size,
+    sizeValue: size,
     regionLabel,
+    regionMultiplier,
+    nationalLow,
+    nationalHigh,
+    timelineMin,
+    timelineMax,
+    tips: base.tips,
   };
 }
 
@@ -124,6 +155,8 @@ export default function FairPricePage() {
     setSize("");
   }
 
+  const regionDiffPct = result ? Math.round((result.regionMultiplier - 1) * 100) : 0;
+
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
       <Navbar />
@@ -146,15 +179,16 @@ export default function FairPricePage() {
                   What should your project cost?
                 </h1>
                 <p className="mt-4 text-lg text-gray-500 leading-relaxed">
-                  Get an instant AI-powered estimate. Localized to your area,
-                  calibrated to your scope. Free, no signup required.
+                  Get an instant AI-powered estimate with timeline, cost breakdown,
+                  and market comparison. Free, no signup required.
                 </p>
 
                 <div className="mt-8 space-y-3">
                   {[
                     "Trained on thousands of real construction estimates",
                     "Adjusted for regional labor and material costs",
-                    "Compare bids against your FairPrice baseline",
+                    "Timeline estimates based on project scope",
+                    "Trade-specific tips from industry experience",
                   ].map((item) => (
                     <div key={item} className="flex items-start gap-3">
                       <Check className="w-4 h-4 mt-0.5 text-brand-600 shrink-0" strokeWidth={2.5} />
@@ -243,8 +277,8 @@ export default function FairPricePage() {
                   </form>
                 ) : (
                   <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden animate-fade-in">
-                    {/* Result header */}
                     <div className="px-6 sm:px-8 pt-6 sm:pt-8 pb-0">
+                      {/* Header */}
                       <div className="flex items-center justify-between mb-1">
                         <p className="text-sm font-semibold text-gray-900">{result.category}</p>
                         <Badge
@@ -264,14 +298,22 @@ export default function FairPricePage() {
                         {result.zip} &middot; {result.size}
                       </p>
 
-                      {/* Price */}
-                      <div className="flex items-baseline gap-2 mb-6">
+                      {/* Price range */}
+                      <div className="flex items-baseline gap-2 mb-2">
                         <span className="text-4xl sm:text-5xl font-bold text-gray-900 tabular-nums">
                           {formatUSD(result.low)}
                         </span>
                         <span className="text-xl text-gray-300">&ndash;</span>
                         <span className="text-4xl sm:text-5xl font-bold text-gray-900 tabular-nums">
                           {formatUSD(result.high)}
+                        </span>
+                      </div>
+
+                      {/* Timeline */}
+                      <div className="flex items-center gap-2 mb-6">
+                        <Clock className="w-3.5 h-3.5 text-gray-400" />
+                        <span className="text-sm text-gray-500">
+                          Estimated {result.timelineMin}–{result.timelineMax} weeks
                         </span>
                       </div>
 
@@ -283,7 +325,7 @@ export default function FairPricePage() {
                       </div>
 
                       {/* Breakdown numbers */}
-                      <div className="grid grid-cols-3 gap-4 mb-5">
+                      <div className="grid grid-cols-3 gap-4 mb-6">
                         {[
                           { color: "bg-brand-600", label: "Materials", value: result.materials, pct: result.materialsPct },
                           { color: "bg-brand-400", label: "Labor", value: result.labor, pct: result.laborPct },
@@ -299,11 +341,73 @@ export default function FairPricePage() {
                         ))}
                       </div>
 
-                      {/* Region note */}
+                      {/* Market comparison */}
+                      <div className="rounded-xl border border-border p-4 mb-6">
+                        <p className="text-xs font-semibold text-gray-900 uppercase tracking-wider mb-3">
+                          Market Comparison
+                        </p>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-[11px] text-gray-400 uppercase tracking-wider mb-1">Your area</p>
+                            <p className="text-base font-bold text-gray-900 tabular-nums">
+                              {formatUSD(result.low)} – {formatUSD(result.high)}
+                            </p>
+                            <div className="flex items-center gap-1 mt-1">
+                              {regionDiffPct !== 0 && (
+                                <>
+                                  {regionDiffPct > 0 ? (
+                                    <ArrowUpRight className="w-3 h-3 text-red-500" />
+                                  ) : (
+                                    <ArrowDownRight className="w-3 h-3 text-green-600" />
+                                  )}
+                                  <span className={cn(
+                                    "text-xs font-semibold",
+                                    regionDiffPct > 0 ? "text-red-500" : "text-green-600"
+                                  )}>
+                                    {Math.abs(regionDiffPct)}% {regionDiffPct > 0 ? "above" : "below"} national
+                                  </span>
+                                </>
+                              )}
+                              {regionDiffPct === 0 && (
+                                <span className="text-xs text-gray-400">At national average</span>
+                              )}
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-[11px] text-gray-400 uppercase tracking-wider mb-1">National avg</p>
+                            <p className="text-base font-bold text-gray-900 tabular-nums">
+                              {formatUSD(result.nationalLow)} – {formatUSD(result.nationalHigh)}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-1">{result.regionLabel}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Tips */}
+                      <div className="rounded-xl bg-amber-50/60 border border-amber-100 p-4 mb-6">
+                        <div className="flex items-center gap-2 mb-2.5">
+                          <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                          <p className="text-xs font-semibold text-amber-800 uppercase tracking-wider">
+                            What to know — {result.category}
+                          </p>
+                        </div>
+                        <ul className="space-y-2">
+                          {result.tips.map((tip) => (
+                            <li key={tip} className="flex items-start gap-2 text-xs text-amber-800/80">
+                              <span className="w-1 h-1 rounded-full bg-amber-400 mt-1.5 shrink-0" />
+                              {tip}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Disclaimer */}
                       <div className="flex items-start gap-2 p-2.5 bg-gray-50 rounded-lg mb-6">
                         <Info className="w-3.5 h-3.5 text-gray-400 mt-0.5 shrink-0" />
                         <p className="text-xs text-gray-500">
-                          {result.regionLabel}. Actual costs depend on scope, materials, and contractor.
+                          Estimates reflect typical costs for your region and scope.
+                          Actual prices depend on site conditions, material choices,
+                          and contractor availability.
                         </p>
                       </div>
                     </div>
@@ -403,10 +507,10 @@ export default function FairPricePage() {
         </section>
 
         {/* Bottom CTA */}
-        <section className="bg-dark py-16">
+        <section className="bg-white border-t border-border py-16">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-2xl font-bold text-white mb-4">Ready for Real Bids?</h2>
-            <p className="text-gray-400 mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Ready for Real Bids?</h2>
+            <p className="text-gray-500 mb-8">
               FairPrice gives you the baseline. FairTradeWorker gives you
               verified contractors competing for your business.
             </p>
@@ -414,8 +518,8 @@ export default function FairPricePage() {
               <Button size="lg" asChild>
                 <Link href="/signup">Post a Project Free</Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-gray-600 bg-transparent text-white hover:bg-white/10 hover:text-white hover:border-gray-500" asChild>
-                <Link href="/pricing">View Contractor Plans</Link>
+              <Button size="lg" variant="outline" asChild>
+                <Link href="/pricing">View Pricing</Link>
               </Button>
             </div>
           </div>
