@@ -86,7 +86,7 @@ export function Sidebar({ items, currentPath, userRole, topAction }: SidebarProp
       <div className="border-t border-border flex-shrink-0">
         <button
           onClick={() => setCollapsed((c) => !c)}
-          className="absolute top-1/2 -translate-y-1/2 -right-3 w-6 h-12 bg-white border border-gray-200 rounded-r-lg flex items-center justify-center hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm z-20"
+          className="absolute bottom-16 -right-3 w-6 h-12 bg-white border border-gray-200 rounded-r-lg flex items-center justify-center hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm z-20"
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {collapsed ? (
