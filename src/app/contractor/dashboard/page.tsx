@@ -227,10 +227,10 @@ export default function ContractorDashboardPage() {
                 const accent = TYPE_ACCENT[entry.type] || TYPE_ACCENT.work;
                 return (
                   <Link key={entry.time} href="/contractor/projects" className="group flex items-center gap-4 hover:opacity-80 transition-opacity py-3 border-b border-gray-100 last:border-0">
-                    <span className="text-[15px] font-bold text-gray-900 tabular-nums w-[75px] flex-shrink-0">{entry.time}</span>
+                    <span className="text-base font-bold text-gray-900 tabular-nums w-[80px] flex-shrink-0">{entry.time}</span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[14px] font-semibold text-gray-900 group-hover:text-brand-700 transition-colors truncate">{entry.label}</p>
-                      <p className="text-[12px] text-gray-400">{entry.client}</p>
+                      <p className="text-[15px] font-semibold text-gray-900 group-hover:text-brand-700 transition-colors truncate">{entry.label}</p>
+                      <p className="text-[13px] text-gray-400">{entry.client}</p>
                     </div>
                     <span className={cn("text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full flex-shrink-0", accent.bg, accent.text)}>
                       {TYPE_LABEL[entry.type]}
@@ -249,8 +249,8 @@ export default function ContractorDashboardPage() {
                   {pendingEstimates.map((est) => (
                     <Link key={est.id} href="/contractor/estimates?tab=my-estimates" className="group flex items-center justify-between hover:opacity-80 transition-opacity">
                       <div className="min-w-0 flex-1">
-                        <p className="text-[15px] font-bold text-gray-900 group-hover:text-brand-700 transition-colors truncate">{est.clientName}</p>
-                        <p className="text-[15px] text-gray-700 tabular-nums mt-0.5">{formatCurrency(est.amount)}</p>
+                        <p className="text-base font-bold text-gray-900 group-hover:text-brand-700 transition-colors truncate">{est.clientName}</p>
+                        <p className="text-base text-gray-700 tabular-nums mt-0.5">{formatCurrency(est.amount)}</p>
                       </div>
                       <Badge variant={est.status === "viewed" ? "warning" : "info"} className="text-[12px] min-w-[44px] justify-center flex-shrink-0 ml-3">
                         {est.status === "viewed" ? "Viewed" : "Sent"}
@@ -271,40 +271,40 @@ export default function ContractorDashboardPage() {
               {/* Revenue + Rating */}
               <div className="flex items-start justify-between mb-4 pb-4 border-b border-gray-100">
                 <div>
-                  <p className="text-[12px] text-gray-400">Revenue</p>
+                  <p className="text-[13px] text-gray-400">Revenue</p>
                   <div className="flex items-baseline gap-1.5 mt-0.5">
-                    <p className="text-[26px] font-bold text-gray-900 tabular-nums leading-none">{formatCurrency(monthlyRevenue)}</p>
-                    <span className="text-[12px] font-semibold text-emerald-600">+{revenueChange}%</span>
+                    <p className="text-[30px] font-bold text-gray-900 tabular-nums leading-none">{formatCurrency(monthlyRevenue)}</p>
+                    <span className="text-[13px] font-semibold text-emerald-600">+{revenueChange}%</span>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-[12px] text-gray-400">Rating</p>
-                  <p className="text-[26px] font-bold text-gray-900 tabular-nums leading-none mt-0.5">{avgRating}</p>
-                  <p className="text-[11px] text-gray-400">{reviews.length} reviews</p>
+                  <p className="text-[13px] text-gray-400">Rating</p>
+                  <p className="text-[30px] font-bold text-gray-900 tabular-nums leading-none mt-0.5">{avgRating}</p>
+                  <p className="text-[12px] text-gray-400">{reviews.length} reviews</p>
                 </div>
               </div>
 
               {/* Stats row */}
               <div className="flex items-center gap-6 mb-4 pb-4 border-b border-gray-100">
                 <div>
-                  <p className="text-[12px] text-gray-400">Win Rate</p>
-                  <p className="text-[18px] font-bold text-gray-900 tabular-nums">{winRate}%</p>
+                  <p className="text-[13px] text-gray-400">Win Rate</p>
+                  <p className="text-xl font-bold text-gray-900 tabular-nums">{winRate}%</p>
                 </div>
                 <div>
-                  <p className="text-[12px] text-gray-400">Pending</p>
-                  <p className="text-[18px] font-bold text-gray-900 tabular-nums">{formatCurrency(totalPipeline)}</p>
+                  <p className="text-[13px] text-gray-400">Pending</p>
+                  <p className="text-xl font-bold text-gray-900 tabular-nums">{formatCurrency(totalPipeline)}</p>
                 </div>
                 <div>
-                  <p className="text-[12px] text-gray-400">Response</p>
-                  <p className="text-[18px] font-bold text-gray-900 tabular-nums">{responseTime}</p>
+                  <p className="text-[13px] text-gray-400">Response</p>
+                  <p className="text-xl font-bold text-gray-900 tabular-nums">{responseTime}</p>
                 </div>
               </div>
 
               {/* Recent wins */}
               {acceptedEstimates.slice(0, 2).map((est) => (
                 <Link key={est.id} href="/contractor/estimates?tab=my-estimates" className="group flex items-center justify-between hover:opacity-80 transition-opacity py-2 border-b border-gray-100 last:border-0">
-                  <p className="text-[14px] font-semibold text-gray-900 group-hover:text-brand-700 transition-colors truncate">{est.clientName}</p>
-                  <span className="text-[14px] font-bold text-emerald-600 tabular-nums flex-shrink-0 ml-3">{formatCurrency(est.amount)}</span>
+                  <p className="text-[15px] font-semibold text-gray-900 group-hover:text-brand-700 transition-colors truncate">{est.clientName}</p>
+                  <span className="text-[15px] font-bold text-emerald-600 tabular-nums flex-shrink-0 ml-3">{formatCurrency(est.amount)}</span>
                 </Link>
               ))}
             </div>

@@ -23,10 +23,10 @@ const config: Config = {
           950: "#410812",
         },
         dark: "#0F1419",
-        surface: "#F9F6F1",
+        surface: "#F8F8F8",
         border: "#E5E1DB",
         gray: {
-          50: "#FDFBF8",
+          50: "#FAFAFA",
           100: "#F3F1ED",
           200: "#E5E1DB",
           300: "#D1CCC4",

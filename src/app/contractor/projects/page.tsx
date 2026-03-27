@@ -1785,7 +1785,6 @@ function JobCostingTab({ projectId, project }: { projectId: string; project: typ
 
 const PROJECT_NAV = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
-  { id: "calendar", label: "Calendar", icon: CalendarDays },
   { id: "daily-log", label: "Daily Log", icon: FileText },
   { id: "schedule", label: "Schedule", icon: Calendar },
   { id: "job-costing", label: "Job Costing", icon: TrendingUp },

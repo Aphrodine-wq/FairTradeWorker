@@ -6,7 +6,7 @@
   --brand-primary: #C41E3A;
   --brand-hover: #A5182F;
   --dark: #0F1419;
-  --bg-soft: #FDFBF8;
+  --bg-soft: #FAFAFA;
   --bg-card: #FFFFFF;
   --text-primary: #050608;
   --text-secondary: #0C0E14;
@@ -27,7 +27,7 @@
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
     color: var(--text-primary);
-    background-color: #FDFBF8;
+    background-color: #FAFAFA;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
