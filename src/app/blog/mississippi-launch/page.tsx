@@ -14,7 +14,7 @@ export default function MississippiLaunchPage() {
   return (
     <>
       <Navbar />
-      <main className="bg-[#FDFBF8] min-h-screen">
+      <main className="bg-[#FAFAFA] min-h-screen">
         <article className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
           <Link
             href="/blog"

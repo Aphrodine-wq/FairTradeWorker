@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@shared/ui/button";
 import { Card, CardContent } from "@shared/ui/card";
+import { BrandMark } from "@shared/components/brand-mark";
 import { Input } from "@shared/ui/input";
 
 export default function ForgotPasswordPage() {
@@ -32,14 +33,13 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF8] flex flex-col items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-[#FAFAFA] flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-[420px]">
         {/* Brand */}
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-block">
-            <span className="text-2xl font-extrabold tracking-tight text-gray-900">
-              Fair<span className="text-brand-600">Trade</span>Worker
-            </span>
+        <div className="flex justify-center mb-8">
+          <Link href="/" className="inline-flex items-center gap-2.5">
+            <BrandMark className="w-9 h-9" />
+            <span className="text-2xl font-bold text-gray-900">FairTradeWorker</span>
           </Link>
         </div>
 

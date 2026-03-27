@@ -7,7 +7,7 @@ export const BRAND = {
     primary: "#C41E3A",
     primaryHover: "#A5182F",
     dark: "#0F1419",
-    bgSoft: "#FDFBF8",
+    bgSoft: "#FAFAFA",
     bgCard: "#FFFFFF",
     textPrimary: "#111318",
     textSecondary: "#4B5563",

@@ -37,7 +37,7 @@ export function MobileNav() {
 
       {/* Slide-in panel */}
       <div
-        className={`fixed top-0 right-0 z-50 h-full w-72 bg-[#FDFBF8]/95 backdrop-blur-sm border-l border-border shadow-lg transform transition-transform duration-200 ease-in-out ${
+        className={`fixed top-0 right-0 z-50 h-full w-72 bg-[#FAFAFA]/95 backdrop-blur-sm border-l border-border shadow-lg transform transition-transform duration-200 ease-in-out ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >

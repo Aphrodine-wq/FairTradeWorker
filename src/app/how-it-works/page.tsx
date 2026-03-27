@@ -10,7 +10,7 @@ import { Footer } from "@marketplace/components/footer";
 
 export default function HowItWorksPage() {
   return (
-    <div className="min-h-screen bg-[#FDFBF8]">
+    <div className="min-h-screen bg-[#FAFAFA]">
       <Navbar />
       <main className="pt-16">
         <HowItWorks />

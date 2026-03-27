@@ -125,7 +125,7 @@ export default function FairPricePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FDFBF8]">
+    <div className="min-h-screen bg-[#FAFAFA]">
       <Navbar />
 
       <main className="pt-24 pb-0">

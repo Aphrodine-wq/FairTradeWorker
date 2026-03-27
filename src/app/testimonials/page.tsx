@@ -11,7 +11,7 @@ import { Footer } from "@marketplace/components/footer";
 
 export default function TestimonialsPage() {
   return (
-    <div className="min-h-screen bg-[#FDFBF8]">
+    <div className="min-h-screen bg-[#FAFAFA]">
       <Navbar />
       <main className="pt-16">
         <Testimonials />

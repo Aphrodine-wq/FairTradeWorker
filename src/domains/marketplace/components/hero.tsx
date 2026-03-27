@@ -34,7 +34,7 @@ function HammerIcon({ className }: { className?: string }) {
 
 export function Hero() {
   return (
-    <section className="bg-[#FDFBF8] pt-28 pb-12 lg:pt-40 lg:pb-20 relative overflow-hidden">
+    <section className="bg-[#FAFAFA] pt-28 pb-12 lg:pt-40 lg:pb-20 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row lg:items-center lg:gap-16">
 

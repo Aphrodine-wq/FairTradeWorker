@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 import { cn, getInitials } from "@shared/lib/utils";
+import { BrandMark } from "@shared/components/brand-mark";
 
 interface NavItem {
   label: string;
@@ -40,16 +41,12 @@ export function Sidebar({ items, currentPath, userRole, topAction }: SidebarProp
       <div className="flex h-16 items-center justify-center px-4 border-b border-border flex-shrink-0">
         {!collapsed ? (
           <Link href="/" className="flex items-center gap-2 min-w-0">
-            <div className="w-7 h-7 rounded-md bg-brand-600 flex items-center justify-center flex-shrink-0">
-              <span className="text-white text-xs font-bold">FTW</span>
-            </div>
+            <BrandMark className="w-7 h-7 flex-shrink-0" />
             <span className="text-sm font-bold text-gray-900 truncate">FairTradeWorker</span>
           </Link>
         ) : (
           <Link href="/">
-            <div className="w-7 h-7 rounded-md bg-brand-600 flex items-center justify-center">
-              <span className="text-white text-xs font-bold">FTW</span>
-            </div>
+            <BrandMark className="w-7 h-7" />
           </Link>
         )}
       </div>

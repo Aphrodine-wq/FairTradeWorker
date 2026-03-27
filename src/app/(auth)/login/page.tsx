@@ -11,6 +11,7 @@ import { Input } from "@shared/ui/input";
 import { cn } from "@shared/lib/utils";
 import { authStore } from "@shared/lib/auth-store";
 import { track, identify } from "@shared/lib/analytics";
+import { BrandMark } from "@shared/components/brand-mark";
 
 export default function LoginPage() {
   return (
@@ -48,14 +49,13 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF8] flex">
+    <div className="min-h-screen bg-[#FAFAFA] flex">
       {/* Left panel — value prop */}
       <div className="hidden lg:flex lg:w-[45%] bg-dark flex-col justify-between p-12">
         <div>
-          <Link href="/" className="inline-block">
-            <span className="text-xl font-extrabold tracking-tight text-white">
-              Fair<span className="text-brand-500">Trade</span>Worker
-            </span>
+          <Link href="/" className="inline-flex items-center gap-2.5">
+            <BrandMark className="w-8 h-8" />
+            <span className="text-xl font-bold text-white">FairTradeWorker</span>
           </Link>
         </div>
 
@@ -115,11 +115,10 @@ function LoginContent() {
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
         <div className="w-full max-w-[420px]">
           {/* Mobile brand */}
-          <div className="text-center mb-8 lg:hidden">
-            <Link href="/" className="inline-block">
-              <span className="text-2xl font-extrabold tracking-tight text-gray-900">
-                Fair<span className="text-brand-600">Trade</span>Worker
-              </span>
+          <div className="flex justify-center mb-8 lg:hidden">
+            <Link href="/" className="inline-flex items-center gap-2.5">
+              <BrandMark className="w-9 h-9" />
+              <span className="text-2xl font-bold text-gray-900">FairTradeWorker</span>
             </Link>
           </div>
 

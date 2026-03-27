@@ -18,7 +18,7 @@ import { Button } from "@shared/ui/button";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-[#FDFBF8]">
+    <div className="min-h-screen bg-[#FAFAFA]">
       <Navbar />
       <main>
         <Hero />

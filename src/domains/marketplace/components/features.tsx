@@ -15,7 +15,7 @@ const features = [
       "Edit any line item before sending",
     ],
     callout: { value: "3 min", label: "average estimate time" },
-    bg: "bg-[#FDFBF8]",
+    bg: "bg-[#FAFAFA]",
   },
   {
     icon: DollarSign,
@@ -45,7 +45,7 @@ const features = [
       "Full payment history and receipts",
     ],
     callout: null,
-    bg: "bg-[#FDFBF8]",
+    bg: "bg-[#FAFAFA]",
   },
   {
     icon: BarChart3,
@@ -75,7 +75,7 @@ const features = [
       "Role-based access for field and office",
     ],
     callout: null,
-    bg: "bg-[#FDFBF8]",
+    bg: "bg-[#FAFAFA]",
   },
   {
     icon: FileText,

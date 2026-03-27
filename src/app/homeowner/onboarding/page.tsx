@@ -53,7 +53,7 @@ export default function HomeownerOnboarding() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF8] flex flex-col items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-[#FAFAFA] flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-lg">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Tell Us About Your Property</h1>
