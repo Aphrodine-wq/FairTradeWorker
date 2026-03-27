@@ -58,6 +58,17 @@ import { fetchProjects } from "@shared/lib/data";
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
+type MilestoneStatus = "paid" | "approved" | "submitted" | "in_progress" | "pending";
+
+interface Milestone {
+  label: string;
+  done: boolean;
+  amount: number;
+  status: MilestoneStatus;
+  completedDate?: string;
+  note?: string;
+}
+
 const PROJECTS = [
   {
     id: "j1",
@@ -68,13 +79,13 @@ const PROJECTS = [
     estimatedEnd: "2026-04-25",
     progress: 52,
     milestones: [
-      { label: "Demo complete", done: true },
-      { label: "Rough-in (plumb/elec)", done: true },
-      { label: "Cabinet install", done: true },
-      { label: "Countertops", done: false },
-      { label: "Tile & flooring", done: false },
-      { label: "Final walkthrough", done: false },
-    ],
+      { label: "Demo complete", done: true, amount: 5000, status: "paid" as MilestoneStatus, completedDate: "2026-03-14" },
+      { label: "Rough-in (plumb/elec)", done: true, amount: 8500, status: "paid" as MilestoneStatus, completedDate: "2026-03-19" },
+      { label: "Cabinet install", done: true, amount: 7000, status: "approved" as MilestoneStatus, completedDate: "2026-03-24" },
+      { label: "Countertops", done: false, amount: 6500, status: "in_progress" as MilestoneStatus },
+      { label: "Tile & flooring", done: false, amount: 7500, status: "pending" as MilestoneStatus },
+      { label: "Final walkthrough", done: false, amount: 4000, status: "pending" as MilestoneStatus },
+    ] satisfies Milestone[],
     changeOrders: 2,
     hoursThisWeek: 34,
     punchListComplete: 5,
@@ -89,12 +100,12 @@ const PROJECTS = [
     estimatedEnd: "2026-04-05",
     progress: 35,
     milestones: [
-      { label: "Demo complete", done: true },
-      { label: "Plumbing rough-in", done: true },
-      { label: "Tile & waterproofing", done: false },
-      { label: "Vanity & fixtures", done: false },
-      { label: "Final walkthrough", done: false },
-    ],
+      { label: "Demo complete", done: true, amount: 2500, status: "paid" as MilestoneStatus, completedDate: "2026-03-17" },
+      { label: "Plumbing rough-in", done: true, amount: 3500, status: "approved" as MilestoneStatus, completedDate: "2026-03-21" },
+      { label: "Tile & waterproofing", done: false, amount: 4200, status: "in_progress" as MilestoneStatus },
+      { label: "Vanity & fixtures", done: false, amount: 3000, status: "pending" as MilestoneStatus },
+      { label: "Final walkthrough", done: false, amount: 2000, status: "pending" as MilestoneStatus },
+    ] satisfies Milestone[],
     changeOrders: 1,
     hoursThisWeek: 20,
     punchListComplete: 1,
@@ -109,12 +120,12 @@ const PROJECTS = [
     estimatedEnd: "2026-04-10",
     progress: 40,
     milestones: [
-      { label: "Footings & posts", done: true },
-      { label: "Framing", done: true },
-      { label: "Decking boards", done: false },
-      { label: "Railing & stairs", done: false },
-      { label: "Final walkthrough", done: false },
-    ],
+      { label: "Footings & posts", done: true, amount: 4500, status: "paid" as MilestoneStatus, completedDate: "2026-03-16" },
+      { label: "Framing", done: true, amount: 6000, status: "submitted" as MilestoneStatus, completedDate: "2026-03-22" },
+      { label: "Decking boards", done: false, amount: 5500, status: "in_progress" as MilestoneStatus },
+      { label: "Railing & stairs", done: false, amount: 4000, status: "pending" as MilestoneStatus },
+      { label: "Final walkthrough", done: false, amount: 2000, status: "pending" as MilestoneStatus },
+    ] satisfies Milestone[],
     changeOrders: 1,
     hoursThisWeek: 28,
     punchListComplete: 0,
@@ -129,12 +140,12 @@ const PROJECTS = [
     estimatedEnd: "2026-03-22",
     progress: 80,
     milestones: [
-      { label: "Tear-off complete", done: true },
-      { label: "OSB & underlayment", done: true },
-      { label: "Shingles", done: true },
-      { label: "Flashings & ridge", done: false },
-      { label: "Final inspection", done: false },
-    ],
+      { label: "Tear-off complete", done: true, amount: 3000, status: "paid" as MilestoneStatus, completedDate: "2026-03-16" },
+      { label: "OSB & underlayment", done: true, amount: 3500, status: "paid" as MilestoneStatus, completedDate: "2026-03-17" },
+      { label: "Shingles", done: true, amount: 4000, status: "approved" as MilestoneStatus, completedDate: "2026-03-19" },
+      { label: "Flashings & ridge", done: false, amount: 2000, status: "in_progress" as MilestoneStatus },
+      { label: "Final inspection", done: false, amount: 1000, status: "pending" as MilestoneStatus },
+    ] satisfies Milestone[],
     changeOrders: 1,
     hoursThisWeek: 16,
     punchListComplete: 2,
@@ -1784,28 +1795,44 @@ function JobCostingTab({ projectId, project }: { projectId: string; project: typ
 
 // ─── Milestones Tab ──────────────────────────────────────────────────────────
 
+const STATUS_CONFIG: Record<MilestoneStatus, { label: string; color: string; bg: string }> = {
+  paid:        { label: "Paid",        color: "text-green-700",  bg: "bg-green-50 border-green-200" },
+  approved:    { label: "Approved",    color: "text-blue-700",   bg: "bg-blue-50 border-blue-200" },
+  submitted:   { label: "Submitted",   color: "text-amber-700",  bg: "bg-amber-50 border-amber-200" },
+  in_progress: { label: "In Progress", color: "text-brand-700",  bg: "bg-brand-50 border-brand-200" },
+  pending:     { label: "Pending",     color: "text-gray-500",   bg: "bg-gray-50 border-gray-200" },
+};
+
 function MilestonesTab({
   project,
   onUpdate,
 }: {
   project: typeof PROJECTS[0];
-  onUpdate: (milestones: { label: string; done: boolean }[]) => void;
+  onUpdate: (milestones: Milestone[]) => void;
 }) {
-  const [newMilestone, setNewMilestone] = useState("");
-  const milestones = project.milestones;
-  const completed = milestones.filter((m) => m.done).length;
-  const total = milestones.length;
-  const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+  const [newLabel, setNewLabel] = useState("");
+  const [newAmount, setNewAmount] = useState("");
+  const [showAdd, setShowAdd] = useState(false);
+  const milestones = project.milestones as Milestone[];
 
-  function toggleMilestone(index: number) {
-    const updated = milestones.map((m, i) => i === index ? { ...m, done: !m.done } : m);
+  const totalAmount = milestones.reduce((s, m) => s + m.amount, 0);
+  const paidAmount = milestones.filter((m) => m.status === "paid").reduce((s, m) => s + m.amount, 0);
+  const approvedAmount = milestones.filter((m) => m.status === "approved").reduce((s, m) => s + m.amount, 0);
+  const releasedAmount = paidAmount + approvedAmount;
+  const pct = totalAmount > 0 ? Math.round((releasedAmount / totalAmount) * 100) : 0;
+
+  function submitMilestone(index: number) {
+    const updated = milestones.map((m, i) => i === index ? { ...m, done: true, status: "submitted" as MilestoneStatus, completedDate: new Date().toISOString().split("T")[0] } : m);
     onUpdate(updated);
   }
 
   function addMilestone() {
-    if (!newMilestone.trim()) return;
-    onUpdate([...milestones, { label: newMilestone.trim(), done: false }]);
-    setNewMilestone("");
+    if (!newLabel.trim()) return;
+    const amount = parseInt(newAmount) || 0;
+    onUpdate([...milestones, { label: newLabel.trim(), done: false, amount, status: "pending" as MilestoneStatus }]);
+    setNewLabel("");
+    setNewAmount("");
+    setShowAdd(false);
   }
 
   function removeMilestone(index: number) {
@@ -1813,78 +1840,175 @@ function MilestonesTab({
   }
 
   return (
-    <div className="p-6 max-w-2xl">
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-1">
-          <h3 className="text-lg font-bold text-gray-900">Milestones</h3>
-          <span className="text-sm text-gray-400">{completed}/{total}</span>
+    <div className="p-6">
+      {/* Finance summary */}
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="bg-white rounded-xl border border-border p-4">
+          <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Contract</p>
+          <p className="text-xl font-bold text-gray-900 tabular-nums mt-1">{formatCurrency(project.contractValue)}</p>
         </div>
-        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-          <div className="h-full bg-brand-600 rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
+        <div className="bg-white rounded-xl border border-border p-4">
+          <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Released</p>
+          <p className="text-xl font-bold text-emerald-600 tabular-nums mt-1">{formatCurrency(releasedAmount)}</p>
+        </div>
+        <div className="bg-white rounded-xl border border-border p-4">
+          <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Remaining</p>
+          <p className="text-xl font-bold text-gray-900 tabular-nums mt-1">{formatCurrency(totalAmount - releasedAmount)}</p>
         </div>
       </div>
 
-      {/* Checklist */}
-      <div className="space-y-1 mb-4">
-        {milestones.map((m, i) => (
-          <div
-            key={`${m.label}-${i}`}
-            className="group flex items-center gap-4 rounded-xl px-4 py-4 hover:bg-gray-50 transition-colors cursor-pointer"
-            onClick={() => toggleMilestone(i)}
-          >
-            {/* Checkbox */}
-            <div className={cn(
-              "w-6 h-6 rounded-md border-2 flex items-center justify-center shrink-0 transition-all",
-              m.done
-                ? "bg-brand-600 border-brand-600"
-                : "border-gray-300 group-hover:border-brand-400"
-            )}>
-              {m.done && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
-            </div>
+      {/* Progress */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[13px] font-medium text-gray-600">Escrow progress</span>
+          <span className="text-[13px] font-bold text-gray-900 tabular-nums">{pct}%</span>
+        </div>
+        <div className="h-2 bg-gray-100 rounded-full overflow-hidden flex">
+          {paidAmount > 0 && (
+            <div className="bg-emerald-500 transition-all duration-500" style={{ width: `${(paidAmount / totalAmount) * 100}%` }} />
+          )}
+          {approvedAmount > 0 && (
+            <div className="bg-blue-400 transition-all duration-500" style={{ width: `${(approvedAmount / totalAmount) * 100}%` }} />
+          )}
+        </div>
+        <div className="flex items-center gap-4 mt-2">
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span className="text-[11px] text-gray-400">Paid</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded-full bg-blue-400" />
+            <span className="text-[11px] text-gray-400">Approved</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded-full bg-gray-200" />
+            <span className="text-[11px] text-gray-400">Remaining</span>
+          </div>
+        </div>
+      </div>
 
-            {/* Label */}
-            <span className={cn(
-              "flex-1 text-[15px]",
-              m.done
-                ? "text-gray-400 line-through"
-                : "text-gray-900 font-medium"
-            )}>
-              {m.label}
-            </span>
-
-            {/* Delete */}
-            <button
-              onClick={(e) => { e.stopPropagation(); removeMilestone(i); }}
-              className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-red-50 text-gray-300 hover:text-red-500"
-              title="Remove"
+      {/* Milestone list */}
+      <div className="space-y-2 mb-4">
+        {milestones.map((m, i) => {
+          const cfg = STATUS_CONFIG[m.status];
+          const isActionable = m.status === "in_progress";
+          return (
+            <div
+              key={`${m.label}-${i}`}
+              className={cn(
+                "group rounded-xl border bg-white transition-all",
+                isActionable ? "border-brand-200 shadow-sm" : "border-border"
+              )}
             >
-              <X className="w-4 h-4" />
+              <div className="flex items-center gap-4 px-5 py-4">
+                {/* Status indicator */}
+                <div className={cn(
+                  "w-7 h-7 rounded-lg flex items-center justify-center shrink-0",
+                  m.status === "paid" || m.status === "approved" ? "bg-emerald-50" : m.status === "submitted" ? "bg-amber-50" : m.status === "in_progress" ? "bg-brand-50" : "bg-gray-50"
+                )}>
+                  {(m.status === "paid" || m.status === "approved") && <Check className="w-4 h-4 text-emerald-600" strokeWidth={2.5} />}
+                  {m.status === "submitted" && <Clock className="w-4 h-4 text-amber-600" />}
+                  {m.status === "in_progress" && <div className="w-2.5 h-2.5 rounded-full bg-brand-600 animate-pulse" />}
+                  {m.status === "pending" && <Circle className="w-4 h-4 text-gray-300" />}
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <p className={cn(
+                    "text-[15px] font-medium leading-tight",
+                    m.status === "paid" ? "text-gray-400" : "text-gray-900"
+                  )}>
+                    {m.label}
+                  </p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className={cn("text-[11px] font-semibold px-1.5 py-0.5 rounded border", cfg.bg, cfg.color)}>
+                      {cfg.label}
+                    </span>
+                    {m.completedDate && (
+                      <span className="text-[11px] text-gray-400">{m.completedDate}</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Amount */}
+                <div className="text-right shrink-0">
+                  <p className={cn(
+                    "text-[15px] font-bold tabular-nums",
+                    m.status === "paid" ? "text-emerald-600" : "text-gray-900"
+                  )}>
+                    {formatCurrency(m.amount)}
+                  </p>
+                </div>
+
+                {/* Actions */}
+                <div className="shrink-0 w-20 flex justify-end">
+                  {isActionable && (
+                    <button
+                      onClick={() => submitMilestone(i)}
+                      className="text-[12px] font-semibold text-white bg-brand-600 hover:bg-brand-700 px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      Submit
+                    </button>
+                  )}
+                  {m.status === "pending" && (
+                    <button
+                      onClick={() => removeMilestone(i)}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-red-50 text-gray-300 hover:text-red-500"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Add milestone */}
+      {!showAdd ? (
+        <button
+          onClick={() => setShowAdd(true)}
+          className="w-full flex items-center justify-center gap-2 rounded-xl border border-dashed border-gray-200 py-3 text-[13px] font-medium text-gray-400 hover:text-gray-600 hover:border-gray-300 transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          Add milestone
+        </button>
+      ) : (
+        <div className="rounded-xl border border-brand-200 bg-white p-4 space-y-3">
+          <input
+            type="text"
+            value={newLabel}
+            onChange={(e) => setNewLabel(e.target.value)}
+            placeholder="Milestone name"
+            className="w-full h-10 rounded-lg border border-border px-3 text-[14px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-1"
+            autoFocus
+          />
+          <input
+            type="text"
+            inputMode="numeric"
+            value={newAmount}
+            onChange={(e) => setNewAmount(e.target.value.replace(/\D/g, ""))}
+            placeholder="Amount ($)"
+            className="w-full h-10 rounded-lg border border-border px-3 text-[14px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-1"
+          />
+          <div className="flex gap-2">
+            <button
+              onClick={addMilestone}
+              disabled={!newLabel.trim()}
+              className="flex-1 h-9 rounded-lg bg-brand-600 text-white text-[13px] font-semibold hover:bg-brand-700 transition-colors disabled:opacity-40"
+            >
+              Add Milestone
+            </button>
+            <button
+              onClick={() => { setShowAdd(false); setNewLabel(""); setNewAmount(""); }}
+              className="h-9 px-4 rounded-lg border border-border text-[13px] font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+            >
+              Cancel
             </button>
           </div>
-        ))}
-      </div>
-
-      {/* Add */}
-      <div className="flex items-center gap-4 px-4 py-3">
-        <div className="w-6 h-6 rounded-md border-2 border-dashed border-gray-200 shrink-0" />
-        <input
-          type="text"
-          value={newMilestone}
-          onChange={(e) => setNewMilestone(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && addMilestone()}
-          placeholder="Add a milestone..."
-          className="flex-1 text-[15px] text-gray-900 placeholder:text-gray-300 bg-transparent focus:outline-none"
-        />
-        {newMilestone.trim() && (
-          <button
-            onClick={addMilestone}
-            className="text-[13px] font-semibold text-brand-600 hover:text-brand-700 transition-colors"
-          >
-            Add
-          </button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1919,8 +2043,8 @@ export default function ProjectsPage() {
   const renderSection = () => {
     switch (activeSection) {
       case "overview": return <OverviewTab project={project} />;
-      case "milestones": return <MilestonesTab project={project} onUpdate={(ms) => {
-        setProjects((prev) => prev.map((p) => p.id === selectedProjectId ? { ...p, milestones: ms, progress: ms.length > 0 ? Math.round(ms.filter((m) => m.done).length / ms.length * 100) : 0 } : p));
+      case "milestones": return <MilestonesTab project={project} onUpdate={(ms: Milestone[]) => {
+        setProjects((prev) => prev.map((p) => p.id === selectedProjectId ? { ...p, milestones: ms as typeof p.milestones, progress: ms.length > 0 ? Math.round(ms.filter((m) => m.done).length / ms.length * 100) : 0 } : p));
       }} />;
       case "daily-log": return <DailyLogTab projectId={selectedProjectId} />;
       case "schedule": return <ScheduleTab />;
