@@ -1839,35 +1839,22 @@ export default function ProjectsPage() {
       {/* Sidebar + Content */}
       <div className="flex flex-1 min-h-0">
         {/* Project list sidebar */}
-        <div className="w-60 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-y-auto">
-          <div className="py-4 px-3 space-y-1.5">
+        <div className="w-56 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-y-auto">
+          <div className="py-3 px-3 space-y-0.5">
             {projects.map((p) => {
               const isSelected = p.id === selectedProjectId;
-              const daysLeft = Math.ceil((new Date(p.estimatedEnd).getTime() - new Date("2026-03-20").getTime()) / 86400000);
-              const completedMilestones = p.milestones.filter((m) => m.done).length;
               return (
                 <button
                   key={p.id}
                   onClick={() => setSelectedProjectId(p.id)}
                   className={cn(
-                    "w-full text-left rounded-xl px-4 py-3.5 transition-colors",
-                    isSelected ? "bg-gray-900 text-white" : "hover:bg-gray-50"
+                    "w-full text-left rounded-lg px-3 py-2.5 transition-colors text-[13px] font-medium truncate",
+                    isSelected
+                      ? "bg-gray-900 text-white"
+                      : "text-gray-700 hover:bg-gray-50"
                   )}
                 >
-                  <p className={cn("text-[14px] font-bold truncate", isSelected ? "text-white" : "text-gray-900")}>{p.name}</p>
-                  <p className={cn("text-[12px] mt-0.5", isSelected ? "text-gray-400" : "text-gray-400")}>{p.client} — {formatCurrency(p.contractValue)}</p>
-                  <div className="flex items-center justify-between mt-2">
-                    <div className="flex-1 mr-3">
-                      <div className={cn("w-full h-1.5 rounded-full overflow-hidden", isSelected ? "bg-white/20" : "bg-gray-200")}>
-                        <div className={cn("h-full rounded-full", isSelected ? "bg-white" : "bg-brand-600")} style={{ width: `${p.progress}%` }} />
-                      </div>
-                    </div>
-                    <p className={cn("text-[13px] font-bold tabular-nums", isSelected ? "text-white" : "text-gray-900")}>{p.progress}%</p>
-                  </div>
-                  <div className={cn("flex items-center gap-3 mt-2 text-[11px]", isSelected ? "text-gray-400" : "text-gray-400")}>
-                    <span>{completedMilestones}/{p.milestones.length} milestones</span>
-                    <span>{daysLeft > 0 ? `${daysLeft}d left` : "Overdue"}</span>
-                  </div>
+                  {p.name}
                 </button>
               );
             })}
