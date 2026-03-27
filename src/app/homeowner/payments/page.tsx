@@ -3,466 +3,404 @@
 import { useState, useMemo } from "react";
 import {
   DollarSign,
-  Receipt,
+  Shield,
+  Lock,
+  ArrowUpRight,
+  ArrowDownRight,
+  ChevronDown,
+  Check,
+  Clock,
+  CreditCard,
+  Building2,
+  FileText,
   Download,
   Search,
-  ChevronDown,
-  ChevronUp,
-  CheckCircle2,
-  Clock,
-  Calendar,
-  FileText,
+  Filter,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { Badge } from "@shared/ui/badge";
 import { Button } from "@shared/ui/button";
-import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
+import { Input } from "@shared/ui/input";
+import { formatCurrency, cn } from "@shared/lib/utils";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-interface ReceiptLineItem {
-  description: string;
-  quantity: number;
-  unitPrice: number;
+type TransactionType = "escrow_funded" | "milestone_released" | "service_fee" | "refund";
+type TransactionStatus = "completed" | "pending" | "processing";
+
+interface Transaction {
+  id: string;
+  type: TransactionType;
+  status: TransactionStatus;
   amount: number;
+  description: string;
+  project: string;
+  contractor: string;
+  milestone?: string;
+  date: string;
+  reference: string;
 }
 
-interface PaymentRecord {
-  id: string;
-  receiptNumber: string;
-  bidId: string;
-  jobTitle: string;
-  contractorName: string;
-  grossAmount: number;
-  serviceFee: number;
-  totalCharged: number;
-  lineItems: ReceiptLineItem[];
-  status: "paid" | "pending";
-  paidAt: string | null;
-  createdAt: string;
+interface EscrowAccount {
+  projectId: string;
+  projectName: string;
+  contractor: string;
+  contractValue: number;
+  funded: number;
+  released: number;
+  held: number;
+  milestonesTotal: number;
+  milestonesPaid: number;
 }
 
 // ─── Mock Data ───────────────────────────────────────────────────────────────
 
-const MOCK_PAYMENTS: PaymentRecord[] = [
+const ESCROW_ACCOUNTS: EscrowAccount[] = [
   {
-    id: "rcpt-1",
-    receiptNumber: "FTW-260312-A7K2",
-    bidId: "bid-1",
-    jobTitle: "Kitchen Remodel - Full Gut",
-    contractorName: "Johnson & Sons Construction",
-    grossAmount: 38500,
-    serviceFee: 1155,
-    totalCharged: 39655,
-    lineItems: [
-      { description: "Demo & Disposal", quantity: 1, unitPrice: 3200, amount: 3200 },
-      { description: "Framing & Rough-in", quantity: 1, unitPrice: 8500, amount: 8500 },
-      { description: "Cabinet Install", quantity: 1, unitPrice: 12000, amount: 12000 },
-      { description: "Countertops & Tile", quantity: 1, unitPrice: 7770, amount: 7770 },
-      { description: "Plumbing & Electrical Finish", quantity: 1, unitPrice: 5250, amount: 5250 },
-      { description: "Permits & Fees", quantity: 1, unitPrice: 1780, amount: 1780 },
-    ],
-    status: "paid",
-    paidAt: "2026-03-12T14:30:00Z",
-    createdAt: "2026-03-12T14:30:00Z",
+    projectId: "j1",
+    projectName: "Kitchen Remodel - Full Gut",
+    contractor: "Johnson & Sons Construction",
+    contractValue: 38500,
+    funded: 38500,
+    released: 13500,
+    held: 25000,
+    milestonesTotal: 6,
+    milestonesPaid: 2,
   },
   {
-    id: "rcpt-2",
-    receiptNumber: "FTW-260318-B3M9",
-    bidId: "bid-2",
-    jobTitle: "Bathroom Renovation",
-    contractorName: "Johnson & Sons Construction",
-    grossAmount: 15200,
-    serviceFee: 456,
-    totalCharged: 15656,
-    lineItems: [
-      { description: "Demo", quantity: 1, unitPrice: 1500, amount: 1500 },
-      { description: "Plumbing Rough-in", quantity: 1, unitPrice: 2800, amount: 2800 },
-      { description: "Tile (Floor & Shower)", quantity: 1, unitPrice: 4200, amount: 4200 },
-      { description: "Vanity & Fixtures", quantity: 1, unitPrice: 3500, amount: 3500 },
-      { description: "Permits", quantity: 1, unitPrice: 1200, amount: 1200 },
-      { description: "Final Labor", quantity: 25, unitPrice: 80, amount: 2000 },
-    ],
-    status: "paid",
-    paidAt: "2026-03-18T10:15:00Z",
-    createdAt: "2026-03-18T10:15:00Z",
+    projectId: "j2",
+    projectName: "Bathroom Reno",
+    contractor: "Johnson & Sons Construction",
+    contractValue: 15200,
+    funded: 15200,
+    released: 2500,
+    held: 12700,
+    milestonesTotal: 5,
+    milestonesPaid: 1,
   },
   {
-    id: "rcpt-3",
-    receiptNumber: "FTW-260322-C8P1",
-    bidId: "bid-4",
-    jobTitle: "Roof Replacement - 30 sq",
-    contractorName: "Apex Roofing Co",
-    grossAmount: 13500,
-    serviceFee: 405,
-    totalCharged: 13905,
-    lineItems: [
-      { description: "Tear-off & Disposal", quantity: 1, unitPrice: 2800, amount: 2800 },
-      { description: "Shingles (30 sq)", quantity: 30, unitPrice: 132, amount: 3960 },
-      { description: "Underlayment & Ice Shield", quantity: 1, unitPrice: 1155, amount: 1155 },
-      { description: "Flashing, Ridge, Drip Edge", quantity: 1, unitPrice: 940, amount: 940 },
-      { description: "Labor", quantity: 1, unitPrice: 4645, amount: 4645 },
-    ],
-    status: "pending",
-    paidAt: null,
-    createdAt: "2026-03-22T11:30:00Z",
-  },
-  {
-    id: "rcpt-4",
-    receiptNumber: "FTW-260310-D2N5",
-    bidId: "bid-5",
-    jobTitle: "HVAC System Install",
-    contractorName: "CoolAir Mechanical",
-    grossAmount: 8900,
-    serviceFee: 267,
-    totalCharged: 9167,
-    lineItems: [
-      { description: "Equipment (14 SEER2 Heat Pump)", quantity: 1, unitPrice: 4200, amount: 4200 },
-      { description: "Ductwork Modification", quantity: 1, unitPrice: 1800, amount: 1800 },
-      { description: "Labor - Install", quantity: 1, unitPrice: 2400, amount: 2400 },
-      { description: "Thermostat & Controls", quantity: 1, unitPrice: 500, amount: 500 },
-    ],
-    status: "paid",
-    paidAt: "2026-03-10T16:45:00Z",
-    createdAt: "2026-03-10T16:45:00Z",
+    projectId: "j4",
+    projectName: "Roof Replacement",
+    contractor: "Apex Roofing Co",
+    contractValue: 13500,
+    funded: 13500,
+    released: 6500,
+    held: 7000,
+    milestonesTotal: 5,
+    milestonesPaid: 2,
   },
 ];
+
+const TRANSACTIONS: Transaction[] = [
+  { id: "t1", type: "milestone_released", status: "completed", amount: 5000, description: "Demo complete", project: "Kitchen Remodel", contractor: "Johnson & Sons", milestone: "Milestone 1 of 6", date: "2026-03-14", reference: "FTW-TXN-260314-A1" },
+  { id: "t2", type: "service_fee", status: "completed", amount: 150, description: "Platform fee (3%)", project: "Kitchen Remodel", contractor: "Johnson & Sons", date: "2026-03-14", reference: "FTW-FEE-260314-A1" },
+  { id: "t3", type: "milestone_released", status: "completed", amount: 8500, description: "Rough-in (plumb/elec)", project: "Kitchen Remodel", contractor: "Johnson & Sons", milestone: "Milestone 2 of 6", date: "2026-03-19", reference: "FTW-TXN-260319-B2" },
+  { id: "t4", type: "service_fee", status: "completed", amount: 255, description: "Platform fee (3%)", project: "Kitchen Remodel", contractor: "Johnson & Sons", date: "2026-03-19", reference: "FTW-FEE-260319-B2" },
+  { id: "t5", type: "milestone_released", status: "processing", amount: 7000, description: "Cabinet install", project: "Kitchen Remodel", contractor: "Johnson & Sons", milestone: "Milestone 3 of 6", date: "2026-03-24", reference: "FTW-TXN-260324-C3" },
+  { id: "t6", type: "escrow_funded", status: "completed", amount: 38500, description: "Escrow funded — Kitchen Remodel", project: "Kitchen Remodel", contractor: "Johnson & Sons", date: "2026-03-08", reference: "FTW-ESC-260308-K1" },
+  { id: "t7", type: "milestone_released", status: "completed", amount: 2500, description: "Demo complete", project: "Bathroom Reno", contractor: "Johnson & Sons", milestone: "Milestone 1 of 5", date: "2026-03-17", reference: "FTW-TXN-260317-D4" },
+  { id: "t8", type: "escrow_funded", status: "completed", amount: 15200, description: "Escrow funded — Bathroom Reno", project: "Bathroom Reno", contractor: "Johnson & Sons", date: "2026-03-12", reference: "FTW-ESC-260312-B1" },
+  { id: "t9", type: "milestone_released", status: "completed", amount: 3000, description: "Tear-off complete", project: "Roof Replacement", contractor: "Apex Roofing", milestone: "Milestone 1 of 5", date: "2026-03-16", reference: "FTW-TXN-260316-E5" },
+  { id: "t10", type: "milestone_released", status: "completed", amount: 3500, description: "OSB & underlayment", project: "Roof Replacement", contractor: "Apex Roofing", milestone: "Milestone 2 of 5", date: "2026-03-17", reference: "FTW-TXN-260317-F6" },
+  { id: "t11", type: "escrow_funded", status: "completed", amount: 13500, description: "Escrow funded — Roof Replacement", project: "Roof Replacement", contractor: "Apex Roofing", date: "2026-03-14", reference: "FTW-ESC-260314-R1" },
+];
+
+const PAYMENT_METHOD = {
+  type: "Visa",
+  last4: "4242",
+  expiry: "08/28",
+  name: "Michael Brown",
+};
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+const TXN_CONFIG: Record<TransactionType, { label: string; icon: typeof DollarSign; color: string; sign: "+" | "-" }> = {
+  escrow_funded:      { label: "Escrow Funded",     icon: Lock,         color: "text-blue-600",    sign: "-" },
+  milestone_released: { label: "Milestone Released", icon: ArrowUpRight, color: "text-emerald-600", sign: "-" },
+  service_fee:        { label: "Service Fee",        icon: FileText,     color: "text-gray-500",    sign: "-" },
+  refund:             { label: "Refund",             icon: ArrowDownRight, color: "text-blue-600",  sign: "+" },
+};
+
+const STATUS_BADGE: Record<TransactionStatus, { label: string; className: string }> = {
+  completed:  { label: "Completed",  className: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+  pending:    { label: "Pending",    className: "bg-amber-50 text-amber-700 border-amber-200" },
+  processing: { label: "Processing", className: "bg-blue-50 text-blue-700 border-blue-200" },
+};
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function HomeownerPaymentsPage() {
-  const [payments] = useState<PaymentRecord[]>(MOCK_PAYMENTS);
+  const [transactions] = useState<Transaction[]>(TRANSACTIONS);
   const [search, setSearch] = useState("");
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"all" | TransactionType>("all");
+  const [expandedTxn, setExpandedTxn] = useState<string | null>(null);
+  const [showBalances, setShowBalances] = useState(true);
 
-  const totalSpent = useMemo(
-    () =>
-      payments
-        .filter((p) => p.status === "paid")
-        .reduce((sum, p) => sum + p.totalCharged, 0),
-    [payments]
-  );
+  const totalEscrowHeld = useMemo(() => ESCROW_ACCOUNTS.reduce((s, a) => s + a.held, 0), []);
+  const totalReleased = useMemo(() => ESCROW_ACCOUNTS.reduce((s, a) => s + a.released, 0), []);
+  const totalFunded = useMemo(() => ESCROW_ACCOUNTS.reduce((s, a) => s + a.funded, 0), []);
+  const totalFees = useMemo(() => transactions.filter((t) => t.type === "service_fee" && t.status === "completed").reduce((s, t) => s + t.amount, 0), [transactions]);
 
-  const totalFees = useMemo(
-    () =>
-      payments
-        .filter((p) => p.status === "paid")
-        .reduce((sum, p) => sum + p.serviceFee, 0),
-    [payments]
-  );
-
-  const pendingTotal = useMemo(
-    () =>
-      payments
-        .filter((p) => p.status === "pending")
-        .reduce((sum, p) => sum + p.totalCharged, 0),
-    [payments]
-  );
-
-  const filtered = useMemo(() => {
-    if (!search) return payments;
-    const q = search.toLowerCase();
-    return payments.filter(
-      (p) =>
-        p.jobTitle.toLowerCase().includes(q) ||
-        p.contractorName.toLowerCase().includes(q) ||
-        p.receiptNumber.toLowerCase().includes(q)
-    );
-  }, [payments, search]);
+  const sortedTransactions = useMemo(() => {
+    let filtered = transactions;
+    if (filter !== "all") filtered = filtered.filter((t) => t.type === filter);
+    if (search) filtered = filtered.filter((t) => t.description.toLowerCase().includes(search.toLowerCase()) || t.project.toLowerCase().includes(search.toLowerCase()) || t.contractor.toLowerCase().includes(search.toLowerCase()));
+    return [...filtered].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [transactions, filter, search]);
 
   return (
     <div className="flex flex-col min-h-full bg-surface">
       {/* Header */}
-      <div className="px-6 pt-5 pb-4 bg-white shadow-[0_4px_16px_-2px_rgba(0,0,0,0.1)] relative z-10">
+      <div className="px-6 pt-5 pb-4 bg-white shadow-[0_4px_16px_-2px_rgba(0,0,0,0.06)] relative z-10">
         <div className="flex items-center justify-between">
-          <h1 className="text-[22px] font-semibold text-gray-900 tracking-tight">
-            Payments
-          </h1>
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">Payments</h1>
+            <p className="text-[13px] text-gray-400 mt-0.5">Escrow balances, transactions, and receipts</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowBalances(!showBalances)}
+              className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border text-[12px] font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+            >
+              {showBalances ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+              {showBalances ? "Hide" : "Show"} balances
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="flex-1 px-6 py-5">
-        <div className="max-w-[1400px]">
-          {/* Summary Cards */}
-          <div className="grid grid-cols-3 gap-5 mb-6">
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-[13px] text-gray-400">Total Spent</p>
-                <div className="w-8 h-8 rounded-lg bg-brand-50 flex items-center justify-center">
-                  <DollarSign className="w-4 h-4 text-brand-600" />
-                </div>
+      <div className="flex-1 px-6 py-5 overflow-y-auto">
+        {/* Finance cards */}
+        <div className="grid grid-cols-4 gap-4 mb-6">
+          <div className="bg-white rounded-xl border border-border p-5">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Total in Escrow</p>
+              <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                <Lock className="w-4 h-4 text-blue-600" />
               </div>
-              <p className="text-[28px] font-bold text-gray-900 tabular-nums leading-tight">
-                {formatCurrency(totalSpent)}
-              </p>
-              <p className="text-[12px] text-gray-400 mt-1">
-                Includes {formatCurrency(totalFees)} in service fees
-              </p>
             </div>
-
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-[13px] text-gray-400">Pending Payments</p>
-                <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
-                  <Clock className="w-4 h-4 text-amber-600" />
-                </div>
-              </div>
-              <p className="text-[28px] font-bold text-gray-900 tabular-nums leading-tight">
-                {formatCurrency(pendingTotal)}
-              </p>
-              <p className="text-[12px] text-gray-400 mt-1">
-                {payments.filter((p) => p.status === "pending").length} awaiting
-                payment
-              </p>
-            </div>
-
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-[13px] text-gray-400">Receipts</p>
-                <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
-                  <Receipt className="w-4 h-4 text-emerald-600" />
-                </div>
-              </div>
-              <p className="text-[28px] font-bold text-gray-900 tabular-nums leading-tight">
-                {payments.filter((p) => p.status === "paid").length}
-              </p>
-              <p className="text-[12px] text-gray-400 mt-1">
-                Completed payments
-              </p>
-            </div>
+            <p className="text-2xl font-bold text-gray-900 tabular-nums">{showBalances ? formatCurrency(totalEscrowHeld) : "****"}</p>
+            <p className="text-[11px] text-gray-400 mt-1">Held across {ESCROW_ACCOUNTS.length} projects</p>
           </div>
 
-          {/* Search */}
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-[14px] font-semibold text-gray-900">
-              Payment History
-            </p>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-              <input
-                type="text"
-                placeholder="Search payments..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="h-9 rounded-lg border border-gray-200 bg-white pl-9 pr-3 text-[13px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 w-[220px]"
-              />
+          <div className="bg-white rounded-xl border border-border p-5">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Total Released</p>
+              <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+                <ArrowUpRight className="w-4 h-4 text-emerald-600" />
+              </div>
             </div>
+            <p className="text-2xl font-bold text-emerald-600 tabular-nums">{showBalances ? formatCurrency(totalReleased) : "****"}</p>
+            <p className="text-[11px] text-gray-400 mt-1">Paid to contractors</p>
           </div>
 
-          {/* Payment List */}
-          <div className="space-y-3">
-            {filtered.length === 0 ? (
-              <div className="bg-white rounded-xl border border-gray-200 px-5 py-12 text-center">
-                <p className="text-[14px] text-gray-400">
-                  No payments found
-                </p>
+          <div className="bg-white rounded-xl border border-border p-5">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Total Funded</p>
+              <div className="w-8 h-8 rounded-lg bg-brand-50 flex items-center justify-center">
+                <DollarSign className="w-4 h-4 text-brand-600" />
               </div>
-            ) : (
-              filtered.map((payment) => {
-                const isExpanded = expandedId === payment.id;
-                const isPaid = payment.status === "paid";
+            </div>
+            <p className="text-2xl font-bold text-gray-900 tabular-nums">{showBalances ? formatCurrency(totalFunded) : "****"}</p>
+            <p className="text-[11px] text-gray-400 mt-1">Across all projects</p>
+          </div>
 
-                return (
-                  <div
-                    key={payment.id}
-                    className="bg-white rounded-xl border border-gray-200 overflow-hidden"
-                  >
-                    {/* Row */}
-                    <button
-                      onClick={() =>
-                        setExpandedId(isExpanded ? null : payment.id)
-                      }
-                      className="w-full flex items-center gap-5 px-5 py-4 hover:bg-gray-50 transition-colors text-left"
-                    >
-                      {/* Status icon */}
-                      <div
-                        className={cn(
-                          "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0",
-                          isPaid ? "bg-emerald-50" : "bg-amber-50"
-                        )}
-                      >
-                        {isPaid ? (
-                          <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                        ) : (
-                          <Clock className="w-5 h-5 text-amber-600" />
-                        )}
-                      </div>
+          <div className="bg-white rounded-xl border border-border p-5">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Platform Fees</p>
+              <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center">
+                <FileText className="w-4 h-4 text-gray-500" />
+              </div>
+            </div>
+            <p className="text-2xl font-bold text-gray-900 tabular-nums">{showBalances ? formatCurrency(totalFees) : "****"}</p>
+            <p className="text-[11px] text-gray-400 mt-1">3% service fee</p>
+          </div>
+        </div>
 
-                      {/* Job info */}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[15px] font-semibold text-gray-900 truncate">
-                          {payment.jobTitle}
-                        </p>
-                        <p className="text-[12px] text-gray-400 truncate">
-                          {payment.contractorName}
-                          {isPaid ? ` — Paid ${formatDate(payment.paidAt!)}` : " — Payment pending"}
-                        </p>
-                      </div>
-
-                      {/* Amount */}
-                      <div className="text-right flex-shrink-0">
-                        <p className="text-[18px] font-bold text-gray-900 tabular-nums">
-                          {formatCurrency(payment.totalCharged)}
-                        </p>
-                        <p className="text-[11px] text-gray-400">
-                          incl. {formatCurrency(payment.serviceFee)} service fee
-                        </p>
-                      </div>
-
-                      {/* Badge */}
-                      <Badge
-                        variant={isPaid ? "success" : "warning"}
-                        className="text-[11px] min-w-[56px] justify-center flex-shrink-0"
-                      >
-                        {isPaid ? "Paid" : "Pending"}
-                      </Badge>
-
-                      {/* Expand icon */}
-                      <div className="flex-shrink-0">
-                        {isExpanded ? (
-                          <ChevronUp className="w-4 h-4 text-gray-300" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4 text-gray-300" />
-                        )}
-                      </div>
-                    </button>
-
-                    {/* Expanded Receipt */}
-                    {isExpanded && (
-                      <div className="px-5 pb-5 border-t border-gray-100">
-                        <div className="mt-4">
-                          {/* Receipt Header */}
-                          <div className="flex items-center justify-between mb-4">
-                            <div>
-                              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wide">
-                                Receipt
-                              </p>
-                              <p className="text-[14px] font-semibold text-gray-900 mt-0.5">
-                                {payment.receiptNumber}
-                              </p>
-                            </div>
-                            {isPaid && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="gap-2 text-[12px]"
-                              >
-                                <Download className="w-3.5 h-3.5" />
-                                Download Receipt
-                              </Button>
-                            )}
-                          </div>
-
-                          {/* Line Items Table */}
-                          <table className="w-full mb-4">
-                            <thead>
-                              <tr className="bg-gray-50">
-                                <th className="text-left text-[10px] font-bold text-gray-400 uppercase tracking-wide px-3 py-2.5 rounded-l-lg">
-                                  Description
-                                </th>
-                                <th className="text-right text-[10px] font-bold text-gray-400 uppercase tracking-wide px-3 py-2.5 w-[60px]">
-                                  Qty
-                                </th>
-                                <th className="text-right text-[10px] font-bold text-gray-400 uppercase tracking-wide px-3 py-2.5 w-[80px]">
-                                  Rate
-                                </th>
-                                <th className="text-right text-[10px] font-bold text-gray-400 uppercase tracking-wide px-3 py-2.5 w-[100px] rounded-r-lg">
-                                  Amount
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {payment.lineItems.map((item, i) => (
-                                <tr
-                                  key={i}
-                                  className="border-b border-gray-100 last:border-0"
-                                >
-                                  <td className="text-[13px] text-gray-900 px-3 py-2.5">
-                                    {item.description}
-                                  </td>
-                                  <td className="text-[13px] text-gray-500 px-3 py-2.5 text-right tabular-nums">
-                                    {item.quantity}
-                                  </td>
-                                  <td className="text-[13px] text-gray-500 px-3 py-2.5 text-right tabular-nums">
-                                    {formatCurrency(item.unitPrice)}
-                                  </td>
-                                  <td className="text-[13px] text-gray-900 font-semibold px-3 py-2.5 text-right tabular-nums">
-                                    {formatCurrency(item.amount)}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-
-                          {/* Totals */}
-                          <div className="flex justify-end">
-                            <div className="w-[260px]">
-                              <div className="flex justify-between py-1.5 px-3">
-                                <span className="text-[12px] text-gray-400">
-                                  Subtotal
-                                </span>
-                                <span className="text-[13px] text-gray-900 tabular-nums">
-                                  {formatCurrency(payment.grossAmount)}
-                                </span>
-                              </div>
-                              <div className="flex justify-between py-1.5 px-3">
-                                <span className="text-[12px] text-gray-400">
-                                  Service Fee (3%)
-                                </span>
-                                <span className="text-[13px] text-gray-900 tabular-nums">
-                                  {formatCurrency(payment.serviceFee)}
-                                </span>
-                              </div>
-                              <div className="flex justify-between py-2.5 px-3 bg-gray-900 rounded-lg mt-1.5">
-                                <span className="text-[12px] font-bold text-white">
-                                  Total Charged
-                                </span>
-                                <span className="text-[16px] font-bold text-white tabular-nums">
-                                  {formatCurrency(payment.totalCharged)}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Payment Info Footer */}
-                          {isPaid && (
-                            <div className="mt-4 bg-emerald-50 border border-emerald-100 rounded-lg px-4 py-3 flex items-center gap-3">
-                              <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                              <div>
-                                <p className="text-[12px] font-semibold text-emerald-700">
-                                  Payment Confirmed
-                                </p>
-                                <p className="text-[11px] text-emerald-600">
-                                  Paid on {formatDate(payment.paidAt!)} via
-                                  QuickBooks. Receipt #{payment.receiptNumber}
-                                </p>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
+        <div className="grid grid-cols-3 gap-5">
+          {/* Left — Transaction history (2 cols) */}
+          <div className="col-span-2 space-y-4">
+            <div className="bg-white rounded-xl border border-border overflow-hidden">
+              {/* Filters */}
+              <div className="px-5 py-4 border-b border-border">
+                <div className="flex items-center gap-3">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Input
+                      type="text"
+                      placeholder="Search transactions..."
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      className="pl-9 h-9 text-[13px]"
+                    />
                   </div>
-                );
-              })
-            )}
+                  <div className="flex items-center gap-1">
+                    {(["all", "milestone_released", "escrow_funded", "service_fee"] as const).map((f) => (
+                      <button
+                        key={f}
+                        onClick={() => setFilter(f)}
+                        className={cn(
+                          "h-8 px-3 rounded-lg text-[12px] font-medium transition-colors",
+                          filter === f
+                            ? "bg-gray-900 text-white"
+                            : "text-gray-500 hover:bg-gray-50"
+                        )}
+                      >
+                        {f === "all" ? "All" : f === "milestone_released" ? "Milestones" : f === "escrow_funded" ? "Escrow" : "Fees"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Transaction list */}
+              <div>
+                {sortedTransactions.length === 0 ? (
+                  <div className="py-12 text-center">
+                    <p className="text-sm text-gray-400">No transactions found</p>
+                  </div>
+                ) : (
+                  sortedTransactions.map((txn) => {
+                    const cfg = TXN_CONFIG[txn.type];
+                    const statusCfg = STATUS_BADGE[txn.status];
+                    const Icon = cfg.icon;
+                    const isExpanded = expandedTxn === txn.id;
+
+                    return (
+                      <div key={txn.id} className="border-b border-border last:border-0">
+                        <button
+                          onClick={() => setExpandedTxn(isExpanded ? null : txn.id)}
+                          className="w-full flex items-center gap-4 px-5 py-4 hover:bg-gray-50/50 transition-colors text-left"
+                        >
+                          <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0",
+                            txn.type === "escrow_funded" ? "bg-blue-50" : txn.type === "milestone_released" ? "bg-emerald-50" : "bg-gray-50"
+                          )}>
+                            <Icon className={cn("w-4 h-4", cfg.color)} />
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[14px] font-medium text-gray-900 truncate">{txn.description}</p>
+                            <p className="text-[12px] text-gray-400 truncate">{txn.project} &middot; {txn.contractor}</p>
+                          </div>
+
+                          <div className="text-right shrink-0">
+                            <p className={cn("text-[14px] font-bold tabular-nums", cfg.color)}>
+                              {cfg.sign}{formatCurrency(txn.amount)}
+                            </p>
+                            <p className="text-[11px] text-gray-400">{txn.date}</p>
+                          </div>
+
+                          <ChevronDown className={cn("w-4 h-4 text-gray-300 shrink-0 transition-transform", isExpanded && "rotate-180")} />
+                        </button>
+
+                        {isExpanded && (
+                          <div className="px-5 pb-4 bg-gray-50/50">
+                            <div className="grid grid-cols-2 gap-x-8 gap-y-3 py-3">
+                              <div>
+                                <p className="text-[11px] text-gray-400 uppercase tracking-wider">Reference</p>
+                                <p className="text-[13px] font-mono text-gray-700 mt-0.5">{txn.reference}</p>
+                              </div>
+                              <div>
+                                <p className="text-[11px] text-gray-400 uppercase tracking-wider">Status</p>
+                                <Badge className={cn("text-[11px] font-semibold mt-0.5 border", statusCfg.className)}>{statusCfg.label}</Badge>
+                              </div>
+                              <div>
+                                <p className="text-[11px] text-gray-400 uppercase tracking-wider">Type</p>
+                                <p className="text-[13px] text-gray-700 mt-0.5">{cfg.label}</p>
+                              </div>
+                              {txn.milestone && (
+                                <div>
+                                  <p className="text-[11px] text-gray-400 uppercase tracking-wider">Milestone</p>
+                                  <p className="text-[13px] text-gray-700 mt-0.5">{txn.milestone}</p>
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex gap-2 pt-2 border-t border-border">
+                              <button className="flex items-center gap-1.5 text-[12px] font-medium text-gray-500 hover:text-gray-900 transition-colors">
+                                <Download className="w-3.5 h-3.5" /> Download receipt
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Fee Info */}
-          <div className="mt-5 px-5 py-4 bg-white rounded-xl border border-gray-200">
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-brand-50 flex items-center justify-center flex-shrink-0">
-                <FileText className="w-4 h-4 text-brand-600" />
+          {/* Right — Sidebar */}
+          <div className="space-y-4">
+            {/* Payment method */}
+            <div className="bg-white rounded-xl border border-border p-5">
+              <p className="text-[12px] font-semibold text-gray-900 uppercase tracking-wider mb-4">Payment Method</p>
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-border">
+                <div className="w-10 h-10 rounded-lg bg-dark flex items-center justify-center shrink-0">
+                  <CreditCard className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-semibold text-gray-900">{PAYMENT_METHOD.type} ending in {PAYMENT_METHOD.last4}</p>
+                  <p className="text-[11px] text-gray-400">Expires {PAYMENT_METHOD.expiry}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-[13px] font-semibold text-gray-900">
-                  About Service Fees
-                </p>
-                <p className="text-[12px] text-gray-400 mt-0.5 leading-relaxed">
-                  A 3% service fee is added to each payment to cover secure
-                  payment processing, contractor verification, dispute
-                  resolution, and the FairTrade Promise protection. All payments
-                  are processed through QuickBooks for your records.
-                </p>
+              <button className="w-full mt-3 h-8 rounded-lg border border-border text-[12px] font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+                Update payment method
+              </button>
+            </div>
+
+            {/* Escrow accounts */}
+            <div className="bg-white rounded-xl border border-border p-5">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[12px] font-semibold text-gray-900 uppercase tracking-wider">Escrow Accounts</p>
+                <Shield className="w-4 h-4 text-brand-600" />
+              </div>
+              <div className="space-y-3">
+                {ESCROW_ACCOUNTS.map((account) => {
+                  const releasedPct = account.funded > 0 ? Math.round((account.released / account.funded) * 100) : 0;
+                  return (
+                    <div key={account.projectId} className="p-3 rounded-lg border border-border">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-[13px] font-semibold text-gray-900 truncate">{account.projectName}</p>
+                      </div>
+                      <p className="text-[11px] text-gray-400 mb-2">{account.contractor}</p>
+                      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden mb-2 flex">
+                        <div className="bg-emerald-500" style={{ width: `${releasedPct}%` }} />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] text-gray-400">{account.milestonesPaid}/{account.milestonesTotal} milestones</span>
+                        <span className="text-[12px] font-bold text-gray-900 tabular-nums">{showBalances ? formatCurrency(account.held) : "****"} held</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Security */}
+            <div className="bg-white rounded-xl border border-border p-5">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+                  <Shield className="w-4 h-4 text-emerald-600" />
+                </div>
+                <div>
+                  <p className="text-[13px] font-semibold text-gray-900">Escrow Protected</p>
+                  <p className="text-[11px] text-gray-400">Funds secured until verified</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                {[
+                  "256-bit SSL encryption",
+                  "QuickBooks-powered payments",
+                  "5-day dispute resolution",
+                  "Full transaction audit trail",
+                ].map((item) => (
+                  <div key={item} className="flex items-center gap-2">
+                    <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" strokeWidth={2.5} />
+                    <span className="text-[12px] text-gray-500">{item}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
