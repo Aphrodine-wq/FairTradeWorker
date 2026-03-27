@@ -40,10 +40,6 @@ export function Hero() {
 
           {/* Left — copy */}
           <div className="lg:w-[55%] relative z-10">
-            <p className="text-sm font-bold uppercase tracking-[0.1em] text-brand-600 mb-5">
-              FairTradeWorker
-            </p>
-
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05]">
               <span className="text-gray-900">Built for</span>
               <br />
