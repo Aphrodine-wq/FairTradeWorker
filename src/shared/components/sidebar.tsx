@@ -34,7 +34,7 @@ export function Sidebar({ items, currentPath, userRole, topAction }: SidebarProp
     <aside
       className={cn(
         "flex-shrink-0 flex h-screen flex-col bg-white border-r border-border transition-[width] duration-200 ease-in-out relative",
-        collapsed ? "w-16" : "w-56"
+        collapsed ? "w-14" : "w-48"
       )}
     >
       {/* Header */}
@@ -42,7 +42,7 @@ export function Sidebar({ items, currentPath, userRole, topAction }: SidebarProp
         {!collapsed ? (
           <Link href="/" className="flex items-center gap-2 min-w-0">
             <BrandMark className="w-7 h-7 flex-shrink-0" />
-            <span className="text-sm font-bold text-gray-900 truncate">FairTradeWorker</span>
+            <span className="text-xs font-bold text-gray-900 truncate">FairTradeWorker</span>
           </Link>
         ) : (
           <Link href="/">
@@ -67,7 +67,7 @@ export function Sidebar({ items, currentPath, userRole, topAction }: SidebarProp
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-3 text-[16px] font-medium transition-colors",
+                "flex items-center gap-2.5 rounded-lg px-2.5 py-2.5 text-[13px] font-medium transition-colors",
                 isActive
                   ? "bg-brand-600 text-white"
                   : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
@@ -75,7 +75,7 @@ export function Sidebar({ items, currentPath, userRole, topAction }: SidebarProp
               )}
               title={collapsed ? item.label : undefined}
             >
-              <Icon className="w-5 h-5 flex-shrink-0" />
+              <Icon className="w-4.5 h-4.5 flex-shrink-0" />
               {!collapsed && <span className="truncate">{item.label}</span>}
             </Link>
           );
