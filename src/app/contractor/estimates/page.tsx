@@ -1009,6 +1009,7 @@ interface CalcItem { desc: string; qty: string; unit: string; unitCost: string }
 interface CalcSection { name: string; items: CalcItem[] }
 
 function CalculatorTab() {
+  const [calcMode, setCalcMode] = useState<"estimate" | "material" | "labor" | "markup" | "sqft">("estimate");
   const [template, setTemplate] = useState("custom");
   const [sections, setSections] = useState<CalcSection[]>(
     JSON.parse(JSON.stringify(JOB_TEMPLATES.custom.sections))
@@ -1018,6 +1019,29 @@ function CalculatorTab() {
   const [taxRate, setTaxRate] = useState("8.25");
   const [permitCost, setPermitCost] = useState("");
   const [contingency, setContingency] = useState("5");
+
+  // Material calculator state
+  const [materialType, setMaterialType] = useState("flooring");
+  const [materialSqft, setMaterialSqft] = useState("");
+  const [concLength, setConcLength] = useState("");
+  const [concWidth, setConcWidth] = useState("");
+  const [concDepth, setConcDepth] = useState("");
+
+  // Labor calculator state
+  const [numWorkers, setNumWorkers] = useState("2");
+  const [hourlyRate, setHourlyRate] = useState("35");
+  const [estDays, setEstDays] = useState("5");
+  const [hoursPerDay, setHoursPerDay] = useState("8");
+  const [overtimeEnabled, setOvertimeEnabled] = useState(false);
+
+  // Markup/Margin calculator state
+  const [markupCost, setMarkupCost] = useState("");
+  const [markupPct, setMarkupPct] = useState("30");
+  const [markupMode, setMarkupMode] = useState<"markup" | "margin">("markup");
+
+  // Per Sq Ft calculator state
+  const [sqftTotalCost, setSqftTotalCost] = useState("");
+  const [sqftTotal, setSqftTotal] = useState("");
 
   const loadTemplate = (key: string) => {
     setTemplate(key);
@@ -1084,7 +1108,388 @@ function CalculatorTab() {
 
   const inputBase = "w-full h-9 rounded-lg border border-gray-200 bg-white px-3 text-[13px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow tabular-nums";
 
+  // Material calculator results
+  const matSqft = parseFloat(materialSqft) || 0;
+  const materialResults = (() => {
+    switch (materialType) {
+      case "flooring": {
+        const withWaste = matSqft * 1.1;
+        return [
+          { label: "Tile (16 sqft/box)", value: `${Math.ceil(withWaste / 16)} boxes` },
+          { label: "LVP (24 sqft/carton)", value: `${Math.ceil(withWaste / 24)} cartons` },
+          { label: "Hardwood (20 sqft/box)", value: `${Math.ceil(withWaste / 20)} boxes` },
+          { label: "Includes 10% waste", value: `${Math.round(withWaste)} sqft total` },
+        ];
+      }
+      case "drywall": {
+        const sheets = Math.ceil(matSqft / 32);
+        return [
+          { label: "4x8 Sheets", value: `${sheets} sheets` },
+          { label: "Tape (linear ft)", value: `${Math.round(sheets * 12)} ft` },
+          { label: "Joint compound", value: `${Math.ceil(sheets / 8)} buckets` },
+        ];
+      }
+      case "paint": {
+        const gallons = Math.ceil((matSqft * 2) / 400);
+        const primer = Math.ceil(matSqft / 400);
+        return [
+          { label: "Paint (2 coats, 400 sqft/gal)", value: `${gallons} gallons` },
+          { label: "Primer (1 coat)", value: `${primer} gallons` },
+        ];
+      }
+      case "concrete": {
+        const l = parseFloat(concLength) || 0;
+        const w = parseFloat(concWidth) || 0;
+        const d = parseFloat(concDepth) || 0;
+        const cubicYards = (l * w * (d / 12)) / 27;
+        return [
+          { label: "Dimensions", value: `${l}' x ${w}' x ${d}"` },
+          { label: "Cubic yards needed", value: cubicYards > 0 ? `${cubicYards.toFixed(2)} cu yd` : "---" },
+        ];
+      }
+      case "roofing": {
+        const squares = matSqft / 100;
+        return [
+          { label: "Squares", value: `${squares.toFixed(1)} squares` },
+          { label: "Shingle bundles (3/square)", value: `${Math.ceil(squares * 3)} bundles` },
+          { label: "Underlayment rolls", value: `${Math.ceil(squares / 2.2)} rolls` },
+        ];
+      }
+      default:
+        return [];
+    }
+  })();
+
+  // Labor calculator results
+  const workers = parseFloat(numWorkers) || 0;
+  const rate = parseFloat(hourlyRate) || 0;
+  const days = parseFloat(estDays) || 0;
+  const hpd = parseFloat(hoursPerDay) || 0;
+  const totalLaborHours = workers * days * hpd;
+  const regularHoursPerDay = Math.min(hpd, 8);
+  const overtimeHoursPerDay = overtimeEnabled ? Math.max(hpd - 8, 0) : 0;
+  const dailyCostPerWorker = (regularHoursPerDay * rate) + (overtimeHoursPerDay * rate * 1.5);
+  const totalLaborCost = workers * days * dailyCostPerWorker;
+  const costPerDay = workers * dailyCostPerWorker;
+
+  // Markup/Margin calculator results
+  const cost = parseFloat(markupCost) || 0;
+  const pct = parseFloat(markupPct) || 0;
+  const markupCalc = (() => {
+    if (cost <= 0 || pct <= 0) return null;
+    if (markupMode === "markup") {
+      const sellPrice = cost * (1 + pct / 100);
+      const profit = sellPrice - cost;
+      const effectiveMargin = (profit / sellPrice) * 100;
+      return { sellPrice, profit, effectiveMarkup: pct, effectiveMargin, formula: `Sell = Cost x (1 + Markup%) = ${formatCurrency(cost)} x ${(1 + pct / 100).toFixed(3)}` };
+    } else {
+      const sellPrice = cost / (1 - pct / 100);
+      const profit = sellPrice - cost;
+      const effectiveMarkup = (profit / cost) * 100;
+      return { sellPrice, profit, effectiveMarkup, effectiveMargin: pct, formula: `Sell = Cost / (1 - Margin%) = ${formatCurrency(cost)} / ${(1 - pct / 100).toFixed(3)}` };
+    }
+  })();
+
+  // Per sqft calculator
+  const sqftCost = parseFloat(sqftTotalCost) || 0;
+  const sqftArea = parseFloat(sqftTotal) || 0;
+  const costPerSqft = sqftArea > 0 ? sqftCost / sqftArea : 0;
+
+  const SQFT_RANGES = [
+    { type: "Kitchen remodel", low: 75, high: 250 },
+    { type: "Bathroom remodel", low: 125, high: 350 },
+    { type: "Room addition", low: 100, high: 400 },
+    { type: "Painting (interior)", low: 2, high: 6 },
+    { type: "Flooring", low: 3, high: 15 },
+    { type: "Roofing", low: 4, high: 12 },
+    { type: "Concrete", low: 6, high: 20 },
+    { type: "Deck", low: 15, high: 45 },
+  ];
+
   return (
+    <div>
+      {/* Calculator mode tabs */}
+      <div className="border-b border-border mb-5">
+        <div className="flex">
+          {[
+            { id: "estimate", label: "Full Estimate" },
+            { id: "material", label: "Material Calc" },
+            { id: "labor", label: "Labor Hours" },
+            { id: "markup", label: "Markup / Margin" },
+            { id: "sqft", label: "Per Sq Ft" },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setCalcMode(tab.id as typeof calcMode)}
+              className={cn(
+                "px-4 py-2.5 text-[13px] font-medium transition-colors border-b-2 -mb-px",
+                calcMode === tab.id ? "border-gray-900 text-gray-900" : "border-transparent text-gray-400 hover:text-gray-600"
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Material Calculator */}
+      {calcMode === "material" && (
+        <div className="max-w-xl space-y-5">
+          <div>
+            <p className="text-[15px] font-bold text-gray-900 mb-1">Material Calculator</p>
+            <p className="text-[12px] text-gray-400 mb-4">Quick quantities for common materials</p>
+            <label className="text-[11px] font-semibold text-gray-900 block mb-1">Material Type</label>
+            <select
+              value={materialType}
+              onChange={(e) => setMaterialType(e.target.value)}
+              className="h-11 w-full max-w-sm rounded-lg border border-gray-200 bg-white px-3.5 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
+            >
+              <option value="flooring">Flooring</option>
+              <option value="drywall">Drywall</option>
+              <option value="paint">Paint</option>
+              <option value="concrete">Concrete</option>
+              <option value="roofing">Roofing</option>
+            </select>
+          </div>
+
+          {materialType === "concrete" ? (
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="text-[11px] font-semibold text-gray-900 block mb-1">Length (ft)</label>
+                <input type="number" min="0" value={concLength} onChange={(e) => setConcLength(e.target.value)} placeholder="0" className={inputBase} />
+              </div>
+              <div>
+                <label className="text-[11px] font-semibold text-gray-900 block mb-1">Width (ft)</label>
+                <input type="number" min="0" value={concWidth} onChange={(e) => setConcWidth(e.target.value)} placeholder="0" className={inputBase} />
+              </div>
+              <div>
+                <label className="text-[11px] font-semibold text-gray-900 block mb-1">Depth (inches)</label>
+                <input type="number" min="0" value={concDepth} onChange={(e) => setConcDepth(e.target.value)} placeholder="4" className={inputBase} />
+              </div>
+            </div>
+          ) : (
+            <div>
+              <label className="text-[11px] font-semibold text-gray-900 block mb-1">
+                {materialType === "drywall" ? "Wall Area (sqft)" : materialType === "roofing" ? "Roof Area (sqft)" : "Square Footage"}
+              </label>
+              <input type="number" min="0" value={materialSqft} onChange={(e) => setMaterialSqft(e.target.value)} placeholder="0" className={cn(inputBase, "max-w-[200px]")} />
+            </div>
+          )}
+
+          {(matSqft > 0 || (materialType === "concrete" && (parseFloat(concLength) || 0) > 0)) && (
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="px-4 py-2.5 bg-gray-50 border-b border-gray-200">
+                <p className="text-[13px] font-bold text-gray-900">Results</p>
+              </div>
+              <div className="divide-y divide-gray-100">
+                {materialResults.map((r, i) => (
+                  <div key={i} className="flex items-center justify-between px-4 py-3">
+                    <span className="text-[13px] text-gray-600">{r.label}</span>
+                    <span className="text-[14px] font-bold text-gray-900 tabular-nums">{r.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Labor Hours Calculator */}
+      {calcMode === "labor" && (
+        <div className="max-w-xl space-y-5">
+          <div>
+            <p className="text-[15px] font-bold text-gray-900 mb-1">Labor Hours Calculator</p>
+            <p className="text-[12px] text-gray-400 mb-4">Calculate total labor cost for a crew</p>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-[11px] font-semibold text-gray-900 block mb-1">Number of Workers</label>
+              <input type="number" min="1" value={numWorkers} onChange={(e) => setNumWorkers(e.target.value)} className={inputBase} />
+            </div>
+            <div>
+              <label className="text-[11px] font-semibold text-gray-900 block mb-1">Hourly Rate ($)</label>
+              <input type="number" min="0" step="0.50" value={hourlyRate} onChange={(e) => setHourlyRate(e.target.value)} className={inputBase} />
+            </div>
+            <div>
+              <label className="text-[11px] font-semibold text-gray-900 block mb-1">Estimated Days</label>
+              <input type="number" min="1" value={estDays} onChange={(e) => setEstDays(e.target.value)} className={inputBase} />
+            </div>
+            <div>
+              <label className="text-[11px] font-semibold text-gray-900 block mb-1">Hours Per Day</label>
+              <input type="number" min="1" max="16" value={hoursPerDay} onChange={(e) => setHoursPerDay(e.target.value)} className={inputBase} />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setOvertimeEnabled(!overtimeEnabled)}
+              className={cn(
+                "w-10 h-5 rounded-full transition-colors relative",
+                overtimeEnabled ? "bg-brand-600" : "bg-gray-200"
+              )}
+            >
+              <div className={cn(
+                "w-4 h-4 bg-white rounded-full absolute top-0.5 transition-transform shadow-sm",
+                overtimeEnabled ? "translate-x-5" : "translate-x-0.5"
+              )} />
+            </button>
+            <span className="text-[13px] text-gray-600">Overtime (1.5x after 8 hrs/day)</span>
+          </div>
+
+          {totalLaborHours > 0 && (
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="px-4 py-2.5 bg-gray-50 border-b border-gray-200">
+                <p className="text-[13px] font-bold text-gray-900">Breakdown</p>
+              </div>
+              <div className="divide-y divide-gray-100">
+                <div className="flex items-center justify-between px-4 py-3">
+                  <span className="text-[13px] text-gray-600">Total labor hours</span>
+                  <span className="text-[14px] font-bold text-gray-900 tabular-nums">{totalLaborHours.toLocaleString()} hrs</span>
+                </div>
+                {overtimeEnabled && overtimeHoursPerDay > 0 && (
+                  <div className="flex items-center justify-between px-4 py-3">
+                    <span className="text-[13px] text-gray-600">Overtime hours/day (per worker)</span>
+                    <span className="text-[14px] font-bold text-amber-600 tabular-nums">{overtimeHoursPerDay} hrs at 1.5x</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between px-4 py-3">
+                  <span className="text-[13px] text-gray-600">Cost per day</span>
+                  <span className="text-[14px] font-bold text-gray-900 tabular-nums">{formatCurrency(costPerDay)}</span>
+                </div>
+                <div className="flex items-center justify-between px-4 py-3 bg-gray-900">
+                  <span className="text-[13px] font-bold text-white">Total labor cost</span>
+                  <span className="text-[18px] font-bold text-white tabular-nums">{formatCurrency(totalLaborCost)}</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Markup / Margin Calculator */}
+      {calcMode === "markup" && (
+        <div className="max-w-xl space-y-5">
+          <div>
+            <p className="text-[15px] font-bold text-gray-900 mb-1">Markup / Margin Calculator</p>
+            <p className="text-[12px] text-gray-400 mb-4">Know your numbers -- markup and margin are not the same thing</p>
+          </div>
+
+          <div>
+            <label className="text-[11px] font-semibold text-gray-900 block mb-1">Your Cost</label>
+            <div className="relative max-w-[200px]">
+              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-300 text-[12px]">$</span>
+              <input type="number" min="0" step="0.01" value={markupCost} onChange={(e) => setMarkupCost(e.target.value)} placeholder="0.00" className={cn(inputBase, "pl-6")} />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 mb-2">
+            <button
+              onClick={() => setMarkupMode("markup")}
+              className={cn(
+                "px-4 py-2 rounded-lg text-[13px] font-medium transition-colors border",
+                markupMode === "markup" ? "bg-gray-900 text-white border-gray-900" : "border-gray-200 text-gray-600 hover:bg-gray-50"
+              )}
+            >
+              Markup %
+            </button>
+            <button
+              onClick={() => setMarkupMode("margin")}
+              className={cn(
+                "px-4 py-2 rounded-lg text-[13px] font-medium transition-colors border",
+                markupMode === "margin" ? "bg-gray-900 text-white border-gray-900" : "border-gray-200 text-gray-600 hover:bg-gray-50"
+              )}
+            >
+              Margin %
+            </button>
+          </div>
+
+          <div>
+            <label className="text-[11px] font-semibold text-gray-900 block mb-1">
+              Desired {markupMode === "markup" ? "Markup" : "Margin"} %
+            </label>
+            <div className="relative max-w-[200px]">
+              <input type="number" min="0" max="99" value={markupPct} onChange={(e) => setMarkupPct(e.target.value)} className={cn(inputBase, "pr-7")} />
+              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-300 text-[12px]">%</span>
+            </div>
+          </div>
+
+          {markupCalc && (
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="px-4 py-2.5 bg-gray-50 border-b border-gray-200">
+                <p className="text-[13px] font-bold text-gray-900">Results</p>
+              </div>
+              <div className="divide-y divide-gray-100">
+                <div className="flex items-center justify-between px-4 py-3 bg-gray-900">
+                  <span className="text-[13px] font-bold text-white">Sell Price</span>
+                  <span className="text-[18px] font-bold text-white tabular-nums">{formatCurrency(markupCalc.sellPrice)}</span>
+                </div>
+                <div className="flex items-center justify-between px-4 py-3">
+                  <span className="text-[13px] text-gray-600">Profit</span>
+                  <span className="text-[14px] font-bold text-brand-600 tabular-nums">{formatCurrency(markupCalc.profit)}</span>
+                </div>
+                <div className="flex items-center justify-between px-4 py-3">
+                  <span className="text-[13px] text-gray-600">Effective Markup</span>
+                  <span className="text-[14px] font-bold text-gray-900 tabular-nums">{markupCalc.effectiveMarkup.toFixed(1)}%</span>
+                </div>
+                <div className="flex items-center justify-between px-4 py-3">
+                  <span className="text-[13px] text-gray-600">Effective Margin</span>
+                  <span className="text-[14px] font-bold text-gray-900 tabular-nums">{markupCalc.effectiveMargin.toFixed(1)}%</span>
+                </div>
+                <div className="px-4 py-3 bg-gray-50">
+                  <p className="text-[11px] text-gray-500 font-mono">{markupCalc.formula}</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Per Sq Ft Calculator */}
+      {calcMode === "sqft" && (
+        <div className="max-w-xl space-y-5">
+          <div>
+            <p className="text-[15px] font-bold text-gray-900 mb-1">Cost Per Square Foot</p>
+            <p className="text-[12px] text-gray-400 mb-4">See how your price stacks up against typical ranges</p>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-[11px] font-semibold text-gray-900 block mb-1">Total Project Cost</label>
+              <div className="relative">
+                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-300 text-[12px]">$</span>
+                <input type="number" min="0" value={sqftTotalCost} onChange={(e) => setSqftTotalCost(e.target.value)} placeholder="0" className={cn(inputBase, "pl-6")} />
+              </div>
+            </div>
+            <div>
+              <label className="text-[11px] font-semibold text-gray-900 block mb-1">Total Square Footage</label>
+              <input type="number" min="0" value={sqftTotal} onChange={(e) => setSqftTotal(e.target.value)} placeholder="0" className={inputBase} />
+            </div>
+          </div>
+
+          {costPerSqft > 0 && (
+            <div className="bg-gray-900 rounded-lg px-5 py-4 flex items-center justify-between">
+              <span className="text-[13px] font-bold text-white">Your Cost Per Sq Ft</span>
+              <span className="text-[24px] font-bold text-white tabular-nums">${costPerSqft.toFixed(2)}</span>
+            </div>
+          )}
+
+          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div className="px-4 py-2.5 bg-gray-50 border-b border-gray-200">
+              <p className="text-[13px] font-bold text-gray-900">Typical $/sqft by Project Type</p>
+            </div>
+            <div className="divide-y divide-gray-100">
+              {SQFT_RANGES.map((r) => (
+                <div key={r.type} className="flex items-center justify-between px-4 py-2.5">
+                  <span className="text-[13px] text-gray-600">{r.type}</span>
+                  <span className="text-[13px] font-semibold text-gray-900 tabular-nums">${r.low} - ${r.high}/sqft</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Full Estimate Calculator (existing) */}
+      {calcMode === "estimate" && (
     <div className="flex gap-6 items-start">
       {/* Left: Calculator Form */}
       <div className="flex-1 min-w-0 space-y-5">
@@ -1285,6 +1690,8 @@ function CalculatorTab() {
           </div>
         </div>
       </div>
+    </div>
+      )}
     </div>
   );
 }

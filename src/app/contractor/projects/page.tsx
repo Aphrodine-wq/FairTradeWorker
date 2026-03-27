@@ -57,6 +57,7 @@ import {
 } from "@shared/ui/dialog";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
 import { fetchProjects } from "@shared/lib/data";
+import { toast } from "sonner";
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -2203,10 +2204,19 @@ function DocumentsTab() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-[13px] text-gray-500">{MOCK_DOCUMENTS.length} documents</p>
-        <Button size="sm" className="h-8 text-[12px] gap-1.5">
-          <Upload className="w-3.5 h-3.5" />
-          Upload Document
-        </Button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => toast.info("Google Drive integration coming soon")}
+            className="h-8 px-3 text-[12px] font-medium rounded-md border border-border text-gray-600 hover:bg-gray-50 transition-colors flex items-center gap-1.5"
+          >
+            <Cloud className="w-3.5 h-3.5" />
+            Connect Google Drive
+          </button>
+          <Button size="sm" className="h-8 text-[12px] gap-1.5">
+            <Upload className="w-3.5 h-3.5" />
+            Upload Document
+          </Button>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg border border-border overflow-hidden">
@@ -2244,6 +2254,22 @@ function DocumentsTab() {
             </div>
           );
         })}
+      </div>
+
+      <div className="bg-gray-50 rounded-lg border border-border p-4 mt-4">
+        <p className="text-[12px] font-semibold text-gray-900 uppercase tracking-wider mb-3">Connected Storage</p>
+        <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-border">
+          <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
+            <Cloud className="w-4.5 h-4.5 text-blue-600" />
+          </div>
+          <div className="flex-1">
+            <p className="text-[13px] font-medium text-gray-900">Google Drive</p>
+            <p className="text-[11px] text-gray-400">Not connected</p>
+          </div>
+          <button onClick={() => toast.info("Google Drive integration coming soon")} className="text-[12px] font-semibold text-brand-600 hover:text-brand-700 transition-colors">
+            Connect
+          </button>
+        </div>
       </div>
     </div>
   );
