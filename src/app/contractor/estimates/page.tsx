@@ -1689,9 +1689,9 @@ function EstimatesPageContent() {
         </div>
       </div>
 
-      {/* Top nav tabs */}
-      <div className="bg-white border-b border-border px-8">
-        <div className="flex">
+      {/* Sidebar + Content */}
+      <div className="flex flex-1 min-h-0">
+        <nav className="w-44 flex-shrink-0 bg-white border-r border-border py-3 px-2 overflow-y-auto">
           {ESTIMATES_NAV.map((item) => {
             const Icon = item.icon;
             const isActive = activeSection === item.id;
@@ -1701,33 +1701,34 @@ function EstimatesPageContent() {
                 key={item.id}
                 onClick={() => setActiveSection(item.id)}
                 className={cn(
-                  "flex items-center gap-2 px-5 py-3 text-[13px] font-medium transition-colors border-b-2 -mb-px",
+                  "w-full flex items-center justify-between rounded-lg px-2.5 py-2 text-[13px] font-medium transition-colors mb-0.5",
                   isActive
-                    ? "border-gray-900 text-gray-900"
-                    : "border-transparent text-gray-400 hover:text-gray-600"
+                    ? "bg-brand-600 text-white"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                 )}
               >
-                <Icon className="w-4 h-4" />
-                {item.label}
-                {item.pro && (
-                  <span className={cn("text-[8px] font-bold uppercase tracking-wide px-1 py-0.5", isActive ? "bg-gray-900 text-white rounded" : "bg-brand-100 text-brand-600 rounded")}>
-                    Pro
-                  </span>
-                )}
+                <div className="flex items-center gap-2.5">
+                  <Icon className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate">{item.label}</span>
+                  {item.pro && (
+                    <span className={cn("text-[8px] font-bold uppercase tracking-wide px-1 py-0.5 rounded", isActive ? "bg-white/20 text-white" : "bg-brand-100 text-brand-600")}>
+                      Pro
+                    </span>
+                  )}
+                </div>
                 {badge != null && badge > 0 && (
-                  <span className={cn("text-[10px] font-bold rounded-full px-1.5 py-0.5 min-w-[18px] text-center", isActive ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-500")}>
+                  <span className={cn("text-[10px] font-bold rounded-full px-1.5 py-0.5 min-w-[20px] text-center", isActive ? "bg-white/20 text-white" : "bg-gray-100 text-gray-500")}>
                     {badge}
                   </span>
                 )}
               </button>
             );
           })}
-        </div>
-      </div>
+        </nav>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto p-8">
-        {renderSection()}
+        <div className="flex-1 overflow-y-auto p-8">
+          {renderSection()}
+        </div>
       </div>
     </div>
   );
