@@ -37,6 +37,7 @@ import {
   MapPin,
   Check,
   ArrowRight,
+  Download,
 } from "lucide-react";
 import Link from "next/link";
 import { AppHeader } from "@shared/components/app-header";
@@ -80,9 +81,9 @@ const PROJECTS = [
     estimatedEnd: "2026-04-25",
     progress: 52,
     milestones: [
-      { label: "Demo complete", done: true, amount: 5000, status: "paid" as MilestoneStatus, completedDate: "2026-03-14" },
-      { label: "Rough-in (plumb/elec)", done: true, amount: 8500, status: "paid" as MilestoneStatus, completedDate: "2026-03-19" },
-      { label: "Cabinet install", done: true, amount: 7000, status: "approved" as MilestoneStatus, completedDate: "2026-03-24" },
+      { label: "Demo complete", done: true, amount: 5000, status: "paid" as MilestoneStatus, completedDate: "2026-03-14", note: "Full gut demo finished — all debris hauled same day. Subfloor in good shape." },
+      { label: "Rough-in (plumb/elec)", done: true, amount: 8500, status: "paid" as MilestoneStatus, completedDate: "2026-03-19", note: "Found old galvanized pipe behind wall — replaced with PEX. Added to CO-002." },
+      { label: "Cabinet install", done: true, amount: 7000, status: "approved" as MilestoneStatus, completedDate: "2026-03-24", note: "All 8 upper boxes set and leveled. Crown molding prepped for next phase." },
       { label: "Countertops", done: false, amount: 6500, status: "in_progress" as MilestoneStatus },
       { label: "Tile & flooring", done: false, amount: 7500, status: "pending" as MilestoneStatus },
       { label: "Final walkthrough", done: false, amount: 4000, status: "pending" as MilestoneStatus },
@@ -101,8 +102,8 @@ const PROJECTS = [
     estimatedEnd: "2026-04-05",
     progress: 35,
     milestones: [
-      { label: "Demo complete", done: true, amount: 2500, status: "paid" as MilestoneStatus, completedDate: "2026-03-17" },
-      { label: "Plumbing rough-in", done: true, amount: 3500, status: "approved" as MilestoneStatus, completedDate: "2026-03-21" },
+      { label: "Demo complete", done: true, amount: 2500, status: "paid" as MilestoneStatus, completedDate: "2026-03-17", note: "Bathroom stripped to studs. No mold found behind tile." },
+      { label: "Plumbing rough-in", done: true, amount: 3500, status: "approved" as MilestoneStatus, completedDate: "2026-03-21", note: "Moved shower drain 6 inches per CO-003. All copper replaced with PEX." },
       { label: "Tile & waterproofing", done: false, amount: 4200, status: "in_progress" as MilestoneStatus },
       { label: "Vanity & fixtures", done: false, amount: 3000, status: "pending" as MilestoneStatus },
       { label: "Final walkthrough", done: false, amount: 2000, status: "pending" as MilestoneStatus },
@@ -121,8 +122,8 @@ const PROJECTS = [
     estimatedEnd: "2026-04-10",
     progress: 40,
     milestones: [
-      { label: "Footings & posts", done: true, amount: 4500, status: "paid" as MilestoneStatus, completedDate: "2026-03-16" },
-      { label: "Framing", done: true, amount: 6000, status: "submitted" as MilestoneStatus, completedDate: "2026-03-22" },
+      { label: "Footings & posts", done: true, amount: 4500, status: "paid" as MilestoneStatus, completedDate: "2026-03-16", note: "8 footings poured — 12\" sonotubes, 24\" depth. Inspector signed off." },
+      { label: "Framing", done: true, amount: 6000, status: "submitted" as MilestoneStatus, completedDate: "2026-03-22", note: "All joists and ledger board secured. Lag bolts torqued to spec." },
       { label: "Decking boards", done: false, amount: 5500, status: "in_progress" as MilestoneStatus },
       { label: "Railing & stairs", done: false, amount: 4000, status: "pending" as MilestoneStatus },
       { label: "Final walkthrough", done: false, amount: 2000, status: "pending" as MilestoneStatus },
@@ -141,9 +142,9 @@ const PROJECTS = [
     estimatedEnd: "2026-03-22",
     progress: 80,
     milestones: [
-      { label: "Tear-off complete", done: true, amount: 3000, status: "paid" as MilestoneStatus, completedDate: "2026-03-16" },
-      { label: "OSB & underlayment", done: true, amount: 3500, status: "paid" as MilestoneStatus, completedDate: "2026-03-17" },
-      { label: "Shingles", done: true, amount: 4000, status: "approved" as MilestoneStatus, completedDate: "2026-03-19" },
+      { label: "Tear-off complete", done: true, amount: 3000, status: "paid" as MilestoneStatus, completedDate: "2026-03-16", note: "Full tear-off to decking. Found 4 sheets compromised OSB — see CO-004." },
+      { label: "OSB & underlayment", done: true, amount: 3500, status: "paid" as MilestoneStatus, completedDate: "2026-03-17", note: "Replaced bad OSB, ice & water shield at eaves and valleys." },
+      { label: "Shingles", done: true, amount: 4000, status: "approved" as MilestoneStatus, completedDate: "2026-03-19", note: "GAF Timberline HDZ installed — all 30 squares. Ridge vent prepped." },
       { label: "Flashings & ridge", done: false, amount: 2000, status: "in_progress" as MilestoneStatus },
       { label: "Final inspection", done: false, amount: 1000, status: "pending" as MilestoneStatus },
     ] satisfies Milestone[],
@@ -216,11 +217,12 @@ interface LogEntry {
   materialsDelivered: string;
   issues: string;
   safetyIncidents: string;
+  milestone: string;
 }
 
 const MOCK_LOGS: LogEntry[] = [
-  { id: "log-1", date: "2026-03-18", weather: "Clear", temp: "72", crew: ["Marcus", "Tony", "David"], hours: "9", workPerformed: "Completed upper cabinet installation on north wall. Set and leveled all 8 boxes. Started crown molding prep cuts.", materialsDelivered: "Crown molding — 3 bundles (16 LF each).", issues: "Soffit framing was 1/2\" out of square — had to shim two cabinet runs.", safetyIncidents: "" },
-  { id: "log-2", date: "2026-03-17", weather: "Cloudy", temp: "65", crew: ["Marcus", "Tony", "David", "Alex"], hours: "10", workPerformed: "Demo complete on lower cabinets. Subfloor inspection revealed no rot. Started upper cabinet run layout.", materialsDelivered: "Upper cabinet boxes staged in dining room.", issues: "Found old galvanized pipe — added to scope (CO-002).", safetyIncidents: "" },
+  { id: "log-1", date: "2026-03-18", weather: "Clear", temp: "72", crew: ["Marcus", "Tony", "David"], hours: "9", workPerformed: "Completed upper cabinet installation on north wall. Set and leveled all 8 boxes. Started crown molding prep cuts.", materialsDelivered: "Crown molding — 3 bundles (16 LF each).", issues: "Soffit framing was 1/2\" out of square — had to shim two cabinet runs.", safetyIncidents: "", milestone: "Cabinet install" },
+  { id: "log-2", date: "2026-03-17", weather: "Cloudy", temp: "65", crew: ["Marcus", "Tony", "David", "Alex"], hours: "10", workPerformed: "Demo complete on lower cabinets. Subfloor inspection revealed no rot. Started upper cabinet run layout.", materialsDelivered: "Upper cabinet boxes staged in dining room.", issues: "Found old galvanized pipe — added to scope (CO-002).", safetyIncidents: "", milestone: "Rough-in (plumb/elec)" },
 ];
 
 // ─── Schedule data ────────────────────────────────────────────────────────────
@@ -595,6 +597,30 @@ function OverviewTab({ project }: { project: typeof PROJECTS[0] }) {
           ))}
         </div>
       </div>
+
+      {/* Recent Milestone Notes */}
+      {(() => {
+        const notedMilestones = project.milestones.filter((m) => m.note);
+        if (notedMilestones.length === 0) return null;
+        return (
+          <div className="bg-white border border-border rounded-xl p-5">
+            <p className="text-sm font-semibold text-gray-900 mb-4">Recent Notes</p>
+            <div className="divide-y divide-border">
+              {notedMilestones.map((m, i) => (
+                <div key={i} className="py-3 first:pt-0 last:pb-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-sm font-medium text-gray-900">{m.label}</p>
+                    {m.completedDate && (
+                      <span className="text-xs text-gray-400">{formatDate(m.completedDate)}</span>
+                    )}
+                  </div>
+                  <p className="text-[13px] text-gray-600 leading-relaxed">{m.note}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
@@ -718,6 +744,9 @@ function DailyLogTab({ projectId }: { projectId: string }) {
           {MOCK_LOGS.map((log) => (
             <div key={log.id} className="bg-white border border-border rounded-xl overflow-hidden">
               <button className="w-full text-left px-4 py-3.5 hover:bg-gray-50 transition-colors" onClick={() => setExpanded(expanded === log.id ? null : log.id)}>
+                {log.milestone && (
+                  <span className="inline-block text-[10px] font-semibold text-brand-700 bg-brand-50 border border-brand-200 rounded px-1.5 py-0.5 mb-1.5">{log.milestone}</span>
+                )}
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-sm font-semibold text-gray-900">{formatDate(log.date)}</span>
                   <span className="flex items-center gap-1 text-xs text-gray-500">
@@ -1721,75 +1750,109 @@ function PunchListTab({ projectId }: { projectId: string }) {
   );
 }
 
+// Recent expenses per project (mock)
+const ALL_EXPENSES: Record<string, { date: string; description: string; amount: number }[]> = {
+  j1: [
+    { date: "Mar 24", description: "Quartz countertop slab deposit", amount: 2800 },
+    { date: "Mar 22", description: "Tile — porcelain 12x24 (14 boxes)", amount: 1260 },
+    { date: "Mar 20", description: "Plumber — rough-in labor", amount: 1400 },
+    { date: "Mar 18", description: "Cabinet hardware — pulls + hinges", amount: 340 },
+    { date: "Mar 15", description: "Dumpster rental — 20yd", amount: 480 },
+  ],
+  j2: [
+    { date: "Mar 23", description: "Schluter membrane + accessories", amount: 620 },
+    { date: "Mar 21", description: "Vanity — 48in double sink", amount: 1350 },
+    { date: "Mar 19", description: "Tile — subway 3x6 white (22 boxes)", amount: 440 },
+  ],
+  j3: [
+    { date: "Mar 24", description: "Composite decking — Trex Enhance", amount: 3200 },
+    { date: "Mar 22", description: "Post brackets + concrete", amount: 480 },
+    { date: "Mar 20", description: "Permit fee — deck construction", amount: 250 },
+  ],
+  j4: [
+    { date: "Mar 23", description: "Architectural shingles — 28 squares", amount: 4200 },
+    { date: "Mar 21", description: "Ice & water shield + underlayment", amount: 860 },
+    { date: "Mar 19", description: "Ridge vent + pipe boots", amount: 320 },
+  ],
+};
+
 function JobCostingTab({ projectId, project }: { projectId: string; project: typeof PROJECTS[0] }) {
   const categories = ALL_COSTING[projectId] ?? [];
+  const expenses = ALL_EXPENSES[projectId] ?? [];
   const totalEstimated = categories.reduce((s, c) => s + c.estimated, 0);
   const totalActual = categories.reduce((s, c) => s + c.actual, 0);
-  const totalVariance = totalActual - totalEstimated;
-  const overBudget = totalVariance > 0;
-  const profit = project.contractValue - totalActual;
-  const profitPct = project.contractValue > 0 ? ((profit / project.contractValue) * 100).toFixed(1) : "0";
+  const remaining = totalEstimated - totalActual;
 
   return (
-    <div className="space-y-5 max-w-[800px]">
-      {/* Summary row */}
-      <div className="flex items-start gap-8 pb-5 border-b border-gray-200">
-        <div>
-          <p className="text-[12px] text-gray-400">Contract</p>
-          <p className="text-[24px] font-bold text-gray-900 tabular-nums leading-tight mt-0.5">{formatCurrency(project.contractValue)}</p>
+    <div className="space-y-6 max-w-[800px]">
+      {/* Summary cards — 3 across */}
+      <div className="grid grid-cols-3 gap-4">
+        <div className="bg-white rounded-xl border border-border p-5">
+          <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Budget</p>
+          <p className="text-[28px] font-bold text-gray-900 tabular-nums leading-tight mt-1">{formatCurrency(totalEstimated)}</p>
         </div>
-        <div>
-          <p className="text-[12px] text-gray-400">Estimated Cost</p>
-          <p className="text-[24px] font-bold text-gray-900 tabular-nums leading-tight mt-0.5">{formatCurrency(totalEstimated)}</p>
+        <div className="bg-white rounded-xl border border-border p-5">
+          <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Spent</p>
+          <p className="text-[28px] font-bold text-gray-900 tabular-nums leading-tight mt-1">{formatCurrency(totalActual)}</p>
         </div>
-        <div>
-          <p className="text-[12px] text-gray-400">Actual Cost</p>
-          <p className="text-[24px] font-bold text-gray-900 tabular-nums leading-tight mt-0.5">{formatCurrency(totalActual)}</p>
-        </div>
-        <div>
-          <p className="text-[12px] text-gray-400">Net Profit</p>
-          <p className={cn("text-[24px] font-bold tabular-nums leading-tight mt-0.5", profit >= 0 ? "text-brand-600" : "text-red-600")}>{formatCurrency(profit)}</p>
-          <p className={cn("text-[12px] font-semibold mt-0.5", profit >= 0 ? "text-brand-600" : "text-red-600")}>{profitPct}% margin</p>
+        <div className="bg-white rounded-xl border border-border p-5">
+          <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Remaining</p>
+          <p className={cn("text-[28px] font-bold tabular-nums leading-tight mt-1", remaining >= 0 ? "text-brand-600" : "text-red-600")}>{formatCurrency(Math.abs(remaining))}</p>
+          {remaining < 0 && <p className="text-[12px] font-semibold text-red-600 mt-0.5">Over budget</p>}
         </div>
       </div>
 
-      {/* Table */}
-      <table className="w-full">
-        <thead>
-          <tr className="bg-gray-50">
-            <th className="text-left text-[11px] font-bold text-gray-400 uppercase tracking-wider px-4 py-3 rounded-l-lg">Category</th>
-            <th className="text-right text-[11px] font-bold text-gray-400 uppercase tracking-wider px-4 py-3">Estimated</th>
-            <th className="text-right text-[11px] font-bold text-gray-400 uppercase tracking-wider px-4 py-3">Actual</th>
-            <th className="text-right text-[11px] font-bold text-gray-400 uppercase tracking-wider px-4 py-3 rounded-r-lg">Variance</th>
-          </tr>
-        </thead>
-        <tbody>
+      {/* Cost breakdown with progress bars */}
+      <div className="bg-white rounded-xl border border-border p-5">
+        <p className="text-[13px] font-bold text-gray-900 uppercase tracking-wider mb-4">Cost Breakdown</p>
+        <div className="space-y-4">
           {categories.map((cat) => {
-            const variance = cat.actual - cat.estimated;
-            const isOver = variance > 0;
+            const pct = cat.estimated > 0 ? Math.round((cat.actual / cat.estimated) * 100) : 0;
+            const isOver = cat.actual > cat.estimated;
             return (
-              <tr key={cat.category} className="border-b border-gray-100 last:border-0">
-                <td className="text-[14px] font-semibold text-gray-900 px-4 py-3.5">{cat.category}</td>
-                <td className="text-[14px] text-gray-500 px-4 py-3.5 text-right tabular-nums">{formatCurrency(cat.estimated)}</td>
-                <td className="text-[14px] font-semibold text-gray-900 px-4 py-3.5 text-right tabular-nums">{formatCurrency(cat.actual)}</td>
-                <td className={cn("text-[14px] font-semibold px-4 py-3.5 text-right tabular-nums", isOver ? "text-red-600" : "text-brand-600")}>
-                  {isOver ? "+" : ""}{formatCurrency(Math.abs(variance))}
-                </td>
-              </tr>
+              <div key={cat.category}>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[14px] font-semibold text-gray-900">{cat.category}</span>
+                  <span className="text-[14px] tabular-nums text-gray-500">
+                    <span className="font-semibold text-gray-900">{formatCurrency(cat.actual)}</span>
+                    {" / "}
+                    {formatCurrency(cat.estimated)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className={cn("h-full rounded-full transition-all duration-500", isOver ? "bg-red-500" : "bg-brand-600")}
+                      style={{ width: `${Math.min(pct, 100)}%` }}
+                    />
+                  </div>
+                  <span className={cn("text-[13px] font-bold tabular-nums w-[40px] text-right", isOver ? "text-red-600" : "text-gray-600")}>
+                    {pct}%
+                  </span>
+                </div>
+              </div>
             );
           })}
-        </tbody>
-        <tfoot>
-          <tr className="bg-gray-50">
-            <td className="text-[14px] font-bold text-gray-900 px-4 py-3.5 rounded-l-lg">Total</td>
-            <td className="text-[14px] font-bold text-gray-900 px-4 py-3.5 text-right tabular-nums">{formatCurrency(totalEstimated)}</td>
-            <td className="text-[14px] font-bold text-gray-900 px-4 py-3.5 text-right tabular-nums">{formatCurrency(totalActual)}</td>
-            <td className={cn("text-[14px] font-bold px-4 py-3.5 text-right tabular-nums rounded-r-lg", overBudget ? "text-red-600" : "text-brand-600")}>
-              {overBudget ? "+" : ""}{formatCurrency(Math.abs(totalVariance))}
-            </td>
-          </tr>
-        </tfoot>
-      </table>
+        </div>
+      </div>
+
+      {/* Recent expenses */}
+      {expenses.length > 0 && (
+        <div className="bg-white rounded-xl border border-border p-5">
+          <p className="text-[13px] font-bold text-gray-900 uppercase tracking-wider mb-4">Recent Expenses</p>
+          <div className="space-y-0">
+            {expenses.map((exp, i) => (
+              <div key={i} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <span className="text-[13px] text-gray-400 tabular-nums w-[52px] flex-shrink-0">{exp.date}</span>
+                  <span className="text-[14px] text-gray-900 truncate">{exp.description}</span>
+                </div>
+                <span className="text-[14px] font-semibold text-gray-900 tabular-nums flex-shrink-0 ml-4">{formatCurrency(exp.amount)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1797,8 +1860,8 @@ function JobCostingTab({ projectId, project }: { projectId: string; project: typ
 // ─── Milestones Tab ──────────────────────────────────────────────────────────
 
 const STATUS_CONFIG: Record<MilestoneStatus, { label: string; color: string; bg: string }> = {
-  paid:        { label: "Paid",        color: "text-green-700",  bg: "bg-green-50 border-green-200" },
-  approved:    { label: "Approved",    color: "text-blue-700",   bg: "bg-blue-50 border-blue-200" },
+  paid:        { label: "Paid",        color: "text-green-700",  bg: "bg-emerald-100 border-emerald-300" },
+  approved:    { label: "Approved",    color: "text-blue-700",   bg: "bg-blue-100 border-blue-300" },
   submitted:   { label: "Submitted",   color: "text-amber-700",  bg: "bg-amber-50 border-amber-200" },
   in_progress: { label: "In Progress", color: "text-brand-700",  bg: "bg-brand-50 border-brand-200" },
   pending:     { label: "Pending",     color: "text-gray-500",   bg: "bg-gray-50 border-gray-200" },
@@ -1859,7 +1922,7 @@ function MilestonesTab({
         </div>
         <div className="bg-white rounded-xl border border-border p-4">
           <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Released</p>
-          <p className="text-xl font-bold text-emerald-600 tabular-nums mt-1">{formatCurrency(releasedAmount)}</p>
+          <p className="text-xl font-bold text-emerald-700 tabular-nums mt-1">{formatCurrency(releasedAmount)}</p>
         </div>
         <div className="bg-white rounded-xl border border-border p-4">
           <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Remaining</p>
@@ -1874,12 +1937,12 @@ function MilestonesTab({
           <span className="text-[13px] font-bold text-gray-900 tabular-nums">{pct}%</span>
         </div>
         <div className="h-2 bg-gray-100 rounded-full overflow-hidden flex">
-          {paidAmount > 0 && <div className="bg-emerald-500 transition-all duration-500" style={{ width: `${(paidAmount / totalAmount) * 100}%` }} />}
-          {approvedAmount > 0 && <div className="bg-blue-400 transition-all duration-500" style={{ width: `${(approvedAmount / totalAmount) * 100}%` }} />}
+          {paidAmount > 0 && <div className="bg-emerald-600 transition-all duration-500" style={{ width: `${(paidAmount / totalAmount) * 100}%` }} />}
+          {approvedAmount > 0 && <div className="bg-blue-600 transition-all duration-500" style={{ width: `${(approvedAmount / totalAmount) * 100}%` }} />}
         </div>
         <div className="flex items-center gap-4 mt-2">
-          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-500" /><span className="text-[11px] text-gray-400">Paid</span></div>
-          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-400" /><span className="text-[11px] text-gray-400">Approved</span></div>
+          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-600" /><span className="text-[11px] text-gray-400">Paid</span></div>
+          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-600" /><span className="text-[11px] text-gray-400">Approved</span></div>
           <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-gray-200" /><span className="text-[11px] text-gray-400">Remaining</span></div>
         </div>
       </div>
@@ -1905,9 +1968,9 @@ function MilestonesTab({
               >
                 <div className={cn(
                   "w-7 h-7 rounded-lg flex items-center justify-center shrink-0",
-                  m.status === "paid" || m.status === "approved" ? "bg-emerald-50" : m.status === "submitted" ? "bg-amber-50" : m.status === "in_progress" ? "bg-brand-50" : "bg-gray-50"
+                  m.status === "paid" || m.status === "approved" ? "bg-emerald-100" : m.status === "submitted" ? "bg-amber-50" : m.status === "in_progress" ? "bg-brand-50" : "bg-gray-50"
                 )}>
-                  {(m.status === "paid" || m.status === "approved") && <Check className="w-4 h-4 text-emerald-600" strokeWidth={2.5} />}
+                  {(m.status === "paid" || m.status === "approved") && <Check className="w-4 h-4 text-emerald-700" strokeWidth={2.5} />}
                   {m.status === "submitted" && <Clock className="w-4 h-4 text-amber-600" />}
                   {m.status === "in_progress" && <div className="w-2.5 h-2.5 rounded-full bg-brand-600 animate-pulse" />}
                   {m.status === "pending" && <Circle className="w-4 h-4 text-gray-300" />}
@@ -1921,7 +1984,7 @@ function MilestonesTab({
                   </div>
                 </div>
 
-                <p className={cn("text-[15px] font-bold tabular-nums shrink-0", m.status === "paid" ? "text-emerald-600" : "text-gray-900")}>{formatCurrency(m.amount)}</p>
+                <p className={cn("text-[15px] font-bold tabular-nums shrink-0", m.status === "paid" ? "text-emerald-700" : "text-gray-900")}>{formatCurrency(m.amount)}</p>
 
                 <div className="shrink-0 w-8 flex justify-end">
                   {canExpand && (
@@ -2005,16 +2068,16 @@ function MilestonesTab({
 
                   {/* Paid confirmation */}
                   {m.status === "paid" && (
-                    <div className="flex items-center gap-2 p-3 bg-emerald-50 rounded-lg border border-emerald-100">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <div className="flex items-center gap-2 p-3 bg-emerald-100 rounded-lg border border-emerald-300">
+                      <Check className="w-4 h-4 text-emerald-700 shrink-0" />
                       <p className="text-[13px] text-emerald-700">Payment of {formatCurrency(m.amount)} released to your account.</p>
                     </div>
                   )}
 
                   {/* Approved message */}
                   {m.status === "approved" && (
-                    <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg border border-blue-100">
-                      <Check className="w-4 h-4 text-blue-600 shrink-0" />
+                    <div className="flex items-center gap-2 p-3 bg-blue-100 rounded-lg border border-blue-300">
+                      <Check className="w-4 h-4 text-blue-700 shrink-0" />
                       <p className="text-[13px] text-blue-700">Approved by {project.client}. Payment processing.</p>
                     </div>
                   )}
@@ -2077,7 +2140,7 @@ function MilestoneScheduleTab({ project }: { project: typeof PROJECTS[0] }) {
               <div className="flex flex-col items-center w-10 shrink-0">
                 <div className={cn(
                   "w-3 h-3 rounded-full border-2 shrink-0 mt-1.5",
-                  m.status === "paid" || m.status === "approved" ? "bg-emerald-500 border-emerald-500"
+                  m.status === "paid" || m.status === "approved" ? "bg-emerald-600 border-emerald-600"
                     : m.status === "submitted" ? "bg-amber-400 border-amber-400"
                     : m.status === "in_progress" ? "bg-brand-600 border-brand-600"
                     : "bg-white border-gray-300"
@@ -2095,11 +2158,89 @@ function MilestoneScheduleTab({ project }: { project: typeof PROJECTS[0] }) {
                       <span className="text-[12px] text-gray-400">{m.completedDate || dateStr}</span>
                     </div>
                   </div>
-                  <span className={cn("text-[14px] font-bold tabular-nums", m.status === "paid" ? "text-emerald-600" : "text-gray-900")}>
+                  <span className={cn("text-[14px] font-bold tabular-nums", m.status === "paid" ? "text-emerald-700" : "text-gray-900")}>
                     {formatCurrency(m.amount)}
                   </span>
                 </div>
               </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── Documents Tab ────────────────────────────────────────────────────────────
+
+const MOCK_DOCUMENTS = [
+  { id: "d1", name: "Contract — Kitchen Remodel", type: "contract", size: "2.4 MB", date: "2026-03-08", status: "signed" },
+  { id: "d2", name: "Change Order #1", type: "change_order", size: "1.1 MB", date: "2026-03-15", status: "approved" },
+  { id: "d3", name: "Change Order #2", type: "change_order", size: "890 KB", date: "2026-03-20", status: "pending" },
+  { id: "d4", name: "Insurance Certificate", type: "insurance", size: "540 KB", date: "2026-03-08", status: "verified" },
+  { id: "d5", name: "Permit — Building", type: "permit", size: "1.8 MB", date: "2026-03-10", status: "approved" },
+  { id: "d6", name: "Inspection Report", type: "inspection", size: "3.2 MB", date: "2026-03-22", status: "passed" },
+];
+
+const DOC_STATUS_STYLE: Record<string, { label: string; className: string }> = {
+  signed: { label: "Signed", className: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+  approved: { label: "Approved", className: "bg-blue-50 text-blue-700 border-blue-200" },
+  pending: { label: "Pending", className: "bg-amber-50 text-amber-700 border-amber-200" },
+  verified: { label: "Verified", className: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+  passed: { label: "Passed", className: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+};
+
+const DOC_TYPE_LABEL: Record<string, string> = {
+  contract: "Contract",
+  change_order: "Change Order",
+  insurance: "Insurance",
+  permit: "Permit",
+  inspection: "Inspection",
+};
+
+function DocumentsTab() {
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <p className="text-[13px] text-gray-500">{MOCK_DOCUMENTS.length} documents</p>
+        <Button size="sm" className="h-8 text-[12px] gap-1.5">
+          <Upload className="w-3.5 h-3.5" />
+          Upload Document
+        </Button>
+      </div>
+
+      <div className="bg-white rounded-lg border border-border overflow-hidden">
+        {MOCK_DOCUMENTS.map((doc, i) => {
+          const status = DOC_STATUS_STYLE[doc.status] || DOC_STATUS_STYLE.pending;
+          const typeLabel = DOC_TYPE_LABEL[doc.type] || doc.type;
+          return (
+            <div
+              key={doc.id}
+              className={cn(
+                "flex items-center gap-4 px-4 py-3 hover:bg-gray-50/80 transition-colors",
+                i < MOCK_DOCUMENTS.length - 1 && "border-b border-border"
+              )}
+            >
+              <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <FileText className="w-4 h-4 text-gray-400" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[13px] font-medium text-gray-900 truncate">{doc.name}</p>
+                <p className="text-[11px] text-gray-400 mt-0.5">{doc.size}</p>
+              </div>
+              <span className="text-[11px] font-medium text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
+                {typeLabel}
+              </span>
+              <span className="text-[12px] text-gray-400 tabular-nums w-[80px] text-right">{doc.date}</span>
+              <span className={cn("text-[10px] font-medium px-2 py-0.5 rounded border min-w-[70px] text-center", status.className)}>
+                {status.label}
+              </span>
+              <button
+                className="flex items-center justify-center w-7 h-7 rounded-md hover:bg-gray-100 transition-colors text-gray-400 hover:text-gray-600"
+                title="Download"
+              >
+                <Download className="w-3.5 h-3.5" />
+              </button>
             </div>
           );
         })}
@@ -2116,6 +2257,7 @@ const PROJECT_NAV = [
   { id: "daily-log", label: "Daily Log", icon: FileText },
   { id: "schedule", label: "Schedule", icon: Calendar },
   { id: "job-costing", label: "Job Costing", icon: TrendingUp },
+  { id: "documents", label: "Documents", icon: FileText },
 ];
 
 export default function ProjectsPage() {
@@ -2146,6 +2288,7 @@ export default function ProjectsPage() {
       case "change-orders": return <ChangeOrdersTab projectId={selectedProjectId} />;
       case "punch-list": return <PunchListTab projectId={selectedProjectId} />;
       case "job-costing": return <JobCostingTab projectId={selectedProjectId} project={project} />;
+      case "documents": return <DocumentsTab />;
       default: return <OverviewTab project={project} />;
     }
   };

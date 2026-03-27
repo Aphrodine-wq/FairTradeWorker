@@ -31,6 +31,8 @@ import {
   TrendingDown,
   TrendingUp,
   Minus,
+  Download,
+  UserPlus,
 } from "lucide-react";
 import { Button } from "@shared/ui/button";
 import { Badge } from "@shared/ui/badge";
@@ -167,6 +169,16 @@ function EstimateRow({ est }: { est: Estimate }) {
 
       {open && (
         <div className="px-5 pb-5">
+          <div className="flex items-center justify-end gap-2 mb-3">
+            <button className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border text-[12px] font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+              <Download className="w-3.5 h-3.5" />
+              Download PDF
+            </button>
+            <button className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border text-[12px] font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+              <Send className="w-3.5 h-3.5" />
+              Send to Client
+            </button>
+          </div>
           {/* PDF-style document */}
           <div className="bg-white rounded-lg shadow-[0_4px_30px_-6px_rgba(0,0,0,0.15)] ring-1 ring-gray-200/80 overflow-hidden max-w-[600px]">
             {/* Top accent line */}
@@ -437,10 +449,18 @@ function NewEstimateTab() {
         <div className={buildStep !== "client" ? "hidden" : ""}>
           <div className="flex items-center gap-2.5 mb-4">
             <span className="w-7 h-7 rounded-full bg-brand-600 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">1</span>
-            <div>
+            <div className="flex-1">
               <p className="text-[15px] font-bold text-gray-900">Client</p>
               <p className="text-[12px] text-gray-400">Who is this estimate for?</p>
             </div>
+            <button
+              type="button"
+              onClick={() => toast.info("Contact import coming soon")}
+              className="flex items-center gap-1.5 text-[12px] font-medium text-brand-600 hover:text-brand-700 transition-colors"
+            >
+              <UserPlus className="w-3.5 h-3.5" />
+              Import from Contacts
+            </button>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
@@ -720,9 +740,9 @@ function NewEstimateTab() {
       </div>
 
       {/* Right: Live PDF Preview */}
-      <div className="w-[440px] flex-shrink-0 sticky top-0">
+      <div className="w-[480px] flex-shrink-0 sticky top-0">
         <p className="text-[12px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Live Preview</p>
-        <div className="bg-white rounded-lg shadow-[0_4px_30px_-6px_rgba(0,0,0,0.15)] ring-1 ring-gray-200/80 overflow-hidden transform scale-[0.90] origin-top-right">
+        <div className="bg-white rounded-lg shadow-[0_4px_30px_-6px_rgba(0,0,0,0.15)] ring-1 ring-gray-200/80 overflow-hidden transform scale-[0.95] origin-top-right">
           {/* Accent bar */}
           <div className="h-1.5 bg-brand-600" />
           <div className="px-6 pt-4 pb-5">

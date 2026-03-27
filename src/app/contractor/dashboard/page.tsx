@@ -83,10 +83,10 @@ const TYPE_LABEL: Record<string, string> = {
 };
 
 const TODAYS_SCHEDULE = [
-  { time: "7:00a", endTime: "4:00p", label: "Kitchen Remodel", detail: "Framing south wall, install headers", location: "4821 Ridgeline Dr, Austin", crew: ["Marcus", "Tony", "David"], type: "work", client: "Michael Brown" },
-  { time: "10:00a", endTime: "11:30a", label: "Site Visit — Bathroom Reno", detail: "Walk-through with homeowner, take measurements for tile order", location: "7744 Stone Oak Pkwy, SA", crew: ["Marcus"], type: "visit", client: "Sarah Williams" },
-  { time: "1:00p", endTime: "2:00p", label: "Roof Inspection", detail: "City inspector on site — bring ladder, permit docs, and insurance cert", location: "15230 Cypress Creek, Houston", crew: ["David", "Alex"], type: "inspection", client: "Linda Okafor" },
-  { time: "3:30p", endTime: "4:30p", label: "Estimate Walkthrough — HVAC", detail: "Measure ductwork, check attic access, photograph existing system", location: "1845 Sam Bass Rd, Round Rock", crew: ["Marcus"], type: "estimate", client: "Kevin Nguyen" },
+  { time: "7:00a", endTime: "11:00a", label: "Countertop template", detail: "Template quartz countertops — confirm sink cutout and edge profile", location: "4821 Ridgeline Dr, Austin", crew: ["Marcus", "Tony"], type: "work", client: "Michael Brown" },
+  { time: "10:00a", endTime: "11:30a", label: "Tile delivery — Bathroom", detail: "Receive tile delivery, verify quantities against order sheet", location: "7744 Stone Oak Pkwy, SA", crew: ["Tony"], type: "visit", client: "Sarah Williams" },
+  { time: "1:00p", endTime: "4:00p", label: "Decking boards install", detail: "Install composite decking boards — 14 squares, stagger joints", location: "902 Pecan Valley, Austin", crew: ["Marcus", "David"], type: "work", client: "Robert Johnson" },
+  { time: "3:30p", endTime: "4:30p", label: "Final inspection — Roof", detail: "City inspector on site — bring permit docs, insurance cert, and ladder", location: "15230 Cypress Creek, Houston", crew: ["David", "Alex"], type: "inspection", client: "Patricia Taylor" },
 ];
 
 // ─── Job Carousel ────────────────────────────────────────────────────────────
