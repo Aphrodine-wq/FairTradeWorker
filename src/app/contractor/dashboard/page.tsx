@@ -195,15 +195,13 @@ export default function ContractorDashboardPage() {
         <div className="flex items-center justify-between">
           <h1 className="text-[22px] font-semibold text-gray-900 tracking-tight">{formatTodayDate()}</h1>
           <div className="flex items-center gap-3">
-            <Link href="/contractor/estimates?tab=agent" className="flex items-center gap-2 h-10 px-4 rounded-lg bg-gray-900 text-white text-[13px] font-semibold hover:bg-gray-800 transition-colors shadow-sm">
-              <Briefcase className="w-4 h-4" />
+            <Link href="/contractor/estimates?tab=agent" className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-gray-900 text-white text-[12px] font-semibold hover:bg-gray-800 transition-colors">
+              <Briefcase className="w-3.5 h-3.5" />
               Estimate Agent
             </Link>
-            <Link href="/contractor/estimates">
-              <Button className="gap-2 shadow-sm">
-                <Plus className="w-4 h-4" />
-                New Estimate
-              </Button>
+            <Link href="/contractor/estimates" className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-brand-600 text-white text-[12px] font-semibold hover:bg-brand-700 transition-colors">
+              <Plus className="w-3.5 h-3.5" />
+              New Estimate
             </Link>
           </div>
         </div>

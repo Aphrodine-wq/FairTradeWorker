@@ -35,6 +35,7 @@ import {
   ClipboardList,
   Pencil,
   MapPin,
+  Check,
 } from "lucide-react";
 import Link from "next/link";
 import { AppHeader } from "@shared/components/app-header";
@@ -1781,10 +1782,74 @@ function JobCostingTab({ projectId, project }: { projectId: string; project: typ
   );
 }
 
+// ─── Milestones Tab ──────────────────────────────────────────────────────────
+
+function MilestonesTab({ project }: { project: typeof PROJECTS[0] }) {
+  const completed = project.milestones.filter((m) => m.done).length;
+  const total = project.milestones.length;
+  const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+  return (
+    <div className="p-6 max-w-2xl">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h3 className="text-base font-bold text-gray-900">Project Milestones</h3>
+          <p className="text-sm text-gray-400 mt-0.5">{completed} of {total} complete</p>
+        </div>
+        <span className="text-2xl font-bold text-gray-900 tabular-nums">{pct}%</span>
+      </div>
+
+      {/* Progress bar */}
+      <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-8">
+        <div className="h-full bg-brand-600 rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
+      </div>
+
+      {/* Milestone list */}
+      <div className="space-y-0">
+        {project.milestones.map((m, i) => {
+          const isLast = i === total - 1;
+          return (
+            <div key={m.label} className="flex gap-4">
+              {/* Timeline line + dot */}
+              <div className="flex flex-col items-center">
+                <div className={cn(
+                  "w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0",
+                  m.done
+                    ? "bg-brand-600 border-brand-600"
+                    : "bg-white border-gray-200"
+                )}>
+                  {m.done && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
+                </div>
+                {!isLast && (
+                  <div className={cn("w-px flex-1 min-h-[32px]", m.done ? "bg-brand-600" : "bg-gray-200")} />
+                )}
+              </div>
+
+              {/* Content */}
+              <div className={cn("pb-6", isLast && "pb-0")}>
+                <p className={cn(
+                  "text-sm font-semibold",
+                  m.done ? "text-gray-900" : "text-gray-500"
+                )}>
+                  {m.label}
+                </p>
+                {m.done && (
+                  <p className="text-xs text-gray-400 mt-0.5">Completed</p>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 const PROJECT_NAV = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "milestones", label: "Milestones", icon: CheckCircle2 },
   { id: "daily-log", label: "Daily Log", icon: FileText },
   { id: "schedule", label: "Schedule", icon: Calendar },
   { id: "job-costing", label: "Job Costing", icon: TrendingUp },
@@ -1810,7 +1875,7 @@ export default function ProjectsPage() {
   const renderSection = () => {
     switch (activeSection) {
       case "overview": return <OverviewTab project={project} />;
-      case "calendar": return <CalendarView project={project} />;
+      case "milestones": return <MilestonesTab project={project} />;
       case "daily-log": return <DailyLogTab projectId={selectedProjectId} />;
       case "schedule": return <ScheduleTab />;
       case "change-orders": return <ChangeOrdersTab projectId={selectedProjectId} />;
