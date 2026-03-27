@@ -1813,87 +1813,77 @@ function MilestonesTab({
   }
 
   return (
-    <div className="p-6 max-w-xl">
+    <div className="p-6 max-w-2xl">
       {/* Header */}
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-base font-bold text-gray-900">Milestones</h3>
-        <span className="text-sm font-bold text-gray-900 tabular-nums">{pct}%</span>
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-1">
+          <h3 className="text-lg font-bold text-gray-900">Milestones</h3>
+          <span className="text-sm text-gray-400">{completed}/{total}</span>
+        </div>
+        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+          <div className="h-full bg-brand-600 rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
+        </div>
       </div>
-      <p className="text-xs text-gray-400 mb-4">{project.name} &middot; {completed} of {total} complete</p>
 
-      {/* Progress bar */}
-      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden mb-6">
-        <div className="h-full bg-brand-600 rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
-      </div>
-
-      {/* Milestone list */}
-      <div className="space-y-0 mb-6">
-        {milestones.map((m, i) => {
-          const isLast = i === total - 1;
-          return (
-            <div key={`${m.label}-${i}`} className="flex gap-3 group">
-              {/* Timeline */}
-              <div className="flex flex-col items-center w-6">
-                <button
-                  onClick={() => toggleMilestone(i)}
-                  className={cn(
-                    "w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors",
-                    m.done
-                      ? "bg-brand-600 border-brand-600 hover:bg-brand-700"
-                      : "bg-white border-gray-300 hover:border-brand-400"
-                  )}
-                >
-                  {m.done && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
-                </button>
-                {!isLast && (
-                  <div className={cn("w-px flex-1 min-h-[24px]", m.done ? "bg-brand-200" : "bg-gray-200")} />
-                )}
-              </div>
-
-              {/* Content */}
-              <div className={cn("flex-1 flex items-start justify-between min-h-[48px]", !isLast && "pb-2")}>
-                <div className="pt-0.5">
-                  <p className={cn(
-                    "text-[13px] font-medium leading-tight",
-                    m.done ? "text-gray-900 line-through decoration-gray-300" : "text-gray-700"
-                  )}>
-                    {m.label}
-                  </p>
-                  <p className="text-[11px] text-gray-400 mt-0.5">
-                    {m.done ? "Completed" : `Step ${i + 1} of ${total}`}
-                  </p>
-                </div>
-                <button
-                  onClick={() => removeMilestone(i)}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-red-50 text-gray-300 hover:text-red-500"
-                  title="Remove milestone"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
+      {/* Checklist */}
+      <div className="space-y-1 mb-4">
+        {milestones.map((m, i) => (
+          <div
+            key={`${m.label}-${i}`}
+            className="group flex items-center gap-4 rounded-xl px-4 py-4 hover:bg-gray-50 transition-colors cursor-pointer"
+            onClick={() => toggleMilestone(i)}
+          >
+            {/* Checkbox */}
+            <div className={cn(
+              "w-6 h-6 rounded-md border-2 flex items-center justify-center shrink-0 transition-all",
+              m.done
+                ? "bg-brand-600 border-brand-600"
+                : "border-gray-300 group-hover:border-brand-400"
+            )}>
+              {m.done && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
             </div>
-          );
-        })}
+
+            {/* Label */}
+            <span className={cn(
+              "flex-1 text-[15px]",
+              m.done
+                ? "text-gray-400 line-through"
+                : "text-gray-900 font-medium"
+            )}>
+              {m.label}
+            </span>
+
+            {/* Delete */}
+            <button
+              onClick={(e) => { e.stopPropagation(); removeMilestone(i); }}
+              className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-red-50 text-gray-300 hover:text-red-500"
+              title="Remove"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        ))}
       </div>
 
-      {/* Add milestone */}
-      <div className="flex gap-2">
+      {/* Add */}
+      <div className="flex items-center gap-4 px-4 py-3">
+        <div className="w-6 h-6 rounded-md border-2 border-dashed border-gray-200 shrink-0" />
         <input
           type="text"
           value={newMilestone}
           onChange={(e) => setNewMilestone(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && addMilestone()}
           placeholder="Add a milestone..."
-          className="flex-1 h-9 rounded-lg border border-border bg-white px-3 text-[13px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-1"
+          className="flex-1 text-[15px] text-gray-900 placeholder:text-gray-300 bg-transparent focus:outline-none"
         />
-        <button
-          onClick={addMilestone}
-          disabled={!newMilestone.trim()}
-          className="h-9 px-3 rounded-lg bg-brand-600 text-white text-[12px] font-semibold hover:bg-brand-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          Add
-        </button>
+        {newMilestone.trim() && (
+          <button
+            onClick={addMilestone}
+            className="text-[13px] font-semibold text-brand-600 hover:text-brand-700 transition-colors"
+          >
+            Add
+          </button>
+        )}
       </div>
     </div>
   );
