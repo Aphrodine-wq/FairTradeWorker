@@ -471,7 +471,7 @@ export default function HomeownerSettingsPage() {
       {/* Sidebar + Content */}
       <div className="flex flex-1 min-h-0">
         {/* Settings sidebar */}
-        <nav className="w-56 flex-shrink-0 bg-white border-r border-border py-4 px-2 overflow-y-auto">
+        <nav className="w-44 flex-shrink-0 bg-white border-r border-border py-3 px-2 overflow-y-auto">
           {NAV_SECTIONS.map((section) => {
             const Icon = section.icon;
             const isActive = active === section.id;
@@ -480,7 +480,7 @@ export default function HomeownerSettingsPage() {
                 key={section.id}
                 onClick={() => setActive(section.id)}
                 className={cn(
-                  "w-full flex items-center gap-2.5 rounded-lg px-3 py-3 text-[15px] font-medium transition-colors mb-1",
+                  "w-full flex items-center gap-2 rounded-lg px-2.5 py-2 text-[13px] font-medium transition-colors mb-0.5",
                   isActive
                     ? "bg-brand-600 text-white"
                     : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"

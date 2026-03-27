@@ -1903,8 +1903,8 @@ export default function ProjectsPage() {
       {/* Sidebar + Content */}
       <div className="flex flex-1 min-h-0">
         {/* Project list sidebar */}
-        <div className="w-56 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-y-auto">
-          <div className="py-3 px-3 space-y-0.5">
+        <div className="w-44 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-y-auto">
+          <div className="py-3 px-2 space-y-0.5">
             {projects.map((p) => {
               const isSelected = p.id === selectedProjectId;
               return (
@@ -1912,7 +1912,7 @@ export default function ProjectsPage() {
                   key={p.id}
                   onClick={() => setSelectedProjectId(p.id)}
                   className={cn(
-                    "w-full text-left rounded-lg px-3 py-2.5 transition-colors text-[13px] font-medium truncate",
+                    "w-full text-left rounded-lg px-2.5 py-2 transition-colors text-[12px] font-medium truncate",
                     isSelected
                       ? "bg-gray-900 text-white"
                       : "text-gray-700 hover:bg-gray-50"
