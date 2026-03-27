@@ -971,6 +971,16 @@ const TEMPLATE_OPTIONS = [
   { value: "roofing", label: "Roof Replacement" },
   { value: "painting", label: "Interior Painting" },
   { value: "concrete", label: "Concrete / Flatwork" },
+  { value: "deck", label: "Deck Build" },
+  { value: "fencing", label: "Fence Install" },
+  { value: "flooring", label: "Flooring Install" },
+  { value: "hvac", label: "HVAC System" },
+  { value: "electrical", label: "Electrical Panel Upgrade" },
+  { value: "plumbing", label: "Plumbing Repipe" },
+  { value: "siding", label: "Siding Replacement" },
+  { value: "drywall", label: "Drywall Repair / Hang" },
+  { value: "landscaping", label: "Landscaping" },
+  { value: "demo", label: "Demolition" },
 ];
 
 const UNIT_OPTIONS = ["ea", "sqft", "lf", "sq", "cuyd", "gal", "hr", "day", "job", "set"];
@@ -1062,22 +1072,15 @@ function CalculatorTab() {
         <div>
           <p className="text-[15px] font-bold text-gray-900 mb-1">Job Template</p>
           <p className="text-[12px] text-gray-400 mb-3">Start from a template or build from scratch</p>
-          <div className="flex flex-wrap gap-2">
+          <select
+            value={template}
+            onChange={(e) => loadTemplate(e.target.value)}
+            className="h-11 w-full max-w-sm rounded-lg border border-gray-200 bg-white px-3.5 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
+          >
             {TEMPLATE_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => loadTemplate(opt.value)}
-                className={cn(
-                  "text-[13px] font-medium px-4 py-2 rounded-lg transition-colors",
-                  template === opt.value
-                    ? "bg-gray-900 text-white"
-                    : "bg-white text-gray-500 hover:bg-gray-100 ring-1 ring-gray-200"
-                )}
-              >
-                {opt.label}
-              </button>
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
-          </div>
+          </select>
         </div>
 
         {/* Sections */}
@@ -1696,32 +1699,7 @@ function EstimatesPageContent() {
     <div className="flex flex-col min-h-full bg-surface">
       {/* Header */}
       <div className="px-8 pt-7 pb-5 bg-white border-b border-border">
-        <div>
-          <h1 className="text-[22px] font-bold text-gray-900 tracking-tight">Estimates</h1>
-          <p className="text-sm text-gray-400 mt-1">
-            {estimates.length} estimates · {formatCurrency(totalValue)} total value
-          </p>
-        </div>
-        <div className="flex items-center gap-5 mt-3">
-          {[
-            { dot: "bg-brand-500", value: String(sent), label: "pending" },
-            { dot: "bg-brand-500", value: String(accepted), label: "accepted" },
-            {
-              dot: "bg-brand-500",
-              value: `${estimates.length > 0 ? Math.round((accepted / estimates.length) * 100) : 0}%`,
-              label: "win rate",
-            },
-            { dot: "bg-brand-500", value: formatCurrency(totalValue), label: "total value" },
-          ].map((stat) => (
-            <div key={stat.label} className="flex items-center gap-2">
-              <span className={cn("w-2 h-2 rounded-full", stat.dot)} />
-              <span className="text-[13px] text-gray-500">
-                <span className="font-bold text-gray-900">{stat.value}</span>{" "}
-                {stat.label}
-              </span>
-            </div>
-          ))}
-        </div>
+        <h1 className="text-[22px] font-bold text-gray-900 tracking-tight">Estimates</h1>
       </div>
 
       {/* Sidebar + Content */}

@@ -2048,6 +2048,66 @@ function MilestonesTab({
   );
 }
 
+// ─── Milestone Schedule Tab ──────────────────────────────────────────────────
+
+function MilestoneScheduleTab({ project }: { project: typeof PROJECTS[0] }) {
+  const milestones = project.milestones as Milestone[];
+  const startDate = new Date(project.startDate);
+
+  return (
+    <div className="p-6 max-w-3xl">
+      <h3 className="text-base font-bold text-gray-900 mb-1">Schedule</h3>
+      <p className="text-[13px] text-gray-400 mb-6">
+        {project.name} &middot; {project.startDate} to {project.estimatedEnd}
+      </p>
+
+      <div className="space-y-0">
+        {milestones.map((m, i) => {
+          const cfg = STATUS_CONFIG[m.status];
+          // Estimate date spread across project timeline
+          const totalDays = Math.max(1, Math.ceil((new Date(project.estimatedEnd).getTime() - startDate.getTime()) / 86400000));
+          const dayOffset = Math.round((i / milestones.length) * totalDays);
+          const estDate = new Date(startDate.getTime() + dayOffset * 86400000);
+          const dateStr = estDate.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+          const isLast = i === milestones.length - 1;
+
+          return (
+            <div key={`${m.label}-${i}`} className="flex gap-4">
+              {/* Timeline */}
+              <div className="flex flex-col items-center w-10 shrink-0">
+                <div className={cn(
+                  "w-3 h-3 rounded-full border-2 shrink-0 mt-1.5",
+                  m.status === "paid" || m.status === "approved" ? "bg-emerald-500 border-emerald-500"
+                    : m.status === "submitted" ? "bg-amber-400 border-amber-400"
+                    : m.status === "in_progress" ? "bg-brand-600 border-brand-600"
+                    : "bg-white border-gray-300"
+                )} />
+                {!isLast && <div className={cn("w-px flex-1 min-h-[40px]", m.done ? "bg-emerald-200" : "bg-gray-200")} />}
+              </div>
+
+              {/* Content */}
+              <div className={cn("flex-1 pb-6", isLast && "pb-0")}>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className={cn("text-[14px] font-medium", m.done ? "text-gray-400" : "text-gray-900")}>{m.label}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className={cn("text-[11px] font-semibold px-1.5 py-0.5 rounded border", cfg.bg, cfg.color)}>{cfg.label}</span>
+                      <span className="text-[12px] text-gray-400">{m.completedDate || dateStr}</span>
+                    </div>
+                  </div>
+                  <span className={cn("text-[14px] font-bold tabular-nums", m.status === "paid" ? "text-emerald-600" : "text-gray-900")}>
+                    {formatCurrency(m.amount)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 const PROJECT_NAV = [
@@ -2082,7 +2142,7 @@ export default function ProjectsPage() {
         setProjects((prev) => prev.map((p) => p.id === selectedProjectId ? { ...p, milestones: ms as typeof p.milestones, progress: ms.length > 0 ? Math.round(ms.filter((m) => m.done).length / ms.length * 100) : 0 } : p));
       }} />;
       case "daily-log": return <DailyLogTab projectId={selectedProjectId} />;
-      case "schedule": return <ScheduleTab />;
+      case "schedule": return <MilestoneScheduleTab project={project} />;
       case "change-orders": return <ChangeOrdersTab projectId={selectedProjectId} />;
       case "punch-list": return <PunchListTab projectId={selectedProjectId} />;
       case "job-costing": return <JobCostingTab projectId={selectedProjectId} project={project} />;
@@ -2119,7 +2179,7 @@ export default function ProjectsPage() {
                   className={cn(
                     "w-full text-left rounded-lg px-2.5 py-2 transition-colors text-[12px] font-medium truncate",
                     isSelected
-                      ? "bg-gray-900 text-white"
+                      ? "bg-brand-600 text-white"
                       : "text-gray-700 hover:bg-gray-50"
                   )}
                 >
