@@ -28,66 +28,11 @@ function useCountUp(target: number, duration: number, active: boolean) {
   return count;
 }
 
-interface StatItemProps {
-  label: string;
-  sublabel: string;
-  value: number;
-  suffix: string;
-  prefix?: string;
-  active: boolean;
-}
-
-function StatItem({
-  label,
-  sublabel,
-  value,
-  suffix,
-  prefix,
-  active,
-}: StatItemProps) {
-  const count = useCountUp(value, 1800, active);
-  return (
-    <div className="text-center px-4 py-2">
-      <div className="text-3xl font-bold text-white tabular-nums">
-        {prefix}
-        {count.toLocaleString()}
-        {suffix}
-      </div>
-      <div className="mt-1 text-sm font-medium text-white/90">{label}</div>
-      <div className="text-xs text-white/60">{sublabel}</div>
-    </div>
-  );
-}
-
 const STATS = [
-  {
-    label: "Jobs Completed",
-    sublabel: "and counting",
-    value: 12847,
-    suffix: "+",
-    prefix: "",
-  },
-  {
-    label: "Verified Contractors",
-    sublabel: "licensed and insured",
-    value: 3200,
-    suffix: "+",
-    prefix: "",
-  },
-  {
-    label: "Homeowner Satisfaction",
-    sublabel: "across all projects",
-    value: 98,
-    suffix: "%",
-    prefix: "",
-  },
-  {
-    label: "Lead Fees",
-    sublabel: "on every plan, forever",
-    value: 0,
-    suffix: "",
-    prefix: "$",
-  },
+  { value: 12847, suffix: "+", prefix: "", label: "Jobs completed" },
+  { value: 3200, suffix: "+", prefix: "", label: "Verified contractors" },
+  { value: 98, suffix: "%", prefix: "", label: "Homeowner satisfaction" },
+  { value: 0, suffix: "", prefix: "$", label: "Lead fees" },
 ] as const;
 
 export function StatsBar() {
@@ -111,20 +56,25 @@ export function StatsBar() {
   }, []);
 
   return (
-    <section ref={ref} className="bg-brand-600 py-10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-0 lg:divide-x lg:divide-white/20">
-          {STATS.map((stat) => (
-            <StatItem
-              key={stat.label}
-              label={stat.label}
-              sublabel={stat.sublabel}
-              value={stat.value}
-              suffix={stat.suffix}
-              prefix={stat.prefix}
-              active={active}
-            />
-          ))}
+    <section ref={ref} className="border-y border-border bg-white">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex items-center justify-between">
+          {STATS.map((stat, i) => {
+            const count = useCountUp(stat.value, 1800, active);
+            return (
+              <React.Fragment key={stat.label}>
+                {i > 0 && <div className="hidden sm:block w-px h-8 bg-border" />}
+                <div className="flex items-baseline gap-2 px-2">
+                  <span className="text-2xl font-bold text-gray-900 tabular-nums">
+                    {stat.prefix}{count.toLocaleString()}{stat.suffix}
+                  </span>
+                  <span className="text-sm text-gray-400 hidden sm:inline">
+                    {stat.label}
+                  </span>
+                </div>
+              </React.Fragment>
+            );
+          })}
         </div>
       </div>
     </section>
