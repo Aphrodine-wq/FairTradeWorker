@@ -394,12 +394,47 @@ function NewEstimateTab() {
     "net30": "Net 30 days",
   };
 
+  const [buildStep, setBuildStep] = useState<"client" | "job" | "items" | "terms">("client");
+
+  const BUILD_STEPS = [
+    { id: "client" as const, label: "Client" },
+    { id: "job" as const, label: "Job Details" },
+    { id: "items" as const, label: "Line Items" },
+    { id: "terms" as const, label: "Terms & Notes" },
+  ];
+
   return (
     <div className="flex gap-6 items-start">
       {/* Left: Form */}
-      <div className="flex-1 min-w-0 space-y-5">
+      <div className="flex-1 min-w-0">
+        {/* Step nav */}
+        <div className="border-b border-border mb-6">
+          <div className="flex">
+            {BUILD_STEPS.map((step, i) => (
+              <button
+                key={step.id}
+                onClick={() => setBuildStep(step.id)}
+                className={cn(
+                  "flex items-center gap-2 px-5 py-3 text-[13px] font-medium transition-colors border-b-2 -mb-px",
+                  buildStep === step.id
+                    ? "border-gray-900 text-gray-900"
+                    : "border-transparent text-gray-400 hover:text-gray-600"
+                )}
+              >
+                <span className={cn(
+                  "w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center",
+                  buildStep === step.id ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-500"
+                )}>
+                  {i + 1}
+                </span>
+                {step.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Client */}
-        <div>
+        <div className={buildStep !== "client" ? "hidden" : ""}>
           <div className="flex items-center gap-2.5 mb-4">
             <span className="w-7 h-7 rounded-full bg-brand-600 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">1</span>
             <div>
@@ -424,7 +459,7 @@ function NewEstimateTab() {
         </div>
 
         {/* Job Details */}
-        <div>
+        <div className={buildStep !== "job" ? "hidden" : ""}>
           <div className="flex items-center gap-2.5 mb-4">
             <span className="w-7 h-7 rounded-full bg-brand-600 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">2</span>
             <div>
@@ -480,7 +515,7 @@ function NewEstimateTab() {
         </div>
 
         {/* Line Items */}
-        <div>
+        <div className={buildStep !== "items" ? "hidden" : ""}>
           <div className="flex items-center gap-2.5 mb-4">
             <span className="w-7 h-7 rounded-full bg-brand-600 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">3</span>
             <div>
@@ -613,10 +648,9 @@ function NewEstimateTab() {
               </div>
             </div>
           </div>
-        </div>
 
-        {/* FairPrice market context */}
-        {category && grandTotal > 0 && (() => {
+          {/* FairPrice market context */}
+          {category && grandTotal > 0 && (() => {
           const fp = getEstimateFairPrice(category, grandTotal);
           if (!fp) return null;
           const isBelow = fp.pct <= -8;
@@ -641,10 +675,11 @@ function NewEstimateTab() {
               </span>
             </div>
           );
-        })()}
+          })()}
+        </div>
 
         {/* Terms */}
-        <div>
+        <div className={buildStep !== "terms" ? "hidden" : ""}>
           <div className="flex items-center gap-2.5 mb-4">
             <span className="w-7 h-7 rounded-full bg-brand-600 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">4</span>
             <div>
