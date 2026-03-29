@@ -18,6 +18,7 @@ import { Button } from "@shared/ui/button";
 import { Badge } from "@shared/ui/badge";
 import { Textarea } from "@shared/ui/textarea";
 import { cn, formatCurrency } from "@shared/lib/utils";
+import { usePageTitle } from "@shared/hooks/use-page-title";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -44,11 +45,11 @@ interface Project {
 // ─── Status Config ──────────────────────────────────────────────────────────
 
 const STATUS_CONFIG: Record<MilestoneStatus, { label: string; color: string; bg: string }> = {
-  paid:        { label: "Paid",        color: "text-green-700",  bg: "bg-green-50 border-green-200" },
+  paid:        { label: "Paid",        color: "text-emerald-950",  bg: "bg-emerald-950/10 border-emerald-800/20" },
   approved:    { label: "Approved",    color: "text-blue-700",   bg: "bg-blue-50 border-blue-200" },
   submitted:   { label: "Review",      color: "text-amber-700",  bg: "bg-amber-50 border-amber-200" },
   in_progress: { label: "In Progress", color: "text-brand-700",  bg: "bg-brand-50 border-brand-200" },
-  pending:     { label: "Pending",     color: "text-gray-500",   bg: "bg-gray-50 border-gray-200" },
+  pending:     { label: "Pending",     color: "text-gray-700",   bg: "bg-gray-50 border-gray-200" },
 };
 
 const VERIFICATION_ITEMS = [
@@ -164,6 +165,7 @@ const MOCK_PROJECTS: Project[] = [
 // ─── Page Component ─────────────────────────────────────────────────────────
 
 export default function HomeownerMilestonesPage() {
+  usePageTitle("Milestones");
   const [projects, setProjects] = useState<Project[]>(MOCK_PROJECTS);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -187,7 +189,7 @@ export default function HomeownerMilestonesPage() {
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Milestones</h1>
-        <p className="text-[14px] text-gray-500 mt-1">Review and approve contractor work</p>
+        <p className="text-[14px] text-gray-700 mt-1">Review and approve contractor work</p>
       </div>
 
       {/* Project Sections */}
@@ -231,20 +233,20 @@ function ProjectSection({
   const submittedCount = milestones.filter((m) => m.status === "submitted").length;
 
   return (
-    <div className="rounded-xl border border-border bg-white">
+    <div className="rounded-none border border-border bg-white">
       {/* Project Header */}
       <div className="px-6 py-5 border-b border-border">
         <div className="flex items-start justify-between">
           <div>
             <h2 className="text-[16px] font-semibold text-gray-900">{project.name}</h2>
             <div className="flex items-center gap-3 mt-1">
-              <span className="text-[13px] text-gray-500">{project.contractor}</span>
+              <span className="text-[13px] text-gray-700">{project.contractor}</span>
               <span className="text-gray-300">|</span>
-              <span className="text-[13px] font-medium text-gray-700 tabular-nums">{formatCurrency(project.contractValue)}</span>
+              <span className="text-[13px] font-medium text-gray-900 tabular-nums">{formatCurrency(project.contractValue)}</span>
             </div>
           </div>
           {submittedCount > 0 && (
-            <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 rounded-lg px-3 py-1.5">
+            <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 rounded-none px-3 py-1.5">
               <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
               <span className="text-[12px] font-medium text-amber-700">
                 {submittedCount} awaiting review
@@ -256,13 +258,13 @@ function ProjectSection({
         {/* Progress Bar */}
         <div className="mt-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[13px] font-medium text-gray-600">Escrow progress</span>
+            <span className="text-[13px] font-medium text-gray-800">Escrow progress</span>
             <span className="text-[13px] font-bold text-gray-900 tabular-nums">{pct}%</span>
           </div>
-          <div className="h-2 bg-gray-100 rounded-full overflow-hidden flex">
+          <div className="h-2 bg-gray-100 rounded-none overflow-hidden flex">
             {paidAmount > 0 && (
               <div
-                className="bg-emerald-500 transition-all duration-500"
+                className="bg-emerald-700 transition-all duration-500"
                 style={{ width: `${(paidAmount / totalAmount) * 100}%` }}
               />
             )}
@@ -275,16 +277,16 @@ function ProjectSection({
           </div>
           <div className="flex items-center gap-4 mt-2">
             <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span className="text-[11px] text-gray-400">Paid</span>
+              <div className="w-2 h-2 rounded-none bg-emerald-700" />
+              <span className="text-[11px] text-gray-600">Paid</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-blue-400" />
-              <span className="text-[11px] text-gray-400">Approved</span>
+              <div className="w-2 h-2 rounded-none bg-blue-400" />
+              <span className="text-[11px] text-gray-600">Approved</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-gray-200" />
-              <span className="text-[11px] text-gray-400">Remaining</span>
+              <div className="w-2 h-2 rounded-none bg-gray-200" />
+              <span className="text-[11px] text-gray-600">Remaining</span>
             </div>
           </div>
         </div>
@@ -342,19 +344,19 @@ function MilestoneRow({
         {/* Status icon */}
         <div
           className={cn(
-            "w-7 h-7 rounded-lg flex items-center justify-center shrink-0",
-            milestone.status === "paid" ? "bg-green-50" :
+            "w-7 h-7 rounded-none flex items-center justify-center shrink-0",
+            milestone.status === "paid" ? "bg-emerald-950/10" :
             milestone.status === "approved" ? "bg-blue-50" :
             milestone.status === "submitted" ? "bg-amber-50" :
             milestone.status === "in_progress" ? "bg-brand-50" :
             "bg-gray-50"
           )}
         >
-          {milestone.status === "paid" && <DollarSign className="w-4 h-4 text-green-600" strokeWidth={2.5} />}
+          {milestone.status === "paid" && <DollarSign className="w-4 h-4 text-emerald-950" strokeWidth={2.5} />}
           {milestone.status === "approved" && <Check className="w-4 h-4 text-blue-600" strokeWidth={2.5} />}
           {milestone.status === "submitted" && <AlertCircle className="w-4 h-4 text-amber-600" />}
           {milestone.status === "in_progress" && <Clock className="w-4 h-4 text-brand-600" />}
-          {milestone.status === "pending" && <Circle className="w-3.5 h-3.5 text-gray-400" />}
+          {milestone.status === "pending" && <Circle className="w-3.5 h-3.5 text-gray-600" />}
         </div>
 
         {/* Label + badge + date */}
@@ -363,7 +365,7 @@ function MilestoneRow({
             <span className="text-[14px] font-medium text-gray-900 truncate">{milestone.label}</span>
             <span
               className={cn(
-                "inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-medium",
+                "inline-flex items-center rounded-none border px-2 py-0.5 text-[11px] font-medium",
                 cfg.bg,
                 cfg.color
               )}
@@ -372,7 +374,7 @@ function MilestoneRow({
             </span>
           </div>
           {milestone.completedDate && (
-            <span className="text-[12px] text-gray-400 mt-0.5 block">
+            <span className="text-[12px] text-gray-600 mt-0.5 block">
               Completed {milestone.completedDate}
             </span>
           )}
@@ -385,9 +387,9 @@ function MilestoneRow({
 
         {/* Expand icon */}
         {isExpanded ? (
-          <ChevronUp className="w-4 h-4 text-gray-400 shrink-0" />
+          <ChevronUp className="w-4 h-4 text-gray-600 shrink-0" />
         ) : (
-          <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />
+          <ChevronDown className="w-4 h-4 text-gray-600 shrink-0" />
         )}
       </button>
 
@@ -444,20 +446,20 @@ function MilestoneDetail({
     <div className="px-6 pb-5 pt-1">
       {/* Photos grid */}
       <div className="mb-4">
-        <p className="text-[12px] font-medium text-gray-500 uppercase tracking-wider mb-2">Photos</p>
+        <p className="text-[12px] font-medium text-gray-700 uppercase tracking-wider mb-2">Photos</p>
         {milestone.photos.length > 0 ? (
           <div className="grid grid-cols-3 gap-2">
             {milestone.photos.map((_, i) => (
               <div
                 key={i}
-                className="aspect-[4/3] rounded-lg bg-gray-100 border border-border flex items-center justify-center"
+                className="aspect-[4/3] rounded-none bg-gray-100 border border-border flex items-center justify-center"
               >
                 <Camera className="w-6 h-6 text-gray-300" />
               </div>
             ))}
           </div>
         ) : (
-          <div className="flex items-center gap-2 text-[13px] text-gray-400 py-3">
+          <div className="flex items-center gap-2 text-[13px] text-gray-600 py-3">
             <Camera className="w-4 h-4" />
             <span>No photos uploaded yet</span>
           </div>
@@ -467,30 +469,30 @@ function MilestoneDetail({
       {/* Contractor note */}
       {milestone.contractorNote && (
         <div className="mb-4">
-          <p className="text-[12px] font-medium text-gray-500 uppercase tracking-wider mb-2">
+          <p className="text-[12px] font-medium text-gray-700 uppercase tracking-wider mb-2">
             Contractor Notes
           </p>
-          <div className="bg-gray-50 rounded-lg border border-border px-4 py-3">
-            <p className="text-[13px] text-gray-700 leading-relaxed">{milestone.contractorNote}</p>
+          <div className="bg-gray-50 rounded-none border border-border px-4 py-3">
+            <p className="text-[13px] text-gray-900 leading-relaxed">{milestone.contractorNote}</p>
           </div>
         </div>
       )}
 
       {/* Waiting state */}
       {isWaiting && (
-        <div className="flex items-center gap-2 bg-gray-50 rounded-lg border border-border px-4 py-3">
-          <HardHat className="w-4 h-4 text-gray-400" />
-          <span className="text-[13px] text-gray-500">Waiting for contractor to submit</span>
+        <div className="flex items-center gap-2 bg-gray-50 rounded-none border border-border px-4 py-3">
+          <HardHat className="w-4 h-4 text-gray-600" />
+          <span className="text-[13px] text-gray-700">Waiting for contractor to submit</span>
         </div>
       )}
 
       {/* Verification checklist */}
       {(isSubmitted || isCompleted) && (
         <div className="mb-4">
-          <p className="text-[12px] font-medium text-gray-500 uppercase tracking-wider mb-2">
+          <p className="text-[12px] font-medium text-gray-700 uppercase tracking-wider mb-2">
             Verification Checklist
           </p>
-          <div className="rounded-lg border border-border bg-white divide-y divide-border">
+          <div className="rounded-none border border-border bg-white divide-y divide-border">
             {VERIFICATION_ITEMS.map((item, i) => {
               const checked = isCompleted ? true : checks[i];
               const disabled = isCompleted;
@@ -518,7 +520,7 @@ function MilestoneDetail({
                   <span
                     className={cn(
                       "text-[14px]",
-                      checked ? "text-gray-700" : "text-gray-500"
+                      checked ? "text-gray-900" : "text-gray-700"
                     )}
                   >
                     {item}
@@ -557,7 +559,7 @@ function MilestoneDetail({
                     setChangesNote("");
                   }}
                   variant="ghost"
-                  className="text-[13px] text-gray-500"
+                  className="text-[13px] text-gray-700"
                 >
                   Cancel
                 </Button>
@@ -572,7 +574,7 @@ function MilestoneDetail({
                   "text-[13px] font-semibold",
                   allChecked
                     ? "bg-emerald-600 hover:bg-emerald-700 text-white"
-                    : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-gray-100 text-gray-600 cursor-not-allowed"
                 )}
               >
                 <CheckCircle2 className="w-4 h-4 mr-1.5" />
@@ -581,14 +583,14 @@ function MilestoneDetail({
               <Button
                 onClick={() => setShowChangesInput(true)}
                 variant="outline"
-                className="text-[13px] text-gray-600"
+                className="text-[13px] text-gray-800"
               >
                 Request Changes
               </Button>
             </div>
           )}
           {!allChecked && !showChangesInput && (
-            <p className="text-[12px] text-gray-400">
+            <p className="text-[12px] text-gray-600">
               Complete all verification checks above to approve this milestone
             </p>
           )}

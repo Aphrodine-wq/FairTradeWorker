@@ -49,13 +49,13 @@ export default function ForgotPasswordPage() {
               <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
                 Reset your password
               </h1>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-700 mt-1">
                 Enter your email and we&apos;ll send you a reset link.
               </p>
             </div>
 
             {submitted ? (
-              <div className="rounded-lg bg-green-50 border border-green-200 p-4 text-sm text-green-700">
+              <div className="rounded-none bg-emerald-950/10 border border-emerald-800/20 p-4 text-sm text-emerald-950">
                 If an account exists with that email, we&apos;ve sent a reset link.
               </div>
             ) : (
@@ -63,7 +63,7 @@ export default function ForgotPasswordPage() {
                 <div className="space-y-1.5">
                   <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-gray-700"
+                    className="block text-sm font-medium text-gray-900"
                   >
                     Email address
                   </label>

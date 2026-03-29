@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
@@ -18,6 +18,7 @@ interface SidebarProps {
   currentPath: string;
   userRole: "contractor" | "homeowner";
   topAction?: React.ReactNode;
+  autoCollapse?: boolean;
 }
 
 const MOCK_USER = {
@@ -25,10 +26,16 @@ const MOCK_USER = {
   homeowner: { name: "Michael Brown", email: "michael@brown.com", rating: 4.9 },
 };
 
-export function Sidebar({ items, currentPath, userRole, topAction }: SidebarProps) {
-  const [collapsed, setCollapsed] = useState(false);
+export function Sidebar({ items, currentPath, userRole, topAction, autoCollapse }: SidebarProps) {
+  const [manualOverride, setManualOverride] = useState<boolean | null>(null);
+  const collapsed = manualOverride ?? (autoCollapse || false);
   const router = useRouter();
   const user = MOCK_USER[userRole];
+
+  // Reset manual override when autoCollapse changes (route change)
+  useEffect(() => {
+    setManualOverride(null);
+  }, [autoCollapse]);
 
   return (
     <aside
@@ -67,10 +74,10 @@ export function Sidebar({ items, currentPath, userRole, topAction }: SidebarProp
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-2.5 rounded-lg px-2.5 py-2.5 text-[13px] font-medium transition-colors",
+                "flex items-center gap-2.5 rounded-none px-2.5 py-2.5 text-[13px] font-medium transition-colors",
                 isActive
                   ? "bg-brand-600 text-white"
-                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+                  : "text-gray-800 hover:bg-gray-100 hover:text-gray-900",
                 collapsed && "justify-center px-2"
               )}
               title={collapsed ? item.label : undefined}
@@ -85,14 +92,14 @@ export function Sidebar({ items, currentPath, userRole, topAction }: SidebarProp
       {/* Bottom: Collapse + User + Logout */}
       <div className="border-t border-border flex-shrink-0">
         <button
-          onClick={() => setCollapsed((c) => !c)}
-          className="absolute bottom-16 -right-3 w-6 h-12 bg-white border border-gray-200 rounded-r-lg flex items-center justify-center hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm z-20"
+          onClick={() => setManualOverride((prev) => !(prev ?? autoCollapse ?? false))}
+          className="absolute bottom-16 -right-3 w-6 h-12 bg-white border border-gray-200 rounded-none-lg flex items-center justify-center hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm z-20"
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {collapsed ? (
-            <ChevronRight className="w-3 h-3 text-gray-400" />
+            <ChevronRight className="w-3 h-3 text-gray-600" />
           ) : (
-            <ChevronLeft className="w-3 h-3 text-gray-400" />
+            <ChevronLeft className="w-3 h-3 text-gray-600" />
           )}
         </button>
         <div className="px-3 pb-3">
@@ -102,7 +109,7 @@ export function Sidebar({ items, currentPath, userRole, topAction }: SidebarProp
               collapsed && "flex-col gap-2"
             )}
           >
-            <div className="w-8 h-8 rounded-full bg-brand-100 border border-brand-200 flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 rounded-none bg-brand-100 border border-brand-200 flex items-center justify-center flex-shrink-0">
               <span className="text-brand-700 text-xs font-bold">
                 {getInitials(user.name)}
               </span>
@@ -112,15 +119,15 @@ export function Sidebar({ items, currentPath, userRole, topAction }: SidebarProp
                 <p className="text-xs font-semibold text-gray-900 truncate">{user.name}</p>
                 <p className="text-[11px] leading-tight mt-0.5">
                   <span className="text-amber-500">&#9733;</span>{" "}
-                  <span className="font-semibold text-gray-600">{user.rating}</span>
+                  <span className="font-semibold text-gray-800">{user.rating}</span>
                 </p>
-                <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                <p className="text-xs text-gray-700 truncate">{user.email}</p>
               </div>
             )}
             <button
               onClick={() => router.push("/login")}
               className={cn(
-                "flex-shrink-0 w-7 h-7 rounded-md hover:bg-red-50 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors",
+                "flex-shrink-0 w-7 h-7 rounded-none hover:bg-red-50 flex items-center justify-center text-gray-600 hover:text-red-500 transition-colors",
                 collapsed && "mx-auto"
               )}
               title="Log out"

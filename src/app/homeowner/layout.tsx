@@ -8,7 +8,7 @@ import {
   Briefcase,
   FolderOpen,
   CheckCircle2,
-  Star,
+  Award,
   Settings,
   MessageSquare,
   Bell,
@@ -26,9 +26,12 @@ const NAV_ITEMS = [
   { label: "Projects", href: "/homeowner/projects", icon: FolderOpen },
   { label: "Milestones", href: "/homeowner/milestones", icon: CheckCircle2 },
   { label: "Payments", href: "/homeowner/payments", icon: Wallet },
-  { label: "Reviews", href: "/homeowner/reviews", icon: Star },
+  { label: "FairRecord", href: "/homeowner/reviews", icon: Award },
   { label: "Settings", href: "/homeowner/settings", icon: Settings },
 ];
+
+const UNREAD_MESSAGES = 2;
+const UNREAD_NOTIFICATIONS = 4;
 
 function GlobalTopBar({ pathname }: { pathname: string }) {
   return (
@@ -36,22 +39,26 @@ function GlobalTopBar({ pathname }: { pathname: string }) {
       <Link
         href="/homeowner/messages"
         className={cn(
-          "relative w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors",
+          "relative w-8 h-8 rounded-none hover:bg-gray-100 flex items-center justify-center transition-colors",
           pathname === "/homeowner/messages" && "bg-gray-100"
         )}
       >
-        <MessageSquare className="w-[18px] h-[18px] text-gray-500" />
-        <span className="absolute top-1 right-1 w-2 h-2 bg-brand-600 rounded-full" />
+        <MessageSquare className="w-[18px] h-[18px] text-gray-700" />
+        {UNREAD_MESSAGES > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 bg-brand-600 text-white text-[9px] font-bold flex items-center justify-center">{UNREAD_MESSAGES}</span>
+        )}
       </Link>
       <Link
         href="/homeowner/notifications"
         className={cn(
-          "relative w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors",
+          "relative w-8 h-8 rounded-none hover:bg-gray-100 flex items-center justify-center transition-colors",
           pathname === "/homeowner/notifications" && "bg-gray-100"
         )}
       >
-        <Bell className="w-[18px] h-[18px] text-gray-500" />
-        <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+        <Bell className="w-[18px] h-[18px] text-gray-700" />
+        {UNREAD_NOTIFICATIONS > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">{UNREAD_NOTIFICATIONS}</span>
+        )}
       </Link>
     </div>
   );
@@ -81,7 +88,7 @@ export default function HomeownerLayout({
         topAction={
           <Link
             href="/homeowner/jobs"
-            className="flex items-center justify-center gap-2 w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold py-3 px-4 transition-colors"
+            className="flex items-center justify-center gap-2 w-full rounded-none bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold py-3 px-4 transition-colors"
           >
             <Plus className="h-4 w-4" />
             Post a Job

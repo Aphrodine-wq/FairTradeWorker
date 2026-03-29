@@ -56,10 +56,10 @@ export function AiEstimateCard({
         <CardContent className="p-4 flex items-center gap-3">
           <Loader2 className="w-5 h-5 text-brand-600 animate-spin" />
           <div>
-            <span className="text-sm text-gray-700 font-medium">
+            <span className="text-sm text-gray-900 font-medium">
               Generating AI estimate...
             </span>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-gray-700 mt-0.5">
               Analyzing project scope, materials, and regional pricing
             </p>
           </div>
@@ -96,14 +96,14 @@ export function AiEstimateCard({
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-brand-100 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-none bg-brand-100 flex items-center justify-center">
               <Sparkles className="w-3.5 h-3.5 text-brand-600" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-900">
                 {variant === "contractor" ? "AI Bid Assistant" : "AI Price Estimate"}
               </p>
-              <p className="text-[11px] text-gray-500">
+              <p className="text-[11px] text-gray-700">
                 Powered by ConstructionAI {estimate.modelVersion}
               </p>
             </div>
@@ -116,11 +116,11 @@ export function AiEstimateCard({
         {/* Estimate range with midpoint */}
         <div className="space-y-1">
           <div className="flex items-baseline gap-1">
-            <span className="text-lg text-gray-500">
+            <span className="text-lg text-gray-700">
               {formatCurrency(estimate.estimateMin)}
             </span>
             <span className="text-gray-300 mx-1">&ndash;</span>
-            <span className="text-lg text-gray-500">
+            <span className="text-lg text-gray-700">
               {formatCurrency(estimate.estimateMax)}
             </span>
           </div>
@@ -128,12 +128,12 @@ export function AiEstimateCard({
             <span className="text-2xl font-bold text-gray-900">
               {formatCurrency(estimate.estimateMid)}
             </span>
-            <span className="text-xs text-gray-500">best estimate</span>
+            <span className="text-xs text-gray-700">best estimate</span>
           </div>
           {estimate.total && estimate.total !== estimate.estimateMid && (
             <div className="flex items-baseline gap-2">
-              <DollarSign className="w-3.5 h-3.5 text-gray-400" />
-              <span className="text-sm text-gray-600">
+              <DollarSign className="w-3.5 h-3.5 text-gray-600" />
+              <span className="text-sm text-gray-800">
                 Total with markup: <strong>{formatCurrency(estimate.total)}</strong>
               </span>
             </div>
@@ -142,8 +142,8 @@ export function AiEstimateCard({
 
         {/* Suggested bid for contractors */}
         {suggestedBid && variant === "contractor" && (
-          <div className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg">
-            <TrendingUp className="w-4 h-4 text-green-600" />
+          <div className="flex items-center gap-2 px-3 py-2 bg-emerald-950/10 border border-emerald-800/20 rounded-none">
+            <TrendingUp className="w-4 h-4 text-emerald-950" />
             <span className="text-sm text-green-800">
               Suggested bid: <strong>{formatCurrency(suggestedBid)}</strong>
             </span>
@@ -152,8 +152,8 @@ export function AiEstimateCard({
 
         {/* Timeline */}
         {estimate.timelineWeeks && (
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Clock className="w-4 h-4 text-gray-400" />
+          <div className="flex items-center gap-2 text-sm text-gray-800">
+            <Clock className="w-4 h-4 text-gray-600" />
             <span>
               Estimated timeline:{" "}
               <strong>
@@ -170,13 +170,13 @@ export function AiEstimateCard({
             <div className="grid grid-cols-3 gap-3">
               {estimate.laborCost != null && (
                 <div className="text-center">
-                  <Hammer className="w-4 h-4 text-gray-400 mx-auto mb-1" />
-                  <p className="text-xs text-gray-500">Labor</p>
+                  <Hammer className="w-4 h-4 text-gray-600 mx-auto mb-1" />
+                  <p className="text-xs text-gray-700">Labor</p>
                   <p className="text-sm font-semibold text-gray-900">
                     {formatCurrency(estimate.laborCost)}
                   </p>
                   {estimate.laborHours != null && (
-                    <p className="text-[11px] text-gray-400">
+                    <p className="text-[11px] text-gray-600">
                       {estimate.laborHours}h
                     </p>
                   )}
@@ -184,8 +184,8 @@ export function AiEstimateCard({
               )}
               {estimate.materialCost != null && (
                 <div className="text-center">
-                  <Package className="w-4 h-4 text-gray-400 mx-auto mb-1" />
-                  <p className="text-xs text-gray-500">Materials</p>
+                  <Package className="w-4 h-4 text-gray-600 mx-auto mb-1" />
+                  <p className="text-xs text-gray-700">Materials</p>
                   <p className="text-sm font-semibold text-gray-900">
                     {formatCurrency(estimate.materialCost)}
                   </p>
@@ -193,8 +193,8 @@ export function AiEstimateCard({
               )}
               {estimate.equipmentCost != null && (
                 <div className="text-center">
-                  <Truck className="w-4 h-4 text-gray-400 mx-auto mb-1" />
-                  <p className="text-xs text-gray-500">Equipment</p>
+                  <Truck className="w-4 h-4 text-gray-600 mx-auto mb-1" />
+                  <p className="text-xs text-gray-700">Equipment</p>
                   <p className="text-sm font-semibold text-gray-900">
                     {formatCurrency(estimate.equipmentCost)}
                   </p>
@@ -204,7 +204,7 @@ export function AiEstimateCard({
 
             {/* Markup percentages */}
             {(estimate.overheadPercent || estimate.profitPercent || estimate.contingencyPct) && (
-              <div className="flex items-center gap-3 text-[11px] text-gray-400">
+              <div className="flex items-center gap-3 text-[11px] text-gray-600">
                 {estimate.overheadPercent != null && (
                   <span>OH {Math.round(estimate.overheadPercent * 100)}%</span>
                 )}
@@ -231,13 +231,13 @@ export function AiEstimateCard({
               onClick={() => setBreakdownOpen((o) => !o)}
               className="flex items-center justify-between w-full text-left"
             >
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+              <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">
                 CSI Division Breakdown
               </span>
               {breakdownOpen ? (
-                <ChevronUp className="w-4 h-4 text-gray-400" />
+                <ChevronUp className="w-4 h-4 text-gray-600" />
               ) : (
-                <ChevronDown className="w-4 h-4 text-gray-400" />
+                <ChevronDown className="w-4 h-4 text-gray-600" />
               )}
             </button>
             {breakdownOpen && (
@@ -247,11 +247,11 @@ export function AiEstimateCard({
                     <div key={i} className="flex items-center justify-between text-sm">
                       <div>
                         {item.division && (
-                          <span className="text-[11px] text-gray-400 mr-1.5">
+                          <span className="text-[11px] text-gray-600 mr-1.5">
                             {item.division}
                           </span>
                         )}
-                        <span className="text-gray-600">{item.item}</span>
+                        <span className="text-gray-800">{item.item}</span>
                       </div>
                       <span className="text-gray-900 font-medium tabular-nums">
                         {formatCurrency(item.cost)}
@@ -273,20 +273,20 @@ export function AiEstimateCard({
               onClick={() => setLineItemsOpen((o) => !o)}
               className="flex items-center justify-between w-full text-left"
             >
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+              <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">
                 Line Items ({(estimate.lineItems as unknown[]).length})
               </span>
               {lineItemsOpen ? (
-                <ChevronUp className="w-4 h-4 text-gray-400" />
+                <ChevronUp className="w-4 h-4 text-gray-600" />
               ) : (
-                <ChevronDown className="w-4 h-4 text-gray-400" />
+                <ChevronDown className="w-4 h-4 text-gray-600" />
               )}
             </button>
             {lineItemsOpen && (
               <div className="overflow-x-auto -mx-1">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="text-[11px] text-gray-400 uppercase tracking-wide border-b border-gray-100">
+                    <tr className="text-[11px] text-gray-600 uppercase tracking-wide border-b border-gray-100">
                       <th className="text-left py-1.5 px-1 font-medium">Description</th>
                       <th className="text-right py-1.5 px-1 font-medium">Qty</th>
                       <th className="text-right py-1.5 px-1 font-medium">Unit</th>
@@ -298,16 +298,16 @@ export function AiEstimateCard({
                     {(estimate.lineItems as { description: string; quantity: number; unit: string; unit_cost: number; total: number }[]).map(
                       (item, i) => (
                         <tr key={i} className="border-b border-gray-50">
-                          <td className="py-1.5 px-1 text-gray-600">
+                          <td className="py-1.5 px-1 text-gray-800">
                             {item.description}
                           </td>
-                          <td className="py-1.5 px-1 text-right text-gray-600 tabular-nums">
+                          <td className="py-1.5 px-1 text-right text-gray-800 tabular-nums">
                             {item.quantity}
                           </td>
-                          <td className="py-1.5 px-1 text-right text-gray-400 text-xs">
+                          <td className="py-1.5 px-1 text-right text-gray-600 text-xs">
                             {item.unit}
                           </td>
-                          <td className="py-1.5 px-1 text-right text-gray-600 tabular-nums">
+                          <td className="py-1.5 px-1 text-right text-gray-800 tabular-nums">
                             {formatCurrency(item.unit_cost)}
                           </td>
                           <td className="py-1.5 px-1 text-right text-gray-900 font-medium tabular-nums">
@@ -332,19 +332,19 @@ export function AiEstimateCard({
               onClick={() => setExclusionsOpen((o) => !o)}
               className="flex items-center justify-between w-full text-left"
             >
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+              <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">
                 Exclusions ({estimate.exclusions.length})
               </span>
               {exclusionsOpen ? (
-                <ChevronUp className="w-4 h-4 text-gray-400" />
+                <ChevronUp className="w-4 h-4 text-gray-600" />
               ) : (
-                <ChevronDown className="w-4 h-4 text-gray-400" />
+                <ChevronDown className="w-4 h-4 text-gray-600" />
               )}
             </button>
             {exclusionsOpen && (
               <ul className="space-y-1">
                 {estimate.exclusions.map((excl, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                  <li key={i} className="flex items-start gap-2 text-sm text-gray-800">
                     <AlertTriangle className="w-3.5 h-3.5 text-amber-500 mt-0.5 shrink-0" />
                     {excl}
                   </li>
@@ -359,11 +359,11 @@ export function AiEstimateCard({
           <>
             <Separator />
             <div className="space-y-1">
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+              <p className="text-xs font-medium text-gray-700 uppercase tracking-wide">
                 Notes
               </p>
               {estimate.notes.map((note, i) => (
-                <p key={i} className="text-sm text-gray-600">
+                <p key={i} className="text-sm text-gray-800">
                   {note}
                 </p>
               ))}
@@ -411,7 +411,7 @@ export function AiEstimateCard({
         )}
 
         {/* Estimate number footer */}
-        <div className="flex items-center justify-between text-[11px] text-gray-400">
+        <div className="flex items-center justify-between text-[11px] text-gray-600">
           <span>{estimate.estimateNumber}</span>
           <span>
             {new Date(estimate.createdAt).toLocaleDateString("en-US", {

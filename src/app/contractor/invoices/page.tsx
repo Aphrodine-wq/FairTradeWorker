@@ -14,6 +14,7 @@ import {
   Eye,
   X,
   Trash2,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@shared/ui/button";
 import { Badge } from "@shared/ui/badge";
@@ -29,6 +30,7 @@ import {
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
 import { toast } from "sonner";
 import { fetchInvoices } from "@shared/lib/data";
+import { usePageTitle } from "@shared/hooks/use-page-title";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -269,6 +271,7 @@ const STATUS_CONFIG: Record<
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function InvoicesPage() {
+  usePageTitle("Invoices");
   const [invoices, setInvoices] = useState<Invoice[]>(MOCK_INVOICES);
   const [filter, setFilter] = useState<"all" | InvoiceStatus>("all");
   const [search, setSearch] = useState("");
@@ -483,29 +486,22 @@ export default function InvoicesPage() {
                 placeholder="Search invoices..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full h-9 rounded-lg border border-gray-200 bg-white pl-9 pr-3 text-[13px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600"
+                className="w-full h-9 rounded-none border border-gray-200 bg-white pl-9 pr-3 text-[13px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600"
               />
             </div>
-            <div className="flex items-center gap-1.5 flex-wrap">
-              {(["all", "sent", "paid", "overdue", "draft"] as const).map((f) => (
-                <button
-                  key={f}
-                  onClick={() => setFilter(f)}
-                  className={cn(
-                    "text-[12px] font-medium px-2.5 py-1 rounded-full transition-colors",
-                    filter === f
-                      ? "bg-gray-900 text-white"
-                      : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                  )}
-                >
-                  {f === "all" ? "All" : f.charAt(0).toUpperCase() + f.slice(1)}
-                  {f !== "all" && (
-                    <span className="ml-1 tabular-nums">
-                      {invoices.filter((inv) => inv.status === f).length}
-                    </span>
-                  )}
-                </button>
-              ))}
+            <div className="relative">
+              <select
+                value={filter}
+                onChange={(e) => setFilter(e.target.value as typeof filter)}
+                className="appearance-none w-full h-9 rounded-none border border-gray-200 bg-white px-3 pr-8 text-[13px] font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 cursor-pointer"
+              >
+                <option value="all">All ({invoices.length})</option>
+                <option value="sent">Sent ({invoices.filter((inv) => inv.status === "sent").length})</option>
+                <option value="paid">Paid ({invoices.filter((inv) => inv.status === "paid").length})</option>
+                <option value="overdue">Overdue ({invoices.filter((inv) => inv.status === "overdue").length})</option>
+                <option value="draft">Draft ({invoices.filter((inv) => inv.status === "draft").length})</option>
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
             </div>
           </div>
 
@@ -514,7 +510,7 @@ export default function InvoicesPage() {
             {filtered.length === 0 && (
               <div className="px-4 py-12 text-center">
                 <FileText className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                <p className="text-sm text-gray-400">No invoices found</p>
+                <p className="text-sm text-gray-600">No invoices found</p>
               </div>
             )}
             {filtered.map((inv) => {
@@ -549,10 +545,10 @@ export default function InvoicesPage() {
                       {formatCurrency(inv.total)}
                     </p>
                   </div>
-                  <p className="text-[12px] text-gray-600 truncate">
+                  <p className="text-[12px] text-gray-800 truncate">
                     {inv.project} — {inv.milestone}
                   </p>
-                  <p className="text-[11px] text-gray-400 mt-0.5">
+                  <p className="text-[11px] text-gray-600 mt-0.5">
                     {inv.client.name}
                     {" · "}
                     {inv.status === "paid"
@@ -575,7 +571,7 @@ export default function InvoicesPage() {
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
                 <FileText className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-gray-600">
                   Select an invoice to preview
                 </p>
               </div>
@@ -634,7 +630,7 @@ export default function InvoicesPage() {
               </div>
 
               {/* Paper document */}
-              <div className="bg-white rounded-lg shadow-[0_4px_30px_-6px_rgba(0,0,0,0.15)] ring-1 ring-gray-200/80 overflow-hidden">
+              <div className="bg-white rounded-none shadow-[0_4px_30px_-6px_rgba(0,0,0,0.15)] ring-1 ring-gray-200/80 overflow-hidden">
                 {/* Top accent */}
                 <div className="h-1.5 bg-brand-600" />
 
@@ -647,16 +643,16 @@ export default function InvoicesPage() {
                         alt="Marcus Johnson"
                         width={48}
                         height={48}
-                        className="w-12 h-12 rounded-full object-cover ring-2 ring-gray-100"
+                        className="w-12 h-12 rounded-none object-cover ring-2 ring-gray-100"
                       />
                       <div>
                         <p className="text-[16px] font-bold text-gray-900 leading-tight">
                           Johnson & Sons Construction
                         </p>
-                        <p className="text-[11px] text-gray-400 mt-0.5">
+                        <p className="text-[11px] text-gray-600 mt-0.5">
                           Marcus Johnson — Owner
                         </p>
-                        <p className="text-[10px] text-gray-400">
+                        <p className="text-[10px] text-gray-600">
                           TX License #R21445 — Fully Insured
                         </p>
                       </div>
@@ -665,7 +661,7 @@ export default function InvoicesPage() {
                       <p className="text-[28px] font-bold text-gray-900 tracking-tight leading-none">
                         INVOICE
                       </p>
-                      <p className="text-[12px] text-gray-400 mt-1">
+                      <p className="text-[12px] text-gray-600 mt-1">
                         {selected.invoiceNumber}
                       </p>
                       <Badge
@@ -682,43 +678,43 @@ export default function InvoicesPage() {
                   {/* Bill To + From + Dates */}
                   <div className="grid grid-cols-3 gap-4 mb-6">
                     <div>
-                      <p className="text-[8px] font-bold text-gray-400 uppercase tracking-[0.1em] mb-1.5">
+                      <p className="text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] mb-1.5">
                         Bill To
                       </p>
                       <p className="text-[13px] font-bold text-gray-900">
                         {selected.client.name}
                       </p>
-                      <p className="text-[10px] text-gray-500 mt-0.5 leading-relaxed">
+                      <p className="text-[10px] text-gray-700 mt-0.5 leading-relaxed">
                         {selected.client.email}
                         <br />
                         {selected.client.address}
                       </p>
                     </div>
                     <div>
-                      <p className="text-[8px] font-bold text-gray-400 uppercase tracking-[0.1em] mb-1.5">
+                      <p className="text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] mb-1.5">
                         Project
                       </p>
                       <p className="text-[13px] font-bold text-gray-900">
                         {selected.project}
                       </p>
-                      <p className="text-[10px] text-gray-500 mt-0.5 leading-relaxed">
+                      <p className="text-[10px] text-gray-700 mt-0.5 leading-relaxed">
                         Milestone {selected.milestoneNumber} of{" "}
                         {selected.totalMilestones} — {selected.milestone}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-[8px] font-bold text-gray-400 uppercase tracking-[0.1em] mb-1.5">
+                      <p className="text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] mb-1.5">
                         Details
                       </p>
                       <div className="space-y-1.5">
                         <div>
-                          <p className="text-[9px] text-gray-400">Issued</p>
+                          <p className="text-[9px] text-gray-600">Issued</p>
                           <p className="text-[11px] font-semibold text-gray-900">
                             {formatDate(selected.issueDate)}
                           </p>
                         </div>
                         <div>
-                          <p className="text-[9px] text-gray-400">Due</p>
+                          <p className="text-[9px] text-gray-600">Due</p>
                           <p className="text-[11px] font-semibold text-gray-900">
                             {formatDate(selected.dueDate)}
                           </p>
@@ -731,16 +727,16 @@ export default function InvoicesPage() {
                   <table className="w-full mb-5">
                     <thead>
                       <tr className="bg-gray-50">
-                        <th className="text-left text-[8px] font-bold text-gray-400 uppercase tracking-[0.1em] px-3 py-2.5 rounded-l-lg">
+                        <th className="text-left text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] px-3 py-2.5 rounded-none-lg">
                           Description
                         </th>
-                        <th className="text-right text-[8px] font-bold text-gray-400 uppercase tracking-[0.1em] px-3 py-2.5 w-[45px]">
+                        <th className="text-right text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] px-3 py-2.5 w-[45px]">
                           Qty
                         </th>
-                        <th className="text-right text-[8px] font-bold text-gray-400 uppercase tracking-[0.1em] px-3 py-2.5 w-[70px]">
+                        <th className="text-right text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] px-3 py-2.5 w-[70px]">
                           Rate
                         </th>
-                        <th className="text-right text-[8px] font-bold text-gray-400 uppercase tracking-[0.1em] px-3 py-2.5 w-[80px] rounded-r-lg">
+                        <th className="text-right text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] px-3 py-2.5 w-[80px] rounded-none-lg">
                           Amount
                         </th>
                       </tr>
@@ -754,10 +750,10 @@ export default function InvoicesPage() {
                           <td className="text-[11px] text-gray-900 px-3 py-2.5">
                             {item.description}
                           </td>
-                          <td className="text-[11px] text-gray-500 px-3 py-2.5 text-right tabular-nums">
+                          <td className="text-[11px] text-gray-700 px-3 py-2.5 text-right tabular-nums">
                             {item.quantity}
                           </td>
-                          <td className="text-[11px] text-gray-500 px-3 py-2.5 text-right tabular-nums">
+                          <td className="text-[11px] text-gray-700 px-3 py-2.5 text-right tabular-nums">
                             {formatCurrency(item.rate)}
                           </td>
                           <td className="text-[11px] text-gray-900 font-semibold px-3 py-2.5 text-right tabular-nums">
@@ -772,7 +768,7 @@ export default function InvoicesPage() {
                   <div className="flex justify-end mb-6">
                     <div className="w-[220px]">
                       <div className="flex justify-between py-1.5 px-3">
-                        <span className="text-[10px] text-gray-400">
+                        <span className="text-[10px] text-gray-600">
                           Subtotal
                         </span>
                         <span className="text-[11px] text-gray-900 tabular-nums">
@@ -780,14 +776,14 @@ export default function InvoicesPage() {
                         </span>
                       </div>
                       <div className="flex justify-between py-1.5 px-3">
-                        <span className="text-[10px] text-gray-400">
+                        <span className="text-[10px] text-gray-600">
                           Platform fee (3%)
                         </span>
                         <span className="text-[11px] text-gray-900 tabular-nums">
                           {formatCurrency(selected.platformFee)}
                         </span>
                       </div>
-                      <div className="flex justify-between py-2.5 px-3 bg-gray-900 rounded-lg mt-1.5">
+                      <div className="flex justify-between py-2.5 px-3 bg-gray-900 rounded-none mt-1.5">
                         <span className="text-[12px] font-bold text-white">
                           Total Due
                         </span>
@@ -799,11 +795,11 @@ export default function InvoicesPage() {
                   </div>
 
                   {/* Payment terms */}
-                  <div className="bg-gray-50 rounded-lg px-4 py-3 mb-5">
-                    <p className="text-[8px] font-bold text-gray-400 uppercase tracking-[0.1em] mb-1">
+                  <div className="bg-gray-50 rounded-none px-4 py-3 mb-5">
+                    <p className="text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] mb-1">
                       Payment Terms
                     </p>
-                    <p className="text-[10px] text-gray-500 leading-relaxed">
+                    <p className="text-[10px] text-gray-700 leading-relaxed">
                       {selected.paymentTerms}. A 1.5% monthly late fee applies
                       to balances past due.
                     </p>
@@ -811,18 +807,18 @@ export default function InvoicesPage() {
 
                   {/* Notes */}
                   {selected.notes && (
-                    <div className="bg-gray-50 rounded-lg px-4 py-3 mb-5">
-                      <p className="text-[8px] font-bold text-gray-400 uppercase tracking-[0.1em] mb-1">
+                    <div className="bg-gray-50 rounded-none px-4 py-3 mb-5">
+                      <p className="text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] mb-1">
                         Notes
                       </p>
-                      <p className="text-[10px] text-gray-500 leading-relaxed">
+                      <p className="text-[10px] text-gray-700 leading-relaxed">
                         {selected.notes}
                       </p>
                     </div>
                   )}
 
                   {/* QuickBooks note */}
-                  <div className="bg-brand-50 rounded-lg px-4 py-3 mb-5 border border-brand-100">
+                  <div className="bg-brand-50 rounded-none px-4 py-3 mb-5 border border-brand-100">
                     <p className="text-[10px] text-brand-700 font-medium">
                       Payment processed via QuickBooks Online. Client will
                       receive a secure payment link by email.
@@ -840,7 +836,7 @@ export default function InvoicesPage() {
                           Marcus Johnson
                         </p>
                       </div>
-                      <p className="text-[9px] text-gray-400">
+                      <p className="text-[9px] text-gray-600">
                         Contractor Signature
                       </p>
                     </div>
@@ -848,7 +844,7 @@ export default function InvoicesPage() {
                       <div className="border-b border-gray-300 pb-1 mb-1">
                         <p className="text-[13px] text-gray-300">&nbsp;</p>
                       </div>
-                      <p className="text-[9px] text-gray-400">
+                      <p className="text-[9px] text-gray-600">
                         Client Signature
                       </p>
                     </div>
@@ -856,7 +852,7 @@ export default function InvoicesPage() {
 
                   {/* Footer */}
                   <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                    <div className="text-[9px] text-gray-400">
+                    <div className="text-[9px] text-gray-600">
                       <p>marcus@johnson.com — (512) 555-0100</p>
                       <p>4200 South Congress Ave, Austin, TX 78745</p>
                     </div>
@@ -866,7 +862,7 @@ export default function InvoicesPage() {
                           FTW
                         </span>
                       </div>
-                      <p className="text-[9px] text-gray-400">
+                      <p className="text-[9px] text-gray-600">
                         FairTradeWorker
                       </p>
                     </div>
@@ -891,13 +887,13 @@ export default function InvoicesPage() {
           <div className="space-y-5 mt-4">
             {/* Project select */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+              <label className="text-xs font-semibold text-gray-800 uppercase tracking-wide">
                 Project
               </label>
               <select
                 value={createProject}
                 onChange={(e) => handleProjectChange(e.target.value)}
-                className="w-full h-10 rounded-lg border border-gray-200 bg-white px-3 text-[13px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600"
+                className="w-full h-10 rounded-none border border-gray-200 bg-white px-3 text-[13px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600"
               >
                 <option value="">Select a project</option>
                 {PROJECTS_WITH_MILESTONES.map((p) => (
@@ -911,18 +907,18 @@ export default function InvoicesPage() {
             {/* Milestone select */}
             {createProject && (
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                <label className="text-xs font-semibold text-gray-800 uppercase tracking-wide">
                   Milestone
                 </label>
                 {availableMilestones.length === 0 ? (
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-gray-600">
                     All milestones have been invoiced
                   </p>
                 ) : (
                   <select
                     value={createMilestone}
                     onChange={(e) => handleMilestoneChange(e.target.value)}
-                    className="w-full h-10 rounded-lg border border-gray-200 bg-white px-3 text-[13px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600"
+                    className="w-full h-10 rounded-none border border-gray-200 bg-white px-3 text-[13px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600"
                   >
                     <option value="">Select a milestone</option>
                     {availableMilestones.map((m) => (
@@ -940,7 +936,7 @@ export default function InvoicesPage() {
             {createLineItems.length > 0 && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                  <label className="text-xs font-semibold text-gray-800 uppercase tracking-wide">
                     Line Items
                   </label>
                   <Button
@@ -954,20 +950,20 @@ export default function InvoicesPage() {
                   </Button>
                 </div>
 
-                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <div className="border border-gray-200 rounded-none overflow-hidden">
                   <table className="w-full">
                     <thead>
                       <tr className="bg-gray-50 text-left">
-                        <th className="text-[10px] font-bold text-gray-400 uppercase tracking-wide px-3 py-2">
+                        <th className="text-[10px] font-bold text-gray-600 uppercase tracking-wide px-3 py-2">
                           Description
                         </th>
-                        <th className="text-[10px] font-bold text-gray-400 uppercase tracking-wide px-3 py-2 w-[60px]">
+                        <th className="text-[10px] font-bold text-gray-600 uppercase tracking-wide px-3 py-2 w-[60px]">
                           Qty
                         </th>
-                        <th className="text-[10px] font-bold text-gray-400 uppercase tracking-wide px-3 py-2 w-[90px]">
+                        <th className="text-[10px] font-bold text-gray-600 uppercase tracking-wide px-3 py-2 w-[90px]">
                           Rate
                         </th>
-                        <th className="text-[10px] font-bold text-gray-400 uppercase tracking-wide px-3 py-2 w-[90px] text-right">
+                        <th className="text-[10px] font-bold text-gray-600 uppercase tracking-wide px-3 py-2 w-[90px] text-right">
                           Amount
                         </th>
                         <th className="w-[36px]" />
@@ -1037,7 +1033,7 @@ export default function InvoicesPage() {
 
                   {/* Subtotal in form */}
                   <div className="border-t border-gray-200 bg-gray-50 px-3 py-2 flex justify-between">
-                    <span className="text-[11px] text-gray-500">Subtotal</span>
+                    <span className="text-[11px] text-gray-700">Subtotal</span>
                     <span className="text-[13px] font-bold text-gray-900 tabular-nums">
                       {formatCurrency(
                         createLineItems.reduce(
@@ -1048,10 +1044,10 @@ export default function InvoicesPage() {
                     </span>
                   </div>
                   <div className="border-t border-gray-100 bg-gray-50 px-3 py-1.5 flex justify-between">
-                    <span className="text-[11px] text-gray-400">
+                    <span className="text-[11px] text-gray-600">
                       Platform fee (3%)
                     </span>
-                    <span className="text-[11px] text-gray-500 tabular-nums">
+                    <span className="text-[11px] text-gray-700 tabular-nums">
                       {formatCurrency(
                         Math.round(
                           createLineItems.reduce(
@@ -1070,13 +1066,13 @@ export default function InvoicesPage() {
 
             {/* Payment terms */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+              <label className="text-xs font-semibold text-gray-800 uppercase tracking-wide">
                 Payment Terms
               </label>
               <select
                 value={createPaymentTerms}
                 onChange={(e) => setCreatePaymentTerms(e.target.value)}
-                className="w-full h-10 rounded-lg border border-gray-200 bg-white px-3 text-[13px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600"
+                className="w-full h-10 rounded-none border border-gray-200 bg-white px-3 text-[13px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600"
               >
                 {PAYMENT_TERMS_OPTIONS.map((t) => (
                   <option key={t} value={t}>
@@ -1088,7 +1084,7 @@ export default function InvoicesPage() {
 
             {/* Notes */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+              <label className="text-xs font-semibold text-gray-800 uppercase tracking-wide">
                 Notes (optional)
               </label>
               <Textarea

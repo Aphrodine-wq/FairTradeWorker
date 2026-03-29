@@ -17,6 +17,7 @@ import {
 import { cn } from "@shared/lib/utils";
 import { fetchNotifications } from "@shared/lib/data";
 import { api } from "@shared/lib/realtime";
+import { usePageTitle } from "@shared/hooks/use-page-title";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -153,9 +154,9 @@ const NOTIFICATIONS: Notification[] = [
 const NOTIF_ICONS: Record<NotifType, { icon: React.ComponentType<{ className?: string }>; bg: string }> = {
   new_bid:             { icon: Gavel,        bg: "bg-blue-100 text-blue-600" },
   message:             { icon: MessageSquare, bg: "bg-violet-100 text-violet-600" },
-  bid_accepted:        { icon: CheckCircle2,  bg: "bg-emerald-100 text-emerald-600" },
+  bid_accepted:        { icon: CheckCircle2,  bg: "bg-emerald-950/10 text-emerald-950" },
   milestone_complete:  { icon: Clock,         bg: "bg-amber-100 text-amber-600" },
-  payment_confirmed:   { icon: DollarSign,    bg: "bg-emerald-100 text-emerald-600" },
+  payment_confirmed:   { icon: DollarSign,    bg: "bg-emerald-950/10 text-emerald-950" },
   review_reminder:     { icon: Star,          bg: "bg-amber-100 text-amber-600" },
   contractor_match:    { icon: Users,         bg: "bg-brand-100 text-brand-600" },
   estimate_updated:    { icon: FileText,      bg: "bg-blue-100 text-blue-600" },
@@ -174,6 +175,7 @@ const FILTERS: { key: FilterKey; label: string }[] = [
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function HomeownerNotificationsPage() {
+  usePageTitle("Notifications");
   const [notifications, setNotifications] = useState<Notification[]>(NOTIFICATIONS);
   const [filter, setFilter] = useState<FilterKey>("all");
 
@@ -228,7 +230,7 @@ export default function HomeownerNotificationsPage() {
               Notifications
             </h1>
             {unreadCount > 0 && (
-              <span className="text-[13px] font-bold text-white bg-red-500 rounded-full px-2 py-0.5 tabular-nums">
+              <span className="text-[13px] font-bold text-white bg-red-500 rounded-none px-2 py-0.5 tabular-nums">
                 {unreadCount}
               </span>
             )}
@@ -255,17 +257,17 @@ export default function HomeownerNotificationsPage() {
                   key={f.key}
                   onClick={() => setFilter(f.key)}
                   className={cn(
-                    "text-[13px] font-medium px-3 py-1.5 rounded-full transition-colors flex items-center gap-1.5",
+                    "text-[13px] font-medium px-3 py-1.5 rounded-none transition-colors flex items-center gap-1.5",
                     filter === f.key
                       ? "bg-gray-900 text-white"
-                      : "bg-white text-gray-500 hover:bg-gray-100"
+                      : "bg-white text-gray-700 hover:bg-gray-100"
                   )}
                 >
                   {f.label}
                   {count > 0 && (
                     <span
                       className={cn(
-                        "text-[11px] font-bold rounded-full px-1.5 py-0.5 tabular-nums leading-none",
+                        "text-[11px] font-bold rounded-none px-1.5 py-0.5 tabular-nums leading-none",
                         filter === f.key
                           ? "bg-white/20 text-white"
                           : "bg-red-500 text-white"
@@ -283,7 +285,7 @@ export default function HomeownerNotificationsPage() {
           <div className="space-y-1">
             {filtered.length === 0 && (
               <div className="py-12 text-center">
-                <p className="text-[14px] text-gray-400">
+                <p className="text-[14px] text-gray-600">
                   No notifications in this category.
                 </p>
               </div>
@@ -298,14 +300,14 @@ export default function HomeownerNotificationsPage() {
                   href={notif.href}
                   onClick={() => markRead(notif.id)}
                   className={cn(
-                    "flex gap-4 rounded-xl px-4 py-4 transition-all hover:bg-white",
+                    "flex gap-4 rounded-none px-4 py-4 transition-all hover:bg-white",
                     !notif.read &&
                       "bg-white shadow-[0_1px_4px_rgba(0,0,0,0.04)]"
                   )}
                 >
                   <div
                     className={cn(
-                      "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
+                      "w-10 h-10 rounded-none flex items-center justify-center flex-shrink-0",
                       config.bg
                     )}
                   >
@@ -321,16 +323,16 @@ export default function HomeownerNotificationsPage() {
                       >
                         {notif.title}
                       </p>
-                      <span className="text-[11px] text-gray-400 flex-shrink-0 pt-0.5">
+                      <span className="text-[11px] text-gray-600 flex-shrink-0 pt-0.5">
                         {notif.time}
                       </span>
                     </div>
-                    <p className="text-[13px] text-gray-400 mt-0.5 line-clamp-1">
+                    <p className="text-[13px] text-gray-600 mt-0.5 line-clamp-1">
                       {notif.body}
                     </p>
                   </div>
                   {!notif.read && (
-                    <div className="w-2.5 h-2.5 rounded-full bg-brand-600 flex-shrink-0 mt-1.5" />
+                    <div className="w-2.5 h-2.5 rounded-none bg-brand-600 flex-shrink-0 mt-1.5" />
                   )}
                 </Link>
               );

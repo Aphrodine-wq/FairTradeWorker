@@ -68,7 +68,7 @@ export function StatsBar() {
                   <span className="text-2xl font-bold text-gray-900 tabular-nums">
                     {stat.prefix}{count.toLocaleString()}{stat.suffix}
                   </span>
-                  <span className="text-sm text-gray-400 hidden sm:inline">
+                  <span className="text-sm text-gray-600 hidden sm:inline">
                     {stat.label}
                   </span>
                 </div>

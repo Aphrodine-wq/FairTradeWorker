@@ -447,7 +447,7 @@ function Cell({ value, featured }: { value: CellValue; featured?: boolean }) {
           <Check
             className={cn(
               "w-5 h-5",
-              featured ? "text-brand-600" : "text-gray-400"
+              featured ? "text-brand-600" : "text-gray-600"
             )}
             strokeWidth={2.5}
           />
@@ -464,7 +464,7 @@ function Cell({ value, featured }: { value: CellValue; featured?: boolean }) {
     <span
       className={cn(
         "text-sm font-medium",
-        featured ? "text-brand-700" : "text-gray-600"
+        featured ? "text-brand-700" : "text-gray-800"
       )}
     >
       {value}
@@ -484,7 +484,7 @@ function BillingToggle({
       <span
         className={cn(
           "text-sm font-medium",
-          !yearly ? "text-gray-900" : "text-gray-400"
+          !yearly ? "text-gray-900" : "text-gray-600"
         )}
       >
         Monthly
@@ -493,13 +493,13 @@ function BillingToggle({
         type="button"
         onClick={onToggle}
         className={cn(
-          "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
+          "relative inline-flex h-6 w-11 items-center rounded-none transition-colors",
           yearly ? "bg-brand-600" : "bg-gray-200"
         )}
       >
         <span
           className={cn(
-            "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
+            "inline-block h-4 w-4 transform rounded-none bg-white transition-transform",
             yearly ? "translate-x-6" : "translate-x-1"
           )}
         />
@@ -507,7 +507,7 @@ function BillingToggle({
       <span
         className={cn(
           "text-sm font-medium",
-          yearly ? "text-gray-900" : "text-gray-400"
+          yearly ? "text-gray-900" : "text-gray-600"
         )}
       >
         Yearly
@@ -529,15 +529,15 @@ function AudienceToggle({
   onChange: (a: Audience) => void;
 }) {
   return (
-    <div className="flex items-center justify-center gap-1 bg-gray-100 rounded-lg p-1 w-fit mx-auto">
+    <div className="flex items-center justify-center gap-1 bg-gray-100 rounded-none p-1 w-fit mx-auto">
       <button
         type="button"
         onClick={() => onChange("contractor")}
         className={cn(
-          "px-5 py-2 text-sm font-medium rounded-md transition-colors",
+          "px-5 py-2 text-sm font-medium rounded-none transition-colors",
           audience === "contractor"
             ? "bg-white text-gray-900 shadow-sm"
-            : "text-gray-500 hover:text-gray-700"
+            : "text-gray-700 hover:text-gray-900"
         )}
       >
         Contractors
@@ -546,10 +546,10 @@ function AudienceToggle({
         type="button"
         onClick={() => onChange("homeowner")}
         className={cn(
-          "px-5 py-2 text-sm font-medium rounded-md transition-colors",
+          "px-5 py-2 text-sm font-medium rounded-none transition-colors",
           audience === "homeowner"
             ? "bg-white text-gray-900 shadow-sm"
-            : "text-gray-500 hover:text-gray-700"
+            : "text-gray-700 hover:text-gray-900"
         )}
       >
         Homeowners
@@ -573,7 +573,7 @@ function PricingCard({
   return (
     <div
       className={cn(
-        "relative bg-white rounded-xl border p-8 flex flex-col",
+        "relative bg-white rounded-none border p-8 flex flex-col",
         tier.featured
           ? "border-brand-600 shadow-lg ring-1 ring-brand-600 lg:scale-[1.03] lg:z-10"
           : "border-border shadow-sm"
@@ -591,20 +591,20 @@ function PricingCard({
         <div className="flex items-center gap-3 mb-2">
           <div
             className={cn(
-              "w-10 h-10 rounded-lg flex items-center justify-center",
+              "w-10 h-10 rounded-none flex items-center justify-center",
               tier.featured ? "bg-brand-50" : "bg-gray-50"
             )}
           >
             <Icon
               className={cn(
                 "w-5 h-5",
-                tier.featured ? "text-brand-600" : "text-gray-500"
+                tier.featured ? "text-brand-600" : "text-gray-700"
               )}
             />
           </div>
           <h3 className="text-xl font-bold text-gray-900">{tier.name}</h3>
         </div>
-        <p className="text-sm text-gray-500 leading-relaxed">
+        <p className="text-sm text-gray-700 leading-relaxed">
           {tier.description}
         </p>
       </div>
@@ -615,26 +615,26 @@ function PricingCard({
             {isFree ? "Free" : `$${price}`}
           </span>
           {!isFree && (
-            <span className="text-gray-400 text-sm mb-1.5">
+            <span className="text-gray-600 text-sm mb-1.5">
               /{yearly ? "year" : "month"}
             </span>
           )}
         </div>
-        {isFree && <p className="text-sm text-gray-400 mt-0.5">forever</p>}
+        {isFree && <p className="text-sm text-gray-600 mt-0.5">forever</p>}
         {!isFree && yearly && (
           <p className="text-sm text-brand-600 mt-1">
             ${Math.round((price / 12) * 100) / 100}/mo effective
           </p>
         )}
         {!isFree && !yearly && (
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-gray-600 mt-1">
             or ${tier.yearlyPrice}/yr (save $
             {tier.monthlyPrice * 12 - tier.yearlyPrice})
           </p>
         )}
       </div>
 
-      <p className="text-xs text-gray-400 mb-6 italic">
+      <p className="text-xs text-gray-600 mb-6 italic">
         Best for: {tier.idealFor}
       </p>
 
@@ -653,7 +653,7 @@ function PricingCard({
                 <Check
                   className={cn(
                     "w-4 h-4 mt-0.5 flex-shrink-0",
-                    tier.featured ? "text-brand-600" : "text-gray-400"
+                    tier.featured ? "text-brand-600" : "text-gray-600"
                   )}
                   strokeWidth={2.5}
                 />
@@ -662,8 +662,8 @@ function PricingCard({
                 className={cn(
                   "text-sm",
                   isHeader
-                    ? "font-semibold text-gray-700"
-                    : "text-gray-600"
+                    ? "font-semibold text-gray-900"
+                    : "text-gray-800"
                 )}
               >
                 {feature}
@@ -697,14 +697,14 @@ function FaqItem({ q, a }: { q: string; a: string }) {
         <span className="text-sm font-medium text-gray-900 pr-4">{q}</span>
         <ChevronDown
           className={cn(
-            "w-4 h-4 text-gray-400 flex-shrink-0 transition-transform",
+            "w-4 h-4 text-gray-600 flex-shrink-0 transition-transform",
             open && "rotate-180"
           )}
         />
       </button>
       {open && (
         <div className="pb-5 px-1">
-          <p className="text-sm text-gray-500 leading-relaxed">{a}</p>
+          <p className="text-sm text-gray-700 leading-relaxed">{a}</p>
         </div>
       )}
     </div>
@@ -741,7 +741,7 @@ export default function PricingPage() {
             <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight">
               Choose Your Plan
             </h1>
-            <p className="mt-5 text-lg text-gray-500 leading-relaxed max-w-2xl mx-auto">
+            <p className="mt-5 text-lg text-gray-700 leading-relaxed max-w-2xl mx-auto">
               Simple, flat-rate subscriptions. No lead fees, no percentage cuts,
               no surprises. Upgrade, downgrade, or cancel anytime.
             </p>
@@ -762,7 +762,7 @@ export default function PricingPage() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
                 <div>
                   <p className="text-2xl font-bold text-gray-900">$0</p>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-gray-700 mt-1">
                     Lead fees, always. Every plan.
                   </p>
                 </div>
@@ -770,7 +770,7 @@ export default function PricingPage() {
                   <p className="text-2xl font-bold text-gray-900">
                     Most tools free
                   </p>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-gray-700 mt-1">
                     Bidding, messaging, escrow, project tracking, and reviews.
                   </p>
                 </div>
@@ -778,7 +778,7 @@ export default function PricingPage() {
                   <p className="text-2xl font-bold text-gray-900">
                     AI is the upgrade
                   </p>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-gray-700 mt-1">
                     Only pay when you want AI estimation and smart matching.
                   </p>
                 </div>
@@ -789,7 +789,7 @@ export default function PricingPage() {
                   <p className="text-2xl font-bold text-gray-900">
                     Free to hire
                   </p>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-gray-700 mt-1">
                     Post jobs, get bids, and pay through escrow at no cost.
                   </p>
                 </div>
@@ -797,7 +797,7 @@ export default function PricingPage() {
                   <p className="text-2xl font-bold text-gray-900">
                     Every contractor verified
                   </p>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-gray-700 mt-1">
                     Licensed, insured, and background-checked before they bid.
                   </p>
                 </div>
@@ -805,7 +805,7 @@ export default function PricingPage() {
                   <p className="text-2xl font-bold text-gray-900">
                     Your money protected
                   </p>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-gray-700 mt-1">
                     Escrow holds payment until you confirm the work is done.
                   </p>
                 </div>
@@ -835,7 +835,7 @@ export default function PricingPage() {
               ))}
             </div>
 
-            <p className="text-center text-sm text-gray-400 mt-10">
+            <p className="text-center text-sm text-gray-600 mt-10">
               {audience === "contractor"
                 ? "All paid plans include a 14-day free trial. No credit card required to start."
                 : "Plus includes a 14-day free trial. No credit card required to start."}
@@ -852,7 +852,7 @@ export default function PricingPage() {
                   ? "Included on Every Contractor Plan"
                   : "Included on Every Homeowner Plan"}
               </h2>
-              <p className="mt-3 text-gray-500 max-w-xl mx-auto">
+              <p className="mt-3 text-gray-700 max-w-xl mx-auto">
                 {audience === "contractor"
                   ? "These aren't locked behind a paywall. They're yours from day one, on every plan, including Free."
                   : "The essentials are always free. No hidden costs to get your project started."}
@@ -895,7 +895,7 @@ export default function PricingPage() {
                       <p className="text-sm font-medium text-gray-900">
                         {item.title}
                       </p>
-                      <p className="text-sm text-gray-500 mt-0.5">
+                      <p className="text-sm text-gray-700 mt-0.5">
                         {item.desc}
                       </p>
                     </div>
@@ -939,7 +939,7 @@ export default function PricingPage() {
                       <p className="text-sm font-medium text-gray-900">
                         {item.title}
                       </p>
-                      <p className="text-sm text-gray-500 mt-0.5">
+                      <p className="text-sm text-gray-700 mt-0.5">
                         {item.desc}
                       </p>
                     </div>
@@ -962,12 +962,12 @@ export default function PricingPage() {
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
                 Full Feature Comparison
               </h2>
-              <p className="mt-3 text-gray-500">
+              <p className="mt-3 text-gray-700">
                 Every feature, every plan. See exactly what you get.
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl border border-border overflow-hidden shadow-sm">
+            <div className="bg-white rounded-none border border-border overflow-hidden shadow-sm">
               {/* Table header */}
               <div
                 className="border-b border-border"
@@ -977,7 +977,7 @@ export default function PricingPage() {
                 }}
               >
                 <div className="p-5">
-                  <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                  <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">
                     Feature
                   </span>
                 </div>
@@ -992,7 +992,7 @@ export default function PricingPage() {
                     <p className="text-sm font-bold text-gray-900">
                       {tier.name}
                     </p>
-                    <p className="text-xs text-gray-400 mt-0.5">
+                    <p className="text-xs text-gray-600 mt-0.5">
                       {tier.monthlyPrice === 0
                         ? "Free"
                         : yearly
@@ -1017,7 +1017,7 @@ export default function PricingPage() {
                       catIndex > 0 && "border-t border-border"
                     )}
                   >
-                    <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+                    <span className="text-xs font-bold text-gray-700 uppercase tracking-widest">
                       {cat.category}
                     </span>
                   </div>
@@ -1079,7 +1079,7 @@ export default function PricingPage() {
                         }}
                       >
                         <div className="px-5 py-4 flex items-center">
-                          <span className="text-sm text-gray-700">
+                          <span className="text-sm text-gray-900">
                             {row.feature}
                           </span>
                         </div>
@@ -1142,7 +1142,7 @@ export default function PricingPage() {
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
                 Frequently Asked Questions
               </h2>
-              <p className="mt-3 text-gray-500">
+              <p className="mt-3 text-gray-700">
                 {audience === "contractor"
                   ? "Common questions from contractors about plans and billing."
                   : "Common questions from homeowners about how FairTradeWorker works."}
@@ -1165,7 +1165,7 @@ export default function PricingPage() {
                 ? "Ready to start winning more work?"
                 : "Ready to find the right contractor?"}
             </h2>
-            <p className="text-gray-400 mb-8 max-w-lg mx-auto">
+            <p className="text-gray-600 mb-8 max-w-lg mx-auto">
               {audience === "contractor"
                 ? "Join thousands of contractors already using FairTradeWorker. Most features are free. Start building your reputation today."
                 : "Post your first job in minutes. Verified contractors will start bidding, and your payment is protected by escrow every step of the way."}

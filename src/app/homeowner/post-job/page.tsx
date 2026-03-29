@@ -28,6 +28,7 @@ import { authStore } from "@shared/lib/auth-store";
 import { api } from "@shared/lib/realtime";
 import { track } from "@shared/lib/analytics";
 import { toast } from "sonner";
+import { usePageTitle } from "@shared/hooks/use-page-title";
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -92,6 +93,7 @@ const INITIAL_FORM: JobForm = {
 };
 
 export default function PostJobPage() {
+  usePageTitle("Post a Job");
   const router = useRouter();
   const [step, setStep] = useState<Step>(1);
   const [form, setForm] = useState<JobForm>(INITIAL_FORM);
@@ -154,13 +156,13 @@ export default function PostJobPage() {
       <div className="flex items-center gap-3 mb-8">
         <button
           onClick={() => (step > 1 ? setStep((s) => (s - 1) as Step) : router.back())}
-          className="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50"
+          className="w-9 h-9 rounded-none border border-gray-200 flex items-center justify-center text-gray-700 hover:bg-gray-50"
         >
           <ArrowLeft className="w-4 h-4" />
         </button>
         <div>
           <h1 className="text-xl font-bold text-gray-900">Post a Job</h1>
-          <p className="text-sm text-gray-500">Step {step} of 4</p>
+          <p className="text-sm text-gray-700">Step {step} of 4</p>
         </div>
       </div>
 
@@ -170,7 +172,7 @@ export default function PostJobPage() {
           <div
             key={s}
             className={cn(
-              "h-1.5 flex-1 rounded-full transition-colors",
+              "h-1.5 flex-1 rounded-none transition-colors",
               s <= step ? "bg-brand-600" : "bg-gray-200"
             )}
           />
@@ -178,7 +180,7 @@ export default function PostJobPage() {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg mb-6">
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-none mb-6">
           {error}
         </div>
       )}
@@ -235,12 +237,12 @@ function StepBasics({
     <div className="space-y-6">
       <div>
         <h2 className="text-lg font-semibold text-gray-900 mb-1">What do you need done?</h2>
-        <p className="text-sm text-gray-500">Describe the job so contractors can give you accurate bids.</p>
+        <p className="text-sm text-gray-700">Describe the job so contractors can give you accurate bids.</p>
       </div>
 
       {/* Category */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">Category</label>
+        <label className="text-sm font-medium text-gray-900">Category</label>
         <div className="grid grid-cols-3 gap-2">
           {JOB_CATEGORIES.map((cat) => (
             <button
@@ -248,10 +250,10 @@ function StepBasics({
               type="button"
               onClick={() => set("category", cat)}
               className={cn(
-                "px-3 py-2 text-sm rounded-lg border transition-colors text-left",
+                "px-3 py-2 text-sm rounded-none border transition-colors text-left",
                 form.category === cat
                   ? "border-brand-600 bg-brand-50 text-brand-700 font-medium"
-                  : "border-gray-200 text-gray-600 hover:border-gray-300"
+                  : "border-gray-200 text-gray-800 hover:border-gray-300"
               )}
             >
               {cat}
@@ -262,7 +264,7 @@ function StepBasics({
 
       {/* Title */}
       <div className="space-y-1.5">
-        <label className="text-sm font-medium text-gray-700">Job title</label>
+        <label className="text-sm font-medium text-gray-900">Job title</label>
         <Input
           placeholder="e.g. Kitchen remodel, roof repair, new deck"
           value={form.title}
@@ -272,35 +274,35 @@ function StepBasics({
 
       {/* Description */}
       <div className="space-y-1.5">
-        <label className="text-sm font-medium text-gray-700">Description</label>
+        <label className="text-sm font-medium text-gray-900">Description</label>
         <textarea
           rows={4}
           placeholder="Describe what you need — the more detail, the better the bids you'll get."
           value={form.description}
           onChange={(e) => set("description", e.target.value)}
-          className="flex w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 ring-offset-white placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
+          className="flex w-full rounded-none border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 ring-offset-white placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
         />
       </div>
 
       {/* Photos */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">Photos (optional)</label>
+        <label className="text-sm font-medium text-gray-900">Photos (optional)</label>
         <div className="flex flex-wrap gap-2">
           {photos.map((f, i) => (
-            <div key={i} className="relative w-20 h-20 rounded-lg bg-gray-100 border border-gray-200 overflow-hidden">
+            <div key={i} className="relative w-20 h-20 rounded-none bg-gray-100 border border-gray-200 overflow-hidden">
               <img src={URL.createObjectURL(f)} alt="" className="w-full h-full object-cover" />
               <button
                 onClick={() => onPhotoRemove(i)}
-                className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-gray-900/60 text-white flex items-center justify-center"
+                className="absolute top-0.5 right-0.5 w-5 h-5 rounded-none bg-gray-900/60 text-white flex items-center justify-center"
               >
                 <X className="w-3 h-3" />
               </button>
             </div>
           ))}
           {photos.length < 10 && (
-            <label className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-brand-600 hover:bg-brand-50/50 transition-colors">
-              <Upload className="w-5 h-5 text-gray-400" />
-              <span className="text-[10px] text-gray-400 mt-0.5">Add</span>
+            <label className="w-20 h-20 rounded-none border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-brand-600 hover:bg-brand-50/50 transition-colors">
+              <Upload className="w-5 h-5 text-gray-600" />
+              <span className="text-[10px] text-gray-600 mt-0.5">Add</span>
               <input type="file" accept="image/*" multiple onChange={onPhotoAdd} className="hidden" />
             </label>
           )}
@@ -323,13 +325,13 @@ function StepLocation({
     <div className="space-y-6">
       <div>
         <h2 className="text-lg font-semibold text-gray-900 mb-1">Where is the job?</h2>
-        <p className="text-sm text-gray-500">This helps match you with local contractors.</p>
+        <p className="text-sm text-gray-700">This helps match you with local contractors.</p>
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-sm font-medium text-gray-700">City / Area</label>
+        <label className="text-sm font-medium text-gray-900">City / Area</label>
         <div className="relative">
-          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
           <Input
             className="pl-9"
             placeholder="e.g. Austin, TX"
@@ -340,7 +342,7 @@ function StepLocation({
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-sm font-medium text-gray-700">Full address (optional, shared after bid accepted)</label>
+        <label className="text-sm font-medium text-gray-900">Full address (optional, shared after bid accepted)</label>
         <Input
           placeholder="123 Main St, Austin, TX 78701"
           value={form.fullAddress}
@@ -350,7 +352,7 @@ function StepLocation({
 
       {/* Property Type */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">Property type</label>
+        <label className="text-sm font-medium text-gray-900">Property type</label>
         <div className="grid grid-cols-3 gap-3">
           {PROPERTY_TYPES.map(({ value, label, icon: Icon }) => (
             <button
@@ -358,10 +360,10 @@ function StepLocation({
               type="button"
               onClick={() => set("propertyType", value)}
               className={cn(
-                "flex flex-col items-center gap-1.5 py-4 rounded-lg border transition-colors",
+                "flex flex-col items-center gap-1.5 py-4 rounded-none border transition-colors",
                 form.propertyType === value
                   ? "border-brand-600 bg-brand-50 text-brand-700"
-                  : "border-gray-200 text-gray-500 hover:border-gray-300"
+                  : "border-gray-200 text-gray-700 hover:border-gray-300"
               )}
             >
               <Icon className="w-5 h-5" />
@@ -373,7 +375,7 @@ function StepLocation({
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-gray-700">Square footage</label>
+          <label className="text-sm font-medium text-gray-900">Square footage</label>
           <Input
             type="number"
             placeholder="2,000"
@@ -382,7 +384,7 @@ function StepLocation({
           />
         </div>
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-gray-700">Year built</label>
+          <label className="text-sm font-medium text-gray-900">Year built</label>
           <Input
             type="number"
             placeholder="1995"
@@ -408,15 +410,15 @@ function StepDetails({
     <div className="space-y-6">
       <div>
         <h2 className="text-lg font-semibold text-gray-900 mb-1">Budget and timeline</h2>
-        <p className="text-sm text-gray-500">Help contractors understand your expectations.</p>
+        <p className="text-sm text-gray-700">Help contractors understand your expectations.</p>
       </div>
 
       {/* Budget */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">Budget range (optional)</label>
+        <label className="text-sm font-medium text-gray-900">Budget range (optional)</label>
         <div className="grid grid-cols-2 gap-3">
           <div className="relative">
-            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
             <Input
               type="number"
               className="pl-9"
@@ -426,7 +428,7 @@ function StepDetails({
             />
           </div>
           <div className="relative">
-            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
             <Input
               type="number"
               className="pl-9"
@@ -440,7 +442,7 @@ function StepDetails({
 
       {/* Urgency */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">How urgent is this?</label>
+        <label className="text-sm font-medium text-gray-900">How urgent is this?</label>
         <div className="space-y-2">
           {URGENCY_OPTIONS.map(({ value, label, desc, icon: Icon }) => (
             <button
@@ -448,16 +450,16 @@ function StepDetails({
               type="button"
               onClick={() => set("urgency", value)}
               className={cn(
-                "w-full flex items-center gap-3 px-4 py-3 rounded-lg border transition-colors text-left",
+                "w-full flex items-center gap-3 px-4 py-3 rounded-none border transition-colors text-left",
                 form.urgency === value
                   ? "border-brand-600 bg-brand-50"
                   : "border-gray-200 hover:border-gray-300"
               )}
             >
-              <Icon className={cn("w-5 h-5", form.urgency === value ? "text-brand-600" : "text-gray-400")} />
+              <Icon className={cn("w-5 h-5", form.urgency === value ? "text-brand-600" : "text-gray-600")} />
               <div>
-                <span className={cn("text-sm font-medium", form.urgency === value ? "text-brand-700" : "text-gray-700")}>{label}</span>
-                <span className="text-xs text-gray-500 ml-2">{desc}</span>
+                <span className={cn("text-sm font-medium", form.urgency === value ? "text-brand-700" : "text-gray-900")}>{label}</span>
+                <span className="text-xs text-gray-700 ml-2">{desc}</span>
               </div>
             </button>
           ))}
@@ -467,7 +469,7 @@ function StepDetails({
       {/* Dates */}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-gray-700">Preferred start</label>
+          <label className="text-sm font-medium text-gray-900">Preferred start</label>
           <Input
             type="date"
             value={form.preferredStartDate}
@@ -475,7 +477,7 @@ function StepDetails({
           />
         </div>
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-gray-700">Deadline</label>
+          <label className="text-sm font-medium text-gray-900">Deadline</label>
           <Input
             type="date"
             value={form.deadline}
@@ -486,7 +488,7 @@ function StepDetails({
 
       {/* Toggles */}
       <div className="space-y-3">
-        <label className="text-sm font-medium text-gray-700">Additional details</label>
+        <label className="text-sm font-medium text-gray-900">Additional details</label>
         {[
           { key: "materialsProvided" as const, label: "I'll provide materials" },
           { key: "permitsRequired" as const, label: "Permits required" },
@@ -498,10 +500,10 @@ function StepDetails({
             type="button"
             onClick={() => set(key, !form[key])}
             className={cn(
-              "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg border transition-colors text-left text-sm",
+              "w-full flex items-center gap-3 px-4 py-2.5 rounded-none border transition-colors text-left text-sm",
               form[key]
                 ? "border-brand-600 bg-brand-50 text-brand-700"
-                : "border-gray-200 text-gray-600 hover:border-gray-300"
+                : "border-gray-200 text-gray-800 hover:border-gray-300"
             )}
           >
             <div className={cn(
@@ -517,13 +519,13 @@ function StepDetails({
 
       {/* Special instructions */}
       <div className="space-y-1.5">
-        <label className="text-sm font-medium text-gray-700">Special instructions (optional)</label>
+        <label className="text-sm font-medium text-gray-900">Special instructions (optional)</label>
         <textarea
           rows={3}
           placeholder="Access codes, parking info, pet warnings..."
           value={form.specialInstructions}
           onChange={(e) => set("specialInstructions", e.target.value)}
-          className="flex w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 ring-offset-white placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
+          className="flex w-full rounded-none border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 ring-offset-white placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
         />
       </div>
     </div>
@@ -537,7 +539,7 @@ function StepReview({ form, photos }: { form: JobForm; photos: File[] }) {
     <div className="space-y-6">
       <div>
         <h2 className="text-lg font-semibold text-gray-900 mb-1">Review your job</h2>
-        <p className="text-sm text-gray-500">Make sure everything looks right before posting.</p>
+        <p className="text-sm text-gray-700">Make sure everything looks right before posting.</p>
       </div>
 
       <Card>
@@ -545,27 +547,27 @@ function StepReview({ form, photos }: { form: JobForm; photos: File[] }) {
           <div>
             <Badge variant="secondary" className="mb-2">{form.category}</Badge>
             <h3 className="text-lg font-semibold text-gray-900">{form.title}</h3>
-            <p className="text-sm text-gray-600 mt-1">{form.description}</p>
+            <p className="text-sm text-gray-800 mt-1">{form.description}</p>
           </div>
 
           <div className="grid grid-cols-2 gap-3 text-sm">
-            <div className="flex items-center gap-2 text-gray-600">
-              <MapPin className="w-4 h-4 text-gray-400" />
+            <div className="flex items-center gap-2 text-gray-800">
+              <MapPin className="w-4 h-4 text-gray-600" />
               {form.location}
             </div>
             {form.budgetMin && (
-              <div className="flex items-center gap-2 text-gray-600">
-                <DollarSign className="w-4 h-4 text-gray-400" />
+              <div className="flex items-center gap-2 text-gray-800">
+                <DollarSign className="w-4 h-4 text-gray-600" />
                 ${Number(form.budgetMin).toLocaleString()} – ${Number(form.budgetMax).toLocaleString()}
               </div>
             )}
-            <div className="flex items-center gap-2 text-gray-600">
-              <FileText className="w-4 h-4 text-gray-400" />
+            <div className="flex items-center gap-2 text-gray-800">
+              <FileText className="w-4 h-4 text-gray-600" />
               {form.propertyType.charAt(0) + form.propertyType.slice(1).toLowerCase()}
               {form.sqft && ` / ${Number(form.sqft).toLocaleString()} sqft`}
             </div>
-            <div className="flex items-center gap-2 text-gray-600">
-              <Clock className="w-4 h-4 text-gray-400" />
+            <div className="flex items-center gap-2 text-gray-800">
+              <Clock className="w-4 h-4 text-gray-600" />
               {URGENCY_OPTIONS.find((u) => u.value === form.urgency)?.label} priority
             </div>
           </div>
@@ -573,7 +575,7 @@ function StepReview({ form, photos }: { form: JobForm; photos: File[] }) {
           {photos.length > 0 && (
             <div className="flex gap-2 pt-2">
               {photos.map((f, i) => (
-                <div key={i} className="w-16 h-16 rounded-lg bg-gray-100 overflow-hidden">
+                <div key={i} className="w-16 h-16 rounded-none bg-gray-100 overflow-hidden">
                   <img src={URL.createObjectURL(f)} alt="" className="w-full h-full object-cover" />
                 </div>
               ))}
@@ -591,7 +593,7 @@ function StepReview({ form, photos }: { form: JobForm; photos: File[] }) {
         </CardContent>
       </Card>
 
-      <p className="text-xs text-gray-500 text-center">
+      <p className="text-xs text-gray-700 text-center">
         Once posted, local contractors will see your job and can submit bids.
         You&apos;ll be notified when bids come in.
       </p>

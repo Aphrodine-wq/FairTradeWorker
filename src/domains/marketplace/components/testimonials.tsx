@@ -68,17 +68,17 @@ export function Testimonials() {
           {testimonials.map((t) => (
             <div
               key={t.name}
-              className="bg-white border border-border rounded-xl p-8 flex flex-col"
+              className="bg-white border border-border rounded-none p-8 flex flex-col"
             >
-              <blockquote className="text-base text-gray-700 leading-relaxed flex-1">
+              <blockquote className="text-base text-gray-900 leading-relaxed flex-1">
                 &ldquo;{t.quote}&rdquo;
               </blockquote>
               <div className="mt-6 pt-5 border-t border-border">
                 <p className="text-sm font-bold text-gray-900">{t.name}</p>
                 {t.company && (
-                  <p className="text-sm text-gray-500">{t.company}</p>
+                  <p className="text-sm text-gray-700">{t.company}</p>
                 )}
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className="text-xs text-gray-600 mt-0.5">
                   {t.role} — {t.location}
                 </p>
               </div>

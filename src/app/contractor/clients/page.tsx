@@ -28,6 +28,7 @@ import {
 } from "@shared/ui/dialog";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
 import { fetchClients } from "@shared/lib/data";
+import { usePageTitle } from "@shared/hooks/use-page-title";
 
 // ─── Mock Data ───────────────────────────────────────────────────────────────
 
@@ -213,6 +214,7 @@ const STATUS_BADGE: Record<string, "default" | "success" | "secondary"> = {
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function ClientsPage() {
+  usePageTitle("Clients");
   const [clients, setClients] = useState<Client[]>(CLIENTS);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "active" | "lead" | "past">("all");
@@ -275,24 +277,24 @@ export default function ClientsPage() {
                 Add Client
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[520px] p-0 overflow-hidden bg-white rounded-xl">
+            <DialogContent className="sm:max-w-[520px] p-0 overflow-hidden bg-white rounded-none">
               {/* Header */}
               <div className="px-6 pt-6 pb-4">
                 <DialogHeader>
                   <DialogTitle className="text-[20px] font-bold text-gray-900">Add New Client</DialogTitle>
                 </DialogHeader>
-                <p className="text-[13px] text-gray-400 mt-1">Add a client to your CRM to track jobs, invoices, and communication.</p>
+                <p className="text-[13px] text-gray-600 mt-1">Add a client to your CRM to track jobs, invoices, and communication.</p>
               </div>
 
               <div className="px-6 pb-6">
                 {/* Avatar placeholder */}
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                  <div className="w-16 h-16 rounded-none bg-gray-100 flex items-center justify-center flex-shrink-0">
                     <User className="w-7 h-7 text-gray-300" />
                   </div>
                   <div>
                     <button className="text-[13px] font-semibold text-brand-600 hover:text-brand-700 transition-colors">Upload photo</button>
-                    <p className="text-[11px] text-gray-400 mt-0.5">Optional — helps you recognize clients fast</p>
+                    <p className="text-[11px] text-gray-600 mt-0.5">Optional — helps you recognize clients fast</p>
                   </div>
                 </div>
 
@@ -302,11 +304,11 @@ export default function ClientsPage() {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="text-[12px] font-semibold text-gray-900 block mb-1.5">First Name</label>
-                      <input type="text" placeholder="John" className="w-full h-10 rounded-lg border border-gray-200 bg-white px-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
+                      <input type="text" placeholder="John" className="w-full h-10 rounded-none border border-gray-200 bg-white px-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
                     </div>
                     <div>
                       <label className="text-[12px] font-semibold text-gray-900 block mb-1.5">Last Name</label>
-                      <input type="text" placeholder="Smith" className="w-full h-10 rounded-lg border border-gray-200 bg-white px-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
+                      <input type="text" placeholder="Smith" className="w-full h-10 rounded-none border border-gray-200 bg-white px-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
                     </div>
                   </div>
 
@@ -315,7 +317,7 @@ export default function ClientsPage() {
                     <label className="text-[12px] font-semibold text-gray-900 block mb-1.5">Email</label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                      <input type="email" placeholder="john@example.com" className="w-full h-10 rounded-lg border border-gray-200 bg-white pl-10 pr-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
+                      <input type="email" placeholder="john@example.com" className="w-full h-10 rounded-none border border-gray-200 bg-white pl-10 pr-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
                     </div>
                   </div>
 
@@ -323,7 +325,7 @@ export default function ClientsPage() {
                     <label className="text-[12px] font-semibold text-gray-900 block mb-1.5">Phone</label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                      <input type="tel" placeholder="(512) 555-0000" className="w-full h-10 rounded-lg border border-gray-200 bg-white pl-10 pr-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
+                      <input type="tel" placeholder="(512) 555-0000" className="w-full h-10 rounded-none border border-gray-200 bg-white pl-10 pr-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
                     </div>
                   </div>
 
@@ -332,14 +334,14 @@ export default function ClientsPage() {
                     <label className="text-[12px] font-semibold text-gray-900 block mb-1.5">Address</label>
                     <div className="relative">
                       <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                      <input type="text" placeholder="1234 Main St, Austin, TX 78701" className="w-full h-10 rounded-lg border border-gray-200 bg-white pl-10 pr-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
+                      <input type="text" placeholder="1234 Main St, Austin, TX 78701" className="w-full h-10 rounded-none border border-gray-200 bg-white pl-10 pr-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
                     </div>
                   </div>
 
                   {/* Status */}
                   <div>
                     <label className="text-[12px] font-semibold text-gray-900 block mb-1.5">Status</label>
-                    <select className="w-full h-10 rounded-lg border border-gray-200 bg-white px-3 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow appearance-none">
+                    <select className="w-full h-10 rounded-none border border-gray-200 bg-white px-3 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow appearance-none">
                       <option value="lead">Lead</option>
                       <option value="active">Active</option>
                       <option value="past">Past</option>
@@ -349,7 +351,7 @@ export default function ClientsPage() {
                   {/* Notes */}
                   <div>
                     <label className="text-[12px] font-semibold text-gray-900 block mb-1.5">Notes</label>
-                    <textarea rows={3} placeholder="Any details about this client..." className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow resize-none" />
+                    <textarea rows={3} placeholder="Any details about this client..." className="w-full rounded-none border border-gray-200 bg-white px-3 py-2.5 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow resize-none" />
                   </div>
                 </div>
 
@@ -374,19 +376,19 @@ export default function ClientsPage() {
           {/* Stats */}
           <div className="flex gap-6 mb-6">
             <div>
-              <p className="text-[13px] text-gray-400">Total Revenue</p>
+              <p className="text-[13px] text-gray-600">Total Revenue</p>
               <p className="text-[28px] font-bold text-gray-900 tabular-nums leading-tight mt-0.5">{formatCurrency(totalClientRevenue)}</p>
             </div>
             <div>
-              <p className="text-[13px] text-gray-400">Active Clients</p>
+              <p className="text-[13px] text-gray-600">Active Clients</p>
               <p className="text-[28px] font-bold text-gray-900 tabular-nums leading-tight mt-0.5">{activeCount}</p>
             </div>
             <div>
-              <p className="text-[13px] text-gray-400">Leads</p>
+              <p className="text-[13px] text-gray-600">Leads</p>
               <p className="text-[28px] font-bold text-gray-900 tabular-nums leading-tight mt-0.5">{leadCount}</p>
             </div>
             <div>
-              <p className="text-[13px] text-gray-400">Total Clients</p>
+              <p className="text-[13px] text-gray-600">Total Clients</p>
               <p className="text-[28px] font-bold text-gray-900 tabular-nums leading-tight mt-0.5">{clients.length}</p>
             </div>
           </div>
@@ -399,10 +401,10 @@ export default function ClientsPage() {
                   key={f}
                   onClick={() => setFilter(f)}
                   className={cn(
-                    "text-[13px] font-medium px-3 py-1.5 rounded-full transition-colors",
+                    "text-[13px] font-medium px-3 py-1.5 rounded-none transition-colors",
                     filter === f
                       ? "bg-gray-900 text-white"
-                      : "bg-white text-gray-500 hover:bg-gray-100"
+                      : "bg-white text-gray-700 hover:bg-gray-100"
                   )}
                 >
                   {f === "all" ? "All" : f.charAt(0).toUpperCase() + f.slice(1)}
@@ -416,7 +418,7 @@ export default function ClientsPage() {
                 placeholder="Search clients..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="h-9 rounded-lg border border-gray-200 bg-white pl-9 pr-3 text-[13px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 w-[220px]"
+                className="h-9 rounded-none border border-gray-200 bg-white pl-9 pr-3 text-[13px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 w-[220px]"
               />
             </div>
           </div>
@@ -432,7 +434,7 @@ export default function ClientsPage() {
                     key={client.id}
                     onClick={() => setSelectedId(client.id)}
                     className={cn(
-                      "w-full text-left rounded-xl p-4 transition-all",
+                      "w-full text-left rounded-none p-4 transition-all",
                       isSelected
                         ? "bg-white shadow-[0_2px_12px_-2px_rgba(0,0,0,0.08)] ring-1 ring-gray-200"
                         : "bg-white hover:bg-gray-50"
@@ -440,14 +442,14 @@ export default function ClientsPage() {
                   >
                     <div className="flex items-center justify-between mb-1.5">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-brand-100 flex items-center justify-center flex-shrink-0">
+                        <div className="w-9 h-9 rounded-none bg-brand-100 flex items-center justify-center flex-shrink-0">
                           <span className="text-brand-700 text-[13px] font-bold">
                             {client.name.split(" ").map((n) => n[0]).join("")}
                           </span>
                         </div>
                         <div>
                           <p className="text-[15px] font-bold text-gray-900">{client.name}</p>
-                          <p className="text-[12px] text-gray-400">{client.city}</p>
+                          <p className="text-[12px] text-gray-600">{client.city}</p>
                         </div>
                       </div>
                       <Badge variant={STATUS_BADGE[client.status]} className="text-[11px]">
@@ -459,9 +461,9 @@ export default function ClientsPage() {
                         <span className="text-[13px] font-bold text-gray-900 tabular-nums">{formatCurrency(client.totalRevenue)}</span>
                       )}
                       {client.totalJobs > 0 && (
-                        <span className="text-[12px] text-gray-400">{client.totalJobs} job{client.totalJobs > 1 ? "s" : ""}</span>
+                        <span className="text-[12px] text-gray-600">{client.totalJobs} job{client.totalJobs > 1 ? "s" : ""}</span>
                       )}
-                      <span className="text-[11px] text-gray-400">{formatDate(client.lastActivity)}</span>
+                      <span className="text-[11px] text-gray-600">{formatDate(client.lastActivity)}</span>
                     </div>
                   </button>
                 );
@@ -470,11 +472,11 @@ export default function ClientsPage() {
 
             {/* Detail panel */}
             {selected && (
-              <div className="w-[460px] flex-shrink-0 bg-white rounded-xl shadow-[0_2px_12px_-2px_rgba(0,0,0,0.08)] ring-1 ring-gray-200 self-start sticky top-5 overflow-hidden">
+              <div className="w-[460px] flex-shrink-0 bg-white rounded-none shadow-[0_2px_12px_-2px_rgba(0,0,0,0.08)] ring-1 ring-gray-200 self-start sticky top-5 overflow-hidden">
                 {/* Header */}
                 <div className="px-6 pt-5 pb-4">
                   <div className="flex items-center gap-4 mb-3">
-                    <div className="w-14 h-14 rounded-full bg-brand-100 flex items-center justify-center flex-shrink-0">
+                    <div className="w-14 h-14 rounded-none bg-brand-100 flex items-center justify-center flex-shrink-0">
                       <span className="text-brand-700 text-[20px] font-bold">
                         {selected.name.split(" ").map((n) => n[0]).join("")}
                       </span>
@@ -487,8 +489,8 @@ export default function ClientsPage() {
                         </Badge>
                       </div>
                       <div className="flex items-center gap-3 mt-0.5">
-                        <span className="text-[12px] text-gray-400">{selected.propertyType}</span>
-                        <span className="text-[12px] text-gray-400">via {selected.source}</span>
+                        <span className="text-[12px] text-gray-600">{selected.propertyType}</span>
+                        <span className="text-[12px] text-gray-600">via {selected.source}</span>
                       </div>
                     </div>
                   </div>
@@ -496,7 +498,7 @@ export default function ClientsPage() {
                   {/* Tags */}
                   <div className="flex flex-wrap gap-1.5">
                     {selected.tags.map((tag) => (
-                      <span key={tag} className="text-[10px] font-medium text-gray-500 bg-gray-100 rounded-full px-2 py-0.5">{tag}</span>
+                      <span key={tag} className="text-[10px] font-medium text-gray-700 bg-gray-100 rounded-none px-2 py-0.5">{tag}</span>
                     ))}
                   </div>
                 </div>
@@ -517,7 +519,7 @@ export default function ClientsPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <Clock className="w-4 h-4 text-gray-300 flex-shrink-0" />
-                    <span className="text-[12px] text-gray-400">Client since {formatDate(selected.firstContact)} — Last active {formatDate(selected.lastActivity)}</span>
+                    <span className="text-[12px] text-gray-600">Client since {formatDate(selected.firstContact)} — Last active {formatDate(selected.lastActivity)}</span>
                   </div>
                 </div>
 
@@ -525,19 +527,19 @@ export default function ClientsPage() {
                   {/* Financials */}
                   <div className="grid grid-cols-4 gap-3 mb-5 pb-5 border-b border-gray-100">
                     <div>
-                      <p className="text-[10px] text-gray-400">Revenue</p>
+                      <p className="text-[10px] text-gray-600">Revenue</p>
                       <p className="text-[17px] font-bold text-gray-900 tabular-nums leading-tight mt-0.5">{formatCurrency(selected.totalRevenue)}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-gray-400">Paid</p>
-                      <p className="text-[17px] font-bold text-emerald-600 tabular-nums leading-tight mt-0.5">{formatCurrency(selected.totalPaid)}</p>
+                      <p className="text-[10px] text-gray-600">Paid</p>
+                      <p className="text-[17px] font-bold text-emerald-950 tabular-nums leading-tight mt-0.5">{formatCurrency(selected.totalPaid)}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-gray-400">Outstanding</p>
+                      <p className="text-[10px] text-gray-600">Outstanding</p>
                       <p className={cn("text-[17px] font-bold tabular-nums leading-tight mt-0.5", selected.outstanding > 0 ? "text-amber-600" : "text-gray-900")}>{formatCurrency(selected.outstanding)}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-gray-400">Rating</p>
+                      <p className="text-[10px] text-gray-600">Rating</p>
                       {selected.rating ? (
                         <div className="flex items-center gap-1 mt-0.5">
                           <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
@@ -552,7 +554,7 @@ export default function ClientsPage() {
                   {/* Notes */}
                   <div className="mb-5 pb-5 border-b border-gray-100">
                     <p className="text-[13px] font-bold text-gray-900 mb-2">Notes</p>
-                    <p className="text-[13px] text-gray-500 leading-relaxed">{selected.notes}</p>
+                    <p className="text-[13px] text-gray-700 leading-relaxed">{selected.notes}</p>
                   </div>
 
                   {/* Job history */}
@@ -564,7 +566,7 @@ export default function ClientsPage() {
                           <div key={i} className="flex items-center justify-between">
                             <div>
                               <p className="text-[13px] font-semibold text-gray-900">{job.title}</p>
-                              <p className="text-[11px] text-gray-400">{job.status} — Started {formatDate(job.date)}</p>
+                              <p className="text-[11px] text-gray-600">{job.status} — Started {formatDate(job.date)}</p>
                             </div>
                             <p className="text-[14px] font-bold text-gray-900 tabular-nums">{formatCurrency(job.amount)}</p>
                           </div>
@@ -581,7 +583,7 @@ export default function ClientsPage() {
                         {selected.invoices.map((inv, i) => (
                           <div key={i} className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <span className="text-[12px] text-gray-500 font-mono">{inv.number}</span>
+                              <span className="text-[12px] text-gray-700 font-mono">{inv.number}</span>
                               <Badge
                                 variant={inv.status === "paid" ? "success" : inv.status === "overdue" ? "danger" : "info"}
                                 className="text-[9px]"
@@ -603,13 +605,13 @@ export default function ClientsPage() {
                       <div className="space-y-3">
                         {selected.communications.map((comm, i) => (
                           <div key={i} className="flex gap-3">
-                            <div className="w-1 rounded-full bg-gray-200 flex-shrink-0" />
+                            <div className="w-1 rounded-none bg-gray-200 flex-shrink-0" />
                             <div>
                               <div className="flex items-center gap-2">
                                 <span className="text-[11px] font-semibold text-gray-900">{comm.type}</span>
-                                <span className="text-[10px] text-gray-400">{formatDate(comm.date)}</span>
+                                <span className="text-[10px] text-gray-600">{formatDate(comm.date)}</span>
                               </div>
-                              <p className="text-[12px] text-gray-500 mt-0.5">{comm.summary}</p>
+                              <p className="text-[12px] text-gray-700 mt-0.5">{comm.summary}</p>
                             </div>
                           </div>
                         ))}

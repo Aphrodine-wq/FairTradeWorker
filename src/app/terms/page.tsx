@@ -18,7 +18,7 @@ export default function TermsPage() {
           <h1 className="text-4xl font-bold text-[#0F1419] tracking-tight">
             Terms of Service
           </h1>
-          <p className="mt-4 text-sm text-gray-500">
+          <p className="mt-4 text-sm text-gray-700">
             Last updated: March 26, 2026
           </p>
 
@@ -28,7 +28,7 @@ export default function TermsPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 Acceptance of Terms
               </h2>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-800 leading-relaxed">
                 By creating an account on or using FairTradeWorker, you agree to
                 be bound by these Terms of Service. If you do not agree to these
                 terms, do not use the platform. FairTradeWorker is operated by
@@ -43,7 +43,7 @@ export default function TermsPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 Description of Service
               </h2>
-              <p className="text-gray-600 leading-relaxed mb-4">
+              <p className="text-gray-800 leading-relaxed mb-4">
                 FairTradeWorker is a two-sided marketplace that connects
                 homeowners with licensed, verified contractors for construction,
                 renovation, and home improvement projects. The platform provides
@@ -51,7 +51,7 @@ export default function TermsPage() {
                 estimation, in-platform messaging, escrow-based payments, and
                 project management.
               </p>
-              <p className="text-gray-600 leading-relaxed font-medium">
+              <p className="text-gray-800 leading-relaxed font-medium">
                 FairTradeWorker is not a contractor, general contractor,
                 construction company, or employer. We do not perform
                 construction work, employ contractors, or guarantee the outcome
@@ -66,7 +66,7 @@ export default function TermsPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 User Accounts
               </h2>
-              <ul className="list-disc pl-6 space-y-2 text-gray-600 leading-relaxed">
+              <ul className="list-disc pl-6 space-y-2 text-gray-800 leading-relaxed">
                 <li>
                   You must provide accurate, complete, and current information
                   when creating your account. Providing false information is
@@ -94,7 +94,7 @@ export default function TermsPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 Contractor Obligations
               </h2>
-              <ul className="list-disc pl-6 space-y-2 text-gray-600 leading-relaxed">
+              <ul className="list-disc pl-6 space-y-2 text-gray-800 leading-relaxed">
                 <li>
                   Maintain a valid, active license for your trade in every
                   jurisdiction where you accept work through the platform, where
@@ -129,7 +129,7 @@ export default function TermsPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 Homeowner Obligations
               </h2>
-              <ul className="list-disc pl-6 space-y-2 text-gray-600 leading-relaxed">
+              <ul className="list-disc pl-6 space-y-2 text-gray-800 leading-relaxed">
                 <li>
                   Provide accurate, detailed job descriptions including scope of
                   work, property conditions, access requirements, and any known
@@ -158,11 +158,11 @@ export default function TermsPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 The FairTrade Promise
               </h2>
-              <p className="text-gray-600 leading-relaxed mb-4">
+              <p className="text-gray-800 leading-relaxed mb-4">
                 FairTradeWorker is built on the principle that both sides of a
                 construction transaction deserve a fair deal. Our commitments:
               </p>
-              <ul className="list-disc pl-6 space-y-2 text-gray-600 leading-relaxed">
+              <ul className="list-disc pl-6 space-y-2 text-gray-800 leading-relaxed">
                 <li>
                   <span className="font-medium text-[#0F1419]">
                     No lead fees:
@@ -199,7 +199,7 @@ export default function TermsPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 Payments and Escrow
               </h2>
-              <ul className="list-disc pl-6 space-y-2 text-gray-600 leading-relaxed">
+              <ul className="list-disc pl-6 space-y-2 text-gray-800 leading-relaxed">
                 <li>
                   All project payments are processed through QuickBooks (Intuit).
                   FairTradeWorker does not directly hold, process, or store
@@ -233,12 +233,12 @@ export default function TermsPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 Dispute Resolution
               </h2>
-              <p className="text-gray-600 leading-relaxed mb-4">
+              <p className="text-gray-800 leading-relaxed mb-4">
                 We encourage homeowners and contractors to resolve
                 disagreements directly through the platform&apos;s messaging
                 system. If direct resolution fails:
               </p>
-              <ol className="list-decimal pl-6 space-y-2 text-gray-600 leading-relaxed">
+              <ol className="list-decimal pl-6 space-y-2 text-gray-800 leading-relaxed">
                 <li>
                   <span className="font-medium text-[#0F1419]">
                     Internal mediation:
@@ -259,7 +259,7 @@ export default function TermsPage() {
                   arbitration costs.
                 </li>
               </ol>
-              <p className="text-gray-600 leading-relaxed mt-4">
+              <p className="text-gray-800 leading-relaxed mt-4">
                 By using FairTradeWorker, you agree to resolve disputes through
                 this process and waive the right to participate in class action
                 lawsuits or class-wide arbitration against Strata Software
@@ -272,7 +272,7 @@ export default function TermsPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 AI Estimation Disclaimer
               </h2>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-800 leading-relaxed">
                 ConstructionAI, our custom-built estimation model, provides cost
                 estimates based on project parameters, regional data, and
                 historical construction pricing. These estimates are informational
@@ -292,7 +292,7 @@ export default function TermsPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 Intellectual Property
               </h2>
-              <ul className="list-disc pl-6 space-y-2 text-gray-600 leading-relaxed">
+              <ul className="list-disc pl-6 space-y-2 text-gray-800 leading-relaxed">
                 <li>
                   The FairTradeWorker platform, including its design, code,
                   branding, ConstructionAI models, and documentation, is the
@@ -321,14 +321,14 @@ export default function TermsPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 Limitation of Liability
               </h2>
-              <p className="text-gray-600 leading-relaxed mb-4">
+              <p className="text-gray-800 leading-relaxed mb-4">
                 FairTradeWorker provides a marketplace platform. We are not a
                 party to the agreements between homeowners and contractors and
                 are not responsible for the quality, safety, legality, or
                 completion of any construction work arranged through the
                 platform.
               </p>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-800 leading-relaxed">
                 To the maximum extent permitted by law, Strata Software Group
                 and its officers, employees, and affiliates shall not be liable
                 for any indirect, incidental, special, consequential, or
@@ -345,7 +345,7 @@ export default function TermsPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 Termination
               </h2>
-              <ul className="list-disc pl-6 space-y-2 text-gray-600 leading-relaxed">
+              <ul className="list-disc pl-6 space-y-2 text-gray-800 leading-relaxed">
                 <li>
                   You may close your account at any time by contacting us at{" "}
                   <a
@@ -377,7 +377,7 @@ export default function TermsPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 Governing Law
               </h2>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-800 leading-relaxed">
                 These Terms of Service are governed by and construed in
                 accordance with the laws of the State of Mississippi, without
                 regard to conflict of law principles. Any legal proceedings not
@@ -392,11 +392,11 @@ export default function TermsPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 Contact Us
               </h2>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-800 leading-relaxed">
                 If you have questions about these Terms of Service, contact us
                 at:
               </p>
-              <div className="mt-4 text-gray-600 leading-relaxed">
+              <div className="mt-4 text-gray-800 leading-relaxed">
                 <p className="font-medium text-[#0F1419]">
                   Strata Software Group
                 </p>

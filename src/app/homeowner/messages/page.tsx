@@ -7,6 +7,7 @@ import { Input } from "@shared/ui/input";
 import { Button } from "@shared/ui/button";
 import { cn, getInitials } from "@shared/lib/utils";
 import { useRealtimeChat } from "@shared/hooks/use-realtime";
+import { usePageTitle } from "@shared/hooks/use-page-title";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -228,6 +229,7 @@ function avatarColor(id: string): string {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function HomeownerMessagesPage() {
+  usePageTitle("Messages");
   const [activeConvId, setActiveConvId] = useState("conv1");
   const [conversations, setConversations] = useState(MOCK_CONVERSATIONS);
   const [inputText, setInputText] = useState("");
@@ -328,7 +330,7 @@ export default function HomeownerMessagesPage() {
           {/* Search */}
           <div className="p-3 border-b border-border">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-600" />
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -353,7 +355,7 @@ export default function HomeownerMessagesPage() {
               >
                 <div
                   className={cn(
-                    "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-white text-xs font-bold",
+                    "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-none text-white text-xs font-bold",
                     avatarColor(conv.contractorId)
                   )}
                 >
@@ -365,16 +367,16 @@ export default function HomeownerMessagesPage() {
                       {conv.contractorName}
                     </p>
                     <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <span className="text-xs text-gray-400">{conv.lastTime}</span>
+                      <span className="text-xs text-gray-600">{conv.lastTime}</span>
                       {conv.unread > 0 && (
-                        <span className="w-4 h-4 rounded-full bg-brand-600 text-white text-[10px] font-bold flex items-center justify-center">
+                        <span className="w-4 h-4 rounded-none bg-brand-600 text-white text-[10px] font-bold flex items-center justify-center">
                           {conv.unread}
                         </span>
                       )}
                     </div>
                   </div>
-                  <p className="text-xs text-gray-500 truncate mt-0.5">{conv.jobTitle}</p>
-                  <p className="text-xs text-gray-400 truncate mt-0.5">{conv.lastMessage}</p>
+                  <p className="text-xs text-gray-700 truncate mt-0.5">{conv.jobTitle}</p>
+                  <p className="text-xs text-gray-600 truncate mt-0.5">{conv.lastMessage}</p>
                 </div>
               </button>
             ))}
@@ -387,7 +389,7 @@ export default function HomeownerMessagesPage() {
           <div className="flex items-center gap-3 px-5 py-3.5 bg-white border-b border-border flex-shrink-0">
             <div
               className={cn(
-                "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-white text-xs font-bold",
+                "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-none text-white text-xs font-bold",
                 avatarColor(activeConv.contractorId)
               )}
             >
@@ -395,10 +397,10 @@ export default function HomeownerMessagesPage() {
             </div>
             <div>
               <p className="text-sm font-bold text-gray-900">{activeConv.contractorName}</p>
-              <p className="text-xs text-gray-500">{activeConv.contractorCompany}</p>
+              <p className="text-xs text-gray-700">{activeConv.contractorCompany}</p>
             </div>
             <div className="ml-3">
-              <span className="text-xs text-gray-400 bg-gray-100 rounded-full px-2.5 py-1 border border-gray-200">
+              <span className="text-xs text-gray-600 bg-gray-100 rounded-none px-2.5 py-1 border border-gray-200">
                 Re: {activeConv.jobTitle}
               </span>
             </div>
@@ -417,7 +419,7 @@ export default function HomeownerMessagesPage() {
                   {!isHomeowner && (
                     <div
                       className={cn(
-                        "flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-white text-[10px] font-bold",
+                        "flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-none text-white text-[10px] font-bold",
                         avatarColor(activeConv.contractorId)
                       )}
                     >
@@ -427,17 +429,17 @@ export default function HomeownerMessagesPage() {
 
                   <div
                     className={cn(
-                      "max-w-[68%] rounded-2xl px-4 py-2.5",
+                      "max-w-[68%] rounded-none px-4 py-2.5",
                       isHomeowner
-                        ? "bg-brand-600 text-white rounded-br-sm"
-                        : "bg-white text-gray-900 border border-gray-200 rounded-bl-sm shadow-sm"
+                        ? "bg-brand-600 text-white rounded-none-sm"
+                        : "bg-white text-gray-900 border border-gray-200 rounded-none-sm shadow-sm"
                     )}
                   >
                     <p className="text-sm leading-relaxed">{msg.text}</p>
                     <p
                       className={cn(
                         "text-[11px] mt-1",
-                        isHomeowner ? "text-brand-200" : "text-gray-400"
+                        isHomeowner ? "text-brand-200" : "text-gray-600"
                       )}
                     >
                       {msg.time}

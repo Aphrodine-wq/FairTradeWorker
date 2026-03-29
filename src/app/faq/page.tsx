@@ -141,7 +141,7 @@ export default function FAQPage() {
           <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
             Questions we actually get asked.
           </h1>
-          <p className="mt-4 text-lg text-gray-500">
+          <p className="mt-4 text-lg text-gray-700">
             If something&apos;s not covered here, email us at{" "}
             <a
               href="mailto:hello@fairtradeworker.com"
@@ -177,14 +177,14 @@ export default function FAQPage() {
                             {item.q}
                           </span>
                           <ChevronDown
-                            className={`w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5 transition-transform duration-200 ${
+                            className={`w-5 h-5 text-gray-600 flex-shrink-0 mt-0.5 transition-transform duration-200 ${
                               isOpen ? "rotate-180 text-brand-600" : ""
                             }`}
                           />
                         </button>
                         {isOpen && (
                           <div className="pb-5">
-                            <p className="text-gray-600 leading-relaxed">
+                            <p className="text-gray-800 leading-relaxed">
                               {item.a}
                             </p>
                           </div>
@@ -204,7 +204,7 @@ export default function FAQPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-3">
               Still have questions?
             </h2>
-            <p className="text-gray-500 mb-6 max-w-md mx-auto">
+            <p className="text-gray-700 mb-6 max-w-md mx-auto">
               We&apos;re a real team, not a chatbot. Reach out and we&apos;ll
               get back to you within 24 hours.
             </p>

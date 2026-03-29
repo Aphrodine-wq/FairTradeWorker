@@ -34,28 +34,38 @@ const NAV_ITEMS = [
   { label: "Settings",       href: "/contractor/settings",       icon: Settings },
 ];
 
+// Pages that have their own inner sidebar — outer sidebar auto-collapses
+const INNER_SIDEBAR_ROUTES = ["/contractor/estimates", "/contractor/settings"];
+
+const UNREAD_MESSAGES = 3;
+const UNREAD_NOTIFICATIONS = 5;
+
 function GlobalTopBar({ pathname }: { pathname: string }) {
   return (
     <div className="h-11 flex items-center justify-end gap-2 px-4 bg-white border-b border-gray-200 flex-shrink-0">
       <Link
         href="/contractor/messages"
         className={cn(
-          "relative w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors",
+          "relative w-8 h-8 rounded-none hover:bg-gray-100 flex items-center justify-center transition-colors",
           pathname === "/contractor/messages" && "bg-gray-100"
         )}
       >
-        <MessageSquare className="w-[18px] h-[18px] text-gray-500" />
-        <span className="absolute top-1 right-1 w-2 h-2 bg-brand-600 rounded-full" />
+        <MessageSquare className="w-[18px] h-[18px] text-gray-700" />
+        {UNREAD_MESSAGES > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 bg-brand-600 text-white text-[9px] font-bold flex items-center justify-center">{UNREAD_MESSAGES}</span>
+        )}
       </Link>
       <Link
         href="/contractor/notifications"
         className={cn(
-          "relative w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors",
+          "relative w-8 h-8 rounded-none hover:bg-gray-100 flex items-center justify-center transition-colors",
           pathname === "/contractor/notifications" && "bg-gray-100"
         )}
       >
-        <Bell className="w-[18px] h-[18px] text-gray-500" />
-        <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+        <Bell className="w-[18px] h-[18px] text-gray-700" />
+        {UNREAD_NOTIFICATIONS > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">{UNREAD_NOTIFICATIONS}</span>
+        )}
       </Link>
     </div>
   );
@@ -83,6 +93,7 @@ export default function ContractorLayout({
         items={NAV_ITEMS}
         currentPath={pathname}
         userRole="contractor"
+        autoCollapse={INNER_SIDEBAR_ROUTES.some((r) => pathname === r || pathname.startsWith(r + "/"))}
       />
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         <GlobalTopBar pathname={pathname} />

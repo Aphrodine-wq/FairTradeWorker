@@ -23,6 +23,7 @@ import { Badge } from "@shared/ui/badge";
 import { cn } from "@shared/lib/utils";
 import { fetchSettings, saveSettings } from "@shared/lib/data";
 import { toast } from "sonner";
+import { usePageTitle } from "@shared/hooks/use-page-title";
 
 // ─── Shared Components ───────────────────────────────────────────────────────
 
@@ -36,15 +37,15 @@ function Toggle({ checked, onChange, label, description }: {
     <div className="flex items-start justify-between gap-4 py-3">
       <div>
         <p className="text-sm font-medium text-gray-900">{label}</p>
-        {description && <p className="text-xs text-gray-500 mt-0.5">{description}</p>}
+        {description && <p className="text-xs text-gray-700 mt-0.5">{description}</p>}
       </div>
       <button
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
-        className={cn("relative flex-shrink-0 mt-0.5 w-10 h-[22px] rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2", checked ? "bg-brand-600" : "bg-gray-200")}
+        className={cn("relative flex-shrink-0 mt-0.5 w-10 h-[22px] rounded-none transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2", checked ? "bg-brand-600" : "bg-gray-200")}
       >
-        <span className={cn("absolute top-0.5 left-0.5 w-[18px] h-[18px] rounded-full bg-white shadow transition-transform duration-200", checked ? "translate-x-[18px]" : "translate-x-0")} />
+        <span className={cn("absolute top-0.5 left-0.5 w-[18px] h-[18px] rounded-none bg-white shadow transition-transform duration-200", checked ? "translate-x-[18px]" : "translate-x-0")} />
       </button>
     </div>
   );
@@ -79,36 +80,36 @@ function ProfileSection() {
     <div className="space-y-6">
       <div>
         <h2 className="text-lg font-bold text-gray-900">Profile</h2>
-        <p className="text-sm text-gray-500 mt-1">Your personal information and primary address</p>
+        <p className="text-sm text-gray-700 mt-1">Your personal information and primary address</p>
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="w-16 h-16 rounded-full bg-brand-100 border-2 border-brand-200 flex items-center justify-center">
+        <div className="w-16 h-16 rounded-none bg-brand-100 border-2 border-brand-200 flex items-center justify-center">
           <span className="text-brand-700 font-bold text-xl">SM</span>
         </div>
         <div>
           <Button variant="outline" size="sm">Upload Photo</Button>
-          <p className="text-xs text-gray-400 mt-1">JPG or PNG, max 2MB</p>
+          <p className="text-xs text-gray-600 mt-1">JPG or PNG, max 2MB</p>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Full Name</label>
+          <label className="text-xs font-semibold text-gray-800 uppercase tracking-wide">Full Name</label>
           <Input value={name} onChange={(e) => setName(e.target.value)} />
         </div>
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Email</label>
+          <label className="text-xs font-semibold text-gray-800 uppercase tracking-wide">Email</label>
           <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         </div>
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Phone</label>
+          <label className="text-xs font-semibold text-gray-800 uppercase tracking-wide">Phone</label>
           <Input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
         </div>
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Primary Address</label>
+        <label className="text-xs font-semibold text-gray-800 uppercase tracking-wide">Primary Address</label>
         <Input value={address} onChange={(e) => setAddress(e.target.value)} />
       </div>
 
@@ -128,14 +129,14 @@ function PropertiesSection() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold text-gray-900">Properties</h2>
-          <p className="text-sm text-gray-500 mt-1">Manage the properties linked to your account</p>
+          <p className="text-sm text-gray-700 mt-1">Manage the properties linked to your account</p>
         </div>
         <Button className="gap-2"><Home className="w-4 h-4" />Add Property</Button>
       </div>
 
       <div className="space-y-3">
         {properties.map((prop) => (
-          <div key={prop.id} className="bg-white border border-border rounded-xl p-5">
+          <div key={prop.id} className="bg-white border border-border rounded-none p-5">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <p className="text-sm font-semibold text-gray-900">{prop.label}</p>
@@ -145,19 +146,19 @@ function PropertiesSection() {
             </div>
             <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
               <div className="flex justify-between py-1.5 border-b border-gray-100">
-                <span className="text-gray-500">Address</span>
+                <span className="text-gray-700">Address</span>
                 <span className="font-medium text-gray-900 text-right">{prop.address}</span>
               </div>
               <div className="flex justify-between py-1.5 border-b border-gray-100">
-                <span className="text-gray-500">Property Type</span>
+                <span className="text-gray-700">Property Type</span>
                 <span className="font-medium text-gray-900">{prop.type}</span>
               </div>
               <div className="flex justify-between py-1.5 border-b border-gray-100">
-                <span className="text-gray-500">Square Footage</span>
+                <span className="text-gray-700">Square Footage</span>
                 <span className="font-medium text-gray-900">{prop.sqft} sqft</span>
               </div>
               <div className="flex justify-between py-1.5 border-b border-gray-100">
-                <span className="text-gray-500">Year Built</span>
+                <span className="text-gray-700">Year Built</span>
                 <span className="font-medium text-gray-900">{prop.yearBuilt}</span>
               </div>
             </div>
@@ -181,25 +182,25 @@ function PaymentSection() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold text-gray-900">Payment Methods</h2>
-          <p className="text-sm text-gray-500 mt-1">Manage saved payment methods for project payments</p>
+          <p className="text-sm text-gray-700 mt-1">Manage saved payment methods for project payments</p>
         </div>
         <Button className="gap-2"><CreditCard className="w-4 h-4" />Add Payment Method</Button>
       </div>
 
       <div className="space-y-3">
         {methods.map((m) => (
-          <div key={m.id} className="flex items-center justify-between p-4 bg-white border border-border rounded-xl">
+          <div key={m.id} className="flex items-center justify-between p-4 bg-white border border-border rounded-none">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-none bg-gray-100 flex items-center justify-center">
                 {m.type === "Visa" ? (
-                  <CreditCard className="w-5 h-5 text-gray-500" />
+                  <CreditCard className="w-5 h-5 text-gray-700" />
                 ) : (
-                  <Landmark className="w-5 h-5 text-gray-500" />
+                  <Landmark className="w-5 h-5 text-gray-700" />
                 )}
               </div>
               <div>
                 <p className="text-sm font-semibold text-gray-900">{m.label}</p>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className="text-xs text-gray-600 mt-0.5">
                   {m.expiry ? `Expires ${m.expiry}` : "Checking account"}
                 </p>
               </div>
@@ -215,7 +216,7 @@ function PaymentSection() {
       <Separator />
 
       <div>
-        <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">Auto-Pay</p>
+        <p className="text-xs font-semibold text-gray-800 uppercase tracking-wide mb-1">Auto-Pay</p>
         <div className="divide-y divide-border">
           <Toggle
             checked={autoPay}
@@ -270,7 +271,7 @@ function NotificationsSection() {
     <div className="space-y-6">
       <div>
         <h2 className="text-lg font-bold text-gray-900">Notifications</h2>
-        <p className="text-sm text-gray-500 mt-1">Choose what you want to be notified about</p>
+        <p className="text-sm text-gray-700 mt-1">Choose what you want to be notified about</p>
       </div>
 
       <div className="divide-y divide-border">
@@ -321,7 +322,7 @@ function PrivacySection() {
     <div className="space-y-6">
       <div>
         <h2 className="text-lg font-bold text-gray-900">Privacy</h2>
-        <p className="text-sm text-gray-500 mt-1">Control what contractors and other users can see</p>
+        <p className="text-sm text-gray-700 mt-1">Control what contractors and other users can see</p>
       </div>
 
       <div className="divide-y divide-border">
@@ -366,23 +367,23 @@ function SecuritySection() {
     <div className="space-y-6">
       <div>
         <h2 className="text-lg font-bold text-gray-900">Security</h2>
-        <p className="text-sm text-gray-500 mt-1">Password, two-factor authentication, and active sessions</p>
+        <p className="text-sm text-gray-700 mt-1">Password, two-factor authentication, and active sessions</p>
       </div>
 
       <div>
-        <p className="text-sm font-semibold text-gray-700 mb-3">Change Password</p>
+        <p className="text-sm font-semibold text-gray-900 mb-3">Change Password</p>
         <div className="space-y-3">
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-gray-600">Current Password</label>
+            <label className="text-xs font-semibold text-gray-800">Current Password</label>
             <Input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="max-w-sm" />
           </div>
           <div className="grid grid-cols-2 gap-3 max-w-lg">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-gray-600">New Password</label>
+              <label className="text-xs font-semibold text-gray-800">New Password</label>
               <Input type="password" placeholder="Min 8 characters" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-gray-600">Confirm Password</label>
+              <label className="text-xs font-semibold text-gray-800">Confirm Password</label>
               <Input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
             </div>
           </div>
@@ -395,7 +396,7 @@ function SecuritySection() {
       <Separator />
 
       <div>
-        <p className="text-sm font-semibold text-gray-700 mb-3">Two-Factor Authentication</p>
+        <p className="text-sm font-semibold text-gray-900 mb-3">Two-Factor Authentication</p>
         <Toggle checked={twoFactor} onChange={setTwoFactor} label="Enable 2FA" description="Require a verification code when signing in from a new device" />
       </div>
 
@@ -403,21 +404,21 @@ function SecuritySection() {
 
       <div>
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-semibold text-gray-700">Active Sessions</p>
+          <p className="text-sm font-semibold text-gray-900">Active Sessions</p>
           <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">Sign Out All Devices</Button>
         </div>
         <div className="space-y-2">
           {sessions.map((s) => {
             const DeviceIcon = s.icon;
             return (
-              <div key={s.id} className="flex items-center justify-between p-4 bg-white border border-border rounded-xl">
+              <div key={s.id} className="flex items-center justify-between p-4 bg-white border border-border rounded-none">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                    <DeviceIcon className="w-4 h-4 text-gray-500" />
+                  <div className="w-9 h-9 rounded-none bg-gray-100 flex items-center justify-center">
+                    <DeviceIcon className="w-4 h-4 text-gray-700" />
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-gray-900">{s.device}</p>
-                    <p className="text-xs text-gray-400">{s.location} · {s.lastActive}</p>
+                    <p className="text-xs text-gray-600">{s.location} · {s.lastActive}</p>
                   </div>
                 </div>
                 {s.lastActive === "Active now" && (
@@ -446,6 +447,7 @@ const NAV_SECTIONS = [
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
 export default function HomeownerSettingsPage() {
+  usePageTitle("Settings");
   const [active, setActive] = useState("profile");
 
   const renderSection = () => {
@@ -465,7 +467,7 @@ export default function HomeownerSettingsPage() {
       {/* Header */}
       <div className="px-8 pt-7 pb-5 bg-white border-b border-border">
         <h1 className="text-[22px] font-bold text-gray-900 tracking-tight">Settings</h1>
-        <p className="text-sm text-gray-400 mt-1">Manage your account, properties, and preferences</p>
+        <p className="text-sm text-gray-600 mt-1">Manage your account, properties, and preferences</p>
       </div>
 
       {/* Sidebar + Content */}
@@ -480,10 +482,10 @@ export default function HomeownerSettingsPage() {
                 key={section.id}
                 onClick={() => setActive(section.id)}
                 className={cn(
-                  "w-full flex items-center gap-2 rounded-lg px-2.5 py-2 text-[13px] font-medium transition-colors mb-0.5",
+                  "w-full flex items-center gap-2 rounded-none px-2.5 py-2 text-[13px] font-medium transition-colors mb-0.5",
                   isActive
                     ? "bg-brand-600 text-white"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                    : "text-gray-800 hover:bg-gray-100 hover:text-gray-900"
                 )}
               >
                 <Icon className="w-4 h-4 flex-shrink-0" />

@@ -84,15 +84,15 @@ function LoginContent() {
           <div className="grid grid-cols-3 gap-4">
             <div>
               <p className="text-2xl font-bold text-white tabular-nums">12,800+</p>
-              <p className="text-xs text-gray-400">Jobs</p>
+              <p className="text-xs text-gray-600">Jobs</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-white tabular-nums">3,200+</p>
-              <p className="text-xs text-gray-400">Contractors</p>
+              <p className="text-xs text-gray-600">Contractors</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-white tabular-nums">98%</p>
-              <p className="text-xs text-gray-400">Satisfaction</p>
+              <p className="text-xs text-gray-600">Satisfaction</p>
             </div>
           </div>
 
@@ -100,13 +100,13 @@ function LoginContent() {
             <p className="text-sm text-gray-300 italic">
               &ldquo;I&apos;ve grown my business 40% since joining.&rdquo;
             </p>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-gray-600 mt-1">
               Marcus Johnson, Oxford MS
             </p>
           </div>
         </div>
 
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-700">
           &copy; {new Date().getFullYear()} FairTradeWorker
         </p>
       </div>
@@ -128,20 +128,20 @@ function LoginContent() {
                 <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
                   Welcome back
                 </h1>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-gray-700 mt-1">
                   Sign in to your account
                 </p>
               </div>
 
               {expired && (
-                <div className="rounded-lg bg-blue-50 border border-blue-200 p-3 text-sm text-blue-700 mb-5">
+                <div className="rounded-none bg-blue-50 border border-blue-200 p-3 text-sm text-blue-700 mb-5">
                   Your session has expired. Please sign in again.
                 </div>
               )}
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+                  <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-none">
                     {error}
                   </div>
                 )}
@@ -149,7 +149,7 @@ function LoginContent() {
                 <div className="space-y-1.5">
                   <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-gray-700"
+                    className="block text-sm font-medium text-gray-900"
                   >
                     Email address
                   </label>
@@ -168,7 +168,7 @@ function LoginContent() {
                   <div className="flex items-center justify-between">
                     <label
                       htmlFor="password"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-gray-900"
                     >
                       Password
                     </label>
@@ -193,7 +193,7 @@ function LoginContent() {
                     <button
                       type="button"
                       onClick={() => setShowPassword((v) => !v)}
-                      className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                      className="absolute inset-y-0 right-3 flex items-center text-gray-600 hover:text-gray-800 transition-colors"
                       tabIndex={-1}
                       aria-label={showPassword ? "Hide password" : "Show password"}
                     >
@@ -216,7 +216,7 @@ function LoginContent() {
                   <div className="w-full border-t border-border" />
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="bg-white px-3 text-gray-400 font-medium uppercase tracking-wide">
+                  <span className="bg-white px-3 text-gray-600 font-medium uppercase tracking-wide">
                     or continue with
                   </span>
                 </div>
@@ -233,7 +233,7 @@ function LoginContent() {
                 </Button>
               </div>
 
-              <p className="mt-7 text-center text-sm text-gray-500">
+              <p className="mt-7 text-center text-sm text-gray-700">
                 Don&apos;t have an account?{" "}
                 <Link
                   href="/signup"
@@ -251,7 +251,7 @@ function LoginContent() {
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full text-xs text-gray-500"
+                className="w-full text-xs text-gray-700"
                 onClick={() => {
                   const payload = btoa(JSON.stringify({ sub: "demo-contractor", role: "CONTRACTOR", demo: true }));
                   document.cookie = `ftw-token=demo.${payload}.demo; path=/`;
@@ -265,7 +265,7 @@ function LoginContent() {
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full text-xs text-gray-500"
+                className="w-full text-xs text-gray-700"
                 onClick={() => {
                   const payload = btoa(JSON.stringify({ sub: "demo-homeowner", role: "HOMEOWNER", demo: true }));
                   document.cookie = `ftw-token=demo.${payload}.demo; path=/`;
@@ -277,11 +277,11 @@ function LoginContent() {
             </div>
           </div>
 
-          <p className="mt-4 text-center text-xs text-gray-400">
+          <p className="mt-4 text-center text-xs text-gray-600">
             By signing in, you agree to our{" "}
-            <Link href="/terms" className="underline hover:text-gray-600 transition-colors">Terms</Link>
+            <Link href="/terms" className="underline hover:text-gray-800 transition-colors">Terms</Link>
             {" "}and{" "}
-            <Link href="/privacy" className="underline hover:text-gray-600 transition-colors">Privacy Policy</Link>.
+            <Link href="/privacy" className="underline hover:text-gray-800 transition-colors">Privacy Policy</Link>.
           </p>
         </div>
       </div>

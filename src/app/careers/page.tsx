@@ -48,7 +48,7 @@ export default function CareersPage() {
             Come build something real.
           </h1>
 
-          <p className="mt-6 text-lg text-gray-600 leading-relaxed max-w-2xl">
+          <p className="mt-6 text-lg text-gray-800 leading-relaxed max-w-2xl">
             We&apos;re a small team in Oxford, MS building the marketplace the construction
             industry deserves. If you&apos;re tired of working on things that don&apos;t
             matter, let&apos;s talk.
@@ -66,7 +66,7 @@ export default function CareersPage() {
               {OPENINGS.map((role) => (
                 <div
                   key={role.title}
-                  className="border border-gray-100 rounded-xl p-7 hover:border-gray-200 hover:shadow-sm transition-all duration-150"
+                  className="border border-gray-100 rounded-none p-7 hover:border-gray-200 hover:shadow-sm transition-all duration-150"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div className="flex-1">
@@ -74,11 +74,11 @@ export default function CareersPage() {
                         {role.title}
                       </h3>
                       <div className="flex flex-wrap items-center gap-3 mt-1.5 mb-3">
-                        <span className="text-sm text-gray-500">{role.location}</span>
+                        <span className="text-sm text-gray-700">{role.location}</span>
                         <span className="text-gray-200 select-none">·</span>
-                        <span className="text-sm text-gray-500">{role.type}</span>
+                        <span className="text-sm text-gray-700">{role.type}</span>
                       </div>
-                      <p className="text-sm text-gray-600 leading-relaxed">
+                      <p className="text-sm text-gray-800 leading-relaxed">
                         {role.description}
                       </p>
                     </div>
@@ -99,7 +99,7 @@ export default function CareersPage() {
           <Separator className="my-12" />
 
           {/* Catch-all */}
-          <p className="text-gray-500">
+          <p className="text-gray-700">
             Don&apos;t see your role?{" "}
             <a
               href="mailto:careers@fairtradeworker.com"

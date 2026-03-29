@@ -46,6 +46,7 @@ import { api } from "@shared/lib/realtime";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
 import { toast } from "sonner";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "@shared/ui/alert-dialog";
+import { usePageTitle } from "@shared/hooks/use-page-title";
 
 // ─── Status Config ───────────────────────────────────────────────────────────
 
@@ -109,14 +110,14 @@ function EstimateRow({ est }: { est: Estimate }) {
         className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50/80 transition-colors text-left"
       >
         <div className="flex items-center gap-4 min-w-0">
-          <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-            <FileText className="w-4 h-4 text-gray-400" />
+          <div className="w-9 h-9 rounded-none bg-gray-100 flex items-center justify-center flex-shrink-0">
+            <FileText className="w-4 h-4 text-gray-600" />
           </div>
           <div className="min-w-0">
             <p className="text-[14px] font-semibold text-gray-900 truncate">
               {est.jobTitle}
             </p>
-            <div className="flex items-center gap-3 mt-0.5 text-[12px] text-gray-400">
+            <div className="flex items-center gap-3 mt-0.5 text-[12px] text-gray-600">
               <span className="flex items-center gap-1">
                 <User className="w-3 h-3" />
                 {est.clientName}
@@ -160,9 +161,9 @@ function EstimateRow({ est }: { est: Estimate }) {
             </AlertDialogContent>
           </AlertDialog>
           {open ? (
-            <ChevronUp className="w-4 h-4 text-gray-400" />
+            <ChevronUp className="w-4 h-4 text-gray-600" />
           ) : (
-            <ChevronDown className="w-4 h-4 text-gray-400" />
+            <ChevronDown className="w-4 h-4 text-gray-600" />
           )}
         </div>
       </button>
@@ -170,17 +171,17 @@ function EstimateRow({ est }: { est: Estimate }) {
       {open && (
         <div className="px-5 pb-5">
           <div className="flex items-center justify-end gap-2 mb-3">
-            <button className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border text-[12px] font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+            <button className="flex items-center gap-1.5 h-8 px-3 rounded-none border border-border text-[12px] font-medium text-gray-800 hover:bg-gray-50 transition-colors">
               <Download className="w-3.5 h-3.5" />
               Download PDF
             </button>
-            <button className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border text-[12px] font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+            <button className="flex items-center gap-1.5 h-8 px-3 rounded-none border border-border text-[12px] font-medium text-gray-800 hover:bg-gray-50 transition-colors">
               <Send className="w-3.5 h-3.5" />
               Send to Client
             </button>
           </div>
           {/* PDF-style document */}
-          <div className="bg-white rounded-lg shadow-[0_4px_30px_-6px_rgba(0,0,0,0.15)] ring-1 ring-gray-200/80 overflow-hidden max-w-[600px]">
+          <div className="bg-white rounded-none shadow-[0_4px_30px_-6px_rgba(0,0,0,0.15)] ring-1 ring-gray-200/80 overflow-hidden max-w-[600px]">
             {/* Top accent line */}
             <div className="h-1.5 bg-brand-600" />
 
@@ -193,17 +194,17 @@ function EstimateRow({ est }: { est: Estimate }) {
                     alt="Marcus Johnson"
                     width={44}
                     height={44}
-                    className="w-11 h-11 rounded-full object-cover ring-2 ring-gray-100"
+                    className="w-11 h-11 rounded-none object-cover ring-2 ring-gray-100"
                   />
                   <div>
                     <p className="text-[14px] font-bold text-gray-900 leading-tight">Johnson & Sons Construction</p>
-                    <p className="text-[10px] text-gray-400 mt-0.5">Marcus Johnson — Owner</p>
-                    <p className="text-[9px] text-gray-400">TX License #R21445 — Fully Insured</p>
+                    <p className="text-[10px] text-gray-600 mt-0.5">Marcus Johnson — Owner</p>
+                    <p className="text-[9px] text-gray-600">TX License #R21445 — Fully Insured</p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-[24px] font-bold text-gray-900 tracking-tight leading-none">ESTIMATE</p>
-                  <p className="text-[11px] text-gray-400 mt-1">EST-{est.id.toUpperCase()}</p>
+                  <p className="text-[11px] text-gray-600 mt-1">EST-{est.id.toUpperCase()}</p>
                 </div>
               </div>
 
@@ -212,13 +213,13 @@ function EstimateRow({ est }: { est: Estimate }) {
               {/* Prepared For + From + Dates */}
               <div className="grid grid-cols-3 gap-4 mb-5">
                 <div>
-                  <p className="text-[8px] font-bold text-gray-400 uppercase tracking-[0.1em] mb-1.5">Prepared For</p>
+                  <p className="text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] mb-1.5">Prepared For</p>
                   <p className="text-[13px] font-bold text-gray-900">{est.clientName}</p>
-                  <p className="text-[10px] text-gray-500 mt-0.5">{est.jobTitle}</p>
+                  <p className="text-[10px] text-gray-700 mt-0.5">{est.jobTitle}</p>
                 </div>
                 <div>
-                  <p className="text-[8px] font-bold text-gray-400 uppercase tracking-[0.1em] mb-1.5">From</p>
-                  <p className="text-[10px] text-gray-500 leading-relaxed">
+                  <p className="text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] mb-1.5">From</p>
+                  <p className="text-[10px] text-gray-700 leading-relaxed">
                     Johnson & Sons Construction<br />
                     4200 South Congress Ave<br />
                     Austin, TX 78745<br />
@@ -226,20 +227,20 @@ function EstimateRow({ est }: { est: Estimate }) {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[8px] font-bold text-gray-400 uppercase tracking-[0.1em] mb-1.5">Details</p>
+                  <p className="text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] mb-1.5">Details</p>
                   <div className="space-y-1.5">
                     <div>
-                      <p className="text-[9px] text-gray-400">Date</p>
+                      <p className="text-[9px] text-gray-600">Date</p>
                       <p className="text-[11px] font-semibold text-gray-900">{formatDate(est.createdDate)}</p>
                     </div>
                     {est.sentDate && (
                       <div>
-                        <p className="text-[9px] text-gray-400">Sent</p>
+                        <p className="text-[9px] text-gray-600">Sent</p>
                         <p className="text-[11px] font-semibold text-gray-900">{formatDate(est.sentDate)}</p>
                       </div>
                     )}
                     <div>
-                      <p className="text-[9px] text-gray-400">Valid For</p>
+                      <p className="text-[9px] text-gray-600">Valid For</p>
                       <p className="text-[11px] font-semibold text-gray-900">30 Days</p>
                     </div>
                   </div>
@@ -250,18 +251,18 @@ function EstimateRow({ est }: { est: Estimate }) {
               <table className="w-full mb-4">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="text-left text-[8px] font-bold text-gray-400 uppercase tracking-[0.1em] px-3 py-2 rounded-l-lg">Description</th>
-                    <th className="text-right text-[8px] font-bold text-gray-400 uppercase tracking-[0.1em] px-3 py-2 w-[40px]">Qty</th>
-                    <th className="text-right text-[8px] font-bold text-gray-400 uppercase tracking-[0.1em] px-3 py-2 w-[60px]">Rate</th>
-                    <th className="text-right text-[8px] font-bold text-gray-400 uppercase tracking-[0.1em] px-3 py-2 w-[70px] rounded-r-lg">Amount</th>
+                    <th className="text-left text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] px-3 py-2 rounded-none-lg">Description</th>
+                    <th className="text-right text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] px-3 py-2 w-[40px]">Qty</th>
+                    <th className="text-right text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] px-3 py-2 w-[60px]">Rate</th>
+                    <th className="text-right text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] px-3 py-2 w-[70px] rounded-none-lg">Amount</th>
                   </tr>
                 </thead>
                 <tbody>
                   {est.lineItems.map((item, i) => (
                     <tr key={i} className="border-b border-gray-100 last:border-0">
                       <td className="text-[11px] text-gray-900 px-3 py-2">{item.description}</td>
-                      <td className="text-[11px] text-gray-500 px-3 py-2 text-right tabular-nums">{item.quantity}</td>
-                      <td className="text-[11px] text-gray-500 px-3 py-2 text-right tabular-nums">{formatCurrency(item.unitPrice)}</td>
+                      <td className="text-[11px] text-gray-700 px-3 py-2 text-right tabular-nums">{item.quantity}</td>
+                      <td className="text-[11px] text-gray-700 px-3 py-2 text-right tabular-nums">{formatCurrency(item.unitPrice)}</td>
                       <td className="text-[11px] text-gray-900 font-semibold px-3 py-2 text-right tabular-nums">{formatCurrency(item.quantity * item.unitPrice)}</td>
                     </tr>
                   ))}
@@ -272,10 +273,10 @@ function EstimateRow({ est }: { est: Estimate }) {
               <div className="flex justify-end mb-5">
                 <div className="w-[200px]">
                   <div className="flex justify-between py-1.5 px-3">
-                    <span className="text-[10px] text-gray-400">Subtotal</span>
+                    <span className="text-[10px] text-gray-600">Subtotal</span>
                     <span className="text-[11px] text-gray-900 tabular-nums">{formatCurrency(est.amount)}</span>
                   </div>
-                  <div className="flex justify-between py-2.5 px-3 bg-gray-900 rounded-lg mt-1.5">
+                  <div className="flex justify-between py-2.5 px-3 bg-gray-900 rounded-none mt-1.5">
                     <span className="text-[12px] font-bold text-white">Total</span>
                     <span className="text-[15px] font-bold text-white tabular-nums">{formatCurrency(est.amount)}</span>
                   </div>
@@ -283,9 +284,9 @@ function EstimateRow({ est }: { est: Estimate }) {
               </div>
 
               {/* Terms */}
-              <div className="bg-gray-50 rounded-lg px-4 py-3 mb-5">
-                <p className="text-[8px] font-bold text-gray-400 uppercase tracking-[0.1em] mb-1">Terms & Conditions</p>
-                <p className="text-[10px] text-gray-500 leading-relaxed">This estimate is valid for 30 days from the date above. A 50% deposit is required to schedule and begin work. Remaining balance is due upon substantial completion. Price is subject to change if project scope changes after acceptance.</p>
+              <div className="bg-gray-50 rounded-none px-4 py-3 mb-5">
+                <p className="text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] mb-1">Terms & Conditions</p>
+                <p className="text-[10px] text-gray-700 leading-relaxed">This estimate is valid for 30 days from the date above. A 50% deposit is required to schedule and begin work. Remaining balance is due upon substantial completion. Price is subject to change if project scope changes after acceptance.</p>
               </div>
 
               {/* Signature lines */}
@@ -294,25 +295,25 @@ function EstimateRow({ est }: { est: Estimate }) {
                   <div className="border-b border-gray-300 pb-1 mb-1">
                     <p className="text-[12px] text-gray-900 italic" style={{ fontFamily: 'Georgia, serif' }}>Marcus Johnson</p>
                   </div>
-                  <p className="text-[9px] text-gray-400">Contractor Signature</p>
+                  <p className="text-[9px] text-gray-600">Contractor Signature</p>
                 </div>
                 <div className="flex-1">
                   <div className="border-b border-gray-300 pb-1 mb-1">
                     <p className="text-[12px] text-gray-300">&nbsp;</p>
                   </div>
-                  <p className="text-[9px] text-gray-400">Client Acceptance</p>
+                  <p className="text-[9px] text-gray-600">Client Acceptance</p>
                 </div>
                 <div className="w-[100px]">
                   <div className="border-b border-gray-300 pb-1 mb-1">
                     <p className="text-[12px] text-gray-300">&nbsp;</p>
                   </div>
-                  <p className="text-[9px] text-gray-400">Date</p>
+                  <p className="text-[9px] text-gray-600">Date</p>
                 </div>
               </div>
 
               {/* Footer */}
               <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                <div className="text-[9px] text-gray-400">
+                <div className="text-[9px] text-gray-600">
                   <p>marcus@johnson.com — (512) 555-0100</p>
                   <p>4200 South Congress Ave, Austin, TX 78745</p>
                 </div>
@@ -320,7 +321,7 @@ function EstimateRow({ est }: { est: Estimate }) {
                   <div className="w-4 h-4 rounded bg-brand-600 flex items-center justify-center">
                     <span className="text-white text-[6px] font-bold">FTW</span>
                   </div>
-                  <p className="text-[9px] text-gray-400">FairTradeWorker</p>
+                  <p className="text-[9px] text-gray-600">FairTradeWorker</p>
                 </div>
               </div>
             </div>
@@ -335,7 +336,7 @@ function MyEstimatesTab({ estimates }: { estimates: Estimate[] }) {
   return (
     <Card className="overflow-hidden">
       {estimates.length === 0 ? (
-        <div className="py-12 text-center text-sm text-gray-400">
+        <div className="py-12 text-center text-sm text-gray-600">
           No estimates yet. Create your first one.
         </div>
       ) : (
@@ -356,10 +357,21 @@ interface LineItem {
   group: LineItemCategory;
 }
 
+const SAVED_CONTACTS = [
+  { name: "Michael Brown", email: "michael@brown.com", phone: "(512) 555-0147" },
+  { name: "Sarah Williams", email: "sarah@williams.com", phone: "(210) 555-0293" },
+  { name: "Robert Johnson", email: "robert@johnson.com", phone: "(512) 555-0831" },
+  { name: "Patricia Taylor", email: "patricia@taylor.com", phone: "(713) 555-0412" },
+  { name: "David Park", email: "david@park.com", phone: "(512) 555-0667" },
+  { name: "Amanda Torres", email: "amanda@torres.com", phone: "(512) 555-0198" },
+  { name: "Chris Martinez", email: "chris@martinez.com", phone: "(512) 555-0544" },
+];
+
 function NewEstimateTab() {
   const [clientName, setClientName] = useState("");
   const [clientEmail, setClientEmail] = useState("");
   const [clientPhone, setClientPhone] = useState("");
+  const [showContacts, setShowContacts] = useState(false);
   const [jobTitle, setJobTitle] = useState("");
   const [jobAddress, setJobAddress] = useState("");
   const [category, setCategory] = useState("");
@@ -394,8 +406,8 @@ function NewEstimateTab() {
   const filledItems = lineItems.filter((i) => i.description && parseFloat(i.unitPrice) > 0);
   const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
-  const inputBase = "w-full h-11 rounded-lg border border-gray-200 bg-white px-3.5 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow";
-  const selectBase = "h-11 w-full rounded-lg border border-gray-200 bg-white px-3.5 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow appearance-none";
+  const inputBase = "w-full h-11 rounded-none border border-gray-200 bg-white px-3.5 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow";
+  const selectBase = "h-11 w-full rounded-none border border-gray-200 bg-white px-3.5 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow appearance-none";
   const labelBase = "text-[12px] font-semibold text-gray-900 block mb-1.5";
 
   const PAYMENT_LABELS: Record<string, string> = {
@@ -430,12 +442,12 @@ function NewEstimateTab() {
                   "flex items-center gap-2 px-5 py-3 text-[13px] font-medium transition-colors border-b-2 -mb-px",
                   buildStep === step.id
                     ? "border-gray-900 text-gray-900"
-                    : "border-transparent text-gray-400 hover:text-gray-600"
+                    : "border-transparent text-gray-600 hover:text-gray-800"
                 )}
               >
                 <span className={cn(
-                  "w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center",
-                  buildStep === step.id ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-500"
+                  "w-5 h-5 rounded-none text-[10px] font-bold flex items-center justify-center",
+                  buildStep === step.id ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-700"
                 )}>
                   {i + 1}
                 </span>
@@ -448,19 +460,44 @@ function NewEstimateTab() {
         {/* Client */}
         <div className={buildStep !== "client" ? "hidden" : ""}>
           <div className="flex items-center gap-2.5 mb-4">
-            <span className="w-7 h-7 rounded-full bg-brand-600 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">1</span>
+            <span className="w-7 h-7 rounded-none bg-brand-600 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">1</span>
             <div className="flex-1">
               <p className="text-[15px] font-bold text-gray-900">Client</p>
-              <p className="text-[12px] text-gray-400">Who is this estimate for?</p>
+              <p className="text-[12px] text-gray-600">Who is this estimate for?</p>
             </div>
-            <button
-              type="button"
-              onClick={() => toast.info("Contact import coming soon")}
-              className="flex items-center gap-1.5 text-[12px] font-medium text-brand-600 hover:text-brand-700 transition-colors"
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              Import from Contacts
-            </button>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowContacts(!showContacts)}
+                className="flex items-center gap-1.5 text-[12px] font-medium text-brand-600 hover:text-brand-700 transition-colors"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                Import from Contacts
+                <ChevronDown className={cn("w-3 h-3 transition-transform", showContacts && "rotate-180")} />
+              </button>
+              {showContacts && (
+                <div className="absolute right-0 top-full mt-1 w-72 bg-white border border-gray-200 shadow-lg z-20 max-h-64 overflow-y-auto">
+                  {SAVED_CONTACTS.filter((c) =>
+                    !clientName || c.name.toLowerCase().includes(clientName.toLowerCase())
+                  ).map((contact) => (
+                    <button
+                      key={contact.email}
+                      type="button"
+                      onClick={() => {
+                        setClientName(contact.name);
+                        setClientEmail(contact.email);
+                        setClientPhone(contact.phone);
+                        setShowContacts(false);
+                      }}
+                      className="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0"
+                    >
+                      <p className="text-[13px] font-semibold text-gray-900">{contact.name}</p>
+                      <p className="text-[11px] text-gray-500">{contact.email} -- {contact.phone}</p>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
@@ -481,10 +518,10 @@ function NewEstimateTab() {
         {/* Job Details */}
         <div className={buildStep !== "job" ? "hidden" : ""}>
           <div className="flex items-center gap-2.5 mb-4">
-            <span className="w-7 h-7 rounded-full bg-brand-600 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">2</span>
+            <span className="w-7 h-7 rounded-none bg-brand-600 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">2</span>
             <div>
               <p className="text-[15px] font-bold text-gray-900">Job Details</p>
-              <p className="text-[12px] text-gray-400">What work is being estimated?</p>
+              <p className="text-[12px] text-gray-600">What work is being estimated?</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3 mb-3">
@@ -537,10 +574,10 @@ function NewEstimateTab() {
         {/* Line Items */}
         <div className={buildStep !== "items" ? "hidden" : ""}>
           <div className="flex items-center gap-2.5 mb-4">
-            <span className="w-7 h-7 rounded-full bg-brand-600 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">3</span>
+            <span className="w-7 h-7 rounded-none bg-brand-600 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">3</span>
             <div>
               <p className="text-[15px] font-bold text-gray-900">Line Items</p>
-              <p className="text-[12px] text-gray-400">Materials, labor, and other charges</p>
+              <p className="text-[12px] text-gray-600">Materials, labor, and other charges</p>
             </div>
           </div>
 
@@ -557,14 +594,14 @@ function NewEstimateTab() {
                       "flex items-center gap-1.5 px-5 py-3 text-[13px] font-medium transition-colors border-b-2 -mb-px",
                       activeGroup === g
                         ? "border-gray-900 text-gray-900"
-                        : "border-transparent text-gray-400 hover:text-gray-600"
+                        : "border-transparent text-gray-600 hover:text-gray-800"
                     )}
                   >
                     {g}
                     {count > 0 && (
                       <span className={cn(
-                        "text-[10px] font-bold rounded-full px-1.5 py-0.5 min-w-[18px] text-center",
-                        activeGroup === g ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-500"
+                        "text-[10px] font-bold rounded-none px-1.5 py-0.5 min-w-[18px] text-center",
+                        activeGroup === g ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-700"
                       )}>
                         {count}
                       </span>
@@ -574,11 +611,11 @@ function NewEstimateTab() {
               })}
             </div>
             {/* Table header */}
-            <div className="grid grid-cols-[1fr_80px_110px_100px_40px] gap-3 px-5 py-3 bg-gray-50">
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Description</span>
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider text-right">Qty</span>
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider text-right">Rate</span>
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider text-right">Amount</span>
+            <div className="grid grid-cols-[1fr_60px_90px_80px_36px] xl:grid-cols-[1fr_80px_110px_100px_40px] gap-2 xl:gap-3 px-4 xl:px-5 py-3 bg-gray-50">
+              <span className="text-[11px] font-bold text-gray-600 uppercase tracking-wider">Description</span>
+              <span className="text-[11px] font-bold text-gray-600 uppercase tracking-wider text-right">Qty</span>
+              <span className="text-[11px] font-bold text-gray-600 uppercase tracking-wider text-right">Rate</span>
+              <span className="text-[11px] font-bold text-gray-600 uppercase tracking-wider text-right">Amount</span>
               <span />
             </div>
 
@@ -586,19 +623,19 @@ function NewEstimateTab() {
             {lineItems.map((item, i) => {
               if (item.group !== activeGroup) return null;
               return (
-                <div key={i} className="grid grid-cols-[1fr_80px_110px_100px_40px] gap-3 px-5 py-3 items-center border-t border-gray-100">
+                <div key={i} className="grid grid-cols-[1fr_60px_90px_80px_36px] xl:grid-cols-[1fr_80px_110px_100px_40px] gap-2 xl:gap-3 px-4 xl:px-5 py-3 items-center border-t border-gray-100">
                   <input
                     value={item.description}
                     onChange={(e) => updateLine(i, "description", e.target.value)}
                     placeholder="What was done or supplied..."
-                    className="h-10 rounded-lg border border-gray-200 bg-white px-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
+                    className="h-10 rounded-none border border-gray-200 bg-white px-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
                   />
                   <input
                     type="number"
                     min="0"
                     value={item.quantity}
                     onChange={(e) => updateLine(i, "quantity", e.target.value)}
-                    className="h-10 rounded-lg border border-gray-200 bg-white px-2 text-[14px] text-gray-900 text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
+                    className="h-10 rounded-none border border-gray-200 bg-white px-2 text-[14px] text-gray-900 text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
                   />
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-[13px]">$</span>
@@ -608,7 +645,7 @@ function NewEstimateTab() {
                       step="0.01"
                       value={item.unitPrice}
                       onChange={(e) => updateLine(i, "unitPrice", e.target.value)}
-                      className="h-10 w-full rounded-lg border border-gray-200 bg-white pl-7 pr-2 text-[14px] text-gray-900 text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
+                      className="h-10 w-full rounded-none border border-gray-200 bg-white pl-7 pr-2 text-[14px] text-gray-900 text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
                     />
                   </div>
                   <span className="text-[14px] font-semibold text-gray-900 text-right tabular-nums">
@@ -618,7 +655,7 @@ function NewEstimateTab() {
                     type="button"
                     onClick={() => removeLine(i)}
                     disabled={lineItems.length === 1}
-                    className="w-9 h-9 flex items-center justify-center rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                    className="w-9 h-9 flex items-center justify-center rounded-none text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -627,10 +664,10 @@ function NewEstimateTab() {
             })}
 
             {/* Ghost row — type to add */}
-            <div className="grid grid-cols-[1fr_80px_110px_100px_40px] gap-3 px-5 py-3 items-center border-t border-dashed border-gray-200 bg-gray-50/30">
+            <div className="grid grid-cols-[1fr_60px_90px_80px_36px] xl:grid-cols-[1fr_80px_110px_100px_40px] gap-2 xl:gap-3 px-4 xl:px-5 py-3 items-center border-t border-dashed border-gray-200 bg-gray-50/30">
               <input
                 placeholder={`Add ${activeGroup.toLowerCase()} item...`}
-                className="h-10 rounded-lg border border-dashed border-gray-200 bg-transparent px-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent focus:bg-white focus:border-solid"
+                className="h-10 rounded-none border border-dashed border-gray-200 bg-transparent px-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent focus:bg-white focus:border-solid"
                 onFocus={() => {
                   // If there isn't already an empty item for this group, add one
                   const hasEmpty = lineItems.some((li) => li.group === activeGroup && !li.description);
@@ -658,12 +695,12 @@ function NewEstimateTab() {
                   <Plus className="w-3.5 h-3.5" />
                   Add Row
                 </button>
-                <span className="text-[11px] text-gray-400">
+                <span className="text-[11px] text-gray-600">
                   {lineItems.filter((li) => li.description).length} items across {new Set(lineItems.filter((li) => li.description).map((li) => li.group)).size} categories
                 </span>
               </div>
               <div className="flex items-baseline gap-3">
-                <span className="text-[12px] text-gray-400 font-medium">Total</span>
+                <span className="text-[12px] text-gray-600 font-medium">Total</span>
                 <span className="text-[24px] font-bold text-gray-900 tabular-nums">{formatCurrency(grandTotal)}</span>
               </div>
             </div>
@@ -676,19 +713,19 @@ function NewEstimateTab() {
           const isBelow = fp.pct <= -8;
           const isAbove = fp.pct >= 8;
           return (
-            <div className="flex items-center gap-3 rounded-xl bg-gray-50 border border-gray-200 px-4 py-3">
+            <div className="flex items-center gap-3 rounded-none bg-gray-50 border border-gray-200 px-4 py-3">
               <BarChart3 className="w-5 h-5 text-brand-600 flex-shrink-0" />
               <div className="flex-1 min-w-0">
-                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">FairPrice Market Rate</p>
+                <p className="text-[11px] font-bold text-gray-600 uppercase tracking-wider">FairPrice Market Rate</p>
                 <p className="text-sm font-bold text-gray-900 tabular-nums">
                   {formatCurrency(fp.low)} &ndash; {formatCurrency(fp.high)}
                 </p>
               </div>
               <span className={cn(
-                "inline-flex items-center gap-1 text-[11px] font-semibold rounded-full px-2.5 py-1 border whitespace-nowrap",
+                "inline-flex items-center gap-1 text-[11px] font-semibold rounded-none px-2.5 py-1 border whitespace-nowrap",
                 isBelow ? "text-brand-700 bg-brand-50 border-brand-100"
                   : isAbove ? "text-amber-700 bg-amber-50 border-amber-100"
-                  : "text-gray-600 bg-white border-gray-200"
+                  : "text-gray-800 bg-white border-gray-200"
               )}>
                 {isBelow ? <TrendingDown className="w-3 h-3" /> : isAbove ? <TrendingUp className="w-3 h-3" /> : <Minus className="w-3 h-3" />}
                 {isBelow ? `${Math.abs(fp.pct)}% below market` : isAbove ? `${fp.pct}% above market` : "At market rate"}
@@ -701,10 +738,10 @@ function NewEstimateTab() {
         {/* Terms */}
         <div className={buildStep !== "terms" ? "hidden" : ""}>
           <div className="flex items-center gap-2.5 mb-4">
-            <span className="w-7 h-7 rounded-full bg-brand-600 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">4</span>
+            <span className="w-7 h-7 rounded-none bg-brand-600 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">4</span>
             <div>
               <p className="text-[15px] font-bold text-gray-900">Terms & Notes</p>
-              <p className="text-[12px] text-gray-400">Payment schedule and scope details</p>
+              <p className="text-[12px] text-gray-600">Payment schedule and scope details</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3 mb-3">
@@ -721,11 +758,11 @@ function NewEstimateTab() {
           </div>
           <div className="mb-3">
             <label className={labelBase}>Scope of Work</label>
-            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Describe the full scope — materials, approach, what's included..." className="w-full rounded-lg border border-gray-200 bg-white px-3.5 py-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow resize-none min-h-[80px]" />
+            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Describe the full scope — materials, approach, what's included..." className="w-full rounded-none border border-gray-200 bg-white px-3.5 py-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow resize-none min-h-[80px]" />
           </div>
           <div>
             <label className={labelBase}>Exclusions</label>
-            <textarea value={exclusions} onChange={(e) => setExclusions(e.target.value)} placeholder="What is NOT included..." className="w-full rounded-lg border border-gray-200 bg-white px-3.5 py-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow resize-none min-h-[60px]" />
+            <textarea value={exclusions} onChange={(e) => setExclusions(e.target.value)} placeholder="What is NOT included..." className="w-full rounded-none border border-gray-200 bg-white px-3.5 py-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow resize-none min-h-[60px]" />
           </div>
         </div>
 
@@ -740,24 +777,24 @@ function NewEstimateTab() {
       </div>
 
       {/* Right: Live PDF Preview */}
-      <div className="w-[480px] flex-shrink-0 sticky top-0">
-        <p className="text-[12px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Live Preview</p>
-        <div className="bg-white rounded-lg shadow-[0_4px_30px_-6px_rgba(0,0,0,0.15)] ring-1 ring-gray-200/80 overflow-hidden transform scale-[0.95] origin-top-right">
+      <div className="hidden xl:block w-[380px] 2xl:w-[480px] flex-shrink-0 sticky top-0">
+        <p className="text-[12px] font-semibold text-gray-600 uppercase tracking-wider mb-2">Live Preview</p>
+        <div className="bg-white rounded-none shadow-[0_4px_30px_-6px_rgba(0,0,0,0.15)] ring-1 ring-gray-200/80 overflow-hidden transform scale-[0.95] origin-top-right">
           {/* Accent bar */}
           <div className="h-1.5 bg-brand-600" />
           <div className="px-6 pt-4 pb-5">
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-2.5">
-                <NextImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" alt="" width={36} height={36} className="w-9 h-9 rounded-full object-cover ring-2 ring-gray-100" />
+                <NextImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" alt="" width={36} height={36} className="w-9 h-9 rounded-none object-cover ring-2 ring-gray-100" />
                 <div>
                   <p className="text-[12px] font-bold text-gray-900">Johnson & Sons Construction</p>
-                  <p className="text-[8px] text-gray-400">Marcus Johnson — TX #R21445</p>
+                  <p className="text-[8px] text-gray-600">Marcus Johnson — TX #R21445</p>
                 </div>
               </div>
               <div className="text-right">
                 <p className="text-[18px] font-bold text-gray-900 leading-none">ESTIMATE</p>
-                <p className="text-[9px] text-gray-400 mt-0.5">{today}</p>
+                <p className="text-[9px] text-gray-600 mt-0.5">{today}</p>
               </div>
             </div>
 
@@ -766,15 +803,15 @@ function NewEstimateTab() {
             {/* Client + Job */}
             <div className="grid grid-cols-2 gap-3 mb-4">
               <div>
-                <p className="text-[7px] font-bold text-gray-400 uppercase tracking-[0.1em] mb-0.5">Prepared For</p>
+                <p className="text-[7px] font-bold text-gray-600 uppercase tracking-[0.1em] mb-0.5">Prepared For</p>
                 <p className="text-[11px] font-bold text-gray-900">{clientName || "Client Name"}</p>
-                <p className="text-[9px] text-gray-400">{jobTitle || "Job Title"}</p>
-                {jobAddress && <p className="text-[8px] text-gray-400 mt-0.5">{jobAddress}</p>}
+                <p className="text-[9px] text-gray-600">{jobTitle || "Job Title"}</p>
+                {jobAddress && <p className="text-[8px] text-gray-600 mt-0.5">{jobAddress}</p>}
               </div>
               <div className="text-right">
-                {category && <p className="text-[9px] text-gray-400">{category}</p>}
-                {timeline && <p className="text-[9px] text-gray-400">{TIMELINE_OPTIONS.find((o) => o.value === timeline)?.label}</p>}
-                {startDate && <p className="text-[9px] text-gray-400">Start: {startDate}</p>}
+                {category && <p className="text-[9px] text-gray-600">{category}</p>}
+                {timeline && <p className="text-[9px] text-gray-600">{TIMELINE_OPTIONS.find((o) => o.value === timeline)?.label}</p>}
+                {startDate && <p className="text-[9px] text-gray-600">Start: {startDate}</p>}
               </div>
             </div>
 
@@ -784,25 +821,25 @@ function NewEstimateTab() {
                 <table className="w-full mb-3">
                   <thead>
                     <tr className="bg-gray-50">
-                      <th className="text-left text-[7px] font-bold text-gray-400 uppercase tracking-[0.1em] px-2 py-1.5 rounded-l">Item</th>
-                      <th className="text-right text-[7px] font-bold text-gray-400 uppercase tracking-[0.1em] px-2 py-1.5 w-[30px]">Qty</th>
-                      <th className="text-right text-[7px] font-bold text-gray-400 uppercase tracking-[0.1em] px-2 py-1.5 w-[50px]">Rate</th>
-                      <th className="text-right text-[7px] font-bold text-gray-400 uppercase tracking-[0.1em] px-2 py-1.5 w-[55px] rounded-r">Amt</th>
+                      <th className="text-left text-[7px] font-bold text-gray-600 uppercase tracking-[0.1em] px-2 py-1.5 rounded-none">Item</th>
+                      <th className="text-right text-[7px] font-bold text-gray-600 uppercase tracking-[0.1em] px-2 py-1.5 w-[30px]">Qty</th>
+                      <th className="text-right text-[7px] font-bold text-gray-600 uppercase tracking-[0.1em] px-2 py-1.5 w-[50px]">Rate</th>
+                      <th className="text-right text-[7px] font-bold text-gray-600 uppercase tracking-[0.1em] px-2 py-1.5 w-[55px] rounded-none">Amt</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filledItems.map((item, i) => (
                       <tr key={i} className="border-b border-gray-100 last:border-0">
                         <td className="text-[9px] text-gray-900 px-2 py-1.5">{item.description}</td>
-                        <td className="text-[9px] text-gray-400 px-2 py-1.5 text-right tabular-nums">{item.quantity}</td>
-                        <td className="text-[9px] text-gray-400 px-2 py-1.5 text-right tabular-nums">{formatCurrency(parseFloat(item.unitPrice) || 0)}</td>
+                        <td className="text-[9px] text-gray-600 px-2 py-1.5 text-right tabular-nums">{item.quantity}</td>
+                        <td className="text-[9px] text-gray-600 px-2 py-1.5 text-right tabular-nums">{formatCurrency(parseFloat(item.unitPrice) || 0)}</td>
                         <td className="text-[9px] text-gray-900 font-semibold px-2 py-1.5 text-right tabular-nums">{formatCurrency(lineTotal(item))}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
                 <div className="flex justify-end mb-3">
-                  <div className="flex justify-between py-2 px-2.5 bg-gray-900 rounded-md w-[140px]">
+                  <div className="flex justify-between py-2 px-2.5 bg-gray-900 rounded-none w-[140px]">
                     <span className="text-[10px] font-bold text-white">Total</span>
                     <span className="text-[12px] font-bold text-white tabular-nums">{formatCurrency(grandTotal)}</span>
                   </div>
@@ -816,13 +853,13 @@ function NewEstimateTab() {
 
             {/* Terms */}
             {(notes || paymentTerms) && (
-              <div className="bg-gray-50 rounded-md px-3 py-2 mb-3">
-                <p className="text-[7px] font-bold text-gray-400 uppercase tracking-[0.1em] mb-0.5">Terms</p>
-                <p className="text-[8px] text-gray-500 leading-relaxed">{PAYMENT_LABELS[paymentTerms]}{notes ? `. ${notes}` : ""}</p>
+              <div className="bg-gray-50 rounded-none px-3 py-2 mb-3">
+                <p className="text-[7px] font-bold text-gray-600 uppercase tracking-[0.1em] mb-0.5">Terms</p>
+                <p className="text-[8px] text-gray-700 leading-relaxed">{PAYMENT_LABELS[paymentTerms]}{notes ? `. ${notes}` : ""}</p>
                 {exclusions && (
                   <>
-                    <p className="text-[7px] font-bold text-gray-400 uppercase tracking-[0.1em] mt-1.5 mb-0.5">Exclusions</p>
-                    <p className="text-[8px] text-gray-500 leading-relaxed">{exclusions}</p>
+                    <p className="text-[7px] font-bold text-gray-600 uppercase tracking-[0.1em] mt-1.5 mb-0.5">Exclusions</p>
+                    <p className="text-[8px] text-gray-700 leading-relaxed">{exclusions}</p>
                   </>
                 )}
               </div>
@@ -834,26 +871,26 @@ function NewEstimateTab() {
                 <div className="border-b border-gray-300 pb-0.5 mb-0.5">
                   <p className="text-[10px] text-gray-900 italic" style={{ fontFamily: 'Georgia, serif' }}>Marcus Johnson</p>
                 </div>
-                <p className="text-[7px] text-gray-400">Contractor</p>
+                <p className="text-[7px] text-gray-600">Contractor</p>
               </div>
               <div className="flex-1">
                 <div className="border-b border-gray-300 pb-0.5 mb-0.5"><p className="text-[10px]">&nbsp;</p></div>
-                <p className="text-[7px] text-gray-400">Client Acceptance</p>
+                <p className="text-[7px] text-gray-600">Client Acceptance</p>
               </div>
               <div className="w-[60px]">
                 <div className="border-b border-gray-300 pb-0.5 mb-0.5"><p className="text-[10px]">&nbsp;</p></div>
-                <p className="text-[7px] text-gray-400">Date</p>
+                <p className="text-[7px] text-gray-600">Date</p>
               </div>
             </div>
 
             {/* Footer */}
             <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-              <p className="text-[7px] text-gray-400">marcus@johnson.com — (512) 555-0100</p>
+              <p className="text-[7px] text-gray-600">marcus@johnson.com — (512) 555-0100</p>
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded bg-brand-600 flex items-center justify-center">
                   <span className="text-white text-[5px] font-bold">FTW</span>
                 </div>
-                <p className="text-[7px] text-gray-400">FairTradeWorker</p>
+                <p className="text-[7px] text-gray-600">FairTradeWorker</p>
               </div>
             </div>
           </div>
@@ -1406,7 +1443,26 @@ interface CalcItem { desc: string; qty: string; unit: string; unitCost: string }
 interface CalcSection { name: string; items: CalcItem[] }
 
 function CalculatorTab() {
-  const [calcMode, setCalcMode] = useState<"estimate" | "material" | "labor" | "markup" | "sqft">("estimate");
+  const [calcMode, setCalcMode] = useState<"estimate" | "material" | "labor" | "markup" | "sqft" | "trade">("estimate");
+  const [tradeType, setTradeType] = useState<"roofing" | "concrete" | "framing" | "paint" | "fencing">("roofing");
+
+  // Trade takeoff state
+  const [tradeRoofArea, setTradeRoofArea] = useState("");
+  const [tradeRoofPitch, setTradeRoofPitch] = useState(1.05);
+  const [tradeConcL, setTradeConcL] = useState("");
+  const [tradeConcW, setTradeConcW] = useState("");
+  const [tradeConcD, setTradeConcD] = useState("");
+  const [tradeWallL, setTradeWallL] = useState("");
+  const [tradeWallH, setTradeWallH] = useState("");
+  const [tradeStud, setTradeStud] = useState<16 | 24>(16);
+  const [tradePaintL, setTradePaintL] = useState("");
+  const [tradePaintW, setTradePaintW] = useState("");
+  const [tradePaintH, setTradePaintH] = useState("");
+  const [tradePaintDoors, setTradePaintDoors] = useState("");
+  const [tradePaintWins, setTradePaintWins] = useState("");
+  const [tradeFenceLF, setTradeFenceLF] = useState("");
+  const [tradeFenceH, setTradeFenceH] = useState<4 | 6 | 8>(6);
+  const [tradeFenceSpacing, setTradeFenceSpacing] = useState<6 | 8>(8);
   const [template, setTemplate] = useState("custom");
   const [sections, setSections] = useState<CalcSection[]>(
     JSON.parse(JSON.stringify(JOB_TEMPLATES.custom.sections))
@@ -1503,7 +1559,7 @@ function CalculatorTab() {
   const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   const allItems = sections.flatMap((s) => s.items.filter((i) => i.desc && parseFloat(i.unitCost) > 0));
 
-  const inputBase = "w-full h-9 rounded-lg border border-gray-200 bg-white px-3 text-[13px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow tabular-nums";
+  const inputBase = "w-full h-9 rounded-none border border-gray-200 bg-white px-3 text-[13px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow tabular-nums";
 
   // Material calculator results
   const matSqft = parseFloat(materialSqft) || 0;
@@ -1614,13 +1670,14 @@ function CalculatorTab() {
             { id: "labor", label: "Labor Hours" },
             { id: "markup", label: "Markup / Margin" },
             { id: "sqft", label: "Per Sq Ft" },
+            { id: "trade", label: "Trade Takeoff" },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setCalcMode(tab.id as typeof calcMode)}
               className={cn(
                 "px-4 py-2.5 text-[13px] font-medium transition-colors border-b-2 -mb-px",
-                calcMode === tab.id ? "border-gray-900 text-gray-900" : "border-transparent text-gray-400 hover:text-gray-600"
+                calcMode === tab.id ? "border-gray-900 text-gray-900" : "border-transparent text-gray-600 hover:text-gray-800"
               )}
             >
               {tab.label}
@@ -1634,12 +1691,12 @@ function CalculatorTab() {
         <div className="max-w-xl space-y-5">
           <div>
             <p className="text-[15px] font-bold text-gray-900 mb-1">Material Calculator</p>
-            <p className="text-[12px] text-gray-400 mb-4">Quick quantities for common materials</p>
+            <p className="text-[12px] text-gray-600 mb-4">Quick quantities for common materials</p>
             <label className="text-[11px] font-semibold text-gray-900 block mb-1">Material Type</label>
             <select
               value={materialType}
               onChange={(e) => setMaterialType(e.target.value)}
-              className="h-11 w-full max-w-sm rounded-lg border border-gray-200 bg-white px-3.5 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
+              className="h-11 w-full max-w-sm rounded-none border border-gray-200 bg-white px-3.5 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
             >
               <option value="flooring">Flooring</option>
               <option value="drywall">Drywall</option>
@@ -1674,14 +1731,14 @@ function CalculatorTab() {
           )}
 
           {(matSqft > 0 || (materialType === "concrete" && (parseFloat(concLength) || 0) > 0)) && (
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-none border border-gray-200 overflow-hidden">
               <div className="px-4 py-2.5 bg-gray-50 border-b border-gray-200">
                 <p className="text-[13px] font-bold text-gray-900">Results</p>
               </div>
               <div className="divide-y divide-gray-100">
                 {materialResults.map((r, i) => (
                   <div key={i} className="flex items-center justify-between px-4 py-3">
-                    <span className="text-[13px] text-gray-600">{r.label}</span>
+                    <span className="text-[13px] text-gray-800">{r.label}</span>
                     <span className="text-[14px] font-bold text-gray-900 tabular-nums">{r.value}</span>
                   </div>
                 ))}
@@ -1696,7 +1753,7 @@ function CalculatorTab() {
         <div className="max-w-xl space-y-5">
           <div>
             <p className="text-[15px] font-bold text-gray-900 mb-1">Labor Hours Calculator</p>
-            <p className="text-[12px] text-gray-400 mb-4">Calculate total labor cost for a crew</p>
+            <p className="text-[12px] text-gray-600 mb-4">Calculate total labor cost for a crew</p>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -1721,36 +1778,36 @@ function CalculatorTab() {
             <button
               onClick={() => setOvertimeEnabled(!overtimeEnabled)}
               className={cn(
-                "w-10 h-5 rounded-full transition-colors relative",
+                "w-10 h-5 rounded-none transition-colors relative",
                 overtimeEnabled ? "bg-brand-600" : "bg-gray-200"
               )}
             >
               <div className={cn(
-                "w-4 h-4 bg-white rounded-full absolute top-0.5 transition-transform shadow-sm",
+                "w-4 h-4 bg-white rounded-none absolute top-0.5 transition-transform shadow-sm",
                 overtimeEnabled ? "translate-x-5" : "translate-x-0.5"
               )} />
             </button>
-            <span className="text-[13px] text-gray-600">Overtime (1.5x after 8 hrs/day)</span>
+            <span className="text-[13px] text-gray-800">Overtime (1.5x after 8 hrs/day)</span>
           </div>
 
           {totalLaborHours > 0 && (
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-none border border-gray-200 overflow-hidden">
               <div className="px-4 py-2.5 bg-gray-50 border-b border-gray-200">
                 <p className="text-[13px] font-bold text-gray-900">Breakdown</p>
               </div>
               <div className="divide-y divide-gray-100">
                 <div className="flex items-center justify-between px-4 py-3">
-                  <span className="text-[13px] text-gray-600">Total labor hours</span>
+                  <span className="text-[13px] text-gray-800">Total labor hours</span>
                   <span className="text-[14px] font-bold text-gray-900 tabular-nums">{totalLaborHours.toLocaleString()} hrs</span>
                 </div>
                 {overtimeEnabled && overtimeHoursPerDay > 0 && (
                   <div className="flex items-center justify-between px-4 py-3">
-                    <span className="text-[13px] text-gray-600">Overtime hours/day (per worker)</span>
+                    <span className="text-[13px] text-gray-800">Overtime hours/day (per worker)</span>
                     <span className="text-[14px] font-bold text-amber-600 tabular-nums">{overtimeHoursPerDay} hrs at 1.5x</span>
                   </div>
                 )}
                 <div className="flex items-center justify-between px-4 py-3">
-                  <span className="text-[13px] text-gray-600">Cost per day</span>
+                  <span className="text-[13px] text-gray-800">Cost per day</span>
                   <span className="text-[14px] font-bold text-gray-900 tabular-nums">{formatCurrency(costPerDay)}</span>
                 </div>
                 <div className="flex items-center justify-between px-4 py-3 bg-gray-900">
@@ -1768,7 +1825,7 @@ function CalculatorTab() {
         <div className="max-w-xl space-y-5">
           <div>
             <p className="text-[15px] font-bold text-gray-900 mb-1">Markup / Margin Calculator</p>
-            <p className="text-[12px] text-gray-400 mb-4">Know your numbers -- markup and margin are not the same thing</p>
+            <p className="text-[12px] text-gray-600 mb-4">Know your numbers -- markup and margin are not the same thing</p>
           </div>
 
           <div>
@@ -1783,8 +1840,8 @@ function CalculatorTab() {
             <button
               onClick={() => setMarkupMode("markup")}
               className={cn(
-                "px-4 py-2 rounded-lg text-[13px] font-medium transition-colors border",
-                markupMode === "markup" ? "bg-gray-900 text-white border-gray-900" : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                "px-4 py-2 rounded-none text-[13px] font-medium transition-colors border",
+                markupMode === "markup" ? "bg-gray-900 text-white border-gray-900" : "border-gray-200 text-gray-800 hover:bg-gray-50"
               )}
             >
               Markup %
@@ -1792,8 +1849,8 @@ function CalculatorTab() {
             <button
               onClick={() => setMarkupMode("margin")}
               className={cn(
-                "px-4 py-2 rounded-lg text-[13px] font-medium transition-colors border",
-                markupMode === "margin" ? "bg-gray-900 text-white border-gray-900" : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                "px-4 py-2 rounded-none text-[13px] font-medium transition-colors border",
+                markupMode === "margin" ? "bg-gray-900 text-white border-gray-900" : "border-gray-200 text-gray-800 hover:bg-gray-50"
               )}
             >
               Margin %
@@ -1811,7 +1868,7 @@ function CalculatorTab() {
           </div>
 
           {markupCalc && (
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-none border border-gray-200 overflow-hidden">
               <div className="px-4 py-2.5 bg-gray-50 border-b border-gray-200">
                 <p className="text-[13px] font-bold text-gray-900">Results</p>
               </div>
@@ -1821,19 +1878,19 @@ function CalculatorTab() {
                   <span className="text-[18px] font-bold text-white tabular-nums">{formatCurrency(markupCalc.sellPrice)}</span>
                 </div>
                 <div className="flex items-center justify-between px-4 py-3">
-                  <span className="text-[13px] text-gray-600">Profit</span>
+                  <span className="text-[13px] text-gray-800">Profit</span>
                   <span className="text-[14px] font-bold text-brand-600 tabular-nums">{formatCurrency(markupCalc.profit)}</span>
                 </div>
                 <div className="flex items-center justify-between px-4 py-3">
-                  <span className="text-[13px] text-gray-600">Effective Markup</span>
+                  <span className="text-[13px] text-gray-800">Effective Markup</span>
                   <span className="text-[14px] font-bold text-gray-900 tabular-nums">{markupCalc.effectiveMarkup.toFixed(1)}%</span>
                 </div>
                 <div className="flex items-center justify-between px-4 py-3">
-                  <span className="text-[13px] text-gray-600">Effective Margin</span>
+                  <span className="text-[13px] text-gray-800">Effective Margin</span>
                   <span className="text-[14px] font-bold text-gray-900 tabular-nums">{markupCalc.effectiveMargin.toFixed(1)}%</span>
                 </div>
                 <div className="px-4 py-3 bg-gray-50">
-                  <p className="text-[11px] text-gray-500 font-mono">{markupCalc.formula}</p>
+                  <p className="text-[11px] text-gray-700 font-mono">{markupCalc.formula}</p>
                 </div>
               </div>
             </div>
@@ -1846,7 +1903,7 @@ function CalculatorTab() {
         <div className="max-w-xl space-y-5">
           <div>
             <p className="text-[15px] font-bold text-gray-900 mb-1">Cost Per Square Foot</p>
-            <p className="text-[12px] text-gray-400 mb-4">See how your price stacks up against typical ranges</p>
+            <p className="text-[12px] text-gray-600 mb-4">See how your price stacks up against typical ranges</p>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -1863,25 +1920,257 @@ function CalculatorTab() {
           </div>
 
           {costPerSqft > 0 && (
-            <div className="bg-gray-900 rounded-lg px-5 py-4 flex items-center justify-between">
+            <div className="bg-gray-900 rounded-none px-5 py-4 flex items-center justify-between">
               <span className="text-[13px] font-bold text-white">Your Cost Per Sq Ft</span>
               <span className="text-[24px] font-bold text-white tabular-nums">${costPerSqft.toFixed(2)}</span>
             </div>
           )}
 
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="bg-white rounded-none border border-gray-200 overflow-hidden">
             <div className="px-4 py-2.5 bg-gray-50 border-b border-gray-200">
               <p className="text-[13px] font-bold text-gray-900">Typical $/sqft by Project Type</p>
             </div>
             <div className="divide-y divide-gray-100">
               {SQFT_RANGES.map((r) => (
                 <div key={r.type} className="flex items-center justify-between px-4 py-2.5">
-                  <span className="text-[13px] text-gray-600">{r.type}</span>
+                  <span className="text-[13px] text-gray-800">{r.type}</span>
                   <span className="text-[13px] font-semibold text-gray-900 tabular-nums">${r.low} - ${r.high}/sqft</span>
                 </div>
               ))}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Trade Takeoff Calculator */}
+      {calcMode === "trade" && (
+        <div className="max-w-3xl space-y-5">
+          <div>
+            <p className="text-[15px] font-bold text-gray-900 mb-1">Trade Takeoff</p>
+            <p className="text-[12px] text-gray-600 mb-4">Field-accurate material quantities with cost ranges by trade</p>
+          </div>
+          <div className="flex gap-2 mb-4">
+            {(["roofing", "concrete", "framing", "paint", "fencing"] as const).map((t) => (
+              <button key={t} onClick={() => setTradeType(t)} className={cn("px-3 py-1.5 text-[12px] font-medium border transition-colors capitalize", tradeType === t ? "bg-gray-900 text-white border-gray-900" : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50")}>
+                {t}
+              </button>
+            ))}
+          </div>
+
+          {tradeType === "roofing" && (() => {
+            const sqFt = parseFloat(tradeRoofArea) || 0;
+            const adjusted = sqFt * tradeRoofPitch;
+            const squares = adjusted / 100;
+            const bundles = Math.ceil(squares * 3);
+            const underlayment = Math.ceil(squares / 4);
+            const ridgeVent = Math.round(adjusted * 0.1);
+            const dripEdge = Math.round(Math.sqrt(adjusted) * 4);
+            const starterStrip = Math.ceil(dripEdge / 105);
+            const iceWater = Math.ceil((adjusted * 0.1) / 75);
+            const nails = Math.ceil(bundles * 0.8);
+            const ready = sqFt > 0;
+            return (
+              <div className="grid grid-cols-2 gap-5">
+                <div className="space-y-3">
+                  <div><label className="text-[11px] font-semibold text-gray-900 block mb-1">Roof Area (sq ft)</label><input type="number" placeholder="2800" value={tradeRoofArea} onChange={(e) => setTradeRoofArea(e.target.value)} className={inputBase} /></div>
+                  <div><label className="text-[11px] font-semibold text-gray-900 block mb-1">Roof Pitch</label>
+                    <select className={inputBase} value={tradeRoofPitch} onChange={(e) => setTradeRoofPitch(parseFloat(e.target.value))}>
+                      <option value={1.0}>Flat (1.00)</option><option value={1.05}>4/12 (1.05)</option><option value={1.12}>6/12 (1.12)</option><option value={1.20}>8/12 (1.20)</option><option value={1.30}>10/12 (1.30)</option><option value={1.41}>12/12 (1.41)</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="bg-white border border-gray-200 p-4 space-y-2">
+                  <p className="text-[12px] font-bold text-gray-900 uppercase tracking-wide mb-2">Material Summary</p>
+                  {!ready ? <p className="text-[12px] text-gray-500">Enter measurements to see results</p> : (
+                    <div className="space-y-1.5 text-[12px]">
+                      {[
+                        ["Adjusted Sq Ft", `${adjusted.toFixed(0)} sq ft`, null],
+                        ["Squares", `${squares.toFixed(2)}`, null],
+                        ["Shingle bundles", `${bundles}`, `${formatCurrency(bundles * 32)}--${formatCurrency(bundles * 55)}`],
+                        ["Underlayment rolls", `${underlayment}`, `${formatCurrency(underlayment * 22)}--${formatCurrency(underlayment * 38)}`],
+                        ["Ridge vent", `${ridgeVent} LF`, `${formatCurrency(ridgeVent * 2)}--${formatCurrency(ridgeVent * 4)}`],
+                        ["Drip edge", `${dripEdge} LF`, `${formatCurrency(dripEdge)}--${formatCurrency(dripEdge * 2)}`],
+                        ["Starter strip", `${starterStrip} rolls`, `${formatCurrency(starterStrip * 65)}--${formatCurrency(starterStrip * 90)}`],
+                        ["Ice & water shield", `${iceWater} rolls`, `${formatCurrency(iceWater * 85)}--${formatCurrency(iceWater * 130)}`],
+                        ["Coil nails (boxes)", `${nails}`, `${formatCurrency(nails * 28)}--${formatCurrency(nails * 42)}`],
+                      ].map(([label, value, cost]) => (
+                        <div key={label as string} className="flex justify-between py-1 border-b border-gray-50 last:border-0">
+                          <span className="text-gray-700">{label}</span>
+                          <div className="text-right"><span className="font-semibold text-gray-900">{value}</span>{cost && <p className="text-[10px] text-gray-500">{cost}</p>}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+
+          {tradeType === "concrete" && (() => {
+            const l = parseFloat(tradeConcL) || 0; const w = parseFloat(tradeConcW) || 0; const d = parseFloat(tradeConcD) || 0;
+            const cuYd = (l * w * (d / 12)) / 27 * 1.1;
+            const bags = Math.ceil(cuYd * 45);
+            const rebar = Math.ceil((l * w * 2) / 20);
+            const form = Math.ceil((l + w) * 2);
+            const base = parseFloat((l * w * (4 / 12) / 27 * 1.5).toFixed(1));
+            const ready = l > 0 && w > 0 && d > 0;
+            return (
+              <div className="grid grid-cols-2 gap-5">
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div><label className="text-[11px] font-semibold text-gray-900 block mb-1">Length (ft)</label><input type="number" placeholder="20" value={tradeConcL} onChange={(e) => setTradeConcL(e.target.value)} className={inputBase} /></div>
+                    <div><label className="text-[11px] font-semibold text-gray-900 block mb-1">Width (ft)</label><input type="number" placeholder="12" value={tradeConcW} onChange={(e) => setTradeConcW(e.target.value)} className={inputBase} /></div>
+                  </div>
+                  <div><label className="text-[11px] font-semibold text-gray-900 block mb-1">Thickness (in)</label><input type="number" placeholder="4" value={tradeConcD} onChange={(e) => setTradeConcD(e.target.value)} className={inputBase} /></div>
+                  <p className="text-[10px] text-gray-500">Includes 10% waste factor</p>
+                </div>
+                <div className="bg-white border border-gray-200 p-4 space-y-2">
+                  <p className="text-[12px] font-bold text-gray-900 uppercase tracking-wide mb-2">Material Summary</p>
+                  {!ready ? <p className="text-[12px] text-gray-500">Enter measurements to see results</p> : (
+                    <div className="space-y-1.5 text-[12px]">
+                      {[
+                        ["Cubic yards (w/ waste)", `${cuYd.toFixed(2)} CY`, `${formatCurrency(cuYd * 130)}--${formatCurrency(cuYd * 175)}`],
+                        ["80 lb bags (small jobs)", `${bags} bags`, `${formatCurrency(bags * 6)}--${formatCurrency(bags * 8)}`],
+                        ["Rebar sticks (20 LF)", `${rebar} sticks`, `${formatCurrency(rebar * 9)}--${formatCurrency(rebar * 14)}`],
+                        ["Form board", `${form} LF`, `${formatCurrency(form)}--${formatCurrency(form * 2)}`],
+                        ["Base material", `${base} tons`, `${formatCurrency(base * 18)}--${formatCurrency(base * 28)}`],
+                      ].map(([label, value, cost]) => (
+                        <div key={label as string} className="flex justify-between py-1 border-b border-gray-50 last:border-0">
+                          <span className="text-gray-700">{label}</span>
+                          <div className="text-right"><span className="font-semibold text-gray-900">{value}</span>{cost && <p className="text-[10px] text-gray-500">{cost}</p>}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+
+          {tradeType === "framing" && (() => {
+            const l = parseFloat(tradeWallL) || 0; const h = parseFloat(tradeWallH) || 0;
+            const studs = l > 0 ? Math.ceil((l / (tradeStud / 12)) + 1) + Math.ceil(l / 8) : 0;
+            const plateLF = Math.ceil(l * 3); const plates = Math.ceil(plateLF / 16);
+            const headers = Math.ceil(l / 8); const sheathing = Math.ceil((l * h) / 32);
+            const ready = l > 0 && h > 0;
+            return (
+              <div className="grid grid-cols-2 gap-5">
+                <div className="space-y-3">
+                  <div><label className="text-[11px] font-semibold text-gray-900 block mb-1">Wall Length (ft)</label><input type="number" placeholder="32" value={tradeWallL} onChange={(e) => setTradeWallL(e.target.value)} className={inputBase} /></div>
+                  <div><label className="text-[11px] font-semibold text-gray-900 block mb-1">Wall Height (ft)</label><input type="number" placeholder="9" value={tradeWallH} onChange={(e) => setTradeWallH(e.target.value)} className={inputBase} /></div>
+                  <div><label className="text-[11px] font-semibold text-gray-900 block mb-1">Stud Spacing</label>
+                    <div className="flex gap-2">{([16, 24] as const).map((s) => (<button key={s} onClick={() => setTradeStud(s)} className={cn("flex-1 h-9 border text-[12px] font-medium", tradeStud === s ? "bg-gray-900 text-white border-gray-900" : "bg-white text-gray-700 border-gray-200")}>{s}&quot; OC</button>))}</div>
+                  </div>
+                </div>
+                <div className="bg-white border border-gray-200 p-4 space-y-2">
+                  <p className="text-[12px] font-bold text-gray-900 uppercase tracking-wide mb-2">Material Summary</p>
+                  {!ready ? <p className="text-[12px] text-gray-500">Enter measurements to see results</p> : (
+                    <div className="space-y-1.5 text-[12px]">
+                      {[
+                        ["Studs", `${studs}`, `${formatCurrency(studs * 6)}--${formatCurrency(studs * 10)}`],
+                        ["Plates", `${plateLF} LF / ${plates} sticks`, `${formatCurrency(plates * 7)}--${formatCurrency(plates * 11)}`],
+                        ["Headers", `${headers}`, `${formatCurrency(headers * 25)}--${formatCurrency(headers * 60)}`],
+                        ["Sheathing (4x8)", `${sheathing} sheets`, `${formatCurrency(sheathing * 22)}--${formatCurrency(sheathing * 38)}`],
+                      ].map(([label, value, cost]) => (
+                        <div key={label as string} className="flex justify-between py-1 border-b border-gray-50 last:border-0">
+                          <span className="text-gray-700">{label}</span>
+                          <div className="text-right"><span className="font-semibold text-gray-900">{value}</span>{cost && <p className="text-[10px] text-gray-500">{cost}</p>}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+
+          {tradeType === "paint" && (() => {
+            const l = parseFloat(tradePaintL) || 0; const w = parseFloat(tradePaintW) || 0; const h = parseFloat(tradePaintH) || 0;
+            const d = parseInt(tradePaintDoors) || 0; const win = parseInt(tradePaintWins) || 0;
+            const wallArea = (2 * (l + w) * h) - (d * 20) - (win * 15);
+            const ceilArea = l * w; const totalArea = Math.max(0, wallArea) + ceilArea;
+            const gal1 = Math.ceil(totalArea / 400); const gal2 = gal1 * 2;
+            const tape = Math.ceil((2 * (l + w)) / 60); const drops = Math.ceil((l * w) / 120);
+            const ready = l > 0 && w > 0 && h > 0;
+            return (
+              <div className="grid grid-cols-2 gap-5">
+                <div className="space-y-3">
+                  <div className="grid grid-cols-3 gap-2">
+                    <div><label className="text-[11px] font-semibold text-gray-900 block mb-1">L (ft)</label><input type="number" placeholder="16" value={tradePaintL} onChange={(e) => setTradePaintL(e.target.value)} className={inputBase} /></div>
+                    <div><label className="text-[11px] font-semibold text-gray-900 block mb-1">W (ft)</label><input type="number" placeholder="14" value={tradePaintW} onChange={(e) => setTradePaintW(e.target.value)} className={inputBase} /></div>
+                    <div><label className="text-[11px] font-semibold text-gray-900 block mb-1">H (ft)</label><input type="number" placeholder="9" value={tradePaintH} onChange={(e) => setTradePaintH(e.target.value)} className={inputBase} /></div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div><label className="text-[11px] font-semibold text-gray-900 block mb-1">Doors</label><input type="number" placeholder="2" value={tradePaintDoors} onChange={(e) => setTradePaintDoors(e.target.value)} className={inputBase} /></div>
+                    <div><label className="text-[11px] font-semibold text-gray-900 block mb-1">Windows</label><input type="number" placeholder="3" value={tradePaintWins} onChange={(e) => setTradePaintWins(e.target.value)} className={inputBase} /></div>
+                  </div>
+                </div>
+                <div className="bg-white border border-gray-200 p-4 space-y-2">
+                  <p className="text-[12px] font-bold text-gray-900 uppercase tracking-wide mb-2">Material Summary</p>
+                  {!ready ? <p className="text-[12px] text-gray-500">Enter measurements to see results</p> : (
+                    <div className="space-y-1.5 text-[12px]">
+                      {[
+                        ["Wall area (net)", `${Math.max(0, wallArea).toFixed(0)} sq ft`, null],
+                        ["Ceiling area", `${ceilArea.toFixed(0)} sq ft`, null],
+                        ["Paint -- 1 coat", `${gal1} gal`, `${formatCurrency(gal1 * 35)}--${formatCurrency(gal1 * 65)}`],
+                        ["Paint -- 2 coats", `${gal2} gal`, `${formatCurrency(gal2 * 35)}--${formatCurrency(gal2 * 65)}`],
+                        ["Painter's tape", `${tape} rolls`, `${formatCurrency(tape * 6)}--${formatCurrency(tape * 10)}`],
+                        ["Drop cloths", `${drops}`, `${formatCurrency(drops * 12)}--${formatCurrency(drops * 22)}`],
+                      ].map(([label, value, cost]) => (
+                        <div key={label as string} className="flex justify-between py-1 border-b border-gray-50 last:border-0">
+                          <span className="text-gray-700">{label}</span>
+                          <div className="text-right"><span className="font-semibold text-gray-900">{value}</span>{cost && <p className="text-[10px] text-gray-500">{cost}</p>}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+
+          {tradeType === "fencing" && (() => {
+            const lf = parseFloat(tradeFenceLF) || 0;
+            const posts = lf > 0 ? Math.ceil(lf / tradeFenceSpacing) + 1 : 0;
+            const pickets = Math.ceil(lf * 12 / 3.5);
+            const bays = lf > 0 ? Math.ceil(lf / tradeFenceSpacing) : 0;
+            const rails = bays * (tradeFenceH >= 6 ? 3 : 2);
+            const concrete = posts * (tradeFenceH >= 6 ? 3 : 2);
+            const gates = Math.ceil(lf / 100);
+            const ready = lf > 0;
+            return (
+              <div className="grid grid-cols-2 gap-5">
+                <div className="space-y-3">
+                  <div><label className="text-[11px] font-semibold text-gray-900 block mb-1">Linear Feet</label><input type="number" placeholder="200" value={tradeFenceLF} onChange={(e) => setTradeFenceLF(e.target.value)} className={inputBase} /></div>
+                  <div><label className="text-[11px] font-semibold text-gray-900 block mb-1">Fence Height</label>
+                    <div className="flex gap-2">{([4, 6, 8] as const).map((h) => (<button key={h} onClick={() => setTradeFenceH(h)} className={cn("flex-1 h-9 border text-[12px] font-medium", tradeFenceH === h ? "bg-gray-900 text-white border-gray-900" : "bg-white text-gray-700 border-gray-200")}>{h} ft</button>))}</div>
+                  </div>
+                  <div><label className="text-[11px] font-semibold text-gray-900 block mb-1">Post Spacing</label>
+                    <div className="flex gap-2">{([6, 8] as const).map((s) => (<button key={s} onClick={() => setTradeFenceSpacing(s)} className={cn("flex-1 h-9 border text-[12px] font-medium", tradeFenceSpacing === s ? "bg-gray-900 text-white border-gray-900" : "bg-white text-gray-700 border-gray-200")}>{s} ft OC</button>))}</div>
+                  </div>
+                </div>
+                <div className="bg-white border border-gray-200 p-4 space-y-2">
+                  <p className="text-[12px] font-bold text-gray-900 uppercase tracking-wide mb-2">Material Summary</p>
+                  {!ready ? <p className="text-[12px] text-gray-500">Enter measurements to see results</p> : (
+                    <div className="space-y-1.5 text-[12px]">
+                      {[
+                        ["Posts", `${posts}`, `${formatCurrency(posts * 12)}--${formatCurrency(posts * 22)}`],
+                        ["Pickets", `${pickets}`, `${formatCurrency(pickets * 3)}--${formatCurrency(pickets * 8)}`],
+                        ["Rails", `${rails}`, `${formatCurrency(rails * 8)}--${formatCurrency(rails * 14)}`],
+                        ["Concrete bags", `${concrete}`, `${formatCurrency(concrete * 6)}--${formatCurrency(concrete * 8)}`],
+                        ["Gate hardware", `${gates} sets`, `${formatCurrency(gates * 45)}--${formatCurrency(gates * 120)}`],
+                      ].map(([label, value, cost]) => (
+                        <div key={label as string} className="flex justify-between py-1 border-b border-gray-50 last:border-0">
+                          <span className="text-gray-700">{label}</span>
+                          <div className="text-right"><span className="font-semibold text-gray-900">{value}</span>{cost && <p className="text-[10px] text-gray-500">{cost}</p>}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       )}
 
@@ -1893,11 +2182,11 @@ function CalculatorTab() {
         {/* Template selector */}
         <div>
           <p className="text-[15px] font-bold text-gray-900 mb-1">Job Template</p>
-          <p className="text-[12px] text-gray-400 mb-3">Start from a template or build from scratch</p>
+          <p className="text-[12px] text-gray-600 mb-3">Start from a template or build from scratch</p>
           <select
             value={template}
             onChange={(e) => loadTemplate(e.target.value)}
-            className="h-11 w-full max-w-sm rounded-lg border border-gray-200 bg-white px-3.5 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
+            className="h-11 w-full max-w-sm rounded-none border border-gray-200 bg-white px-3.5 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
           >
             {TEMPLATE_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -1907,7 +2196,7 @@ function CalculatorTab() {
 
         {/* Sections */}
         {sections.map((sec, si) => (
-          <div key={si} className="rounded-xl ring-1 ring-gray-200 overflow-hidden">
+          <div key={si} className="rounded-none ring-1 ring-gray-200 overflow-hidden">
             <div className="flex items-center justify-between px-4 py-2.5 bg-gray-50">
               <input
                 value={sec.name}
@@ -1923,7 +2212,7 @@ function CalculatorTab() {
                 )}
               </div>
             </div>
-            <div className="grid grid-cols-[1fr_60px_60px_85px_80px_32px] gap-1.5 px-4 py-2 text-[9px] font-bold text-gray-400 uppercase tracking-wider">
+            <div className="grid grid-cols-[1fr_50px_50px_70px_65px_28px] xl:grid-cols-[1fr_60px_60px_85px_80px_32px] gap-1 xl:gap-1.5 px-3 xl:px-4 py-2 text-[9px] font-bold text-gray-600 uppercase tracking-wider">
               <span>Description</span>
               <span className="text-right">Qty</span>
               <span className="text-center">Unit</span>
@@ -1932,10 +2221,10 @@ function CalculatorTab() {
               <span />
             </div>
             {sec.items.map((item, ii) => (
-              <div key={ii} className="grid grid-cols-[1fr_60px_60px_85px_80px_32px] gap-1.5 px-4 py-1 items-center border-t border-gray-100">
+              <div key={ii} className="grid grid-cols-[1fr_50px_50px_70px_65px_28px] xl:grid-cols-[1fr_60px_60px_85px_80px_32px] gap-1 xl:gap-1.5 px-3 xl:px-4 py-1 items-center border-t border-gray-100">
                 <input value={item.desc} onChange={(e) => updateItem(si, ii, "desc", e.target.value)} placeholder="Item..." className={inputBase} />
                 <input type="number" min="0" value={item.qty} onChange={(e) => updateItem(si, ii, "qty", e.target.value)} className={cn(inputBase, "text-right px-2")} />
-                <select value={item.unit} onChange={(e) => updateItem(si, ii, "unit", e.target.value)} className="h-9 text-[11px] text-center rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent">
+                <select value={item.unit} onChange={(e) => updateItem(si, ii, "unit", e.target.value)} className="h-9 text-[11px] text-center rounded-none border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent">
                   {UNIT_OPTIONS.map((u) => <option key={u} value={u}>{u}</option>)}
                 </select>
                 <div className="relative">
@@ -1943,7 +2232,7 @@ function CalculatorTab() {
                   <input type="number" min="0" step="0.01" value={item.unitCost} onChange={(e) => updateItem(si, ii, "unitCost", e.target.value)} className={cn(inputBase, "text-right pl-5 pr-2")} />
                 </div>
                 <span className="text-[13px] font-semibold text-gray-900 text-right tabular-nums">{itemTotal(item) > 0 ? formatCurrency(itemTotal(item)) : "—"}</span>
-                <button onClick={() => removeItem(si, ii)} disabled={sec.items.length === 1} className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-20">
+                <button onClick={() => removeItem(si, ii)} disabled={sec.items.length === 1} className="w-8 h-8 flex items-center justify-center rounded-none text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-20">
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -1956,7 +2245,7 @@ function CalculatorTab() {
           </div>
         ))}
 
-        <button onClick={addSection} className="text-[13px] font-semibold text-gray-500 hover:text-gray-900 flex items-center gap-1.5 transition-colors">
+        <button onClick={addSection} className="text-[13px] font-semibold text-gray-700 hover:text-gray-900 flex items-center gap-1.5 transition-colors">
           <Plus className="w-4 h-4" /> Add Section
         </button>
 
@@ -1993,26 +2282,26 @@ function CalculatorTab() {
             <FileText className="w-4 h-4" />
             Convert to Estimate
           </Button>
-          <p className="text-[12px] text-gray-400">Pre-fills a new estimate with these line items and totals.</p>
+          <p className="text-[12px] text-gray-600">Pre-fills a new estimate with these line items and totals.</p>
         </div>
       </div>
 
       {/* Right: Live Breakdown */}
-      <div className="w-[340px] flex-shrink-0 sticky top-0">
-        <p className="text-[12px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Live Breakdown</p>
-        <div className="bg-white rounded-lg shadow-[0_4px_30px_-6px_rgba(0,0,0,0.15)] ring-1 ring-gray-200/80 overflow-hidden">
+      <div className="hidden xl:block w-[280px] 2xl:w-[340px] flex-shrink-0 sticky top-0">
+        <p className="text-[12px] font-semibold text-gray-600 uppercase tracking-wider mb-2">Live Breakdown</p>
+        <div className="bg-white rounded-none shadow-[0_4px_30px_-6px_rgba(0,0,0,0.15)] ring-1 ring-gray-200/80 overflow-hidden">
           <div className="h-1.5 bg-brand-600" />
           <div className="px-5 pt-4 pb-5">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <NextImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" alt="" width={32} height={32} className="w-8 h-8 rounded-full object-cover ring-2 ring-gray-100" />
+                <NextImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" alt="" width={32} height={32} className="w-8 h-8 rounded-none object-cover ring-2 ring-gray-100" />
                 <div>
                   <p className="text-[11px] font-bold text-gray-900">Johnson & Sons</p>
-                  <p className="text-[8px] text-gray-400">Cost Calculator</p>
+                  <p className="text-[8px] text-gray-600">Cost Calculator</p>
                 </div>
               </div>
-              <p className="text-[9px] text-gray-400">{today}</p>
+              <p className="text-[9px] text-gray-600">{today}</p>
             </div>
 
             {/* Section breakdown */}
@@ -2026,8 +2315,8 @@ function CalculatorTab() {
                   <div className="ml-2 mt-0.5 space-y-0.5">
                     {sec.items.filter((i) => i.desc && parseFloat(i.unitCost) > 0).map((item, j) => (
                       <div key={j} className="flex items-center justify-between">
-                        <span className="text-[9px] text-gray-400 truncate mr-2">{item.desc}</span>
-                        <span className="text-[9px] text-gray-500 tabular-nums flex-shrink-0">{formatCurrency(itemTotal(item))}</span>
+                        <span className="text-[9px] text-gray-600 truncate mr-2">{item.desc}</span>
+                        <span className="text-[9px] text-gray-700 tabular-nums flex-shrink-0">{formatCurrency(itemTotal(item))}</span>
                       </div>
                     ))}
                   </div>
@@ -2040,49 +2329,49 @@ function CalculatorTab() {
             {/* Totals */}
             <div className="space-y-1.5 mb-3">
               <div className="flex justify-between text-[11px]">
-                <span className="text-gray-400">Subtotal</span>
+                <span className="text-gray-600">Subtotal</span>
                 <span className="text-gray-900 tabular-nums">{formatCurrency(materialsSubtotal)}</span>
               </div>
               {wasteAmt > 0 && (
                 <div className="flex justify-between text-[11px]">
-                  <span className="text-gray-400">Waste ({wasteFactor}%)</span>
-                  <span className="text-gray-500 tabular-nums">+{formatCurrency(wasteAmt)}</span>
+                  <span className="text-gray-600">Waste ({wasteFactor}%)</span>
+                  <span className="text-gray-700 tabular-nums">+{formatCurrency(wasteAmt)}</span>
                 </div>
               )}
               {tax > 0 && (
                 <div className="flex justify-between text-[11px]">
-                  <span className="text-gray-400">Tax ({taxRate}%)</span>
-                  <span className="text-gray-500 tabular-nums">+{formatCurrency(tax)}</span>
+                  <span className="text-gray-600">Tax ({taxRate}%)</span>
+                  <span className="text-gray-700 tabular-nums">+{formatCurrency(tax)}</span>
                 </div>
               )}
               {permits > 0 && (
                 <div className="flex justify-between text-[11px]">
-                  <span className="text-gray-400">Permits</span>
-                  <span className="text-gray-500 tabular-nums">+{formatCurrency(permits)}</span>
+                  <span className="text-gray-600">Permits</span>
+                  <span className="text-gray-700 tabular-nums">+{formatCurrency(permits)}</span>
                 </div>
               )}
               {contingencyAmt > 0 && (
                 <div className="flex justify-between text-[11px]">
-                  <span className="text-gray-400">Contingency ({contingency}%)</span>
-                  <span className="text-gray-500 tabular-nums">+{formatCurrency(contingencyAmt)}</span>
+                  <span className="text-gray-600">Contingency ({contingency}%)</span>
+                  <span className="text-gray-700 tabular-nums">+{formatCurrency(contingencyAmt)}</span>
                 </div>
               )}
               <div className="flex justify-between text-[11px]">
-                <span className="text-gray-400">Margin ({marginPct}%)</span>
+                <span className="text-gray-600">Margin ({marginPct}%)</span>
                 <span className="text-brand-600 font-semibold tabular-nums">+{formatCurrency(marginAmt)}</span>
               </div>
             </div>
 
             {/* Bid price */}
-            <div className="flex justify-between py-3 px-3 bg-gray-900 rounded-lg">
+            <div className="flex justify-between py-3 px-3 bg-gray-900 rounded-none">
               <span className="text-[13px] font-bold text-white">Bid Price</span>
               <span className="text-[18px] font-bold text-white tabular-nums">{formatCurrency(grandTotal)}</span>
             </div>
 
             {/* Margin insight */}
             <div className="mt-3 text-center">
-              <p className="text-[10px] text-gray-400">Your profit: <span className="font-bold text-brand-600">{formatCurrency(marginAmt)}</span> ({marginPct}% margin)</p>
-              {materialsSubtotal > 0 && <p className="text-[9px] text-gray-400 mt-0.5">Markup on cost: {((grandTotal / materialsSubtotal - 1) * 100).toFixed(1)}%</p>}
+              <p className="text-[10px] text-gray-600">Your profit: <span className="font-bold text-brand-600">{formatCurrency(marginAmt)}</span> ({marginPct}% margin)</p>
+              {materialsSubtotal > 0 && <p className="text-[9px] text-gray-600 mt-0.5">Markup on cost: {((grandTotal / materialsSubtotal - 1) * 100).toFixed(1)}%</p>}
             </div>
           </div>
         </div>
@@ -2134,19 +2423,19 @@ function ProGate({ onUnlock }: { onUnlock: () => void }) {
         <h2 className="text-[38px] font-bold text-gray-900 tracking-tight leading-tight mb-3">
           Estimate Agent
         </h2>
-        <p className="text-[17px] text-gray-400 leading-relaxed mb-8 max-w-[520px]">
+        <p className="text-[17px] text-gray-600 leading-relaxed mb-8 max-w-[520px]">
           Tell it what you need. Get a full estimate back. Voice, text, or upload — it handles everything.
         </p>
         <div className="flex items-center gap-5">
           <button
             onClick={onUnlock}
-            className="h-12 px-8 rounded-xl bg-gray-900 hover:bg-gray-800 text-white text-[15px] font-bold transition-colors"
+            className="h-12 px-8 rounded-none bg-gray-900 hover:bg-gray-800 text-white text-[15px] font-bold transition-colors"
           >
             Start 14-Day Free Trial
           </button>
           <div className="flex items-baseline gap-1">
             <span className="text-[28px] font-bold text-gray-900 tabular-nums">$49</span>
-            <span className="text-[14px] text-gray-400">/mo after trial</span>
+            <span className="text-[14px] text-gray-600">/mo after trial</span>
           </div>
         </div>
       </div>
@@ -2163,7 +2452,7 @@ function ProGate({ onUnlock }: { onUnlock: () => void }) {
         ].map((feat) => (
           <div key={feat.title} className="py-4">
             <p className="text-[16px] font-bold text-gray-900 mb-1.5">{feat.title}</p>
-            <p className="text-[13px] text-gray-400 leading-relaxed">{feat.desc}</p>
+            <p className="text-[13px] text-gray-600 leading-relaxed">{feat.desc}</p>
           </div>
         ))}
       </div>
@@ -2172,22 +2461,22 @@ function ProGate({ onUnlock }: { onUnlock: () => void }) {
       <div className="flex items-center gap-8 py-4">
         <div>
           <p className="text-[22px] font-bold text-gray-900 tabular-nums">5,200+</p>
-          <p className="text-[12px] text-gray-400">Training estimates</p>
+          <p className="text-[12px] text-gray-600">Training estimates</p>
         </div>
         <div>
           <p className="text-[22px] font-bold text-gray-900 tabular-nums">8</p>
-          <p className="text-[12px] text-gray-400">Built-in tools</p>
+          <p className="text-[12px] text-gray-600">Built-in tools</p>
         </div>
         <div>
           <p className="text-[22px] font-bold text-gray-900">Texas</p>
-          <p className="text-[12px] text-gray-400">Regional pricing</p>
+          <p className="text-[12px] text-gray-600">Regional pricing</p>
         </div>
         <div>
           <p className="text-[22px] font-bold text-gray-900">30 sec</p>
-          <p className="text-[12px] text-gray-400">Avg estimate time</p>
+          <p className="text-[12px] text-gray-600">Avg estimate time</p>
         </div>
         <div className="ml-auto">
-          <p className="text-[12px] text-gray-400">No credit card required. Cancel anytime.</p>
+          <p className="text-[12px] text-gray-600">No credit card required. Cancel anytime.</p>
         </div>
       </div>
     </div>
@@ -2343,14 +2632,14 @@ function EstimateAgentTab() {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-[17px] font-bold text-gray-900">Estimate Agent</h2>
-                <span className="text-[10px] font-bold uppercase tracking-wide bg-brand-600 text-white px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="text-[10px] font-bold uppercase tracking-wide bg-brand-600 text-white px-2 py-0.5 rounded-none flex items-center gap-1">
                   <Crown className="w-2.5 h-2.5" />Pro
                 </span>
               </div>
-              <p className="text-[13px] text-gray-400">Powered by ConstructionAI</p>
+              <p className="text-[13px] text-gray-600">Powered by ConstructionAI</p>
             </div>
           </div>
-          <div className="flex items-center gap-4 text-[12px] text-gray-400">
+          <div className="flex items-center gap-4 text-[12px] text-gray-600">
             <span className="flex items-center gap-1.5"><Mic className="w-3.5 h-3.5" /> Voice</span>
             <span className="flex items-center gap-1.5"><Paperclip className="w-3.5 h-3.5" /> Upload</span>
             <span className="flex items-center gap-1.5"><Calculator className="w-3.5 h-3.5" /> 8 Tools</span>
@@ -2358,16 +2647,16 @@ function EstimateAgentTab() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto rounded-2xl bg-white shadow-[0_2px_12px_-2px_rgba(0,0,0,0.06)] ring-1 ring-gray-200/80 p-5 space-y-5 mb-3">
+        <div className="flex-1 overflow-y-auto rounded-none bg-white shadow-[0_2px_12px_-2px_rgba(0,0,0,0.06)] ring-1 ring-gray-200/80 p-5 space-y-5 mb-3">
           {messages.map((msg) => {
             if (msg.role === "tool") {
               return (
                 <div key={msg.id} className="flex justify-center">
                   <div className={cn(
-                    "flex items-center gap-2 text-[12px] font-medium px-4 py-2 rounded-full",
+                    "flex items-center gap-2 text-[12px] font-medium px-4 py-2 rounded-none",
                     msg.toolStatus === "complete"
                       ? "bg-brand-50 text-brand-700"
-                      : "bg-gray-50 text-gray-500"
+                      : "bg-gray-50 text-gray-700"
                   )}>
                     {msg.toolStatus === "running" ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -2384,30 +2673,30 @@ function EstimateAgentTab() {
             return (
               <div key={msg.id} className={cn("flex gap-3", isAgent ? "items-start" : "items-start flex-row-reverse")}>
                 {!isAgent && (
-                  <div className="w-9 h-9 rounded-xl bg-brand-100 flex items-center justify-center flex-shrink-0">
+                  <div className="w-9 h-9 rounded-none bg-brand-100 flex items-center justify-center flex-shrink-0">
                     <span className="text-brand-700 text-[12px] font-bold">MJ</span>
                   </div>
                 )}
                 <div className={cn("max-w-[80%]", !isAgent && "items-end")}>
                   <div className={cn(
-                    "px-4 py-3 rounded-2xl text-[14px] leading-relaxed whitespace-pre-wrap",
+                    "px-4 py-3 rounded-none text-[14px] leading-relaxed whitespace-pre-wrap",
                     isAgent
-                      ? "bg-gray-50 text-gray-800 rounded-tl-md"
-                      : "bg-gray-900 text-white rounded-tr-md"
+                      ? "bg-gray-50 text-gray-900 rounded-none-md"
+                      : "bg-gray-900 text-white rounded-none-md"
                   )}>
                     {msg.content}
                   </div>
                   {msg.attachments && msg.attachments.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       {msg.attachments.map((att, i) => (
-                        <span key={i} className="inline-flex items-center gap-1 text-[11px] font-medium text-gray-600 bg-gray-100 rounded-lg px-2.5 py-1">
+                        <span key={i} className="inline-flex items-center gap-1 text-[11px] font-medium text-gray-800 bg-gray-100 rounded-none px-2.5 py-1">
                           {att.type.startsWith("image") ? <ImageIcon className="w-3 h-3" /> : <FileText className="w-3 h-3" />}
                           {att.name}
                         </span>
                       ))}
                     </div>
                   )}
-                  <p className={cn("text-[11px] text-gray-400 mt-1.5 px-1", !isAgent && "text-right")}>{msg.timestamp}</p>
+                  <p className={cn("text-[11px] text-gray-600 mt-1.5 px-1", !isAgent && "text-right")}>{msg.timestamp}</p>
                 </div>
               </div>
             );
@@ -2415,14 +2704,14 @@ function EstimateAgentTab() {
 
           {isThinking && (
             <div className="flex gap-3 items-start">
-              <div className="w-9 h-9 rounded-xl bg-gray-900 flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 rounded-none bg-gray-900 flex items-center justify-center flex-shrink-0">
                 <span className="text-white text-[11px] font-bold">AI</span>
               </div>
-              <div className="bg-gray-50 rounded-2xl rounded-tl-md px-5 py-4">
+              <div className="bg-gray-50 rounded-none rounded-none-md px-5 py-4">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                  <span className="w-2 h-2 bg-gray-400 rounded-none animate-bounce" style={{ animationDelay: "0ms" }} />
+                  <span className="w-2 h-2 bg-gray-400 rounded-none animate-bounce" style={{ animationDelay: "150ms" }} />
+                  <span className="w-2 h-2 bg-gray-400 rounded-none animate-bounce" style={{ animationDelay: "300ms" }} />
                 </div>
               </div>
             </div>
@@ -2435,8 +2724,8 @@ function EstimateAgentTab() {
         {uploadedFiles.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-2">
             {uploadedFiles.map((f, i) => (
-              <span key={i} className="inline-flex items-center gap-1.5 text-[12px] font-medium text-gray-700 bg-white ring-1 ring-gray-200 rounded-lg px-3 py-1.5">
-                {f.type.startsWith("image") ? <ImageIcon className="w-3.5 h-3.5 text-gray-400" /> : <FileText className="w-3.5 h-3.5 text-gray-400" />}
+              <span key={i} className="inline-flex items-center gap-1.5 text-[12px] font-medium text-gray-900 bg-white ring-1 ring-gray-200 rounded-none px-3 py-1.5">
+                {f.type.startsWith("image") ? <ImageIcon className="w-3.5 h-3.5 text-gray-600" /> : <FileText className="w-3.5 h-3.5 text-gray-600" />}
                 {f.name}
                 <button onClick={() => setUploadedFiles((prev) => prev.filter((_, j) => j !== i))} className="text-gray-300 hover:text-red-500 ml-1">
                   <Trash2 className="w-3 h-3" />
@@ -2447,18 +2736,18 @@ function EstimateAgentTab() {
         )}
 
         {/* Input */}
-        <div className="flex items-center gap-2 bg-white rounded-2xl shadow-[0_2px_12px_-2px_rgba(0,0,0,0.06)] ring-1 ring-gray-200/80 px-4 py-3">
+        <div className="flex items-center gap-2 bg-white rounded-none shadow-[0_2px_12px_-2px_rgba(0,0,0,0.06)] ring-1 ring-gray-200/80 px-4 py-3">
           <input type="file" ref={fileInputRef} className="hidden" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.txt" onChange={handleFileUpload} />
-          <button onClick={() => fileInputRef.current?.click()} className="w-9 h-9 flex items-center justify-center rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+          <button onClick={() => fileInputRef.current?.click()} className="w-9 h-9 flex items-center justify-center rounded-none text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-colors">
             <Paperclip className="w-[18px] h-[18px]" />
           </button>
           <button
             onClick={toggleRecording}
             className={cn(
-              "w-9 h-9 flex items-center justify-center rounded-xl transition-colors",
+              "w-9 h-9 flex items-center justify-center rounded-none transition-colors",
               isRecording
                 ? "bg-red-500 text-white animate-pulse"
-                : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                : "text-gray-600 hover:text-gray-800 hover:bg-gray-100"
             )}
           >
             {isRecording ? <MicOff className="w-[18px] h-[18px]" /> : <Mic className="w-[18px] h-[18px]" />}
@@ -2471,7 +2760,7 @@ function EstimateAgentTab() {
             className={cn("flex-1 text-[14px] bg-transparent outline-none placeholder:text-gray-300", isRecording && "text-red-500 placeholder:text-red-400")}
             disabled={isRecording}
           />
-          <Button onClick={handleSend} disabled={!input.trim() && uploadedFiles.length === 0} className="gap-2 h-10 px-5 rounded-xl">
+          <Button onClick={handleSend} disabled={!input.trim() && uploadedFiles.length === 0} className="gap-2 h-10 px-5 rounded-none">
             <Send className="w-4 h-4" />
             Send
           </Button>
@@ -2528,7 +2817,7 @@ function EstimatesPageContent() {
 
       {/* Sidebar + Content */}
       <div className="flex flex-1 min-h-0">
-        <nav className="w-48 flex-shrink-0 bg-white border-r border-border py-3 px-2 overflow-y-auto">
+        <nav className="w-44 xl:w-56 flex-shrink-0 bg-white border-r border-border py-3 px-2 overflow-y-auto">
           {ESTIMATES_NAV.map((item) => {
             const Icon = item.icon;
             const isActive = activeSection === item.id;
@@ -2538,10 +2827,10 @@ function EstimatesPageContent() {
                 key={item.id}
                 onClick={() => setActiveSection(item.id)}
                 className={cn(
-                  "w-full flex items-center justify-between rounded-lg px-2.5 py-2 text-[13px] font-medium transition-colors mb-0.5",
+                  "w-full flex items-center justify-between rounded-none px-2.5 py-2 text-[13px] font-medium transition-colors mb-0.5",
                   isActive
                     ? "bg-brand-600 text-white"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                    : "text-gray-800 hover:bg-gray-100 hover:text-gray-900"
                 )}
               >
                 <div className="flex items-center gap-2.5">
@@ -2554,7 +2843,7 @@ function EstimatesPageContent() {
                   )}
                 </div>
                 {badge != null && badge > 0 && (
-                  <span className={cn("text-[10px] font-bold rounded-full px-1.5 py-0.5 min-w-[20px] text-center", isActive ? "bg-white/20 text-white" : "bg-gray-100 text-gray-500")}>
+                  <span className={cn("text-[10px] font-bold rounded-none px-1.5 py-0.5 min-w-[20px] text-center", isActive ? "bg-white/20 text-white" : "bg-gray-100 text-gray-700")}>
                     {badge}
                   </span>
                 )}
@@ -2563,7 +2852,7 @@ function EstimatesPageContent() {
           })}
         </nav>
 
-        <div className="flex-1 overflow-y-auto p-8">
+        <div className="flex-1 overflow-y-auto p-4 xl:p-8">
           {renderSection()}
         </div>
       </div>
@@ -2572,6 +2861,7 @@ function EstimatesPageContent() {
 }
 
 export default function EstimatesPage() {
+  usePageTitle("Estimates");
   return (
     <Suspense>
       <EstimatesPageContent />

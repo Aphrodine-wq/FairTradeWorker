@@ -5,6 +5,7 @@ import { Star, TrendingUp, MessageSquare, ThumbsUp } from "lucide-react";
 import { mockReviews } from "@shared/lib/mock-data";
 import { fetchReviews } from "@shared/lib/data";
 import { formatDate, cn } from "@shared/lib/utils";
+import { usePageTitle } from "@shared/hooks/use-page-title";
 
 const RATING_BREAKDOWN = [
   { stars: 5, count: 4, pct: 80 },
@@ -37,6 +38,7 @@ function StarRating({ rating, size = 16 }: { rating: number; size?: number }) {
 }
 
 export default function ContractorReviewsPage() {
+  usePageTitle("Reviews");
   const [filter, setFilter] = useState<"all" | "5" | "4" | "3">("all");
   const [reviews, setReviews] = useState(mockReviews);
 
@@ -85,16 +87,16 @@ export default function ContractorReviewsPage() {
                 <div>
                   <p className="text-[56px] font-bold text-gray-900 tabular-nums leading-none">{avgRating}</p>
                   <StarRating rating={avgRating} size={20} />
-                  <p className="text-[13px] text-gray-400 mt-1">{totalReviews} reviews</p>
+                  <p className="text-[13px] text-gray-600 mt-1">{totalReviews} reviews</p>
                 </div>
                 <div className="flex-1 space-y-1.5">
                   {RATING_BREAKDOWN.map((row) => (
                     <div key={row.stars} className="flex items-center gap-2">
-                      <span className="text-[12px] text-gray-400 w-3 text-right tabular-nums">{row.stars}</span>
-                      <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-amber-400 rounded-full" style={{ width: `${row.pct}%` }} />
+                      <span className="text-[12px] text-gray-600 w-3 text-right tabular-nums">{row.stars}</span>
+                      <div className="flex-1 h-2 bg-gray-100 rounded-none overflow-hidden">
+                        <div className="h-full bg-amber-400 rounded-none" style={{ width: `${row.pct}%` }} />
                       </div>
-                      <span className="text-[12px] text-gray-400 w-6 tabular-nums">{row.count}</span>
+                      <span className="text-[12px] text-gray-600 w-6 tabular-nums">{row.count}</span>
                     </div>
                   ))}
                 </div>
@@ -103,23 +105,23 @@ export default function ContractorReviewsPage() {
 
             {/* Comparison cards */}
             <div className="flex gap-4">
-              <div className="w-[180px] rounded-xl bg-white p-4">
-                <TrendingUp className="w-5 h-5 text-emerald-600 mb-2" />
-                <p className="text-[12px] text-gray-400">Rating Trend</p>
+              <div className="w-[180px] rounded-none bg-white p-4">
+                <TrendingUp className="w-5 h-5 text-emerald-950 mb-2" />
+                <p className="text-[12px] text-gray-600">Rating Trend</p>
                 <p className="text-[24px] font-bold text-gray-900 leading-tight">+0.3</p>
-                <p className="text-[11px] text-gray-400 mt-0.5">vs last month</p>
+                <p className="text-[11px] text-gray-600 mt-0.5">vs last month</p>
               </div>
-              <div className="w-[180px] rounded-xl bg-white p-4">
+              <div className="w-[180px] rounded-none bg-white p-4">
                 <Star className="w-5 h-5 text-amber-400 mb-2" />
-                <p className="text-[12px] text-gray-400">Area Average</p>
+                <p className="text-[12px] text-gray-600">Area Average</p>
                 <p className="text-[24px] font-bold text-gray-900 leading-tight">{areaAvg}</p>
-                <p className="text-[11px] text-emerald-600 font-semibold mt-0.5">You&apos;re {(avgRating - areaAvg).toFixed(1)} above</p>
+                <p className="text-[11px] text-emerald-950 font-semibold mt-0.5">You&apos;re {(avgRating - areaAvg).toFixed(1)} above</p>
               </div>
-              <div className="w-[180px] rounded-xl bg-white p-4">
+              <div className="w-[180px] rounded-none bg-white p-4">
                 <ThumbsUp className="w-5 h-5 text-brand-600 mb-2" />
-                <p className="text-[12px] text-gray-400">Ranking</p>
+                <p className="text-[12px] text-gray-600">Ranking</p>
                 <p className="text-[24px] font-bold text-gray-900 leading-tight">Top 5%</p>
-                <p className="text-[11px] text-gray-400 mt-0.5">Austin, TX contractors</p>
+                <p className="text-[11px] text-gray-600 mt-0.5">Austin, TX contractors</p>
               </div>
             </div>
           </div>
@@ -131,10 +133,10 @@ export default function ContractorReviewsPage() {
                 key={f}
                 onClick={() => setFilter(f)}
                 className={cn(
-                  "text-[13px] font-medium px-3 py-1.5 rounded-full transition-colors",
+                  "text-[13px] font-medium px-3 py-1.5 rounded-none transition-colors",
                   filter === f
                     ? "bg-gray-900 text-white"
-                    : "bg-white text-gray-500 hover:bg-gray-100"
+                    : "bg-white text-gray-700 hover:bg-gray-100"
                 )}
               >
                 {f === "all" ? "All" : `${f} stars`}
@@ -145,22 +147,22 @@ export default function ContractorReviewsPage() {
           {/* Reviews list */}
           <div className="space-y-4">
             {filteredReviews.map((review) => (
-              <div key={review.id} className="bg-white rounded-xl p-5">
+              <div key={review.id} className="bg-white rounded-none p-5">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-none bg-brand-100 flex items-center justify-center flex-shrink-0">
                       <span className="text-brand-700 text-sm font-bold">
                         {review.authorName.split(" ").map((n) => n[0]).join("")}
                       </span>
                     </div>
                     <div>
                       <p className="text-[15px] font-bold text-gray-900">{review.authorName}</p>
-                      <p className="text-[12px] text-gray-400">{formatDate(review.date)}</p>
+                      <p className="text-[12px] text-gray-600">{formatDate(review.date)}</p>
                     </div>
                   </div>
                   <StarRating rating={review.rating} size={14} />
                 </div>
-                <p className="text-[14px] text-gray-600 leading-relaxed">{review.text}</p>
+                <p className="text-[14px] text-gray-800 leading-relaxed">{review.text}</p>
               </div>
             ))}
           </div>

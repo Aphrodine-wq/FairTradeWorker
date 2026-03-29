@@ -23,7 +23,7 @@ export default function AboutPage() {
           </h1>
 
           {/* Story */}
-          <div className="mt-10 space-y-6 text-lg text-gray-600 leading-relaxed max-w-3xl">
+          <div className="mt-10 space-y-6 text-lg text-gray-800 leading-relaxed max-w-3xl">
             <p>
               A contractor bids on a lead from HomeAdvisor. Pays $75. The
               homeowner already hired someone. He bids again next week. Same
@@ -84,7 +84,7 @@ export default function AboutPage() {
                   <p className="text-lg font-medium text-gray-900">
                     {item.value}
                   </p>
-                  <p className="text-sm text-gray-500 mt-2 leading-relaxed max-w-2xl">
+                  <p className="text-sm text-gray-700 mt-2 leading-relaxed max-w-2xl">
                     {item.detail}
                   </p>
                 </div>
@@ -99,7 +99,7 @@ export default function AboutPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               What makes this different.
             </h2>
-            <p className="text-gray-600 leading-relaxed max-w-3xl mb-8">
+            <p className="text-gray-800 leading-relaxed max-w-3xl mb-8">
               Most construction marketplaces make money by selling leads. That
               model creates bad incentives — the platform benefits when
               contractors compete to spend more, not when they do better work.
@@ -124,11 +124,11 @@ export default function AboutPage() {
                   desc: "Every contractor is license-checked, insurance-verified, and identity-confirmed. We'd rather have 500 verified contractors than 5,000 unvetted ones flooding homeowner feeds.",
                 },
               ].map((item) => (
-                <div key={item.title} className="bg-surface rounded-lg p-6">
+                <div key={item.title} className="bg-surface rounded-none p-6">
                   <p className="text-sm font-bold text-gray-900 mb-2">
                     {item.title}
                   </p>
-                  <p className="text-sm text-gray-500 leading-relaxed">
+                  <p className="text-sm text-gray-700 leading-relaxed">
                     {item.desc}
                   </p>
                 </div>
@@ -143,7 +143,7 @@ export default function AboutPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               Built in Mississippi. By people who&apos;ve swung a hammer.
             </h2>
-            <div className="space-y-4 text-gray-600 leading-relaxed max-w-3xl">
+            <div className="space-y-4 text-gray-800 leading-relaxed max-w-3xl">
               <p>
                 We&apos;re a small team based in Oxford, Mississippi. Some of us came from
                 construction — years on job sites, running crews, dealing with
@@ -166,11 +166,11 @@ export default function AboutPage() {
           <Separator className="my-14" />
 
           {/* CTA */}
-          <section className="bg-dark rounded-xl p-10 text-center">
+          <section className="bg-dark rounded-none p-10 text-center">
             <h2 className="text-2xl font-bold text-white mb-3">
               Ready to see it for yourself?
             </h2>
-            <p className="text-gray-400 mb-6 max-w-md mx-auto">
+            <p className="text-gray-600 mb-6 max-w-md mx-auto">
               Create a free account in under two minutes. No credit card
               required. See why contractors and homeowners are switching.
             </p>

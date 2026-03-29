@@ -34,14 +34,14 @@ export function EstimateCard({ estimate, onView }: EstimateCardProps) {
       <CardContent className="p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-lg bg-brand-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div className="w-9 h-9 rounded-none bg-brand-50 flex items-center justify-center flex-shrink-0 mt-0.5">
               <FileText className="w-4 h-4 text-brand-600" />
             </div>
             <div className="min-w-0">
               <p className="font-semibold text-gray-900 text-sm truncate">
                 {estimate.jobTitle}
               </p>
-              <p className="text-xs text-gray-500 mt-0.5 truncate">
+              <p className="text-xs text-gray-700 mt-0.5 truncate">
                 {estimate.clientName}
               </p>
             </div>
@@ -55,7 +55,7 @@ export function EstimateCard({ estimate, onView }: EstimateCardProps) {
           <p className="text-lg font-bold text-gray-900 tabular-nums">
             {formatCurrency(estimate.amount)}
           </p>
-          <div className="flex items-center gap-3 text-xs text-gray-400">
+          <div className="flex items-center gap-3 text-xs text-gray-600">
             <span className="flex items-center gap-1">
               <List className="w-3 h-3" />
               {estimate.lineItems.length} items

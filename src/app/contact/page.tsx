@@ -57,7 +57,7 @@ export default function ContactPage() {
           <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
             Let&apos;s talk.
           </h1>
-          <p className="mt-4 text-lg text-gray-500 max-w-2xl">
+          <p className="mt-4 text-lg text-gray-700 max-w-2xl">
             Whether you&apos;re a contractor with questions or a homeowner looking for
             help, we&apos;re here.
           </p>
@@ -73,7 +73,7 @@ export default function ContactPage() {
                   <h2 className="text-2xl font-bold text-gray-900 mb-3">
                     We got it.
                   </h2>
-                  <p className="text-gray-500">
+                  <p className="text-gray-700">
                     Someone from our team will follow up within one business day.
                     If it&apos;s urgent, email us directly at{" "}
                     <a
@@ -91,7 +91,7 @@ export default function ContactPage() {
                     <div className="space-y-1.5">
                       <label
                         htmlFor="name"
-                        className="block text-sm font-medium text-gray-700"
+                        className="block text-sm font-medium text-gray-900"
                       >
                         Name
                       </label>
@@ -107,7 +107,7 @@ export default function ContactPage() {
                     <div className="space-y-1.5">
                       <label
                         htmlFor="email"
-                        className="block text-sm font-medium text-gray-700"
+                        className="block text-sm font-medium text-gray-900"
                       >
                         Email
                       </label>
@@ -125,7 +125,7 @@ export default function ContactPage() {
                   <div className="space-y-1.5">
                     <label
                       htmlFor="subject"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-gray-900"
                     >
                       Subject
                     </label>
@@ -133,7 +133,7 @@ export default function ContactPage() {
                       id="subject"
                       value={subject}
                       onChange={(e) => setSubject(e.target.value as typeof subject)}
-                      className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-brand-600 transition-colors"
+                      className="w-full rounded-none border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-brand-600 transition-colors"
                     >
                       {SUBJECTS.map((s) => (
                         <option key={s} value={s}>
@@ -146,7 +146,7 @@ export default function ContactPage() {
                   <div className="space-y-1.5">
                     <label
                       htmlFor="message"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-gray-900"
                     >
                       Message
                     </label>
@@ -178,10 +178,10 @@ export default function ContactPage() {
                   <li className="flex items-start gap-3">
                     <Mail className="w-4 h-4 text-brand-600 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="text-xs text-gray-400 mb-0.5">Email</p>
+                      <p className="text-xs text-gray-600 mb-0.5">Email</p>
                       <a
                         href="mailto:hello@fairtradeworker.com"
-                        className="text-sm text-gray-700 hover:text-brand-600 transition-colors"
+                        className="text-sm text-gray-900 hover:text-brand-600 transition-colors"
                       >
                         hello@fairtradeworker.com
                       </a>
@@ -190,15 +190,15 @@ export default function ContactPage() {
                   <li className="flex items-start gap-3">
                     <Phone className="w-4 h-4 text-brand-600 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="text-xs text-gray-400 mb-0.5">Phone</p>
-                      <span className="text-sm text-gray-700">(512) 555-0100</span>
+                      <p className="text-xs text-gray-600 mb-0.5">Phone</p>
+                      <span className="text-sm text-gray-900">(512) 555-0100</span>
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
                     <Clock className="w-4 h-4 text-brand-600 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="text-xs text-gray-400 mb-0.5">Hours</p>
-                      <span className="text-sm text-gray-700">
+                      <p className="text-xs text-gray-600 mb-0.5">Hours</p>
+                      <span className="text-sm text-gray-900">
                         Mon–Fri, 8am–6pm CT
                       </span>
                     </div>
@@ -206,8 +206,8 @@ export default function ContactPage() {
                   <li className="flex items-start gap-3">
                     <MapPin className="w-4 h-4 text-brand-600 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="text-xs text-gray-400 mb-0.5">Location</p>
-                      <span className="text-sm text-gray-700">Oxford, MS</span>
+                      <p className="text-xs text-gray-600 mb-0.5">Location</p>
+                      <span className="text-sm text-gray-900">Oxford, MS</span>
                     </div>
                   </li>
                 </ul>
@@ -216,7 +216,7 @@ export default function ContactPage() {
               <Separator />
 
               <div>
-                <p className="text-sm text-gray-500 leading-relaxed">
+                <p className="text-sm text-gray-700 leading-relaxed">
                   For contractor support or billing questions, email{" "}
                   <a
                     href="mailto:hello@fairtradeworker.com"

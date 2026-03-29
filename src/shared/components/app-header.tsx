@@ -19,7 +19,7 @@ export function AppHeader({ title, subtitle, actions, className }: AppHeaderProp
       <div className="min-w-0">
         <h1 className="text-xl font-bold text-gray-900 truncate">{title}</h1>
         {subtitle && (
-          <p className="mt-0.5 text-sm text-gray-500 truncate">{subtitle}</p>
+          <p className="mt-0.5 text-sm text-gray-700 truncate">{subtitle}</p>
         )}
       </div>
       {actions && (

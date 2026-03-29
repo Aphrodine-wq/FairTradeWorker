@@ -24,22 +24,22 @@ export function PricingSection() {
             <h2 className="text-3xl font-bold text-gray-900 inline">
               Pricing{" "}
             </h2>
-            <span className="text-3xl font-normal text-gray-400">
+            <span className="text-3xl font-normal text-gray-600">
               No surprises.
             </span>
           </div>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             {/* Audience toggle */}
-            <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+            <div className="flex items-center gap-1 bg-gray-100 rounded-none p-1">
               <button
                 type="button"
                 onClick={() => setAudience("contractor")}
                 className={cn(
-                  "px-4 py-1.5 text-sm font-medium rounded-md transition-colors",
+                  "px-4 py-1.5 text-sm font-medium rounded-none transition-colors",
                   audience === "contractor"
                     ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-700"
+                    : "text-gray-700 hover:text-gray-900"
                 )}
               >
                 Contractors
@@ -48,10 +48,10 @@ export function PricingSection() {
                 type="button"
                 onClick={() => setAudience("homeowner")}
                 className={cn(
-                  "px-4 py-1.5 text-sm font-medium rounded-md transition-colors",
+                  "px-4 py-1.5 text-sm font-medium rounded-none transition-colors",
                   audience === "homeowner"
                     ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-700"
+                    : "text-gray-700 hover:text-gray-900"
                 )}
               >
                 Homeowners
@@ -63,7 +63,7 @@ export function PricingSection() {
               <span
                 className={cn(
                   "text-sm font-medium",
-                  !yearly ? "text-gray-900" : "text-gray-400"
+                  !yearly ? "text-gray-900" : "text-gray-600"
                 )}
               >
                 Monthly
@@ -72,13 +72,13 @@ export function PricingSection() {
                 type="button"
                 onClick={() => setYearly(!yearly)}
                 className={cn(
-                  "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
+                  "relative inline-flex h-6 w-11 items-center rounded-none transition-colors",
                   yearly ? "bg-brand-600" : "bg-gray-200"
                 )}
               >
                 <span
                   className={cn(
-                    "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
+                    "inline-block h-4 w-4 transform rounded-none bg-white transition-transform",
                     yearly ? "translate-x-6" : "translate-x-1"
                   )}
                 />
@@ -86,7 +86,7 @@ export function PricingSection() {
               <span
                 className={cn(
                   "text-sm font-medium",
-                  yearly ? "text-gray-900" : "text-gray-400"
+                  yearly ? "text-gray-900" : "text-gray-600"
                 )}
               >
                 Yearly
@@ -131,7 +131,7 @@ export function PricingSection() {
                 <h3 className="text-lg font-bold text-gray-900">
                   {tier.name}
                 </h3>
-                <p className="text-sm text-gray-500 mt-1 mb-6">
+                <p className="text-sm text-gray-700 mt-1 mb-6">
                   {tier.description}
                 </p>
 
@@ -140,12 +140,12 @@ export function PricingSection() {
                     {isFree ? "Free" : `$${price}`}
                   </span>
                   {!isFree && (
-                    <span className="text-sm text-gray-500 ml-1">
+                    <span className="text-sm text-gray-700 ml-1">
                       /{yearly ? "year" : "month"}
                     </span>
                   )}
                   {isFree && (
-                    <p className="text-sm text-gray-400 mt-1">forever</p>
+                    <p className="text-sm text-gray-600 mt-1">forever</p>
                   )}
                   {!isFree && yearly && (
                     <p className="text-sm text-brand-600 mt-1">
@@ -158,7 +158,7 @@ export function PricingSection() {
                   {tier.features.map((feature) => (
                     <li
                       key={feature}
-                      className="flex items-start gap-3 text-sm text-gray-600"
+                      className="flex items-start gap-3 text-sm text-gray-800"
                     >
                       <span className="text-brand-600 font-bold flex-shrink-0">
                         &#10003;
@@ -181,7 +181,7 @@ export function PricingSection() {
           })}
         </div>
 
-        <p className="text-sm text-gray-500 mt-8">
+        <p className="text-sm text-gray-700 mt-8">
           Zero lead fees on every plan.
         </p>
       </div>

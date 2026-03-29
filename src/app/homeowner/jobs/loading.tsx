@@ -5,11 +5,11 @@ export default function Loading() {
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
         <Skeleton className="h-8 w-32" />
-        <Skeleton className="h-10 w-32 rounded-lg" />
+        <Skeleton className="h-10 w-32 rounded-none" />
       </div>
       <div className="space-y-3">
         {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-32 rounded-xl" />
+          <Skeleton key={i} className="h-32 rounded-none" />
         ))}
       </div>
     </div>

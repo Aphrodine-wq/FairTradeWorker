@@ -17,6 +17,7 @@ import {
 import { cn } from "@shared/lib/utils";
 import { fetchNotifications } from "@shared/lib/data";
 import { api } from "@shared/lib/realtime";
+import { usePageTitle } from "@shared/hooks/use-page-title";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -146,21 +147,22 @@ const NOTIFICATIONS: Notification[] = [
 ];
 
 const NOTIF_ICONS: Record<NotifType, { icon: React.ComponentType<{ className?: string }>; bg: string }> = {
-  estimate_viewed:   { icon: Eye,          bg: "bg-blue-100 text-blue-600" },
-  estimate_accepted: { icon: CheckCircle2, bg: "bg-emerald-100 text-emerald-600" },
-  estimate_declined: { icon: AlertCircle,  bg: "bg-red-100 text-red-600" },
-  payment_received:  { icon: DollarSign,   bg: "bg-emerald-100 text-emerald-600" },
-  message:           { icon: MessageSquare, bg: "bg-violet-100 text-violet-600" },
-  review:            { icon: Star,         bg: "bg-amber-100 text-amber-600" },
-  new_job:           { icon: Briefcase,    bg: "bg-brand-100 text-brand-600" },
-  inspection:        { icon: Calendar,     bg: "bg-amber-100 text-amber-600" },
-  invoice_overdue:   { icon: AlertCircle,  bg: "bg-red-100 text-red-600" },
-  milestone:         { icon: CheckCircle2, bg: "bg-brand-100 text-brand-600" },
+  estimate_viewed:   { icon: Eye,          bg: "bg-gray-100 text-gray-600" },
+  estimate_accepted: { icon: CheckCircle2, bg: "bg-gray-100 text-gray-600" },
+  estimate_declined: { icon: AlertCircle,  bg: "bg-gray-100 text-gray-600" },
+  payment_received:  { icon: DollarSign,   bg: "bg-gray-100 text-gray-600" },
+  message:           { icon: MessageSquare, bg: "bg-gray-100 text-gray-600" },
+  review:            { icon: Star,         bg: "bg-gray-100 text-gray-600" },
+  new_job:           { icon: Briefcase,    bg: "bg-gray-100 text-gray-600" },
+  inspection:        { icon: Calendar,     bg: "bg-gray-100 text-gray-600" },
+  invoice_overdue:   { icon: AlertCircle,  bg: "bg-gray-100 text-gray-600" },
+  milestone:         { icon: CheckCircle2, bg: "bg-gray-100 text-gray-600" },
 };
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function NotificationsPage() {
+  usePageTitle("Notifications");
   const [notifications, setNotifications] = useState<Notification[]>(NOTIFICATIONS);
   const [filter, setFilter] = useState<"all" | "unread">("all");
 
@@ -201,7 +203,7 @@ export default function NotificationsPage() {
           <div className="flex items-center gap-3">
             <h1 className="text-[22px] font-semibold text-gray-900 tracking-tight">Notifications</h1>
             {unreadCount > 0 && (
-              <span className="text-[13px] font-bold text-white bg-red-500 rounded-full px-2 py-0.5 tabular-nums">{unreadCount}</span>
+              <span className="text-[13px] font-bold text-white bg-red-500 rounded-none px-2 py-0.5 tabular-nums">{unreadCount}</span>
             )}
           </div>
           {unreadCount > 0 && (
@@ -221,10 +223,10 @@ export default function NotificationsPage() {
                 key={f}
                 onClick={() => setFilter(f)}
                 className={cn(
-                  "text-[13px] font-medium px-3 py-1.5 rounded-full transition-colors",
+                  "text-[13px] font-medium px-3 py-1.5 rounded-none transition-colors",
                   filter === f
                     ? "bg-gray-900 text-white"
-                    : "bg-white text-gray-500 hover:bg-gray-100"
+                    : "bg-white text-gray-700 hover:bg-gray-100"
                 )}
               >
                 {f === "all" ? "All" : `Unread (${unreadCount})`}
@@ -244,22 +246,22 @@ export default function NotificationsPage() {
                   href={notif.href}
                   onClick={() => markRead(notif.id)}
                   className={cn(
-                    "flex gap-4 rounded-xl px-4 py-4 transition-all hover:bg-white",
+                    "flex gap-4 rounded-none px-4 py-4 transition-all hover:bg-white",
                     !notif.read && "bg-white shadow-[0_1px_4px_rgba(0,0,0,0.04)]"
                   )}
                 >
-                  <div className={cn("w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0", config.bg)}>
+                  <div className={cn("w-10 h-10 rounded-none flex items-center justify-center flex-shrink-0", config.bg)}>
                     <Icon className="w-5 h-5" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-3">
                       <p className={cn("text-[14px] text-gray-900 leading-snug", !notif.read && "font-bold")}>{notif.title}</p>
-                      <span className="text-[11px] text-gray-400 flex-shrink-0 pt-0.5">{notif.time}</span>
+                      <span className="text-[11px] text-gray-600 flex-shrink-0 pt-0.5">{notif.time}</span>
                     </div>
-                    <p className="text-[13px] text-gray-400 mt-0.5 line-clamp-1">{notif.body}</p>
+                    <p className="text-[13px] text-gray-600 mt-0.5 line-clamp-1">{notif.body}</p>
                   </div>
                   {!notif.read && (
-                    <div className="w-2.5 h-2.5 rounded-full bg-brand-600 flex-shrink-0 mt-1.5" />
+                    <div className="w-2.5 h-2.5 rounded-none bg-brand-600 flex-shrink-0 mt-1.5" />
                   )}
                 </Link>
               );

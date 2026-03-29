@@ -59,6 +59,7 @@ import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
 import { type BadgeProps } from "@shared/ui/badge";
 import { useRealtimeJobs } from "@shared/hooks/use-realtime";
 import { fetchJobs } from "@shared/lib/data";
+import { usePageTitle } from "@shared/hooks/use-page-title";
 
 // ─── Shared types ─────────────────────────────────────────────────────────────
 
@@ -77,7 +78,7 @@ function FilterSection({ label, defaultOpen = true, children }: { label: string;
   return (
     <div>
       <button onClick={() => setOpen((v) => !v)} className="flex items-center justify-between w-full group mb-1.5">
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide group-hover:text-gray-600 transition-colors">{label}</p>
+        <p className="text-[10px] font-bold text-gray-600 uppercase tracking-wide group-hover:text-gray-800 transition-colors">{label}</p>
         <ChevronRight className={cn("w-3 h-3 text-gray-300 transition-transform", open && "rotate-90")} />
       </button>
       {open && children}
@@ -243,7 +244,7 @@ function BrowseJobsTab() {
             if (e.target.value === "") { setSelectedCategories(new Set()); }
             else { setSelectedCategories(new Set([e.target.value])); }
           }}
-          className="h-10 rounded-lg border border-gray-200 bg-white px-3 pr-8 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 appearance-none"
+          className="h-10 rounded-none border border-gray-200 bg-white px-3 pr-8 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 appearance-none"
         >
           <option value="">All Categories</option>
           {Object.entries(categoryCounts).sort((a, b) => b[1] - a[1]).map(([cat, count]) => (
@@ -258,7 +259,7 @@ function BrowseJobsTab() {
             if (e.target.value === "") { setSelectedCities(new Set()); }
             else { setSelectedCities(new Set([e.target.value])); }
           }}
-          className="h-10 rounded-lg border border-gray-200 bg-white px-3 pr-8 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 appearance-none"
+          className="h-10 rounded-none border border-gray-200 bg-white px-3 pr-8 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 appearance-none"
         >
           <option value="">All Locations</option>
           {Object.entries(cityCounts).sort((a, b) => b[1] - a[1]).map(([city, count]) => (
@@ -267,7 +268,7 @@ function BrowseJobsTab() {
         </select>
 
         {/* Urgency pills */}
-        <div className="flex rounded-lg ring-1 ring-gray-200 overflow-hidden">
+        <div className="flex rounded-none ring-1 ring-gray-200 overflow-hidden">
           {[
             { value: "all", label: "All" },
             { value: "high", label: "Urgent" },
@@ -279,7 +280,7 @@ function BrowseJobsTab() {
               onClick={() => setUrgency(opt.value)}
               className={cn(
                 "px-3 py-2 text-[13px] font-medium transition-colors",
-                urgency === opt.value ? "bg-gray-900 text-white" : "bg-white text-gray-500 hover:bg-gray-50"
+                urgency === opt.value ? "bg-gray-900 text-white" : "bg-white text-gray-700 hover:bg-gray-50"
               )}
             >
               {opt.label}
@@ -291,7 +292,7 @@ function BrowseJobsTab() {
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as SortOption)}
-          className="h-10 rounded-lg border border-gray-200 bg-white px-3 pr-8 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 appearance-none"
+          className="h-10 rounded-none border border-gray-200 bg-white px-3 pr-8 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 appearance-none"
         >
           <option value="newest">Newest</option>
           <option value="budget-high">Budget: High</option>
@@ -300,11 +301,11 @@ function BrowseJobsTab() {
         </select>
 
         {/* View toggle */}
-        <div className="flex rounded-lg ring-1 ring-gray-200 overflow-hidden">
-          <button onClick={() => setViewMode("grid")} className={cn("px-2.5 py-2 transition-colors", viewMode === "grid" ? "bg-gray-900 text-white" : "bg-white text-gray-400 hover:bg-gray-50")}>
+        <div className="flex rounded-none ring-1 ring-gray-200 overflow-hidden">
+          <button onClick={() => setViewMode("grid")} className={cn("px-2.5 py-2 transition-colors", viewMode === "grid" ? "bg-gray-900 text-white" : "bg-white text-gray-600 hover:bg-gray-50")}>
             <LayoutGrid className="w-4 h-4" />
           </button>
-          <button onClick={() => setViewMode("list")} className={cn("px-2.5 py-2 transition-colors", viewMode === "list" ? "bg-gray-900 text-white" : "bg-white text-gray-400 hover:bg-gray-50")}>
+          <button onClick={() => setViewMode("list")} className={cn("px-2.5 py-2 transition-colors", viewMode === "list" ? "bg-gray-900 text-white" : "bg-white text-gray-600 hover:bg-gray-50")}>
             <List className="w-4 h-4" />
           </button>
         </div>
@@ -317,30 +318,9 @@ function BrowseJobsTab() {
         )}
 
         {/* Result count */}
-        <span className="text-[13px] text-gray-400 ml-auto">{filtered.length} jobs</span>
+        <span className="text-[13px] text-gray-600 ml-auto">{filtered.length} jobs</span>
       </div>
 
-      {/* Recommended for you — single top pick */}
-        {selectedCategories.size === 0 && urgency === "all" && search === "" && (() => {
-          const pick = openJobs.find((j) => j.urgency === "high" && j.bidsCount <= 3) || openJobs.find((j) => j.urgency === "high") || openJobs[0];
-          if (!pick) return null;
-          return (
-            <div className="flex items-center gap-3 bg-brand-50 border border-brand-100 rounded-xl px-4 py-3">
-              <div className="relative w-11 h-11 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
-                <Image src={pick.thumbnail} alt="" fill className="object-cover" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-[10px] font-bold text-brand-600 uppercase tracking-wide">Top Pick for You</p>
-                <p className="text-[13px] font-bold text-gray-900 truncate">{pick.title}</p>
-                <p className="text-[11px] text-gray-500">{pick.location} · {formatCurrency(pick.budget.min)}–{formatCurrency(pick.budget.max)}</p>
-              </div>
-              <div className="flex items-center gap-1.5 flex-shrink-0">
-                {pick.urgency === "high" && <span className="text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">URGENT</span>}
-                {pick.bidsCount <= 3 && <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">LOW BIDS</span>}
-              </div>
-            </div>
-          );
-        })()}
 
       {/* Job grid / list */}
       {filtered.length > 0 ? (
@@ -354,10 +334,10 @@ function BrowseJobsTab() {
             ))}
           </div>
         ) : (
-          <div className="bg-white border border-border rounded-xl py-16 text-center">
+          <div className="bg-white border border-border rounded-none py-16 text-center">
             <Briefcase className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500 text-sm mb-1 font-medium">No jobs found</p>
-            <p className="text-gray-400 text-sm mb-4">Try adjusting your filters or search terms.</p>
+            <p className="text-gray-700 text-sm mb-1 font-medium">No jobs found</p>
+            <p className="text-gray-600 text-sm mb-4">Try adjusting your filters or search terms.</p>
             <Button variant="outline" size="sm" onClick={clearAll}>Clear Filters</Button>
           </div>
         )}
@@ -403,39 +383,39 @@ function EstimateDetailDialog({ estimate, open, onClose }: { estimate: Estimate 
             <Badge variant={config.variant}>{config.label}</Badge>
           </DialogTitle>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+        <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-none">
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Client</p>
+            <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1">Client</p>
             <p className="text-sm font-semibold text-gray-900">{estimate.clientName}</p>
           </div>
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Created</p>
-            <p className="text-sm text-gray-700">{formatDate(estimate.createdDate)}</p>
+            <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1">Created</p>
+            <p className="text-sm text-gray-900">{formatDate(estimate.createdDate)}</p>
           </div>
         </div>
-        <div className="rounded-lg border border-border overflow-hidden">
+        <div className="rounded-none border border-border overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 border-b border-border">
-                <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500">Description</th>
-                <th className="text-right px-4 py-2.5 text-xs font-semibold text-gray-500 w-16">Qty</th>
-                <th className="text-right px-4 py-2.5 text-xs font-semibold text-gray-500 w-28">Unit Price</th>
-                <th className="text-right px-4 py-2.5 text-xs font-semibold text-gray-500 w-28">Total</th>
+                <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-700">Description</th>
+                <th className="text-right px-4 py-2.5 text-xs font-semibold text-gray-700 w-16">Qty</th>
+                <th className="text-right px-4 py-2.5 text-xs font-semibold text-gray-700 w-28">Unit Price</th>
+                <th className="text-right px-4 py-2.5 text-xs font-semibold text-gray-700 w-28">Total</th>
               </tr>
             </thead>
             <tbody>
               {estimate.lineItems.map((item, idx) => (
                 <tr key={idx} className="border-b border-border last:border-0">
                   <td className="px-4 py-2.5 text-gray-900">{item.description}</td>
-                  <td className="px-4 py-2.5 text-right tabular-nums text-gray-600">{item.quantity}</td>
-                  <td className="px-4 py-2.5 text-right tabular-nums text-gray-600">{formatCurrency(item.unitPrice)}</td>
+                  <td className="px-4 py-2.5 text-right tabular-nums text-gray-800">{item.quantity}</td>
+                  <td className="px-4 py-2.5 text-right tabular-nums text-gray-800">{formatCurrency(item.unitPrice)}</td>
                   <td className="px-4 py-2.5 text-right tabular-nums font-semibold text-gray-900">{formatCurrency(item.quantity * item.unitPrice)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
           <div className="bg-gray-50 border-t-2 border-gray-200 px-4 py-3 flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Total</span>
+            <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Total</span>
             <span className="text-xl font-bold text-gray-900 tabular-nums">{formatCurrency(subtotal)}</span>
           </div>
         </div>
@@ -502,24 +482,24 @@ function MyEstimatesTab() {
     <div className="space-y-5">
       {/* Quick stats */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white border border-border rounded-xl p-4 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-brand-50 flex items-center justify-center"><DollarSign className="w-4 h-4 text-brand-600" /></div>
+        <div className="bg-white border border-border rounded-none p-4 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-none bg-brand-50 flex items-center justify-center"><DollarSign className="w-4 h-4 text-brand-600" /></div>
           <div>
-            <p className="text-xs text-gray-500">Total Value</p>
+            <p className="text-xs text-gray-700">Total Value</p>
             <p className="text-lg font-bold text-gray-900 tabular-nums">{formatCurrency(totalValue)}</p>
           </div>
         </div>
-        <div className="bg-white border border-border rounded-xl p-4 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center"><TrendingUp className="w-4 h-4 text-blue-600" /></div>
+        <div className="bg-white border border-border rounded-none p-4 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-none bg-blue-50 flex items-center justify-center"><TrendingUp className="w-4 h-4 text-blue-600" /></div>
           <div>
-            <p className="text-xs text-gray-500">Acceptance Rate</p>
+            <p className="text-xs text-gray-700">Acceptance Rate</p>
             <p className="text-lg font-bold text-gray-900">{acceptanceRate}%</p>
           </div>
         </div>
-        <div className="bg-white border border-border rounded-xl p-4 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center"><FileText className="w-4 h-4 text-amber-600" /></div>
+        <div className="bg-white border border-border rounded-none p-4 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-none bg-amber-50 flex items-center justify-center"><FileText className="w-4 h-4 text-amber-600" /></div>
           <div>
-            <p className="text-xs text-gray-500">Total Estimates</p>
+            <p className="text-xs text-gray-700">Total Estimates</p>
             <p className="text-lg font-bold text-gray-900">{mockEstimates.length}</p>
           </div>
         </div>
@@ -528,7 +508,7 @@ function MyEstimatesTab() {
       {/* Search + status tabs */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
           <Input
             placeholder="Search by job or client..."
             value={search}
@@ -536,7 +516,7 @@ function MyEstimatesTab() {
             className="pl-9 h-9"
           />
           {search && (
-            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800">
               <X className="w-3.5 h-3.5" />
             </button>
           )}
@@ -547,15 +527,15 @@ function MyEstimatesTab() {
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={cn(
-                "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border",
+                "px-3 py-1.5 rounded-none text-xs font-medium transition-colors border",
                 activeTab === tab
                   ? "bg-brand-600 text-white border-brand-600"
-                  : "bg-white text-gray-600 border-border hover:bg-gray-50"
+                  : "bg-white text-gray-800 border-border hover:bg-gray-50"
               )}
             >
               {tab === "all" ? "All" : tab.charAt(0).toUpperCase() + tab.slice(1)}
               {tabCounts[tab] > 0 && (
-                <span className={cn("ml-1.5 text-[10px] rounded-full px-1.5 py-0.5", activeTab === tab ? "bg-white/20 text-white" : "bg-gray-100 text-gray-600")}>
+                <span className={cn("ml-1.5 text-[10px] rounded-none px-1.5 py-0.5", activeTab === tab ? "bg-white/20 text-white" : "bg-gray-100 text-gray-800")}>
                   {tabCounts[tab]}
                 </span>
               )}
@@ -565,7 +545,7 @@ function MyEstimatesTab() {
       </div>
 
       {/* Table */}
-      <div className="bg-white border border-border rounded-xl overflow-hidden">
+      <div className="bg-white border border-border rounded-none overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -573,25 +553,25 @@ function MyEstimatesTab() {
                 <th className="px-4 py-3 w-10">
                   <button
                     onClick={() => setSelected(selected.size === getFiltered(activeTab).length ? new Set() : new Set(getFiltered(activeTab).map((e) => e.id)))}
-                    className="text-gray-400 hover:text-brand-600 transition-colors"
+                    className="text-gray-600 hover:text-brand-600 transition-colors"
                   >
                     {selected.size === getFiltered(activeTab).length && selected.size > 0
                       ? <CheckSquare className="w-4 h-4 text-brand-600" />
                       : <Square className="w-4 h-4" />}
                   </button>
                 </th>
-                <th className="text-left px-4 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wide">Job / Client</th>
-                <th className="text-right px-4 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wide hidden sm:table-cell">Amount</th>
-                <th className="text-center px-4 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wide">Status</th>
-                <th className="text-right px-4 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wide hidden md:table-cell">Sent</th>
-                <th className="text-right px-4 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wide hidden lg:table-cell">Last Activity</th>
+                <th className="text-left px-4 py-3 font-semibold text-gray-700 text-xs uppercase tracking-wide">Job / Client</th>
+                <th className="text-right px-4 py-3 font-semibold text-gray-700 text-xs uppercase tracking-wide hidden sm:table-cell">Amount</th>
+                <th className="text-center px-4 py-3 font-semibold text-gray-700 text-xs uppercase tracking-wide">Status</th>
+                <th className="text-right px-4 py-3 font-semibold text-gray-700 text-xs uppercase tracking-wide hidden md:table-cell">Sent</th>
+                <th className="text-right px-4 py-3 font-semibold text-gray-700 text-xs uppercase tracking-wide hidden lg:table-cell">Last Activity</th>
                 <th className="w-12" />
               </tr>
             </thead>
             <tbody>
               {getFiltered(activeTab).length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-sm text-gray-400">No estimates found.</td>
+                  <td colSpan={7} className="py-12 text-center text-sm text-gray-600">No estimates found.</td>
                 </tr>
               ) : getFiltered(activeTab).map((estimate) => {
                 const config = STATUS_CONFIG[estimate.status];
@@ -603,13 +583,13 @@ function MyEstimatesTab() {
                     onClick={() => openDetail(estimate)}
                   >
                     <td className="px-4 py-3.5" onClick={(e) => { e.stopPropagation(); toggleOne(estimate.id); }}>
-                      <div className="flex items-center justify-center text-gray-400 hover:text-brand-600">
+                      <div className="flex items-center justify-center text-gray-600 hover:text-brand-600">
                         {isSelected ? <CheckSquare className="w-4 h-4 text-brand-600" /> : <Square className="w-4 h-4" />}
                       </div>
                     </td>
                     <td className="px-4 py-3.5">
                       <p className="font-semibold text-gray-900 truncate max-w-xs">{estimate.jobTitle}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">{estimate.clientName}</p>
+                      <p className="text-xs text-gray-700 mt-0.5">{estimate.clientName}</p>
                     </td>
                     <td className="px-4 py-3.5 text-right hidden sm:table-cell">
                       <span className="font-bold text-gray-900 tabular-nums">{formatCurrency(estimate.amount)}</span>
@@ -617,34 +597,34 @@ function MyEstimatesTab() {
                     <td className="px-4 py-3.5 text-center">
                       <Badge variant={config.variant}>{config.label}</Badge>
                     </td>
-                    <td className="px-4 py-3.5 text-right text-gray-500 text-xs hidden md:table-cell">
+                    <td className="px-4 py-3.5 text-right text-gray-700 text-xs hidden md:table-cell">
                       {estimate.sentDate ? formatDate(estimate.sentDate) : <span className="text-gray-300">Not sent</span>}
                     </td>
-                    <td className="px-4 py-3.5 text-right text-xs text-gray-500 hidden lg:table-cell">
+                    <td className="px-4 py-3.5 text-right text-xs text-gray-700 hidden lg:table-cell">
                       {relativeTime(estimate.sentDate || estimate.createdDate)}
                     </td>
                     <td className="px-2 py-3.5 relative" onClick={(e) => e.stopPropagation()}>
                       <button
                         onClick={() => setOpenMenu(openMenu === estimate.id ? null : estimate.id)}
-                        className="w-7 h-7 rounded-md hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+                        className="w-7 h-7 rounded-none hover:bg-gray-100 flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
                       >
                         <MoreHorizontal className="w-4 h-4" />
                       </button>
                       {openMenu === estimate.id && (
-                        <div className="absolute right-2 top-full mt-1 z-20 bg-white border border-border rounded-lg shadow-lg py-1 w-44" onMouseLeave={() => setOpenMenu(null)}>
-                          <button className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-gray-700 hover:bg-gray-50" onClick={() => { openDetail(estimate); setOpenMenu(null); }}>
-                            <Eye className="w-3.5 h-3.5 text-gray-400" />View Details<ChevronRight className="w-3 h-3 text-gray-300 ml-auto" />
+                        <div className="absolute right-2 top-full mt-1 z-20 bg-white border border-border rounded-none shadow-lg py-1 w-44" onMouseLeave={() => setOpenMenu(null)}>
+                          <button className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-gray-900 hover:bg-gray-50" onClick={() => { openDetail(estimate); setOpenMenu(null); }}>
+                            <Eye className="w-3.5 h-3.5 text-gray-600" />View Details<ChevronRight className="w-3 h-3 text-gray-300 ml-auto" />
                           </button>
-                          <button className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-gray-700 hover:bg-gray-50">
-                            <Edit className="w-3.5 h-3.5 text-gray-400" />Edit
+                          <button className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-gray-900 hover:bg-gray-50">
+                            <Edit className="w-3.5 h-3.5 text-gray-600" />Edit
                           </button>
                           {(estimate.status === "draft" || estimate.status === "sent") && (
                             <button className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-brand-600 hover:bg-brand-50">
                               <Send className="w-3.5 h-3.5" />{estimate.status === "draft" ? "Send" : "Resend"}
                             </button>
                           )}
-                          <button className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-gray-700 hover:bg-gray-50">
-                            <Download className="w-3.5 h-3.5 text-gray-400" />Download PDF
+                          <button className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-gray-900 hover:bg-gray-50">
+                            <Download className="w-3.5 h-3.5 text-gray-600" />Download PDF
                           </button>
                           <div className="my-1 border-t border-border" />
                           <button className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-red-500 hover:bg-red-50">
@@ -688,7 +668,7 @@ const CATEGORY_COLORS: Record<LineCategory, string> = {
   Equipment:     "bg-purple-100 text-purple-700",
   Subcontractor: "bg-orange-100 text-orange-700",
   Permit:        "bg-red-100 text-red-700",
-  Other:         "bg-gray-100 text-gray-600",
+  Other:         "bg-gray-100 text-gray-800",
 };
 
 const TEMPLATES = [
@@ -803,7 +783,7 @@ function NewEstimateTab() {
     <div className="space-y-6">
       {/* Templates */}
       <div>
-        <p className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+        <p className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
           <Layers className="w-4 h-4 text-brand-600" />
           Start From a Template
         </p>
@@ -815,12 +795,12 @@ function NewEstimateTab() {
                 key={template.id}
                 onClick={() => applyTemplate(template)}
                 className={cn(
-                  "text-left rounded-xl border-2 p-3.5 transition-colors",
+                  "text-left rounded-none border-2 p-3.5 transition-colors",
                   isActive ? "border-brand-600 bg-brand-50" : "border-border hover:border-gray-300 hover:bg-gray-50"
                 )}
               >
                 <p className={cn("text-sm font-semibold", isActive ? "text-brand-700" : "text-gray-900")}>{template.name}</p>
-                <p className="text-xs text-gray-500 mt-1 leading-relaxed">{template.description}</p>
+                <p className="text-xs text-gray-700 mt-1 leading-relaxed">{template.description}</p>
                 {isActive && <span className="inline-block mt-2 text-xs font-medium text-brand-600">Applied</span>}
               </button>
             );
@@ -834,7 +814,7 @@ function NewEstimateTab() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base">Voice AI Estimator</CardTitle>
-              <p className="text-xs text-gray-500 mt-0.5">Describe your estimate out loud and Hunter will extract line items automatically.</p>
+              <p className="text-xs text-gray-700 mt-0.5">Describe your estimate out loud and Hunter will extract line items automatically.</p>
             </CardHeader>
             <CardContent className="pt-0">
               <VoiceRecorder onItemsExtracted={handleVoiceItems} />
@@ -854,13 +834,13 @@ function NewEstimateTab() {
                 onDragLeave={() => setIsDragOver(false)}
                 onDrop={(e) => { e.preventDefault(); setIsDragOver(false); }}
                 className={cn(
-                  "border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center gap-2 transition-colors cursor-pointer",
+                  "border-2 border-dashed rounded-none p-6 flex flex-col items-center justify-center gap-2 transition-colors cursor-pointer",
                   isDragOver ? "border-brand-600 bg-brand-50" : "border-border hover:border-gray-300 hover:bg-gray-50"
                 )}
               >
-                <Upload className="w-5 h-5 text-gray-400" />
-                <p className="text-sm font-medium text-gray-700">{isDragOver ? "Drop to attach" : "Drag & drop photos or click to browse"}</p>
-                <p className="text-xs text-gray-400">JPG, PNG up to 10MB</p>
+                <Upload className="w-5 h-5 text-gray-600" />
+                <p className="text-sm font-medium text-gray-900">{isDragOver ? "Drop to attach" : "Drag & drop photos or click to browse"}</p>
+                <p className="text-xs text-gray-600">JPG, PNG up to 10MB</p>
                 <Button variant="outline" size="sm">Choose Files</Button>
               </div>
             </CardContent>
@@ -875,7 +855,7 @@ function NewEstimateTab() {
             </CardHeader>
             <CardContent className="pt-0 space-y-3">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-gray-600">Payment Schedule</label>
+                <label className="text-xs font-semibold text-gray-800">Payment Schedule</label>
                 <Textarea value={paymentTerms} onChange={(e) => setPaymentTerms(e.target.value)} className="min-h-[80px] resize-none text-xs" />
               </div>
             </CardContent>
@@ -893,9 +873,9 @@ function NewEstimateTab() {
             </CardHeader>
             <CardContent className="pt-0 space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-gray-600">Select Existing Client</label>
+                <label className="text-xs font-semibold text-gray-800">Select Existing Client</label>
                 <select
-                  className="w-full border border-border rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-brand-600"
+                  className="w-full border border-border rounded-none px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-brand-600"
                   value={selectedClientIdx ?? ""}
                   onChange={(e) => { const val = e.target.value; if (val !== "") handleClientSelect(Number(val)); }}
                 >
@@ -905,24 +885,24 @@ function NewEstimateTab() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-gray-600">Full Name</label>
+                  <label className="text-xs font-semibold text-gray-800">Full Name</label>
                   <Input placeholder="Michael Brown" value={clientName} onChange={(e) => setClientName(e.target.value)} />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-gray-600">Job Title</label>
+                  <label className="text-xs font-semibold text-gray-800">Job Title</label>
                   <Input placeholder="Kitchen Remodel" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-gray-600">Email</label>
+                  <label className="text-xs font-semibold text-gray-800">Email</label>
                   <Input type="email" placeholder="client@email.com" value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-gray-600">Phone</label>
+                  <label className="text-xs font-semibold text-gray-800">Phone</label>
                   <Input type="tel" placeholder="(512) 555-0100" value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} />
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-gray-600">Property Address</label>
+                <label className="text-xs font-semibold text-gray-800">Property Address</label>
                 <Input placeholder="4821 Shoal Creek Blvd, Austin, TX 78756" value={clientAddress} onChange={(e) => setClientAddress(e.target.value)} />
               </div>
             </CardContent>
@@ -933,11 +913,11 @@ function NewEstimateTab() {
               <CardTitle className="text-base">Estimate Builder</CardTitle>
             </CardHeader>
             <CardContent className="pt-0 space-y-4">
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-none">
                 <Clock className="w-4 h-4 text-brand-600" />
-                <span className="text-xs font-semibold text-gray-600">Valid For</span>
+                <span className="text-xs font-semibold text-gray-800">Valid For</span>
                 <select
-                  className="border border-border rounded-lg px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-600"
+                  className="border border-border rounded-none px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-600"
                   value={validityDays}
                   onChange={(e) => setValidityDays(Number(e.target.value))}
                 >
@@ -947,21 +927,21 @@ function NewEstimateTab() {
 
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Line Items</p>
+                  <p className="text-xs font-semibold text-gray-800 uppercase tracking-wide">Line Items</p>
                   <button onClick={addItem} className="flex items-center gap-1 text-xs text-brand-600 hover:text-brand-700 font-medium">
                     <Plus className="w-3.5 h-3.5" />Add row
                   </button>
                 </div>
-                <div className="rounded-lg border border-border overflow-hidden">
+                <div className="rounded-none border border-border overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs">
                       <thead>
                         <tr className="bg-gray-50 border-b border-border">
-                          <th className="text-left px-3 py-2 text-gray-500 font-semibold">Description</th>
-                          <th className="text-left px-2 py-2 text-gray-500 font-semibold w-28">Category</th>
-                          <th className="text-right px-2 py-2 text-gray-500 font-semibold w-14">Qty</th>
-                          <th className="text-right px-2 py-2 text-gray-500 font-semibold w-20">Unit $</th>
-                          <th className="text-right px-3 py-2 text-gray-500 font-semibold w-20">Total</th>
+                          <th className="text-left px-3 py-2 text-gray-700 font-semibold">Description</th>
+                          <th className="text-left px-2 py-2 text-gray-700 font-semibold w-28">Category</th>
+                          <th className="text-right px-2 py-2 text-gray-700 font-semibold w-14">Qty</th>
+                          <th className="text-right px-2 py-2 text-gray-700 font-semibold w-20">Unit $</th>
+                          <th className="text-right px-3 py-2 text-gray-700 font-semibold w-20">Total</th>
                           <th className="w-8" />
                         </tr>
                       </thead>
@@ -972,7 +952,7 @@ function NewEstimateTab() {
                               <input className="w-full bg-transparent text-gray-900 focus:outline-none focus:ring-1 focus:ring-brand-600 rounded px-1 py-1 text-sm" placeholder="Description..." value={item.description} onChange={(e) => updateItem(item.id, "description", e.target.value)} />
                             </td>
                             <td className="px-1.5 py-1.5">
-                              <select className="w-full appearance-none text-xs border border-border rounded px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-brand-600" value={item.category} onChange={(e) => updateItem(item.id, "category", e.target.value)}>
+                              <select className="w-full appearance-none text-xs border border-border rounded px-2 py-1.5 bg-white text-gray-900 focus:outline-none focus:ring-1 focus:ring-brand-600" value={item.category} onChange={(e) => updateItem(item.id, "category", e.target.value)}>
                                 {LINE_CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
                               </select>
                             </td>
@@ -998,11 +978,11 @@ function NewEstimateTab() {
 
                   {Object.keys(categoryTotals).length > 1 && (
                     <div className="border-t border-border bg-gray-50 px-4 py-3 space-y-1.5">
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">By Category</p>
+                      <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">By Category</p>
                       {(Object.entries(categoryTotals) as [LineCategory, number][]).map(([cat, amt]) => (
                         <div key={cat} className="flex items-center justify-between">
-                          <span className={cn("text-xs px-2 py-0.5 rounded-full font-medium", CATEGORY_COLORS[cat])}>{cat}</span>
-                          <span className="text-xs font-semibold text-gray-700 tabular-nums">{formatCurrency(amt)}</span>
+                          <span className={cn("text-xs px-2 py-0.5 rounded-none font-medium", CATEGORY_COLORS[cat])}>{cat}</span>
+                          <span className="text-xs font-semibold text-gray-900 tabular-nums">{formatCurrency(amt)}</span>
                         </div>
                       ))}
                     </div>
@@ -1010,19 +990,19 @@ function NewEstimateTab() {
 
                   <div className="border-t border-border">
                     <div className="flex items-center justify-between px-4 py-2.5">
-                      <span className="text-xs text-gray-500">Subtotal</span>
+                      <span className="text-xs text-gray-700">Subtotal</span>
                       <span className="text-sm font-semibold text-gray-900 tabular-nums">{formatCurrency(subtotal)}</span>
                     </div>
                     <div className="flex items-center justify-between px-4 py-2.5 border-t border-border">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500">Tax Rate</span>
+                        <span className="text-xs text-gray-700">Tax Rate</span>
                         <input type="number" min="0" max="30" step="0.5" value={taxRate} onChange={(e) => setTaxRate(parseFloat(e.target.value) || 0)} className="w-14 text-right text-xs border border-border rounded px-2 py-1 tabular-nums focus:outline-none focus:ring-1 focus:ring-brand-600" />
-                        <span className="text-xs text-gray-500">%</span>
+                        <span className="text-xs text-gray-700">%</span>
                       </div>
-                      <span className="text-sm text-gray-700 tabular-nums">{formatCurrency(taxAmount)}</span>
+                      <span className="text-sm text-gray-900 tabular-nums">{formatCurrency(taxAmount)}</span>
                     </div>
                     <div className="bg-gray-50 border-t-2 border-gray-200 px-4 py-3 flex items-center justify-between">
-                      <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Grand Total</span>
+                      <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Grand Total</span>
                       <span className="text-xl font-bold text-brand-600 tabular-nums">{formatCurrency(grandTotal)}</span>
                     </div>
                   </div>
@@ -1042,10 +1022,11 @@ function NewEstimateTab() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// TAB 4 — CALCULATOR
+// MAIN PAGE
 // ─────────────────────────────────────────────────────────────────────────────
 
-const PITCH_MULTIPLIERS = [
+const __REMOVED_CALCULATOR = true; // Calculator now lives in Estimates page
+const _UNUSED_PITCH_MULTIPLIERS = [
   { label: "Flat (1.00)", value: 1.0 },
   { label: "4/12 (1.05)", value: 1.05 },
   { label: "6/12 (1.12)", value: 1.12 },
@@ -1057,7 +1038,7 @@ const PITCH_MULTIPLIERS = [
 function FieldGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-sm font-medium text-gray-700">{label}</label>
+      <label className="text-sm font-medium text-gray-900">{label}</label>
       {children}
     </div>
   );
@@ -1072,12 +1053,12 @@ function CalcLayout({ inputs, results, ready, copied, onCopy }: {
 }) {
   return (
     <div className="grid grid-cols-2 gap-6">
-      <div className="bg-white border border-border rounded-xl p-5 space-y-4">
+      <div className="bg-white border border-border rounded-none p-5 space-y-4">
         <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">Inputs</h3>
         <Separator />
         {inputs}
       </div>
-      <div className="bg-white border border-border rounded-xl p-5 flex flex-col">
+      <div className="bg-white border border-border rounded-none p-5 flex flex-col">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">Material Summary</h3>
           {ready && (
@@ -1088,15 +1069,15 @@ function CalcLayout({ inputs, results, ready, copied, onCopy }: {
         </div>
         <Separator className="mb-4" />
         {!ready ? (
-          <div className="flex-1 flex items-center justify-center text-sm text-gray-400">Enter measurements to see results</div>
+          <div className="flex-1 flex items-center justify-center text-sm text-gray-600">Enter measurements to see results</div>
         ) : (
           <div className="space-y-0 flex-1">
             {results.map((r, i) => (
               <div key={i} className={cn("flex items-center justify-between py-2.5 text-sm", i < results.length - 1 && "border-b border-gray-50")}>
-                <span className="text-gray-600">{r.label}</span>
+                <span className="text-gray-800">{r.label}</span>
                 <div className="text-right">
                   <span className="font-semibold text-gray-900">{r.value}</span>
-                  {r.cost && <p className="text-xs text-gray-400 mt-0.5">{r.cost}</p>}
+                  {r.cost && <p className="text-xs text-gray-600 mt-0.5">{r.cost}</p>}
                 </div>
               </div>
             ))}
@@ -1135,7 +1116,7 @@ function RoofingCalc() {
       inputs={<>
         <FieldGroup label="Roof Area (sq ft)"><Input type="number" placeholder="e.g. 2800" value={area} onChange={(e) => setArea(e.target.value)} /></FieldGroup>
         <FieldGroup label="Roof Pitch">
-          <select className="w-full h-10 rounded-lg border border-border bg-white px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600" value={pitch} onChange={(e) => setPitch(parseFloat(e.target.value))}>
+          <select className="w-full h-10 rounded-none border border-border bg-white px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600" value={pitch} onChange={(e) => setPitch(parseFloat(e.target.value))}>
             {PITCH_MULTIPLIERS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
           </select>
         </FieldGroup>
@@ -1179,7 +1160,7 @@ function ConcreteCalc() {
           <FieldGroup label="Width (ft)"><Input type="number" placeholder="12" value={width} onChange={(e) => setWidth(e.target.value)} /></FieldGroup>
         </div>
         <FieldGroup label="Thickness (in)"><Input type="number" placeholder="4" value={thickness} onChange={(e) => setThickness(e.target.value)} /></FieldGroup>
-        <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
+        <label className="flex items-center gap-2 text-sm text-gray-900 cursor-pointer select-none">
           <input type="checkbox" checked={waste} onChange={(e) => setWaste(e.target.checked)} className="w-4 h-4 rounded accent-brand-600" />
           Include 10% waste factor
         </label>
@@ -1219,7 +1200,7 @@ function FramingCalc() {
         <FieldGroup label="Stud Spacing">
           <div className="flex gap-2">
             {([16, 24] as const).map((s) => (
-              <button key={s} onClick={() => setSpacing(s)} className={cn("flex-1 h-10 rounded-lg border text-sm font-medium transition-colors", spacing === s ? "border-brand-600 bg-brand-600 text-white" : "border-border bg-white text-gray-700 hover:bg-gray-50")}>
+              <button key={s} onClick={() => setSpacing(s)} className={cn("flex-1 h-10 rounded-none border text-sm font-medium transition-colors", spacing === s ? "border-brand-600 bg-brand-600 text-white" : "border-border bg-white text-gray-900 hover:bg-gray-50")}>
                 {s}&quot; OC
               </button>
             ))}
@@ -1267,9 +1248,9 @@ function PaintCalc() {
       inputs={<>
         <FieldGroup label="Room Dimensions">
           <div className="grid grid-cols-3 gap-2">
-            <div><label className="text-xs text-gray-500 mb-1 block">L (ft)</label><Input type="number" placeholder="16" value={roomL} onChange={(e) => setRoomL(e.target.value)} /></div>
-            <div><label className="text-xs text-gray-500 mb-1 block">W (ft)</label><Input type="number" placeholder="14" value={roomW} onChange={(e) => setRoomW(e.target.value)} /></div>
-            <div><label className="text-xs text-gray-500 mb-1 block">H (ft)</label><Input type="number" placeholder="9" value={roomH} onChange={(e) => setRoomH(e.target.value)} /></div>
+            <div><label className="text-xs text-gray-700 mb-1 block">L (ft)</label><Input type="number" placeholder="16" value={roomL} onChange={(e) => setRoomL(e.target.value)} /></div>
+            <div><label className="text-xs text-gray-700 mb-1 block">W (ft)</label><Input type="number" placeholder="14" value={roomW} onChange={(e) => setRoomW(e.target.value)} /></div>
+            <div><label className="text-xs text-gray-700 mb-1 block">H (ft)</label><Input type="number" placeholder="9" value={roomH} onChange={(e) => setRoomH(e.target.value)} /></div>
           </div>
         </FieldGroup>
         <div className="grid grid-cols-2 gap-3">
@@ -1312,7 +1293,7 @@ function FencingCalc() {
         <FieldGroup label="Fence Height">
           <div className="flex gap-2">
             {([4, 6, 8] as const).map((h) => (
-              <button key={h} onClick={() => setFenceHeight(h)} className={cn("flex-1 h-10 rounded-lg border text-sm font-medium transition-colors", fenceHeight === h ? "border-brand-600 bg-brand-600 text-white" : "border-border bg-white text-gray-700 hover:bg-gray-50")}>
+              <button key={h} onClick={() => setFenceHeight(h)} className={cn("flex-1 h-10 rounded-none border text-sm font-medium transition-colors", fenceHeight === h ? "border-brand-600 bg-brand-600 text-white" : "border-border bg-white text-gray-900 hover:bg-gray-50")}>
                 {h} ft
               </button>
             ))}
@@ -1321,7 +1302,7 @@ function FencingCalc() {
         <FieldGroup label="Post Spacing">
           <div className="flex gap-2">
             {([6, 8] as const).map((s) => (
-              <button key={s} onClick={() => setPostSpacing(s)} className={cn("flex-1 h-10 rounded-lg border text-sm font-medium transition-colors", postSpacing === s ? "border-brand-600 bg-brand-600 text-white" : "border-border bg-white text-gray-700 hover:bg-gray-50")}>
+              <button key={s} onClick={() => setPostSpacing(s)} className={cn("flex-1 h-10 rounded-none border text-sm font-medium transition-colors", postSpacing === s ? "border-brand-600 bg-brand-600 text-white" : "border-border bg-white text-gray-900 hover:bg-gray-50")}>
                 {s} ft OC
               </button>
             ))}
@@ -1340,7 +1321,7 @@ function FencingCalc() {
 function CalculatorTab() {
   return (
     <div className="space-y-1">
-      <div className="flex items-center gap-2 text-xs text-gray-400 mb-4">
+      <div className="flex items-center gap-2 text-xs text-gray-600 mb-4">
         <Calculator className="w-4 h-4" />
         Field-accurate quantities for roofing, concrete, framing, paint, and fencing
       </div>
@@ -1367,6 +1348,7 @@ function CalculatorTab() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function WorkPage() {
+  usePageTitle("Browse Jobs");
   const openJobs = mockJobs.filter((j) => j.status === "open");
   const totalBudget = openJobs.reduce((s, j) => s + j.budget.max, 0);
 
@@ -1376,14 +1358,14 @@ export default function WorkPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-[22px] font-semibold text-gray-900 tracking-tight">Job Marketplace</h1>
-            <p className="text-[13px] text-gray-400 mt-0.5">{openJobs.length} open jobs — {formatCurrency(totalBudget)} in available work</p>
+            <p className="text-[13px] text-gray-600 mt-0.5">{openJobs.length} open jobs — {formatCurrency(totalBudget)} in available work</p>
           </div>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
             <input
               type="text"
               placeholder="Search jobs, locations, categories..."
-              className="h-10 rounded-lg border border-gray-200 bg-white pl-10 pr-4 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 w-[320px]"
+              className="h-10 rounded-none border border-gray-200 bg-white pl-10 pr-4 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 w-[320px]"
             />
           </div>
         </div>

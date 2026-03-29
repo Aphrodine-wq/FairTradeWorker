@@ -60,7 +60,7 @@ export default function FeaturesPage() {
               <br />
               Nothing you don&apos;t.
             </h1>
-            <p className="mt-5 text-lg text-gray-500 max-w-xl mx-auto leading-relaxed">
+            <p className="mt-5 text-lg text-gray-700 max-w-xl mx-auto leading-relaxed">
               Built for contractors who want to win more work and homeowners who
               want honest pricing. No bloat, no gimmicks.
             </p>
@@ -74,20 +74,20 @@ export default function FeaturesPage() {
               {TOP_FEATURES.map((feature) => {
                 const Icon = feature.icon;
                 return (
-                  <div key={feature.title} className="bg-white rounded-2xl border border-border p-8 flex flex-col text-center">
-                    <div className="w-12 h-12 rounded-xl bg-brand-50 flex items-center justify-center mx-auto mb-5">
+                  <div key={feature.title} className="bg-white rounded-none border border-border p-8 flex flex-col text-center">
+                    <div className="w-12 h-12 rounded-none bg-brand-50 flex items-center justify-center mx-auto mb-5">
                       <Icon className="w-5 h-5 text-brand-600" />
                     </div>
                     <h3 className="text-lg font-bold text-gray-900 mb-2">
                       {feature.title}
                     </h3>
-                    <p className="text-sm text-gray-500 leading-relaxed mb-6 flex-1">
+                    <p className="text-sm text-gray-700 leading-relaxed mb-6 flex-1">
                       {feature.description}
                     </p>
                     <ul className="space-y-2.5 text-left mx-auto">
                       {feature.points.map((d) => (
-                        <li key={d} className="flex items-center gap-2.5 text-sm text-gray-600">
-                          <div className="w-5 h-5 rounded-full bg-brand-50 flex items-center justify-center shrink-0">
+                        <li key={d} className="flex items-center gap-2.5 text-sm text-gray-800">
+                          <div className="w-5 h-5 rounded-none bg-brand-50 flex items-center justify-center shrink-0">
                             <Check className="w-3 h-3 text-brand-600" strokeWidth={3} />
                           </div>
                           {d}
@@ -97,7 +97,7 @@ export default function FeaturesPage() {
                     {feature.stat && (
                       <div className="mt-6 pt-5 border-t border-border text-center">
                         <p className="text-3xl font-bold text-gray-900 tabular-nums">{feature.stat.value}</p>
-                        <p className="text-xs text-gray-400 mt-0.5">{feature.stat.label}</p>
+                        <p className="text-xs text-gray-600 mt-0.5">{feature.stat.label}</p>
                       </div>
                     )}
                   </div>
@@ -112,13 +112,13 @@ export default function FeaturesPage() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
-                <div className="w-12 h-12 rounded-xl bg-brand-50 flex items-center justify-center mb-5">
+                <div className="w-12 h-12 rounded-none bg-brand-50 flex items-center justify-center mb-5">
                   <BarChart3 className="w-5 h-5 text-brand-600" />
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight mb-3">
                   Know your numbers.
                 </h2>
-                <p className="text-gray-500 leading-relaxed mb-6">
+                <p className="text-gray-700 leading-relaxed mb-6">
                   See which jobs are profitable, track your win rate, and export
                   reports. Team plans add job costing and crew productivity metrics.
                 </p>
@@ -129,8 +129,8 @@ export default function FeaturesPage() {
                     "Team productivity on Team plans",
                     "QuickBooks-ready report exports",
                   ].map((d) => (
-                    <li key={d} className="flex items-center gap-2.5 text-sm text-gray-600">
-                      <div className="w-5 h-5 rounded-full bg-brand-50 flex items-center justify-center shrink-0">
+                    <li key={d} className="flex items-center gap-2.5 text-sm text-gray-800">
+                      <div className="w-5 h-5 rounded-none bg-brand-50 flex items-center justify-center shrink-0">
                         <Check className="w-3 h-3 text-brand-600" strokeWidth={3} />
                       </div>
                       {d}
@@ -146,10 +146,10 @@ export default function FeaturesPage() {
                   { label: "Response Time", value: "2.1 hr", sub: "faster than 90%" },
                   { label: "Revenue MTD", value: "$47,200", sub: "+23% vs last month" },
                 ].map((s) => (
-                  <div key={s.label} className="bg-[#FAFAFA] rounded-xl border border-border p-5 text-center">
-                    <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-1">{s.label}</p>
+                  <div key={s.label} className="bg-[#FAFAFA] rounded-none border border-border p-5 text-center">
+                    <p className="text-[11px] font-medium text-gray-600 uppercase tracking-wider mb-1">{s.label}</p>
                     <p className="text-2xl font-bold text-gray-900 tabular-nums">{s.value}</p>
-                    <p className="text-xs text-gray-400 mt-1">{s.sub}</p>
+                    <p className="text-xs text-gray-600 mt-1">{s.sub}</p>
                   </div>
                 ))}
               </div>
@@ -177,20 +177,20 @@ export default function FeaturesPage() {
               ].map((feature) => {
                 const Icon = feature.icon;
                 return (
-                  <div key={feature.title} className="bg-white rounded-2xl border border-border p-8">
-                    <div className="w-12 h-12 rounded-xl bg-brand-50 flex items-center justify-center mb-5">
+                  <div key={feature.title} className="bg-white rounded-none border border-border p-8">
+                    <div className="w-12 h-12 rounded-none bg-brand-50 flex items-center justify-center mb-5">
                       <Icon className="w-5 h-5 text-brand-600" />
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">
                       {feature.title}
                     </h3>
-                    <p className="text-sm text-gray-500 leading-relaxed mb-6">
+                    <p className="text-sm text-gray-700 leading-relaxed mb-6">
                       {feature.description}
                     </p>
                     <ul className="space-y-2.5">
                       {feature.points.map((d) => (
-                        <li key={d} className="flex items-center gap-2.5 text-sm text-gray-600">
-                          <div className="w-5 h-5 rounded-full bg-brand-50 flex items-center justify-center shrink-0">
+                        <li key={d} className="flex items-center gap-2.5 text-sm text-gray-800">
+                          <div className="w-5 h-5 rounded-none bg-brand-50 flex items-center justify-center shrink-0">
                             <Check className="w-3 h-3 text-brand-600" strokeWidth={3} />
                           </div>
                           {d}
@@ -210,21 +210,21 @@ export default function FeaturesPage() {
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight mb-4">
               Ready to see it in action?
             </h2>
-            <p className="text-gray-500 mb-8 max-w-lg mx-auto">
+            <p className="text-gray-700 mb-8 max-w-lg mx-auto">
               Start free. No credit card required. See why contractors are switching
               from lead-based platforms.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/signup"
-                className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-700 transition-colors"
+                className="inline-flex items-center gap-2 rounded-none bg-brand-600 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-700 transition-colors"
               >
                 Get Started Free
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 href="/pricing"
-                className="inline-flex items-center gap-2 rounded-lg border border-border bg-white px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                className="inline-flex items-center gap-2 rounded-none border border-border bg-white px-6 py-3 text-sm font-semibold text-gray-900 hover:bg-gray-50 transition-colors"
               >
                 View Pricing
               </Link>

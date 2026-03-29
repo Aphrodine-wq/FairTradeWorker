@@ -87,8 +87,8 @@ function FairPriceRange({ job }: { job: Job }) {
   return (
     <div className="flex items-center gap-1.5 text-[11px]">
       <BarChart3 className="w-3 h-3 text-brand-600" />
-      <span className="text-gray-500">FairPrice:</span>
-      <span className="font-semibold text-gray-700 tabular-nums">
+      <span className="text-gray-700">FairPrice:</span>
+      <span className="font-semibold text-gray-900 tabular-nums">
         {formatCurrency(fp.low)}&ndash;{formatCurrency(fp.high)}
       </span>
     </div>
@@ -100,7 +100,7 @@ function FairPriceRange({ job }: { job: Job }) {
 const URGENCY_CONFIG = {
   low: {
     label: "Low Priority",
-    color: "text-gray-600",
+    color: "text-gray-800",
     bg: "bg-gray-100",
     dot: "bg-gray-400",
   },
@@ -144,7 +144,7 @@ function DeadlinePill({ deadline }: { deadline: string }) {
           ? "text-red-600"
           : days <= 21
           ? "text-amber-600"
-          : "text-gray-500"
+          : "text-gray-700"
       )}
     >
       <CalendarClock className="w-3 h-3" />
@@ -218,7 +218,7 @@ const RISK_DB: Record<string, RiskItem[]> = {
 const LIKELIHOOD_STYLE = {
   high: { label: "Likely", dot: "bg-red-500", text: "text-red-700", bg: "bg-red-50" },
   medium: { label: "Possible", dot: "bg-amber-400", text: "text-amber-700", bg: "bg-amber-50" },
-  low: { label: "Unlikely", dot: "bg-gray-400", text: "text-gray-600", bg: "bg-gray-100" },
+  low: { label: "Unlikely", dot: "bg-gray-400", text: "text-gray-800", bg: "bg-gray-100" },
 };
 
 function getRisksForJob(job: Job): RiskItem[] {
@@ -261,7 +261,7 @@ function JobModalContent({ job }: { job: Job }) {
               urgency.color
             )}
           >
-            <span className={cn("w-1.5 h-1.5 rounded-full mr-1.5", urgency.dot)} />
+            <span className={cn("w-1.5 h-1.5 rounded-none mr-1.5", urgency.dot)} />
             {urgency.label}
           </Badge>
           <div className="flex items-center gap-1.5">
@@ -277,19 +277,19 @@ function JobModalContent({ job }: { job: Job }) {
         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             {photoCount > 0 && (
-              <span className="flex items-center gap-1 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded-full">
+              <span className="flex items-center gap-1 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded-none">
                 <Camera className="w-3 h-3" />
                 {photoCount}
               </span>
             )}
             {videoCount > 0 && (
-              <span className="flex items-center gap-1 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded-full">
+              <span className="flex items-center gap-1 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded-none">
                 <Video className="w-3 h-3" />
                 {videoCount}
               </span>
             )}
           </div>
-          <span className="flex items-center gap-1 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded-full">
+          <span className="flex items-center gap-1 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded-none">
             <Eye className="w-3 h-3" />
             {job.viewCount} views
           </span>
@@ -321,14 +321,14 @@ function JobModalContent({ job }: { job: Job }) {
               </span>
             </div>
             <DeadlinePill deadline={job.deadline} />
-            <div className="flex items-center gap-1 text-sm text-gray-500">
+            <div className="flex items-center gap-1 text-sm text-gray-700">
               <Users className="w-3.5 h-3.5" />
               <span className="font-semibold text-gray-900">{job.bidsCount}</span>{" "}
               bids
             </div>
           </div>
           {/* FairPrice context for contractor */}
-          <div className="flex items-center gap-2 mt-2 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200">
+          <div className="flex items-center gap-2 mt-2 px-3 py-2 rounded-none bg-gray-50 border border-gray-200">
             <BarChart3 className="w-4 h-4 text-brand-600 flex-shrink-0" />
             <FairPriceRange job={job} />
           </div>
@@ -337,24 +337,24 @@ function JobModalContent({ job }: { job: Job }) {
         {/* Job details row */}
         <div className="grid grid-cols-3 gap-3 text-sm">
           <div className="flex items-start gap-2">
-            <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
+            <MapPin className="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5" />
             <div>
-              <span className="text-[10px] text-gray-400 block font-medium uppercase tracking-wide">Location</span>
-              <span className="text-gray-800 font-medium">{job.location}</span>
+              <span className="text-[10px] text-gray-600 block font-medium uppercase tracking-wide">Location</span>
+              <span className="text-gray-900 font-medium">{job.location}</span>
             </div>
           </div>
           <div className="flex items-start gap-2">
-            <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
+            <Calendar className="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5" />
             <div>
-              <span className="text-[10px] text-gray-400 block font-medium uppercase tracking-wide">Start Date</span>
-              <span className="text-gray-800 font-medium">{formatDate(job.preferredStartDate)}</span>
+              <span className="text-[10px] text-gray-600 block font-medium uppercase tracking-wide">Start Date</span>
+              <span className="text-gray-900 font-medium">{formatDate(job.preferredStartDate)}</span>
             </div>
           </div>
           <div className="flex items-start gap-2">
-            <Timer className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
+            <Timer className="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5" />
             <div>
-              <span className="text-[10px] text-gray-400 block font-medium uppercase tracking-wide">Duration</span>
-              <span className="text-gray-800 font-medium">{job.estimatedDuration}</span>
+              <span className="text-[10px] text-gray-600 block font-medium uppercase tracking-wide">Duration</span>
+              <span className="text-gray-900 font-medium">{job.estimatedDuration}</span>
             </div>
           </div>
         </div>
@@ -363,69 +363,69 @@ function JobModalContent({ job }: { job: Job }) {
         {job.property && (
           <div>
             <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <Home className="w-4 h-4 text-gray-400" />
+              <Home className="w-4 h-4 text-gray-600" />
               Property Details
             </h4>
-            <div className="bg-gray-50 rounded-lg border border-border p-4 space-y-4">
+            <div className="bg-gray-50 rounded-none border border-border p-4 space-y-4">
               {/* Structure */}
               <div className="grid grid-cols-3 gap-x-6 gap-y-2.5 text-sm">
                 <div>
-                  <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wide block">Year Built</span>
+                  <span className="text-[10px] text-gray-600 font-medium uppercase tracking-wide block">Year Built</span>
                   <span className="text-gray-900 font-medium">{job.yearBuilt}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wide block">Size</span>
+                  <span className="text-[10px] text-gray-600 font-medium uppercase tracking-wide block">Size</span>
                   <span className="text-gray-900 font-medium">{job.sqft > 0 ? `${job.sqft.toLocaleString()} sqft` : "—"}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wide block">Stories</span>
+                  <span className="text-[10px] text-gray-600 font-medium uppercase tracking-wide block">Stories</span>
                   <span className="text-gray-900 font-medium">{job.property.stories}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wide block">Foundation</span>
+                  <span className="text-[10px] text-gray-600 font-medium uppercase tracking-wide block">Foundation</span>
                   <span className="text-gray-900 font-medium capitalize">{job.property.foundation.replace("_", " & ")}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wide block">Exterior</span>
+                  <span className="text-[10px] text-gray-600 font-medium uppercase tracking-wide block">Exterior</span>
                   <span className="text-gray-900 font-medium">{job.property.exterior}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wide block">Garage</span>
+                  <span className="text-[10px] text-gray-600 font-medium uppercase tracking-wide block">Garage</span>
                   <span className="text-gray-900 font-medium capitalize">{job.property.garage}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wide block">Lot Size</span>
+                  <span className="text-[10px] text-gray-600 font-medium uppercase tracking-wide block">Lot Size</span>
                   <span className="text-gray-900 font-medium">{job.property.lotSize}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wide block">Roof</span>
+                  <span className="text-[10px] text-gray-600 font-medium uppercase tracking-wide block">Roof</span>
                   <span className="text-gray-900 font-medium">{job.property.roofType} ({job.property.roofAge}yr old)</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wide block">Sewer</span>
+                  <span className="text-[10px] text-gray-600 font-medium uppercase tracking-wide block">Sewer</span>
                   <span className="text-gray-900 font-medium capitalize">{job.property.sewer}</span>
                 </div>
               </div>
 
               {/* Systems */}
               <div className="border-t border-border pt-3">
-                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wide block mb-2">Systems</span>
+                <span className="text-[10px] text-gray-600 font-bold uppercase tracking-wide block mb-2">Systems</span>
                 <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
                   <div className="flex items-center gap-2">
                     <Zap className="w-3.5 h-3.5 text-amber-500" />
-                    <span className="text-gray-700">{job.property.electrical}</span>
+                    <span className="text-gray-900">{job.property.electrical}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Droplets className="w-3.5 h-3.5 text-blue-500" />
-                    <span className="text-gray-700">{job.property.plumbing}</span>
+                    <span className="text-gray-900">{job.property.plumbing}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Thermometer className="w-3.5 h-3.5 text-red-400" />
-                    <span className="text-gray-700">{job.property.heating} / {job.property.cooling}</span>
+                    <span className="text-gray-900">{job.property.heating} / {job.property.cooling}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Layers className="w-3.5 h-3.5 text-gray-400" />
-                    <span className="text-gray-700 capitalize">{job.property.waterHeater.replace("_", " ")} water heater</span>
+                    <Layers className="w-3.5 h-3.5 text-gray-600" />
+                    <span className="text-gray-900 capitalize">{job.property.waterHeater.replace("_", " ")} water heater</span>
                   </div>
                 </div>
               </div>
@@ -433,8 +433,8 @@ function JobModalContent({ job }: { job: Job }) {
               {/* HOA */}
               {job.property.hoa && (
                 <div className="border-t border-border pt-3">
-                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wide block mb-1">HOA</span>
-                  <p className="text-sm text-gray-700">{job.property.hoaNotes || "HOA community — check for restrictions."}</p>
+                  <span className="text-[10px] text-gray-600 font-bold uppercase tracking-wide block mb-1">HOA</span>
+                  <p className="text-sm text-gray-900">{job.property.hoaNotes || "HOA community — check for restrictions."}</p>
                 </div>
               )}
 
@@ -444,7 +444,7 @@ function JobModalContent({ job }: { job: Job }) {
                   <span className="text-[10px] text-red-500 font-bold uppercase tracking-wide block mb-2">Known Issues</span>
                   <ul className="space-y-1.5">
                     {job.property.knownIssues.map((issue, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                      <li key={i} className="flex items-start gap-2 text-sm text-gray-900">
                         <AlertTriangle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0 mt-0.5" />
                         {issue}
                       </li>
@@ -456,10 +456,10 @@ function JobModalContent({ job }: { job: Job }) {
               {/* Recent Work */}
               {job.property.recentWork.length > 0 && (
                 <div className="border-t border-border pt-3">
-                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wide block mb-2">Recent Work</span>
+                  <span className="text-[10px] text-gray-600 font-bold uppercase tracking-wide block mb-2">Recent Work</span>
                   <ul className="space-y-1.5">
                     {job.property.recentWork.map((work, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                      <li key={i} className="flex items-start gap-2 text-sm text-gray-900">
                         <CheckCircle2 className="w-3.5 h-3.5 text-brand-600 flex-shrink-0 mt-0.5" />
                         {work}
                       </li>
@@ -474,25 +474,25 @@ function JobModalContent({ job }: { job: Job }) {
         {/* Status pills row */}
         <div className="flex flex-wrap gap-2">
           {job.permitsRequired && (
-            <span className="inline-flex items-center gap-1 text-xs text-blue-700 bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-full font-medium">
+            <span className="inline-flex items-center gap-1 text-xs text-blue-700 bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-none font-medium">
               <FileCheck className="w-3 h-3" />
               Permits Required
             </span>
           )}
           {job.inspectionRequired && (
-            <span className="inline-flex items-center gap-1 text-xs text-violet-700 bg-violet-50 border border-violet-100 px-2.5 py-1 rounded-full font-medium">
+            <span className="inline-flex items-center gap-1 text-xs text-violet-700 bg-violet-50 border border-violet-100 px-2.5 py-1 rounded-none font-medium">
               <Wrench className="w-3 h-3" />
               Inspection Required
             </span>
           )}
           {job.materialsProvided && (
-            <span className="inline-flex items-center gap-1 text-xs text-emerald-700 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full font-medium">
+            <span className="inline-flex items-center gap-1 text-xs text-emerald-950 bg-emerald-950/10 border border-emerald-800/20 px-2.5 py-1 rounded-none font-medium">
               <CheckCircle2 className="w-3 h-3" />
               Materials Provided
             </span>
           )}
           {job.insuranceClaim && (
-            <span className="inline-flex items-center gap-1 text-xs text-amber-700 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded-full font-medium">
+            <span className="inline-flex items-center gap-1 text-xs text-amber-700 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded-none font-medium">
               <Shield className="w-3 h-3" />
               Insurance Claim
             </span>
@@ -509,7 +509,7 @@ function JobModalContent({ job }: { job: Job }) {
           </h4>
           <div className="space-y-2">
             {job.detailedScope.split("\n\n").map((paragraph, i) => (
-              <p key={i} className="text-sm text-gray-600 leading-relaxed">
+              <p key={i} className="text-sm text-gray-800 leading-relaxed">
                 {paragraph}
               </p>
             ))}
@@ -525,7 +525,7 @@ function JobModalContent({ job }: { job: Job }) {
             <div className="grid grid-cols-3 gap-2">
               {job.photos.map((photo: JobPhoto, i: number) => (
                 <div key={i} className="group">
-                  <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 border border-border">
+                  <div className="relative aspect-square rounded-none overflow-hidden bg-gray-100 border border-border">
                     {photo.type === "photo" ? (
                       <Image
                         src={photo.url}
@@ -536,13 +536,13 @@ function JobModalContent({ job }: { job: Job }) {
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center bg-gray-800">
                         <Video className="w-6 h-6 text-gray-300" />
-                        <span className="text-[10px] text-gray-400 mt-1">
+                        <span className="text-[10px] text-gray-600 mt-1">
                           Video
                         </span>
                       </div>
                     )}
                   </div>
-                  <p className="text-[10px] text-gray-500 mt-1 leading-tight line-clamp-2">
+                  <p className="text-[10px] text-gray-700 mt-1 leading-tight line-clamp-2">
                     {photo.caption}
                   </p>
                 </div>
@@ -559,7 +559,7 @@ function JobModalContent({ job }: { job: Job }) {
             </h4>
             <ul className="space-y-2">
               {job.requirements.map((req, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                <li key={i} className="flex items-start gap-2 text-sm text-gray-900">
                   {req.met ? (
                     <CheckCircle2 className="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5" />
                   ) : (
@@ -582,9 +582,9 @@ function JobModalContent({ job }: { job: Job }) {
               {job.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="inline-flex items-center gap-1 text-xs text-gray-600 bg-gray-100 px-2.5 py-1 rounded-full"
+                  className="inline-flex items-center gap-1 text-xs text-gray-800 bg-gray-100 px-2.5 py-1 rounded-none"
                 >
-                  <Tag className="w-2.5 h-2.5 text-gray-400" />
+                  <Tag className="w-2.5 h-2.5 text-gray-600" />
                   {tag}
                 </span>
               ))}
@@ -598,7 +598,7 @@ function JobModalContent({ job }: { job: Job }) {
             <h4 className="text-sm font-semibold text-gray-900 mb-2">
               Site Access
             </h4>
-            <p className="text-sm text-gray-600 leading-relaxed">
+            <p className="text-sm text-gray-800 leading-relaxed">
               {job.accessNotes}
             </p>
           </div>
@@ -606,7 +606,7 @@ function JobModalContent({ job }: { job: Job }) {
 
         {/* Special Instructions callout */}
         {job.specialInstructions && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <div className="bg-amber-50 border border-amber-200 rounded-none p-4">
             <div className="flex items-center gap-2 mb-2">
               <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0" />
               <h4 className="text-sm font-semibold text-amber-800">
@@ -631,17 +631,17 @@ function JobModalContent({ job }: { job: Job }) {
                   Risk Mitigation & Additional Scope
                 </h4>
               </div>
-              <p className="text-xs text-gray-500 mb-3">
+              <p className="text-xs text-gray-700 mb-3">
                 Common issues found on {job.category.toLowerCase()} jobs{job.yearBuilt > 0 && job.yearBuilt < 1980 ? ` in pre-1980 homes (built ${job.yearBuilt})` : ""}. Flag these during your site visit to protect your bid and identify upsell opportunities.
               </p>
               <div className="space-y-2">
                 {risks.map((r, i) => {
                   const style = LIKELIHOOD_STYLE[r.likelihood];
                   return (
-                    <div key={i} className="flex items-start gap-3 bg-gray-50 border border-border rounded-lg p-3">
+                    <div key={i} className="flex items-start gap-3 bg-gray-50 border border-border rounded-none p-3">
                       <div className="flex-shrink-0 mt-0.5">
-                        <span className={cn("inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full", style.bg, style.text)}>
-                          <span className={cn("w-1.5 h-1.5 rounded-full", style.dot)} />
+                        <span className={cn("inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-none", style.bg, style.text)}>
+                          <span className={cn("w-1.5 h-1.5 rounded-none", style.dot)} />
                           {style.label}
                         </span>
                       </div>
@@ -649,8 +649,8 @@ function JobModalContent({ job }: { job: Job }) {
                         <p className="text-[13px] font-medium text-gray-900">{r.risk}</p>
                         <div className="flex items-center gap-2 mt-1">
                           <Lightbulb className="w-3 h-3 text-amber-500 flex-shrink-0" />
-                          <p className="text-xs text-gray-500">
-                            <span className="font-medium text-gray-700">{r.upsell}</span>
+                          <p className="text-xs text-gray-700">
+                            <span className="font-medium text-gray-900">{r.upsell}</span>
                             {" · "}
                             <span className="font-semibold text-brand-600">{r.estimatedAdd}</span>
                           </p>
@@ -666,8 +666,8 @@ function JobModalContent({ job }: { job: Job }) {
 
         {/* Address + deadline info boxes */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-gray-50 rounded-lg p-3 border border-border">
-            <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wide block mb-1">
+          <div className="bg-gray-50 rounded-none p-3 border border-border">
+            <span className="text-[10px] text-gray-600 font-medium uppercase tracking-wide block mb-1">
               Bid Deadline
             </span>
             <span className="text-sm font-semibold text-gray-900">
@@ -675,24 +675,24 @@ function JobModalContent({ job }: { job: Job }) {
             </span>
             <DeadlinePill deadline={job.deadline} />
           </div>
-          <div className="bg-gray-50 rounded-lg p-3 border border-border">
-            <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wide block mb-1">
+          <div className="bg-gray-50 rounded-none p-3 border border-border">
+            <span className="text-[10px] text-gray-600 font-medium uppercase tracking-wide block mb-1">
               Full Address
             </span>
-            <span className="text-sm font-medium text-gray-800 leading-snug block">
+            <span className="text-sm font-medium text-gray-900 leading-snug block">
               {job.fullAddress}
             </span>
           </div>
         </div>
 
         {/* Posted by */}
-        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-border">
-          <div className="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center flex-shrink-0">
+        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-none border border-border">
+          <div className="w-10 h-10 rounded-none bg-brand-100 flex items-center justify-center flex-shrink-0">
             <User className="w-5 h-5 text-brand-700" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-gray-900">{job.postedBy}</p>
-            <div className="flex items-center gap-2 mt-0.5 text-xs text-gray-500">
+            <div className="flex items-center gap-2 mt-0.5 text-xs text-gray-700">
               <span className="flex items-center gap-0.5">
                 <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
                 {job.postedByRating}
@@ -756,7 +756,7 @@ export function JobCard({ job }: { job: Job }) {
                 )}
               >
                 <span
-                  className={cn("w-1.5 h-1.5 rounded-full mr-1", urgency.dot)}
+                  className={cn("w-1.5 h-1.5 rounded-none mr-1", urgency.dot)}
                 />
                 {urgency.label}
               </Badge>
@@ -809,7 +809,7 @@ export function JobCard({ job }: { job: Job }) {
             </h3>
 
             {/* Description preview */}
-            <p className="text-xs text-gray-500 leading-relaxed mb-3 line-clamp-2">
+            <p className="text-xs text-gray-700 leading-relaxed mb-3 line-clamp-2">
               {job.description}
             </p>
 
@@ -829,7 +829,7 @@ export function JobCard({ job }: { job: Job }) {
                     ? "text-red-600"
                     : deadlineDays <= 21
                     ? "text-amber-600"
-                    : "text-gray-500"
+                    : "text-gray-700"
                 )}
               >
                 <CalendarClock className="w-3 h-3" />
@@ -841,21 +841,21 @@ export function JobCard({ job }: { job: Job }) {
             <FairPriceRange job={job} />
 
             {/* Info grid */}
-            <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs text-gray-500 mb-3 mt-3">
+            <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs text-gray-700 mb-3 mt-3">
               <span className="flex items-center gap-1">
-                <MapPin className="w-3 h-3 text-gray-400" />
+                <MapPin className="w-3 h-3 text-gray-600" />
                 {job.location}
               </span>
               <span className="flex items-center gap-1">
-                <Calendar className="w-3 h-3 text-gray-400" />
+                <Calendar className="w-3 h-3 text-gray-600" />
                 {formatDate(job.preferredStartDate)}
               </span>
               <span className="flex items-center gap-1">
-                <Timer className="w-3 h-3 text-gray-400" />
+                <Timer className="w-3 h-3 text-gray-600" />
                 {job.estimatedDuration}
               </span>
               <span className="flex items-center gap-1">
-                <PropertyIcon className="w-3 h-3 text-gray-400" />
+                <PropertyIcon className="w-3 h-3 text-gray-600" />
                 {job.sqft > 0
                   ? `${job.sqft.toLocaleString()} sqft`
                   : job.propertyType}
@@ -865,25 +865,25 @@ export function JobCard({ job }: { job: Job }) {
             {/* Status pills */}
             <div className="flex flex-wrap gap-1 mb-3">
               {job.permitsRequired && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded-full font-medium">
+                <span className="inline-flex items-center gap-0.5 text-[10px] text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded-none font-medium">
                   <FileCheck className="w-2.5 h-2.5" />
                   Permits
                 </span>
               )}
               {job.inspectionRequired && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] text-violet-700 bg-violet-50 px-1.5 py-0.5 rounded-full font-medium">
+                <span className="inline-flex items-center gap-0.5 text-[10px] text-violet-700 bg-violet-50 px-1.5 py-0.5 rounded-none font-medium">
                   <Wrench className="w-2.5 h-2.5" />
                   Inspection
                 </span>
               )}
               {job.materialsProvided && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-full font-medium">
+                <span className="inline-flex items-center gap-0.5 text-[10px] text-emerald-950 bg-emerald-950/10 px-1.5 py-0.5 rounded-none font-medium">
                   <CheckCircle2 className="w-2.5 h-2.5" />
                   Materials Incl.
                 </span>
               )}
               {job.yearBuilt > 0 && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded-full font-medium">
+                <span className="inline-flex items-center gap-0.5 text-[10px] text-gray-800 bg-gray-100 px-1.5 py-0.5 rounded-none font-medium">
                   Built {job.yearBuilt}
                 </span>
               )}
@@ -892,20 +892,20 @@ export function JobCard({ job }: { job: Job }) {
             {/* Footer — posted by + bid count */}
             <div className="flex items-center justify-between pt-2.5 border-t border-border mt-auto">
               <div className="flex items-center gap-1.5">
-                <div className="w-6 h-6 rounded-full bg-brand-100 flex items-center justify-center">
+                <div className="w-6 h-6 rounded-none bg-brand-100 flex items-center justify-center">
                   <User className="w-3 h-3 text-brand-700" />
                 </div>
                 <div className="min-w-0">
                   <p className="text-xs font-medium text-gray-900 truncate">
                     {job.postedBy}
                   </p>
-                  <div className="flex items-center gap-1 text-[10px] text-gray-400">
+                  <div className="flex items-center gap-1 text-[10px] text-gray-600">
                     <Star className="w-2.5 h-2.5 text-amber-400 fill-amber-400" />
                     {job.postedByRating}
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-1 text-xs text-gray-500">
+              <div className="flex items-center gap-1 text-xs text-gray-700">
                 <Users className="w-3 h-3" />
                 <span className="font-semibold">{job.bidsCount}</span> bids
               </div>

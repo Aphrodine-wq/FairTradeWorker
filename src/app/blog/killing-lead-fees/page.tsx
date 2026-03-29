@@ -18,21 +18,21 @@ export default function KillingLeadFeesPage() {
         <article className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
           <Link
             href="/blog"
-            className="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 mb-8"
+            className="inline-flex items-center text-sm text-gray-700 hover:text-gray-900 mb-8"
           >
             <ArrowLeft className="w-4 h-4 mr-1" /> Back to blog
           </Link>
 
           <div className="mb-8">
-            <span className="text-sm text-gray-600 font-medium">Company</span>
+            <span className="text-sm text-gray-800 font-medium">Company</span>
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mt-2">
               Why We&apos;re Killing Lead Fees
             </h1>
-            <p className="text-gray-500 mt-2">March 15, 2026</p>
+            <p className="text-gray-700 mt-2">March 15, 2026</p>
           </div>
 
           <div className="max-w-none">
-            <p className="text-gray-600 leading-relaxed mb-4">
+            <p className="text-gray-800 leading-relaxed mb-4">
               If you&apos;re a contractor who&apos;s used HomeAdvisor, Angi, or
               Thumbtack in the last five years, you already know the drill. A
               homeowner submits a request. The platform sells that same lead to
@@ -42,7 +42,7 @@ export default function KillingLeadFeesPage() {
               from the first wave.
             </p>
 
-            <p className="text-gray-600 leading-relaxed mb-4">
+            <p className="text-gray-800 leading-relaxed mb-4">
               That&apos;s the lead-fee model. It was built to make platforms
               money, not to help contractors build businesses. We think
               it&apos;s fundamentally broken, and we built FairTradeWorker to
@@ -53,7 +53,7 @@ export default function KillingLeadFeesPage() {
               The Real Cost of Lead Fees
             </h2>
 
-            <p className="text-gray-600 leading-relaxed mb-4">
+            <p className="text-gray-800 leading-relaxed mb-4">
               Let&apos;s do the math that the big platforms don&apos;t want you
               to think about. Say you&apos;re a general contractor doing
               residential remodels. A decent kitchen lead on Angi runs about
@@ -62,7 +62,7 @@ export default function KillingLeadFeesPage() {
               hires one.
             </p>
 
-            <p className="text-gray-600 leading-relaxed mb-4">
+            <p className="text-gray-800 leading-relaxed mb-4">
               That&apos;s $300 to $480 in lead costs for a single job. If
               you&apos;re closing one job a week from these platforms,
               you&apos;re spending $1,200 to $1,920 a month. That&apos;s
@@ -70,7 +70,7 @@ export default function KillingLeadFeesPage() {
               for the time you spent chasing leads that went nowhere.
             </p>
 
-            <p className="text-gray-600 leading-relaxed mb-4">
+            <p className="text-gray-800 leading-relaxed mb-4">
               For specialty trades, it&apos;s even worse. Plumbing and
               electrical leads are cheaper per unit but convert at lower rates
               because homeowners are more likely to get multiple quotes for
@@ -83,7 +83,7 @@ export default function KillingLeadFeesPage() {
               Why It Creates a Race to the Bottom
             </h2>
 
-            <p className="text-gray-600 leading-relaxed mb-4">
+            <p className="text-gray-800 leading-relaxed mb-4">
               The lead-fee model doesn&apos;t just cost money. It warps
               behavior. When you&apos;re paying $60 for a lead, you feel
               pressure to underbid just to win the job and recover that cost.
@@ -93,7 +93,7 @@ export default function KillingLeadFeesPage() {
               working for less than the job is worth.
             </p>
 
-            <p className="text-gray-600 leading-relaxed mb-4">
+            <p className="text-gray-800 leading-relaxed mb-4">
               It also punishes smaller operations. A solo contractor
               can&apos;t absorb $1,500 a month in lead costs the way a
               company with 20 trucks can. The platforms end up favoring volume
@@ -106,7 +106,7 @@ export default function KillingLeadFeesPage() {
               How FairTradeWorker Works Instead
             </h2>
 
-            <p className="text-gray-600 leading-relaxed mb-4">
+            <p className="text-gray-800 leading-relaxed mb-4">
               We charge a flat monthly subscription. That&apos;s it. No
               per-lead fees, no per-bid charges, no surprise costs when a
               homeowner looks at your profile. You pay one price and you get
@@ -114,7 +114,7 @@ export default function KillingLeadFeesPage() {
               trade categories.
             </p>
 
-            <ul className="list-disc pl-6 space-y-2 text-gray-600 mb-4">
+            <ul className="list-disc pl-6 space-y-2 text-gray-800 mb-4">
               <li>
                 <strong>Free tier:</strong> Limited to 3 active bids per month.
                 Enough to try the platform and see if it works for you.
@@ -137,7 +137,7 @@ export default function KillingLeadFeesPage() {
               The Math That Actually Works
             </h2>
 
-            <p className="text-gray-600 leading-relaxed mb-4">
+            <p className="text-gray-800 leading-relaxed mb-4">
               At $29 a month, a Solo contractor spends $348 a year on
               FairTradeWorker. Compare that to the $14,000+ they&apos;d spend
               on lead fees doing the same volume of work. That&apos;s a savings
@@ -145,7 +145,7 @@ export default function KillingLeadFeesPage() {
               for contractors who were heavily reliant on paid leads.
             </p>
 
-            <p className="text-gray-600 leading-relaxed mb-4">
+            <p className="text-gray-800 leading-relaxed mb-4">
               More importantly, every bid you submit goes directly to one
               homeowner who posted a real job. There&apos;s no shared lead.
               The homeowner reviews bids, checks your verified profile and
@@ -158,7 +158,7 @@ export default function KillingLeadFeesPage() {
               Built by People Who Get It
             </h2>
 
-            <p className="text-gray-600 leading-relaxed mb-4">
+            <p className="text-gray-800 leading-relaxed mb-4">
               We didn&apos;t build FairTradeWorker because we saw a market
               opportunity in &ldquo;disrupting home services.&rdquo; We built
               it because the current system is unfair to the people who do the
@@ -167,7 +167,7 @@ export default function KillingLeadFeesPage() {
               way while they run their business.
             </p>
 
-            <p className="text-gray-600 leading-relaxed mb-4">
+            <p className="text-gray-800 leading-relaxed mb-4">
               That&apos;s what killing lead fees means. Not a marketing
               gimmick. A different business model, built on the idea that if
               the platform only makes money when contractors succeed, then the

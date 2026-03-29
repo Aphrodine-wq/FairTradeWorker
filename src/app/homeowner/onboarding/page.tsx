@@ -8,6 +8,7 @@ import { Card, CardContent } from "@shared/ui/card";
 import { Input } from "@shared/ui/input";
 import { cn } from "@shared/lib/utils";
 import { authStore } from "@shared/lib/auth-store";
+import { usePageTitle } from "@shared/hooks/use-page-title";
 
 const PROPERTY_TYPES = [
   { id: "single_family", label: "Single Family Home", icon: Home },
@@ -16,6 +17,7 @@ const PROPERTY_TYPES = [
 ];
 
 export default function HomeownerOnboarding() {
+  usePageTitle("Get Started");
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [address, setAddress] = useState("");
@@ -57,7 +59,7 @@ export default function HomeownerOnboarding() {
       <div className="w-full max-w-lg">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Tell Us About Your Property</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-700 mt-1">
             This helps contractors give you more accurate bids.
           </p>
         </div>
@@ -66,7 +68,7 @@ export default function HomeownerOnboarding() {
           <CardContent className="p-8 space-y-6">
             {/* Property Type */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">Property Type</label>
+              <label className="block text-sm font-medium text-gray-900 mb-3">Property Type</label>
               <div className="grid grid-cols-3 gap-3">
                 {PROPERTY_TYPES.map((type) => {
                   const Icon = type.icon;
@@ -76,18 +78,18 @@ export default function HomeownerOnboarding() {
                       key={type.id}
                       onClick={() => setPropertyType(type.id)}
                       className={cn(
-                        "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
+                        "flex flex-col items-center gap-2 p-4 rounded-none border-2 transition-all",
                         selected
                           ? "border-brand-600 bg-brand-50"
                           : "border-gray-200 hover:border-gray-300 bg-white"
                       )}
                     >
-                      <Icon className={cn("w-6 h-6", selected ? "text-brand-600" : "text-gray-400")} />
-                      <span className={cn("text-xs font-medium", selected ? "text-brand-700" : "text-gray-600")}>
+                      <Icon className={cn("w-6 h-6", selected ? "text-brand-600" : "text-gray-600")} />
+                      <span className={cn("text-xs font-medium", selected ? "text-brand-700" : "text-gray-800")}>
                         {type.label}
                       </span>
                       {selected && (
-                        <div className="w-4 h-4 rounded-full bg-brand-600 flex items-center justify-center">
+                        <div className="w-4 h-4 rounded-none bg-brand-600 flex items-center justify-center">
                           <Check className="w-2.5 h-2.5 text-white" />
                         </div>
                       )}
@@ -99,7 +101,7 @@ export default function HomeownerOnboarding() {
 
             {/* Address */}
             <div className="space-y-1.5">
-              <label htmlFor="address" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="address" className="block text-sm font-medium text-gray-900">
                 Street Address
               </label>
               <Input
@@ -113,7 +115,7 @@ export default function HomeownerOnboarding() {
             {/* City / State / Zip */}
             <div className="grid grid-cols-6 gap-3">
               <div className="col-span-3 space-y-1.5">
-                <label htmlFor="city" className="block text-sm font-medium text-gray-700">City</label>
+                <label htmlFor="city" className="block text-sm font-medium text-gray-900">City</label>
                 <Input
                   id="city"
                   placeholder="Austin"
@@ -122,7 +124,7 @@ export default function HomeownerOnboarding() {
                 />
               </div>
               <div className="col-span-1 space-y-1.5">
-                <label htmlFor="state" className="block text-sm font-medium text-gray-700">State</label>
+                <label htmlFor="state" className="block text-sm font-medium text-gray-900">State</label>
                 <Input
                   id="state"
                   value={state}
@@ -131,7 +133,7 @@ export default function HomeownerOnboarding() {
                 />
               </div>
               <div className="col-span-2 space-y-1.5">
-                <label htmlFor="zip" className="block text-sm font-medium text-gray-700">ZIP Code</label>
+                <label htmlFor="zip" className="block text-sm font-medium text-gray-900">ZIP Code</label>
                 <Input
                   id="zip"
                   placeholder="78701"
@@ -155,7 +157,7 @@ export default function HomeownerOnboarding() {
             {/* Skip */}
             <button
               onClick={() => router.push("/homeowner/dashboard")}
-              className="w-full text-center text-sm text-gray-400 hover:text-gray-600 transition-colors"
+              className="w-full text-center text-sm text-gray-600 hover:text-gray-800 transition-colors"
             >
               Skip for now
             </button>

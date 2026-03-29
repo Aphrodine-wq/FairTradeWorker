@@ -46,7 +46,7 @@ export function Hero() {
               <span className="text-brand-600">the trades.</span>
             </h1>
 
-            <p className="mt-6 text-lg text-gray-500 max-w-lg leading-relaxed">
+            <p className="mt-6 text-lg text-gray-700 max-w-lg leading-relaxed">
               Flat monthly subscription. Zero per-lead fees. Every dollar you earn is yours.
               We built this because we were tired of getting ripped off too.
             </p>
@@ -60,20 +60,20 @@ export function Hero() {
               </Button>
             </div>
 
-            <p className="mt-6 text-sm text-gray-400">
+            <p className="mt-6 text-sm text-gray-600">
               No credit card required. Free to start.
             </p>
           </div>
 
           {/* Right — hammer visual */}
           <div className="mt-14 lg:mt-0 lg:w-[45%] flex items-center justify-center relative">
-            <div className="absolute w-72 h-72 lg:w-[22rem] lg:h-[22rem] rounded-full bg-brand-600/[0.04]" />
+            <div className="absolute w-72 h-72 lg:w-[22rem] lg:h-[22rem] rounded-none bg-brand-600/[0.04]" />
             <div className="relative z-10" style={{ transform: "rotate(-30deg)" }}>
               <HammerIcon className="w-48 h-auto lg:w-60" />
             </div>
-            <div className="absolute bottom-4 right-4 lg:bottom-6 lg:right-6 bg-white border border-border rounded-xl px-5 py-3 shadow-sm z-20 text-center">
+            <div className="absolute bottom-4 right-4 lg:bottom-6 lg:right-6 bg-white border border-border rounded-none px-5 py-3 shadow-sm z-20 text-center">
               <div className="text-2xl font-bold text-gray-900 tabular-nums">$0</div>
-              <div className="text-xs text-gray-400">per lead. ever.</div>
+              <div className="text-xs text-gray-600">per lead. ever.</div>
             </div>
           </div>
 

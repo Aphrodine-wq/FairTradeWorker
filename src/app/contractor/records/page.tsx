@@ -3,22 +3,29 @@
 import { useState, useEffect } from "react";
 import {
   Award,
+  Briefcase,
   Calendar,
   CheckCircle2,
   Clock,
+  Copy,
   DollarSign,
   ExternalLink,
-  Copy,
+  Link2,
+  MapPin,
+  Shield,
   Star,
   TrendingUp,
-  Shield,
+  Wrench,
 } from "lucide-react";
 import { Badge } from "@shared/ui/badge";
 import { Button } from "@shared/ui/button";
-import { mockFairRecords, type FairRecord } from "@shared/lib/mock-data";
+import { mockFairRecords, mockContractors, type FairRecord } from "@shared/lib/mock-data";
 import { fetchFairRecords } from "@shared/lib/data";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
 import { track } from "@shared/lib/analytics";
+import { usePageTitle } from "@shared/hooks/use-page-title";
+
+// ─── Star Rating ────────────────────────────────────────────────────────────
 
 function StarRating({ rating, size = 14 }: { rating: number; size?: number }) {
   return (
@@ -42,8 +49,12 @@ function StarRating({ rating, size = 14 }: { rating: number; size?: number }) {
   );
 }
 
+// ─── Page ───────────────────────────────────────────────────────────────────
+
 export default function ContractorRecordsPage() {
+  usePageTitle("FairRecord");
   const [records, setRecords] = useState<FairRecord[]>(mockFairRecords);
+  const contractor = mockContractors[0]; // current logged-in contractor
   const [stats, setStats] = useState({
     total: mockFairRecords.length,
     avg_budget_accuracy: 96.8,
@@ -51,6 +62,7 @@ export default function ContractorRecordsPage() {
     avg_rating: 4.9,
   });
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copiedProfile, setCopiedProfile] = useState(false);
 
   useEffect(() => {
     fetchFairRecords().then((data) => {
@@ -68,146 +80,226 @@ export default function ContractorRecordsPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const copyProfileLink = () => {
+    navigator.clipboard.writeText(`${window.location.origin}/contractor/profile`);
+    track("fair_record_profile_shared");
+    setCopiedProfile(true);
+    setTimeout(() => setCopiedProfile(false), 2000);
+  };
+
+  const totalEarnings = records.reduce((sum, r) => sum + r.finalCost, 0);
+  const initials = contractor.name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2);
+
   return (
     <div className="flex flex-col min-h-full bg-surface">
-      <div className="px-6 pt-5 pb-4 bg-white shadow-[0_4px_16px_-2px_rgba(0,0,0,0.1)] relative z-10">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-[22px] font-semibold text-gray-900 tracking-tight">FairRecord</h1>
-            <p className="text-[13px] text-gray-400 mt-0.5">Verified project completion history</p>
+      {/* ── Profile Header ───────────────────────────────────────── */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="px-6 pt-6 pb-6 max-w-[1100px]">
+          {/* Profile row */}
+          <div className="flex items-start gap-5 mb-6">
+            {/* Avatar */}
+            <div className="w-[72px] h-[72px] rounded-none bg-brand-100 flex items-center justify-center shrink-0">
+              <span className="text-brand-700 text-[24px] font-bold">{initials}</span>
+            </div>
+
+            {/* Identity */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-1">
+                <h1 className="text-[24px] font-bold text-gray-900 tracking-tight">{contractor.name}</h1>
+                {contractor.verified && (
+                  <Badge variant="success" className="text-[11px]">
+                    <Shield className="w-3 h-3 mr-1" />
+                    Verified
+                  </Badge>
+                )}
+              </div>
+              <p className="text-[15px] text-gray-800 font-medium">{contractor.company}</p>
+              <div className="flex items-center gap-4 mt-2">
+                <div className="flex items-center gap-1.5">
+                  <Wrench className="w-3.5 h-3.5 text-gray-600" />
+                  <span className="text-[13px] text-gray-700">{contractor.specialty}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-gray-600" />
+                  <span className="text-[13px] text-gray-700">Oxford, MS</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Briefcase className="w-3.5 h-3.5 text-gray-600" />
+                  <span className="text-[13px] text-gray-700">{contractor.yearsExperience} years</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <StarRating rating={stats.avg_rating} size={13} />
+                  <span className="text-[13px] font-medium text-gray-900">{stats.avg_rating}</span>
+                  <span className="text-[12px] text-gray-600">({stats.total} records)</span>
+                </div>
+              </div>
+              {contractor.licensed && contractor.insured && (
+                <div className="flex items-center gap-3 mt-2">
+                  <span className="text-[11px] font-medium text-emerald-950 bg-emerald-950/10 px-2 py-0.5 rounded-none">Licensed</span>
+                  <span className="text-[11px] font-medium text-emerald-950 bg-emerald-950/10 px-2 py-0.5 rounded-none">Insured</span>
+                  {contractor.skills.slice(0, 3).map((skill) => (
+                    <span key={skill} className="text-[11px] font-medium text-gray-800 bg-gray-100 px-2 py-0.5 rounded-none">{skill}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Share button */}
+            <Button
+              variant="outline"
+              onClick={copyProfileLink}
+              className="text-[13px] gap-2 shrink-0"
+            >
+              {copiedProfile ? (
+                <><CheckCircle2 className="w-4 h-4" /> Copied</>
+              ) : (
+                <><Link2 className="w-4 h-4" /> Share Profile</>
+              )}
+            </Button>
           </div>
-          <div className="flex items-center gap-2">
-            <Shield className="w-5 h-5 text-brand-600" />
-            <span className="text-[13px] font-medium text-gray-900">{stats.total} verified records</span>
+
+          {/* ── Performance Stats ─────────────────────────────────── */}
+          <div className="grid grid-cols-4 gap-3">
+            <div className="rounded-none border border-gray-200 p-4 text-center">
+              <p className="text-[11px] font-medium text-gray-600 uppercase tracking-wider mb-2">FairRecords</p>
+              <p className="text-[32px] font-bold text-gray-900 leading-none tabular-nums">{stats.total}</p>
+              <p className="text-[11px] text-gray-600 mt-1">verified by homeowners</p>
+            </div>
+            <div className="rounded-none border border-gray-200 p-4 text-center">
+              <p className="text-[11px] font-medium text-gray-600 uppercase tracking-wider mb-2">Budget Accuracy</p>
+              <p className="text-[32px] font-bold text-emerald-950 leading-none tabular-nums">{stats.avg_budget_accuracy}%</p>
+              <p className="text-[11px] text-gray-600 mt-1">avg across projects</p>
+            </div>
+            <div className="rounded-none border border-gray-200 p-4 text-center">
+              <p className="text-[11px] font-medium text-gray-600 uppercase tracking-wider mb-2">On-Time Rate</p>
+              <p className="text-[32px] font-bold text-gray-900 leading-none tabular-nums">{stats.on_time_rate}%</p>
+              <p className="text-[11px] text-gray-600 mt-1">delivered on schedule</p>
+            </div>
+            <div className="rounded-none border border-gray-200 p-4 text-center">
+              <p className="text-[11px] font-medium text-gray-600 uppercase tracking-wider mb-2">Project Volume</p>
+              <p className="text-[32px] font-bold text-gray-900 leading-none tabular-nums">{formatCurrency(totalEarnings)}</p>
+              <p className="text-[11px] text-gray-600 mt-1">total verified value</p>
+            </div>
           </div>
         </div>
       </div>
 
+      {/* ── How FairRecord Works (explainer for new contractors) ── */}
+      {records.length <= 3 && (
+        <div className="px-6 pt-5 max-w-[1100px]">
+          <div className="rounded-none bg-brand-50 border border-brand-200 px-5 py-4">
+            <p className="text-[13px] font-semibold text-brand-900 mb-1">How FairRecord works</p>
+            <p className="text-[12px] text-brand-700 leading-relaxed">
+              When a homeowner verifies your completed work through FairTradeWorker&apos;s escrow system,
+              a FairRecord is automatically added to your profile. Each record shows budget accuracy, timeline
+              performance, and the homeowner&apos;s verified rating. Share your profile or individual records
+              to win more bids.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* ── Project Records ──────────────────────────────────────── */}
       <div className="flex-1 px-6 py-5">
-        <div className="max-w-[1200px]">
-          {/* Stats row */}
-          <div className="flex gap-4 mb-8">
-            <div className="w-[180px] rounded-xl bg-white p-4">
-              <Award className="w-5 h-5 text-brand-600 mb-2" />
-              <p className="text-[12px] text-gray-400">Total Records</p>
-              <p className="text-[24px] font-bold text-gray-900 leading-tight">{stats.total}</p>
-              <p className="text-[11px] text-gray-400 mt-0.5">verified completions</p>
-            </div>
-            <div className="w-[180px] rounded-xl bg-white p-4">
-              <DollarSign className="w-5 h-5 text-emerald-600 mb-2" />
-              <p className="text-[12px] text-gray-400">Budget Accuracy</p>
-              <p className="text-[24px] font-bold text-gray-900 leading-tight">{stats.avg_budget_accuracy}%</p>
-              <p className="text-[11px] text-emerald-600 font-semibold mt-0.5">avg across projects</p>
-            </div>
-            <div className="w-[180px] rounded-xl bg-white p-4">
-              <Clock className="w-5 h-5 text-blue-600 mb-2" />
-              <p className="text-[12px] text-gray-400">On-Time Rate</p>
-              <p className="text-[24px] font-bold text-gray-900 leading-tight">{stats.on_time_rate}%</p>
-              <p className="text-[11px] text-gray-400 mt-0.5">projects on schedule</p>
-            </div>
-            <div className="w-[180px] rounded-xl bg-white p-4">
-              <Star className="w-5 h-5 text-amber-400 mb-2" />
-              <p className="text-[12px] text-gray-400">Avg Rating</p>
-              <p className="text-[24px] font-bold text-gray-900 leading-tight">{stats.avg_rating}</p>
-              <p className="text-[11px] text-gray-400 mt-0.5">at time of completion</p>
-            </div>
+        <div className="max-w-[1100px]">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-[14px] font-semibold text-gray-900 uppercase tracking-wider">
+              Verified Project History
+            </h2>
+            <span className="text-[12px] text-gray-600">{records.length} records</span>
           </div>
 
-          {/* Records list */}
-          <div className="space-y-4">
+          {/* Records as a clean table-like list */}
+          <div className="bg-white rounded-none border border-gray-100 divide-y divide-gray-100">
             {records.map((record) => (
-              <div key={record.id} className="bg-white rounded-xl p-5">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center flex-shrink-0">
-                      <Award className="w-5 h-5 text-brand-700" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="text-[15px] font-bold text-gray-900">{record.projectTitle}</p>
-                        {record.homeownerConfirmed && (
-                          <Badge variant="success" className="text-[10px] px-1.5 py-0">Verified</Badge>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-3 mt-0.5">
-                        <span className="text-[12px] text-gray-400">{record.category}</span>
-                        <span className="text-[12px] text-gray-400">{record.locationCity}, TX</span>
-                        <span className="text-[12px] text-gray-400">{formatDate(record.actualCompletionDate)}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => copyLink(record.publicId)}
-                      className="text-[12px] gap-1"
-                    >
-                      {copiedId === record.publicId ? (
-                        <><CheckCircle2 className="w-3 h-3" /> Copied</>
-                      ) : (
-                        <><Copy className="w-3 h-3" /> Copy Link</>
+              <div key={record.id} className="px-5 py-4 hover:bg-gray-50/50 transition-colors">
+                <div className="flex items-start gap-4">
+                  {/* Left: project info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-[15px] font-semibold text-gray-900">{record.projectTitle}</p>
+                      {record.homeownerConfirmed && (
+                        <Shield className="w-3.5 h-3.5 text-brand-600 shrink-0" />
                       )}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => window.open(`/record/${record.publicId}`, "_blank")}
-                      className="text-[12px] gap-1"
-                    >
-                      <ExternalLink className="w-3 h-3" /> View
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Metrics row */}
-                <div className="flex gap-6 mb-3">
-                  <div className="flex items-center gap-2">
-                    <DollarSign className="w-3.5 h-3.5 text-gray-400" />
-                    <span className="text-[13px] text-gray-600">
-                      {formatCurrency(record.finalCost)} of {formatCurrency(record.estimatedBudget)}
-                    </span>
-                    <span className={cn(
-                      "text-[11px] font-semibold px-1.5 py-0.5 rounded",
-                      record.onBudget
-                        ? "bg-emerald-50 text-emerald-700"
-                        : "bg-amber-50 text-amber-700"
-                    )}>
-                      {record.budgetAccuracyPct}% accuracy
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                    <span className={cn(
-                      "text-[11px] font-semibold px-1.5 py-0.5 rounded",
-                      record.onTime
-                        ? "bg-emerald-50 text-emerald-700"
-                        : "bg-amber-50 text-amber-700"
-                    )}>
-                      {record.onTime ? "On Time" : "Late"}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <StarRating rating={record.avgRating} />
-                    <span className="text-[12px] text-gray-400">{record.avgRating} ({record.reviewCount})</span>
-                  </div>
-                  {record.disputeCount === 0 && (
-                    <div className="flex items-center gap-1.5">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                      <span className="text-[12px] text-emerald-600 font-medium">No disputes</span>
                     </div>
-                  )}
-                </div>
+                    <div className="flex items-center gap-2 text-[12px] text-gray-600">
+                      <span>{record.category}</span>
+                      <span className="text-gray-200">|</span>
+                      <span>{record.locationCity}, MS</span>
+                      <span className="text-gray-200">|</span>
+                      <span>{formatDate(record.actualCompletionDate)}</span>
+                      {record.homeownerConfirmed && record.confirmedAt && (
+                        <>
+                          <span className="text-gray-200">|</span>
+                          <span>Verified {formatDate(record.confirmedAt)}</span>
+                        </>
+                      )}
+                    </div>
 
-                {/* Scope preview */}
-                <p className="text-[13px] text-gray-500 leading-relaxed line-clamp-2">{record.scopeSummary}</p>
+                    {/* Scope preview */}
+                    <p className="text-[12px] text-gray-700 leading-relaxed line-clamp-1 mt-1.5">{record.scopeSummary}</p>
 
-                {/* Public ID */}
-                <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
-                  <span className="text-[11px] text-gray-400 font-mono">{record.publicId}</span>
-                  <span className="text-[11px] text-gray-400">
-                    Quality Score: <span className="font-semibold text-gray-600">{record.qualityScoreAtCompletion}/100</span>
-                  </span>
+                    {/* Metric pills */}
+                    <div className="flex flex-wrap gap-2 mt-2.5">
+                      <span className={cn(
+                        "inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded",
+                        record.onBudget ? "bg-emerald-950/10 text-emerald-950" : "bg-amber-50 text-amber-700"
+                      )}>
+                        <DollarSign className="w-3 h-3" />
+                        {record.budgetAccuracyPct}%
+                      </span>
+                      <span className={cn(
+                        "inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded",
+                        record.onTime ? "bg-emerald-950/10 text-emerald-950" : "bg-amber-50 text-amber-700"
+                      )}>
+                        <Clock className="w-3 h-3" />
+                        {record.onTime ? "On Time" : "Late"}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded bg-gray-50 text-gray-900">
+                        <Star className="w-3 h-3 text-amber-400" />
+                        {record.avgRating}
+                      </span>
+                      {record.disputeCount === 0 && (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-950/10 text-emerald-950">
+                          <CheckCircle2 className="w-3 h-3" />
+                          Clean
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Right: value + actions */}
+                  <div className="shrink-0 text-right">
+                    <p className="text-[16px] font-bold text-gray-900 tabular-nums">{formatCurrency(record.finalCost)}</p>
+                    <p className="text-[11px] text-gray-600 mb-3">of {formatCurrency(record.estimatedBudget)}</p>
+                    <div className="flex items-center gap-1 justify-end">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyLink(record.publicId)}
+                        className="text-[11px] h-7 px-2 gap-1"
+                      >
+                        {copiedId === record.publicId ? (
+                          <><CheckCircle2 className="w-3 h-3" /> Copied</>
+                        ) : (
+                          <><Copy className="w-3 h-3" /> Share</>
+                        )}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => window.open(`/record/${record.publicId}`, "_blank")}
+                        className="text-[11px] h-7 px-2 gap-1"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                      </Button>
+                    </div>
+                    <p className="text-[10px] text-gray-300 font-mono mt-1">{record.publicId}</p>
+                  </div>
                 </div>
               </div>
             ))}

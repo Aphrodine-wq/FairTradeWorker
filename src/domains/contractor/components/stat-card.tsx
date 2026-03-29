@@ -20,7 +20,7 @@ export function StatCard({ title, value, change, icon: Icon, prefix }: StatCardP
       <CardContent className="p-6">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-500 truncate">{title}</p>
+            <p className="text-sm font-medium text-gray-700 truncate">{title}</p>
             <p className="mt-1.5 text-2xl font-bold text-gray-900 tabular-nums">
               {prefix && <span>{prefix}</span>}
               {value}
@@ -29,7 +29,7 @@ export function StatCard({ title, value, change, icon: Icon, prefix }: StatCardP
               <div
                 className={cn(
                   "mt-1.5 flex items-center gap-1 text-xs font-semibold",
-                  isPositive && "text-emerald-600",
+                  isPositive && "text-emerald-950",
                   isNegative && "text-red-500"
                 )}
               >
@@ -45,7 +45,7 @@ export function StatCard({ title, value, change, icon: Icon, prefix }: StatCardP
               </div>
             )}
           </div>
-          <div className="w-11 h-11 rounded-xl bg-brand-50 flex items-center justify-center flex-shrink-0">
+          <div className="w-11 h-11 rounded-none bg-brand-50 flex items-center justify-center flex-shrink-0">
             <Icon className="w-5 h-5 text-brand-600" />
           </div>
         </div>

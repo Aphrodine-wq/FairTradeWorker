@@ -158,15 +158,15 @@ function SignupContent() {
           <div className="grid grid-cols-3 gap-4">
             <div>
               <p className="text-2xl font-bold text-white tabular-nums">12,800+</p>
-              <p className="text-xs text-gray-400">Jobs</p>
+              <p className="text-xs text-gray-600">Jobs</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-white tabular-nums">3,200+</p>
-              <p className="text-xs text-gray-400">Contractors</p>
+              <p className="text-xs text-gray-600">Contractors</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-white tabular-nums">98%</p>
-              <p className="text-xs text-gray-400">Satisfaction</p>
+              <p className="text-xs text-gray-600">Satisfaction</p>
             </div>
           </div>
 
@@ -174,13 +174,13 @@ function SignupContent() {
             <p className="text-sm text-gray-300 italic">
               &ldquo;Landed three jobs in my first two weeks.&rdquo;
             </p>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-gray-600 mt-1">
               David Ramirez, San Antonio TX
             </p>
           </div>
         </div>
 
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-700">
           &copy; {new Date().getFullYear()} FairTradeWorker
         </p>
       </div>
@@ -235,18 +235,18 @@ function SignupContent() {
             </CardContent>
           </Card>
 
-          <p className="mt-6 text-center text-xs text-gray-400">
+          <p className="mt-6 text-center text-xs text-gray-600">
             By creating an account, you agree to our{" "}
             <Link
               href="/terms"
-              className="underline hover:text-gray-600 transition-colors"
+              className="underline hover:text-gray-800 transition-colors"
             >
               Terms
             </Link>{" "}
             and{" "}
             <Link
               href="/privacy"
-              className="underline hover:text-gray-600 transition-colors"
+              className="underline hover:text-gray-800 transition-colors"
             >
               Privacy Policy
             </Link>
@@ -271,12 +271,12 @@ function StepDot({
     <div className="flex flex-col items-center gap-1">
       <div
         className={cn(
-          "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-colors duration-150",
+          "w-8 h-8 rounded-none flex items-center justify-center text-xs font-bold border-2 transition-colors duration-150",
           active
             ? "border-brand-600 bg-brand-600 text-white"
             : completed
             ? "border-brand-600 bg-brand-50 text-brand-600"
-            : "border-border bg-white text-gray-400"
+            : "border-border bg-white text-gray-600"
         )}
       >
         {completed ? (
@@ -302,7 +302,7 @@ function StepDot({
       <span
         className={cn(
           "text-[10px] font-medium uppercase tracking-wide",
-          active ? "text-brand-600" : "text-gray-400"
+          active ? "text-brand-600" : "text-gray-600"
         )}
       >
         {label}
@@ -324,7 +324,7 @@ function StepOne({
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
           Create your account
         </h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-gray-700 mt-1">
           How will you use FairTradeWorker?
         </p>
       </div>
@@ -346,7 +346,7 @@ function StepOne({
         />
       </div>
 
-      <p className="mt-7 text-center text-sm text-gray-500">
+      <p className="mt-7 text-center text-sm text-gray-700">
         Already have an account?{" "}
         <Link
           href="/login"
@@ -377,14 +377,14 @@ function RoleCard({
       type="button"
       onClick={onClick}
       className={cn(
-        "relative w-full text-left rounded-xl border-2 p-5 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2",
+        "relative w-full text-left rounded-none border-2 p-5 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2",
         selected
           ? "border-brand-600 bg-brand-50"
           : "border-border bg-white hover:border-gray-300 hover:bg-gray-50"
       )}
     >
       {selected && (
-        <span className="absolute top-3 right-3 w-4 h-4 rounded-full bg-brand-600 flex items-center justify-center">
+        <span className="absolute top-3 right-3 w-4 h-4 rounded-none bg-brand-600 flex items-center justify-center">
           <svg
             className="w-2.5 h-2.5 text-white"
             fill="none"
@@ -403,7 +403,7 @@ function RoleCard({
       <span
         className={cn(
           "mb-3 block",
-          selected ? "text-brand-600" : "text-gray-500"
+          selected ? "text-brand-600" : "text-gray-700"
         )}
       >
         {icon}
@@ -411,7 +411,7 @@ function RoleCard({
       <span className="block text-sm font-semibold text-gray-900 leading-snug mb-1">
         {title}
       </span>
-      <span className="block text-xs text-gray-500 leading-relaxed">
+      <span className="block text-xs text-gray-700 leading-relaxed">
         {description}
       </span>
     </button>
@@ -472,7 +472,7 @@ function StepTwo({
         <button
           type="button"
           onClick={onBack}
-          className="flex items-center justify-center w-8 h-8 rounded-lg border border-border text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
+          className="flex items-center justify-center w-8 h-8 rounded-none border border-border text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
           aria-label="Go back"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -481,7 +481,7 @@ function StepTwo({
           <h1 className="text-xl font-bold text-gray-900 tracking-tight">
             {isContractor ? "Contractor details" : "Your details"}
           </h1>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-700">
             {isContractor
               ? "Tell us about your business"
               : "Set up your homeowner account"}
@@ -491,7 +491,7 @@ function StepTwo({
 
       <form onSubmit={onSubmit} className="space-y-4">
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+          <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-none">
             {error}
           </div>
         )}
@@ -537,7 +537,7 @@ function StepTwo({
                   value={form.specialty}
                   onChange={update("specialty")}
                   required
-                  className="flex h-10 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-gray-900 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex h-10 w-full rounded-none border border-border bg-white px-3 py-2 text-sm text-gray-900 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <option value="" disabled>
                     Select...
@@ -606,7 +606,7 @@ function StepTwo({
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-gray-500">
+      <p className="mt-6 text-center text-sm text-gray-700">
         Already have an account?{" "}
         <Link
           href="/login"
@@ -630,10 +630,10 @@ function Field({
 }) {
   return (
     <div className="space-y-1.5">
-      <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
+      <label className="flex items-center gap-1.5 text-sm font-medium text-gray-900">
         {label}
         {optional && (
-          <span className="text-xs font-normal text-gray-400">(optional)</span>
+          <span className="text-xs font-normal text-gray-600">(optional)</span>
         )}
       </label>
       {children}
@@ -670,7 +670,7 @@ function PasswordInput({
       <button
         type="button"
         onClick={onToggle}
-        className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+        className="absolute inset-y-0 right-3 flex items-center text-gray-600 hover:text-gray-800 transition-colors"
         tabIndex={-1}
         aria-label={show ? "Hide password" : "Show password"}
       >

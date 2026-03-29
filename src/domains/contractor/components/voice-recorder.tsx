@@ -140,7 +140,7 @@ export function VoiceRecorder({ onItemsExtracted }: VoiceRecorderProps) {
       {/* Microphone button area */}
       <div className="flex flex-col items-center gap-4 py-6">
         {/* Status label */}
-        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+        <p className="text-xs font-semibold uppercase tracking-widest text-gray-600">
           {state === "idle" && "Voice AI Estimator"}
           {state === "recording" && "Recording..."}
           {state === "processing" && "Processing audio..."}
@@ -151,23 +151,23 @@ export function VoiceRecorder({ onItemsExtracted }: VoiceRecorderProps) {
         <div className="relative flex items-center justify-center">
           {state === "recording" && (
             <>
-              <span className="absolute inline-flex h-[88px] w-[88px] rounded-full bg-brand-600 opacity-20 animate-ping" />
-              <span className="absolute inline-flex h-[104px] w-[104px] rounded-full bg-brand-600 opacity-10 animate-ping [animation-delay:200ms]" />
+              <span className="absolute inline-flex h-[88px] w-[88px] rounded-none bg-brand-600 opacity-20 animate-ping" />
+              <span className="absolute inline-flex h-[104px] w-[104px] rounded-none bg-brand-600 opacity-10 animate-ping [animation-delay:200ms]" />
             </>
           )}
           <button
             onClick={handleToggleRecording}
             disabled={state === "processing"}
             className={cn(
-              "relative z-10 w-20 h-20 rounded-full flex items-center justify-center transition-colors duration-150 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-600",
+              "relative z-10 w-20 h-20 rounded-none flex items-center justify-center transition-colors duration-150 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-600",
               state === "idle" &&
                 "bg-brand-600 hover:bg-brand-700 text-white",
               state === "recording" &&
                 "bg-red-500 hover:bg-red-600 text-white",
               state === "processing" &&
-                "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none",
+                "bg-gray-200 text-gray-600 cursor-not-allowed shadow-none",
               state === "done" &&
-                "bg-gray-100 hover:bg-gray-200 text-gray-500"
+                "bg-gray-100 hover:bg-gray-200 text-gray-700"
             )}
             aria-label={
               state === "recording" ? "Stop recording" : "Start recording"
@@ -198,7 +198,7 @@ export function VoiceRecorder({ onItemsExtracted }: VoiceRecorderProps) {
             {Array.from({ length: 24 }).map((_, i) => (
               <div
                 key={i}
-                className="w-1.5 rounded-full bg-brand-600"
+                className="w-1.5 rounded-none bg-brand-600"
                 style={{
                   height: `${20 + Math.random() * 60}%`,
                   animation: `pulse ${0.4 + (i % 5) * 0.1}s ease-in-out infinite alternate`,
@@ -212,12 +212,12 @@ export function VoiceRecorder({ onItemsExtracted }: VoiceRecorderProps) {
 
         {/* Hint text */}
         {state === "idle" && (
-          <p className="text-xs text-gray-400 text-center max-w-48 leading-relaxed">
+          <p className="text-xs text-gray-600 text-center max-w-48 leading-relaxed">
             Tap the mic and describe your estimate out loud. Hunter will extract line items automatically.
           </p>
         )}
         {state === "done" && (
-          <p className="text-xs text-green-600 font-medium text-center">
+          <p className="text-xs text-emerald-950 font-medium text-center">
             {lineItems.length} line items extracted. Tap mic to re-record.
           </p>
         )}
@@ -225,11 +225,11 @@ export function VoiceRecorder({ onItemsExtracted }: VoiceRecorderProps) {
 
       {/* Transcript */}
       {(state === "recording" || transcript) && (
-        <div className="rounded-lg border border-border bg-gray-50 p-4">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+        <div className="rounded-none border border-border bg-gray-50 p-4">
+          <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
             Transcript
           </p>
-          <p className="text-sm text-gray-700 leading-relaxed min-h-[3rem]">
+          <p className="text-sm text-gray-900 leading-relaxed min-h-[3rem]">
             {transcript}
             {state === "recording" && (
               <span className="inline-block w-0.5 h-4 bg-brand-600 ml-0.5 animate-pulse align-middle" />
@@ -240,9 +240,9 @@ export function VoiceRecorder({ onItemsExtracted }: VoiceRecorderProps) {
 
       {/* Extracted line items table */}
       {state === "done" && lineItems.length > 0 && (
-        <div className="rounded-lg border border-border overflow-hidden">
+        <div className="rounded-none border border-border overflow-hidden">
           <div className="bg-gray-50 px-4 py-2.5 flex items-center justify-between border-b border-border">
-            <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+            <p className="text-xs font-semibold text-gray-800 uppercase tracking-wide">
               Extracted Line Items
             </p>
             <button
@@ -257,16 +257,16 @@ export function VoiceRecorder({ onItemsExtracted }: VoiceRecorderProps) {
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-border">
-                  <th className="text-left px-3 py-2 text-gray-500 font-semibold w-full">
+                  <th className="text-left px-3 py-2 text-gray-700 font-semibold w-full">
                     Description
                   </th>
-                  <th className="text-right px-3 py-2 text-gray-500 font-semibold whitespace-nowrap">
+                  <th className="text-right px-3 py-2 text-gray-700 font-semibold whitespace-nowrap">
                     Qty
                   </th>
-                  <th className="text-right px-3 py-2 text-gray-500 font-semibold whitespace-nowrap">
+                  <th className="text-right px-3 py-2 text-gray-700 font-semibold whitespace-nowrap">
                     Unit $
                   </th>
-                  <th className="text-right px-3 py-2 text-gray-500 font-semibold whitespace-nowrap">
+                  <th className="text-right px-3 py-2 text-gray-700 font-semibold whitespace-nowrap">
                     Total
                   </th>
                   <th className="w-8" />
@@ -321,7 +321,7 @@ export function VoiceRecorder({ onItemsExtracted }: VoiceRecorderProps) {
               </tbody>
               <tfoot>
                 <tr className="bg-gray-50 border-t-2 border-gray-200">
-                  <td colSpan={3} className="px-3 py-2.5 text-xs font-bold text-gray-700 text-right">
+                  <td colSpan={3} className="px-3 py-2.5 text-xs font-bold text-gray-900 text-right">
                     Total
                   </td>
                   <td className="px-3 py-2.5 text-sm font-bold text-gray-900 text-right tabular-nums whitespace-nowrap">

@@ -58,7 +58,7 @@ export function HowItWorks() {
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
             Simple for both sides.
           </h2>
-          <p className="mt-4 text-lg text-gray-500 max-w-2xl">
+          <p className="mt-4 text-lg text-gray-700 max-w-2xl">
             No algorithms to game. No credits to buy. No middlemen.
           </p>
         </div>
@@ -73,7 +73,7 @@ export function HowItWorks() {
             <div className="space-y-10">
               {contractorSteps.map((step) => (
                 <div key={step.number} className="flex items-start gap-5">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-none bg-brand-600 flex items-center justify-center">
                     <span className="text-sm font-bold text-white">
                       {step.number}
                     </span>
@@ -82,7 +82,7 @@ export function HowItWorks() {
                     <h4 className="text-base font-bold text-gray-900 mb-2">
                       {step.title}
                     </h4>
-                    <p className="text-sm text-gray-500 leading-relaxed">
+                    <p className="text-sm text-gray-700 leading-relaxed">
                       {step.description}
                     </p>
                   </div>
@@ -99,7 +99,7 @@ export function HowItWorks() {
             <div className="space-y-10">
               {homeownerSteps.map((step) => (
                 <div key={step.number} className="flex items-start gap-5">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-none bg-gray-900 flex items-center justify-center">
                     <span className="text-sm font-bold text-white">
                       {step.number}
                     </span>
@@ -108,7 +108,7 @@ export function HowItWorks() {
                     <h4 className="text-base font-bold text-gray-900 mb-2">
                       {step.title}
                     </h4>
-                    <p className="text-sm text-gray-500 leading-relaxed">
+                    <p className="text-sm text-gray-700 leading-relaxed">
                       {step.description}
                     </p>
                   </div>

@@ -46,7 +46,7 @@ function ResetPasswordContent() {
               <h1 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">
                 Invalid reset link
               </h1>
-              <p className="text-sm text-gray-500 mb-6">
+              <p className="text-sm text-gray-700 mb-6">
                 This password reset link is invalid or has expired.
               </p>
               <Link href="/forgot-password">
@@ -115,14 +115,14 @@ function ResetPasswordContent() {
               <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
                 Set new password
               </h1>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-700 mt-1">
                 Enter your new password below.
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+                <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-none">
                   {error}
                 </div>
               )}
@@ -130,7 +130,7 @@ function ResetPasswordContent() {
               <div className="space-y-1.5">
                 <label
                   htmlFor="password"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-gray-900"
                 >
                   New password
                 </label>
@@ -148,7 +148,7 @@ function ResetPasswordContent() {
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute inset-y-0 right-3 flex items-center text-gray-600 hover:text-gray-800 transition-colors"
                     tabIndex={-1}
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
@@ -164,7 +164,7 @@ function ResetPasswordContent() {
               <div className="space-y-1.5">
                 <label
                   htmlFor="confirm-password"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-gray-900"
                 >
                   Confirm password
                 </label>
@@ -182,7 +182,7 @@ function ResetPasswordContent() {
                   <button
                     type="button"
                     onClick={() => setShowConfirm((v) => !v)}
-                    className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute inset-y-0 right-3 flex items-center text-gray-600 hover:text-gray-800 transition-colors"
                     tabIndex={-1}
                     aria-label={showConfirm ? "Hide password" : "Show password"}
                   >

@@ -15,12 +15,12 @@ export default function GlobalError({
           <h1 className="text-2xl font-semibold text-gray-900 mb-2">
             Something went wrong
           </h1>
-          <p className="text-gray-500 mb-8">
+          <p className="text-gray-700 mb-8">
             An unexpected error occurred. Please try again.
           </p>
           <button
             onClick={() => reset()}
-            className="inline-flex items-center justify-center rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 transition-colors"
+            className="inline-flex items-center justify-center rounded-none bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 transition-colors"
           >
             Try again
           </button>

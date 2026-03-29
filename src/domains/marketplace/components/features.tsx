@@ -106,7 +106,7 @@ export function Features() {
                 {/* Left — content */}
                 <div className="lg:flex-1">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-lg bg-brand-50 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-none bg-brand-50 flex items-center justify-center flex-shrink-0">
                       <Icon className="w-5 h-5 text-brand-600" />
                     </div>
                     <p className="text-sm font-bold text-brand-600 uppercase tracking-widest">
@@ -118,7 +118,7 @@ export function Features() {
                     {feature.title}
                   </h2>
 
-                  <p className="text-lg text-gray-500 max-w-2xl leading-relaxed mb-8">
+                  <p className="text-lg text-gray-700 max-w-2xl leading-relaxed mb-8">
                     {feature.description}
                   </p>
 
@@ -126,9 +126,9 @@ export function Features() {
                     {feature.details.map((detail) => (
                       <li
                         key={detail}
-                        className="flex items-start gap-3 text-sm text-gray-600"
+                        className="flex items-start gap-3 text-sm text-gray-800"
                       >
-                        <span className="w-1.5 h-1.5 rounded-full bg-brand-600 mt-1.5 flex-shrink-0" />
+                        <span className="w-1.5 h-1.5 rounded-none bg-brand-600 mt-1.5 flex-shrink-0" />
                         {detail}
                       </li>
                     ))}
@@ -144,7 +144,7 @@ export function Features() {
                     <div className="text-7xl font-bold text-gray-200 leading-none tabular-nums select-none">
                       {feature.callout.value}
                     </div>
-                    <p className="text-sm text-gray-400 mt-2">
+                    <p className="text-sm text-gray-600 mt-2">
                       {feature.callout.label}
                     </p>
                   </div>

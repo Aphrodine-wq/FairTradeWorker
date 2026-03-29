@@ -10,7 +10,7 @@
   --bg-card: #FFFFFF;
   --text-primary: #050608;
   --text-secondary: #0C0E14;
-  --text-muted: #141720;
+  --text-muted: #2A2E38;
   --border: #E5E1DB;
 }
 
@@ -31,6 +31,22 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+  }
+
+  .bg-surface,
+  [class*="bg-surface"] {
+    position: relative;
+  }
+
+  .bg-surface::before,
+  [class*="bg-surface"]::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.025;
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEWFhYWDg4N3d3dtbW17e3t1dXWBgYGHh4d5eXlzc3Oelieli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli AAAAAAAAkR");
   }
 
   ::selection {

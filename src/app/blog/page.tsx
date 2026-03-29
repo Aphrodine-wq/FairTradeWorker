@@ -45,7 +45,7 @@ const POSTS = [
 ] as const;
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Company: "bg-gray-100 text-gray-600",
+  Company: "bg-gray-100 text-gray-800",
   Product: "bg-brand-50 text-brand-700",
   Guides: "bg-blue-50 text-blue-700",
   News: "bg-amber-50 text-amber-700",
@@ -63,7 +63,7 @@ export default function BlogPage() {
           <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
             From the field.
           </h1>
-          <p className="mt-4 text-lg text-gray-500">
+          <p className="mt-4 text-lg text-gray-700">
             Tips, stories, and updates from the FairTradeWorker team.
           </p>
 
@@ -75,29 +75,29 @@ export default function BlogPage() {
               <Link
                 key={post.title}
                 href={post.slug}
-                className="group block border border-gray-100 rounded-xl p-7 hover:border-gray-200 hover:shadow-sm transition-all duration-150"
+                className="group block border border-gray-100 rounded-none p-7 hover:border-gray-200 hover:shadow-sm transition-all duration-150"
               >
                 <div className="flex items-center gap-3 mb-4">
                   <span
-                    className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-                      CATEGORY_COLORS[post.category] ?? "bg-gray-100 text-gray-600"
+                    className={`text-xs font-semibold px-2.5 py-1 rounded-none ${
+                      CATEGORY_COLORS[post.category] ?? "bg-gray-100 text-gray-800"
                     }`}
                   >
                     {post.category}
                   </span>
-                  <span className="text-xs text-gray-400">{post.date}</span>
+                  <span className="text-xs text-gray-600">{post.date}</span>
                 </div>
                 <h2 className="text-lg font-bold text-gray-900 leading-snug group-hover:text-brand-600 transition-colors mb-3">
                   {post.title}
                 </h2>
-                <p className="text-sm text-gray-500 leading-relaxed line-clamp-2">
+                <p className="text-sm text-gray-700 leading-relaxed line-clamp-2">
                   {post.excerpt}
                 </p>
               </Link>
             ))}
           </div>
 
-          <p className="mt-14 text-sm text-gray-400">More coming soon.</p>
+          <p className="mt-14 text-sm text-gray-600">More coming soon.</p>
 
         </div>
       </main>

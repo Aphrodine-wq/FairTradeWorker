@@ -21,7 +21,7 @@ export function MobileNav() {
     <div className="md:hidden">
       <button
         onClick={() => setOpen(true)}
-        className="p-2 text-gray-600 hover:text-gray-900 transition-colors duration-150"
+        className="p-2 text-gray-800 hover:text-gray-900 transition-colors duration-150"
         aria-label="Open menu"
       >
         <Menu className="h-5 w-5" />
@@ -45,7 +45,7 @@ export function MobileNav() {
           <span className="text-base font-bold text-gray-900">Menu</span>
           <button
             onClick={() => setOpen(false)}
-            className="p-2 text-gray-600 hover:text-gray-900 transition-colors duration-150"
+            className="p-2 text-gray-800 hover:text-gray-900 transition-colors duration-150"
             aria-label="Close menu"
           >
             <X className="h-5 w-5" />
@@ -58,10 +58,10 @@ export function MobileNav() {
               key={link.href}
               href={link.href}
               onClick={() => setOpen(false)}
-              className={`block px-3 py-2.5 rounded-lg text-sm transition-colors duration-150 ${
+              className={`block px-3 py-2.5 rounded-none text-sm transition-colors duration-150 ${
                 link.accent
                   ? "font-medium text-brand-600 hover:bg-brand-50"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  : "text-gray-800 hover:text-gray-900 hover:bg-gray-100"
               }`}
             >
               {link.label}
@@ -73,7 +73,7 @@ export function MobileNav() {
           <Link
             href="/login"
             onClick={() => setOpen(false)}
-            className="block px-3 py-2.5 text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150"
+            className="block px-3 py-2.5 text-sm text-gray-800 hover:text-gray-900 transition-colors duration-150"
           >
             Log In
           </Link>

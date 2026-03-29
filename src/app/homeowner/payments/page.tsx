@@ -23,6 +23,7 @@ import { Badge } from "@shared/ui/badge";
 import { Button } from "@shared/ui/button";
 import { Input } from "@shared/ui/input";
 import { formatCurrency, cn } from "@shared/lib/utils";
+import { usePageTitle } from "@shared/hooks/use-page-title";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -101,16 +102,17 @@ const PAYMENT_METHOD = {
 };
 
 const STATUS_CONFIG: Record<MilestoneStatus, { label: string; color: string; bg: string }> = {
-  paid:        { label: "Paid",         color: "text-emerald-700", bg: "bg-emerald-100 border-emerald-300" },
+  paid:        { label: "Paid",         color: "text-emerald-950", bg: "bg-emerald-950/10 border-emerald-800/30" },
   approved:    { label: "Processing",   color: "text-blue-700",    bg: "bg-blue-100 border-blue-300" },
   submitted:   { label: "Awaiting Review", color: "text-amber-700", bg: "bg-amber-100 border-amber-300" },
-  in_progress: { label: "In Progress",  color: "text-gray-600",    bg: "bg-gray-100 border-gray-200" },
-  pending:     { label: "Upcoming",     color: "text-gray-400",    bg: "bg-gray-50 border-gray-200" },
+  in_progress: { label: "In Progress",  color: "text-gray-800",    bg: "bg-gray-100 border-gray-200" },
+  pending:     { label: "Upcoming",     color: "text-gray-600",    bg: "bg-gray-50 border-gray-200" },
 };
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function HomeownerPaymentsPage() {
+  usePageTitle("Payments");
   const [expandedProject, setExpandedProject] = useState<string | null>("j1");
   const [expandedMilestone, setExpandedMilestone] = useState<string | null>(null);
   const [showBalances, setShowBalances] = useState(true);
@@ -131,13 +133,13 @@ export default function HomeownerPaymentsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-gray-900">Payments</h1>
-            <p className="text-[13px] text-gray-400 mt-0.5">Escrow balances and milestone payments</p>
+            <p className="text-[13px] text-gray-600 mt-0.5">Escrow balances and milestone payments</p>
           </div>
           <div className="flex items-center gap-2">
             {awaitingReview > 0 && (
               <Link
                 href="/homeowner/milestones"
-                className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-amber-50 border border-amber-200 text-[12px] font-semibold text-amber-700 hover:bg-amber-100 transition-colors"
+                className="flex items-center gap-1.5 h-8 px-3 rounded-none bg-amber-50 border border-amber-200 text-[12px] font-semibold text-amber-700 hover:bg-amber-100 transition-colors"
               >
                 <Clock className="w-3.5 h-3.5" />
                 {awaitingReview} awaiting review
@@ -145,7 +147,7 @@ export default function HomeownerPaymentsPage() {
             )}
             <button
               onClick={() => setShowBalances(!showBalances)}
-              className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border text-[12px] font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1.5 h-8 px-3 rounded-none border border-border text-[12px] font-medium text-gray-800 hover:bg-gray-50 transition-colors"
             >
               {showBalances ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
               {showBalances ? "Hide" : "Show"}
@@ -157,37 +159,37 @@ export default function HomeownerPaymentsPage() {
       <div className="flex-1 px-6 py-5 overflow-y-auto">
         {/* Finance cards */}
         <div className="grid grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-xl border border-border p-5">
+          <div className="bg-white rounded-none border border-border p-5">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">In Escrow</p>
+              <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wider">In Escrow</p>
               <Lock className="w-4 h-4 text-blue-600" />
             </div>
             <p className="text-2xl font-bold text-gray-900 tabular-nums">{showBalances ? formatCurrency(totalHeld) : "****"}</p>
-            <p className="text-[11px] text-gray-400 mt-1">Held until milestones approved</p>
+            <p className="text-[11px] text-gray-600 mt-1">Held until milestones approved</p>
           </div>
-          <div className="bg-white rounded-xl border border-border p-5">
+          <div className="bg-white rounded-none border border-border p-5">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Paid Out</p>
-              <Check className="w-4 h-4 text-emerald-600" />
+              <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wider">Paid Out</p>
+              <Check className="w-4 h-4 text-emerald-950" />
             </div>
-            <p className="text-2xl font-bold text-emerald-700 tabular-nums">{showBalances ? formatCurrency(totalPaid) : "****"}</p>
-            <p className="text-[11px] text-gray-400 mt-1">Released to contractors</p>
+            <p className="text-2xl font-bold text-emerald-950 tabular-nums">{showBalances ? formatCurrency(totalPaid) : "****"}</p>
+            <p className="text-[11px] text-gray-600 mt-1">Released to contractors</p>
           </div>
-          <div className="bg-white rounded-xl border border-border p-5">
+          <div className="bg-white rounded-none border border-border p-5">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Processing</p>
+              <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wider">Processing</p>
               <Clock className="w-4 h-4 text-blue-600" />
             </div>
             <p className="text-2xl font-bold text-blue-700 tabular-nums">{showBalances ? formatCurrency(totalProcessing) : "****"}</p>
-            <p className="text-[11px] text-gray-400 mt-1">Approved, releasing soon</p>
+            <p className="text-[11px] text-gray-600 mt-1">Approved, releasing soon</p>
           </div>
-          <div className="bg-white rounded-xl border border-border p-5">
+          <div className="bg-white rounded-none border border-border p-5">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Fees Paid</p>
-              <FileText className="w-4 h-4 text-gray-400" />
+              <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wider">Fees Paid</p>
+              <FileText className="w-4 h-4 text-gray-600" />
             </div>
             <p className="text-2xl font-bold text-gray-900 tabular-nums">{showBalances ? formatCurrency(totalFees) : "****"}</p>
-            <p className="text-[11px] text-gray-400 mt-1">3% platform fee</p>
+            <p className="text-[11px] text-gray-600 mt-1">3% platform fee</p>
           </div>
         </div>
 
@@ -201,7 +203,7 @@ export default function HomeownerPaymentsPage() {
               const nextAction = project.milestones.find((m) => m.status === "submitted");
 
               return (
-                <div key={project.id} className="bg-white rounded-xl border border-border overflow-hidden">
+                <div key={project.id} className="bg-white rounded-none border border-border overflow-hidden">
                   {/* Project header */}
                   <button
                     onClick={() => setExpandedProject(isExpanded ? null : project.id)}
@@ -216,13 +218,13 @@ export default function HomeownerPaymentsPage() {
                           </span>
                         )}
                       </div>
-                      <p className="text-[12px] text-gray-400 mt-0.5">{project.contractor}</p>
+                      <p className="text-[12px] text-gray-600 mt-0.5">{project.contractor}</p>
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-[15px] font-bold text-gray-900 tabular-nums">{formatCurrency(project.contractValue)}</p>
-                      <p className="text-[11px] text-gray-400">{pct}% paid</p>
+                      <p className="text-[11px] text-gray-600">{pct}% paid</p>
                     </div>
-                    <ChevronDown className={cn("w-4 h-4 text-gray-400 shrink-0 transition-transform", isExpanded && "rotate-180")} />
+                    <ChevronDown className={cn("w-4 h-4 text-gray-600 shrink-0 transition-transform", isExpanded && "rotate-180")} />
                   </button>
 
                   {/* Expanded milestone list */}
@@ -231,10 +233,10 @@ export default function HomeownerPaymentsPage() {
                       {/* Progress bar */}
                       <div className="px-5 py-3 bg-gray-50/50">
                         <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-[11px] font-medium text-gray-500">Escrow progress</span>
+                          <span className="text-[11px] font-medium text-gray-700">Escrow progress</span>
                           <span className="text-[11px] font-bold text-gray-900 tabular-nums">{formatCurrency(paid)} / {formatCurrency(project.contractValue)}</span>
                         </div>
-                        <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden flex">
+                        <div className="h-1.5 bg-gray-200 rounded-none overflow-hidden flex">
                           {(() => {
                             const paidPct = (project.milestones.filter((m) => m.status === "paid").reduce((s, m) => s + m.amount, 0) / project.contractValue) * 100;
                             const approvedPct = (project.milestones.filter((m) => m.status === "approved").reduce((s, m) => s + m.amount, 0) / project.contractValue) * 100;
@@ -262,24 +264,24 @@ export default function HomeownerPaymentsPage() {
                             >
                               {/* Status dot */}
                               <div className={cn(
-                                "w-6 h-6 rounded-lg flex items-center justify-center shrink-0",
-                                m.status === "paid" ? "bg-emerald-100" : m.status === "approved" ? "bg-blue-100" : m.status === "submitted" ? "bg-amber-100" : "bg-gray-50"
+                                "w-6 h-6 rounded-none flex items-center justify-center shrink-0",
+                                m.status === "paid" ? "bg-emerald-950/10" : m.status === "approved" ? "bg-blue-100" : m.status === "submitted" ? "bg-amber-100" : "bg-gray-50"
                               )}>
-                                {m.status === "paid" && <Check className="w-3.5 h-3.5 text-emerald-700" strokeWidth={2.5} />}
+                                {m.status === "paid" && <Check className="w-3.5 h-3.5 text-emerald-950" strokeWidth={2.5} />}
                                 {m.status === "approved" && <Clock className="w-3.5 h-3.5 text-blue-700" />}
                                 {m.status === "submitted" && <Clock className="w-3.5 h-3.5 text-amber-700" />}
-                                {m.status === "in_progress" && <div className="w-2 h-2 rounded-full bg-gray-400" />}
+                                {m.status === "in_progress" && <div className="w-2 h-2 rounded-none bg-gray-400" />}
                                 {m.status === "pending" && <Circle className="w-3.5 h-3.5 text-gray-300" />}
                               </div>
 
                               {/* Label */}
                               <div className="flex-1 min-w-0">
-                                <p className={cn("text-[13px] font-medium", m.status === "pending" ? "text-gray-400" : "text-gray-900")}>{m.label}</p>
+                                <p className={cn("text-[13px] font-medium", m.status === "pending" ? "text-gray-600" : "text-gray-900")}>{m.label}</p>
                                 <span className={cn("text-[10px] font-semibold px-1.5 py-0.5 rounded border inline-block mt-0.5", cfg.bg, cfg.color)}>{cfg.label}</span>
                               </div>
 
                               {/* Amount */}
-                              <p className={cn("text-[14px] font-bold tabular-nums shrink-0", m.status === "paid" ? "text-emerald-700" : "text-gray-900")}>
+                              <p className={cn("text-[14px] font-bold tabular-nums shrink-0", m.status === "paid" ? "text-emerald-950" : "text-gray-900")}>
                                 {formatCurrency(m.amount)}
                               </p>
 
@@ -288,7 +290,7 @@ export default function HomeownerPaymentsPage() {
                                 {m.status === "submitted" && (
                                   <Link
                                     href="/homeowner/milestones"
-                                    className="text-[11px] font-semibold text-amber-700 bg-amber-100 hover:bg-amber-200 border border-amber-300 px-2.5 py-1 rounded-lg transition-colors"
+                                    className="text-[11px] font-semibold text-amber-700 bg-amber-100 hover:bg-amber-200 border border-amber-300 px-2.5 py-1 rounded-none transition-colors"
                                   >
                                     Review
                                   </Link>
@@ -304,24 +306,24 @@ export default function HomeownerPaymentsPage() {
                               <div className="px-5 pb-4 bg-gray-50/50">
                                 <div className="grid grid-cols-2 gap-x-8 gap-y-2 py-3 border-t border-border">
                                   <div>
-                                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">Reference</p>
-                                    <p className="text-[12px] font-mono text-gray-700 mt-0.5">{m.reference}</p>
+                                    <p className="text-[10px] text-gray-600 uppercase tracking-wider">Reference</p>
+                                    <p className="text-[12px] font-mono text-gray-900 mt-0.5">{m.reference}</p>
                                   </div>
                                   <div>
-                                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">{m.status === "paid" ? "Paid" : "Approved"}</p>
-                                    <p className="text-[12px] text-gray-700 mt-0.5">{m.paidDate || m.approvedDate}</p>
+                                    <p className="text-[10px] text-gray-600 uppercase tracking-wider">{m.status === "paid" ? "Paid" : "Approved"}</p>
+                                    <p className="text-[12px] text-gray-900 mt-0.5">{m.paidDate || m.approvedDate}</p>
                                   </div>
                                   <div>
-                                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">Milestone amount</p>
+                                    <p className="text-[10px] text-gray-600 uppercase tracking-wider">Milestone amount</p>
                                     <p className="text-[12px] font-semibold text-gray-900 mt-0.5 tabular-nums">{formatCurrency(m.amount)}</p>
                                   </div>
                                   <div>
-                                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">Platform fee (3%)</p>
-                                    <p className="text-[12px] text-gray-700 mt-0.5 tabular-nums">{formatCurrency(m.platformFee || 0)}</p>
+                                    <p className="text-[10px] text-gray-600 uppercase tracking-wider">Platform fee (3%)</p>
+                                    <p className="text-[12px] text-gray-900 mt-0.5 tabular-nums">{formatCurrency(m.platformFee || 0)}</p>
                                   </div>
                                 </div>
                                 <div className="flex gap-2 pt-2">
-                                  <button className="flex items-center gap-1.5 text-[11px] font-medium text-gray-500 hover:text-gray-900 transition-colors">
+                                  <button className="flex items-center gap-1.5 text-[11px] font-medium text-gray-700 hover:text-gray-900 transition-colors">
                                     <Download className="w-3 h-3" /> Receipt
                                   </button>
                                 </div>
@@ -340,49 +342,49 @@ export default function HomeownerPaymentsPage() {
           {/* Right sidebar */}
           <div className="space-y-4">
             {/* Payment method */}
-            <div className="bg-white rounded-xl border border-border p-5">
+            <div className="bg-white rounded-none border border-border p-5">
               <p className="text-[12px] font-semibold text-gray-900 uppercase tracking-wider mb-4">Payment Method</p>
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-border">
-                <div className="w-10 h-10 rounded-lg bg-dark flex items-center justify-center shrink-0">
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-none border border-border">
+                <div className="w-10 h-10 rounded-none bg-dark flex items-center justify-center shrink-0">
                   <CreditCard className="w-5 h-5 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[13px] font-semibold text-gray-900">{PAYMENT_METHOD.type} ending in {PAYMENT_METHOD.last4}</p>
-                  <p className="text-[11px] text-gray-400">Expires {PAYMENT_METHOD.expiry}</p>
+                  <p className="text-[11px] text-gray-600">Expires {PAYMENT_METHOD.expiry}</p>
                 </div>
               </div>
-              <button className="w-full mt-3 h-8 rounded-lg border border-border text-[12px] font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+              <button className="w-full mt-3 h-8 rounded-none border border-border text-[12px] font-medium text-gray-800 hover:bg-gray-50 transition-colors">
                 Update payment method
               </button>
             </div>
 
             {/* Quick actions */}
-            <div className="bg-white rounded-xl border border-border p-5">
+            <div className="bg-white rounded-none border border-border p-5">
               <p className="text-[12px] font-semibold text-gray-900 uppercase tracking-wider mb-3">Quick Actions</p>
               <div className="space-y-2">
                 <Link
                   href="/homeowner/milestones"
-                  className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-none border border-border hover:bg-gray-50 transition-colors"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-none bg-amber-50 flex items-center justify-center shrink-0">
                     <Clock className="w-4 h-4 text-amber-600" />
                   </div>
                   <div className="flex-1">
                     <p className="text-[13px] font-medium text-gray-900">Review Milestones</p>
-                    <p className="text-[11px] text-gray-400">{awaitingReview} awaiting approval</p>
+                    <p className="text-[11px] text-gray-600">{awaitingReview} awaiting approval</p>
                   </div>
                   <ExternalLink className="w-3.5 h-3.5 text-gray-300" />
                 </Link>
                 <Link
                   href="/homeowner/projects"
-                  className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-none border border-border hover:bg-gray-50 transition-colors"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-brand-50 flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-none bg-brand-50 flex items-center justify-center shrink-0">
                     <FileText className="w-4 h-4 text-brand-600" />
                   </div>
                   <div className="flex-1">
                     <p className="text-[13px] font-medium text-gray-900">View Projects</p>
-                    <p className="text-[11px] text-gray-400">{PROJECTS.length} active</p>
+                    <p className="text-[11px] text-gray-600">{PROJECTS.length} active</p>
                   </div>
                   <ExternalLink className="w-3.5 h-3.5 text-gray-300" />
                 </Link>
@@ -390,14 +392,14 @@ export default function HomeownerPaymentsPage() {
             </div>
 
             {/* Security */}
-            <div className="bg-white rounded-xl border border-border p-5">
+            <div className="bg-white rounded-none border border-border p-5">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
-                  <Shield className="w-4 h-4 text-emerald-600" />
+                <div className="w-8 h-8 rounded-none bg-emerald-950/10 flex items-center justify-center">
+                  <Shield className="w-4 h-4 text-emerald-950" />
                 </div>
                 <div>
                   <p className="text-[13px] font-semibold text-gray-900">Escrow Protected</p>
-                  <p className="text-[11px] text-gray-400">Funds secured until verified</p>
+                  <p className="text-[11px] text-gray-600">Funds secured until verified</p>
                 </div>
               </div>
               <div className="space-y-2">
@@ -408,8 +410,8 @@ export default function HomeownerPaymentsPage() {
                   "Full transaction audit trail",
                 ].map((item) => (
                   <div key={item} className="flex items-center gap-2">
-                    <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" strokeWidth={2.5} />
-                    <span className="text-[12px] text-gray-500">{item}</span>
+                    <Check className="w-3.5 h-3.5 text-emerald-800 shrink-0" strokeWidth={2.5} />
+                    <span className="text-[12px] text-gray-700">{item}</span>
                   </div>
                 ))}
               </div>

@@ -49,6 +49,7 @@ import { mockContractors, mockJobs, type Job } from "@shared/lib/mock-data";
 import { fetchJobs } from "@shared/lib/data";
 import { useRealtimeJobs } from "@shared/hooks/use-realtime";
 import type { LucideIcon } from "lucide-react";
+import { usePageTitle } from "@shared/hooks/use-page-title";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -111,7 +112,7 @@ const CATEGORY_STYLE: Record<string, { icon: LucideIcon; color: string; bg: stri
   "Roofing":             { icon: Home, color: "text-red-600", bg: "bg-red-50" },
   "Painting":            { icon: PaintBucket, color: "text-violet-600", bg: "bg-violet-50" },
   "Flooring":            { icon: Layers, color: "text-stone-600", bg: "bg-stone-50" },
-  "Landscaping":         { icon: TreePine, color: "text-emerald-600", bg: "bg-emerald-50" },
+  "Landscaping":         { icon: TreePine, color: "text-emerald-950", bg: "bg-emerald-950/10" },
   "Remodeling":          { icon: LayoutGrid, color: "text-indigo-600", bg: "bg-indigo-50" },
   "Concrete":            { icon: Square, color: "text-slate-600", bg: "bg-slate-50" },
   "Fencing":             { icon: Fence, color: "text-teal-600", bg: "bg-teal-50" },
@@ -119,10 +120,10 @@ const CATEGORY_STYLE: Record<string, { icon: LucideIcon; color: string; bg: stri
 };
 
 function CategoryIcon({ category }: { category: string }) {
-  const style = CATEGORY_STYLE[category] ?? { icon: Hammer, color: "text-gray-500", bg: "bg-gray-100" };
+  const style = CATEGORY_STYLE[category] ?? { icon: Hammer, color: "text-gray-700", bg: "bg-gray-100" };
   const Icon = style.icon;
   return (
-    <div className={cn("flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg", style.bg)}>
+    <div className={cn("flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-none", style.bg)}>
       <Icon className={cn("h-4.5 w-4.5", style.color)} />
     </div>
   );
@@ -185,12 +186,12 @@ function FairPriceTag({ bidAmount, fairPrice }: { bidAmount: number; fairPrice: 
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 text-[10px] font-semibold rounded-full px-2 py-0.5 border whitespace-nowrap",
+        "inline-flex items-center gap-1 text-[10px] font-semibold rounded-none px-2 py-0.5 border whitespace-nowrap",
         comparison.sentiment === "below"
           ? "text-brand-700 bg-brand-50 border-brand-100"
           : comparison.sentiment === "above"
           ? "text-amber-700 bg-amber-50 border-amber-100"
-          : "text-gray-600 bg-gray-50 border-gray-200"
+          : "text-gray-800 bg-gray-50 border-gray-200"
       )}
     >
       {comparison.sentiment === "below" ? (
@@ -274,7 +275,7 @@ type StatusFilter = "all" | "open" | "in_progress" | "completed";
 const STATUS_BADGE: Record<string, { label: string; className: string }> = {
   open:        { label: "Open",        className: "bg-brand-50 text-brand-700 border-brand-200" },
   in_progress: { label: "In Progress", className: "bg-amber-50 text-amber-700 border-amber-200" },
-  completed:   { label: "Completed",   className: "bg-gray-100 text-gray-600 border-gray-200" },
+  completed:   { label: "Completed",   className: "bg-gray-100 text-gray-800 border-gray-200" },
   cancelled:   { label: "Cancelled",   className: "bg-red-50 text-red-600 border-red-200" },
 };
 
@@ -310,7 +311,7 @@ function BidDialog({
         </DialogHeader>
 
         {isAccepted && (
-          <div className="mx-6 mt-6 flex items-start gap-3 rounded-xl bg-brand-50 border border-brand-200 p-4">
+          <div className="mx-6 mt-6 flex items-start gap-3 rounded-none bg-brand-50 border border-brand-200 p-4">
             <CheckCircle2 className="h-5 w-5 text-brand-600 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-semibold text-brand-800">Bid Accepted</p>
@@ -324,7 +325,7 @@ function BidDialog({
         <div className="flex items-start gap-4 px-6 pt-6">
           <div
             className={cn(
-              "flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full text-white text-base font-bold",
+              "flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-none text-white text-base font-bold",
               avatarColor(contractor.id)
             )}
           >
@@ -332,11 +333,11 @@ function BidDialog({
           </div>
           <div className="flex-1 min-w-0">
             <h2 className="text-lg font-bold text-gray-900">{contractor.name}</h2>
-            <p className="text-sm text-gray-500">{contractor.company}</p>
+            <p className="text-sm text-gray-700">{contractor.company}</p>
             <div className="flex items-center gap-2 mt-1">
               <StarRating rating={contractor.rating} />
               <span className="text-sm font-semibold text-gray-900">{contractor.rating}</span>
-              <span className="text-sm text-gray-400">({contractor.reviewCount} reviews)</span>
+              <span className="text-sm text-gray-600">({contractor.reviewCount} reviews)</span>
             </div>
           </div>
         </div>
@@ -347,7 +348,7 @@ function BidDialog({
             { show: contractor.licensed, label: "Licensed", style: "text-blue-700 bg-blue-50 border-blue-100" },
             { show: contractor.insured,  label: "Insured",  style: "text-violet-700 bg-violet-50 border-violet-100" },
           ] as const).filter((b) => b.show).map((b) => (
-            <span key={b.label} className={cn("inline-flex items-center gap-1 text-xs font-medium border rounded-full px-2.5 py-0.5", b.style)}>
+            <span key={b.label} className={cn("inline-flex items-center gap-1 text-xs font-medium border rounded-none px-2.5 py-0.5", b.style)}>
               <Shield className="h-3 w-3" /> {b.label}
             </span>
           ))}
@@ -361,19 +362,19 @@ function BidDialog({
             { icon: Clock, label: "Timeline", value: bid.timeline, accent: false },
             { icon: CalendarDays, label: "Submitted", value: formatDate(bid.submittedDate), accent: false },
           ].map((s) => (
-            <div key={s.label} className={cn("rounded-xl border p-4 text-center", s.accent ? "bg-brand-50 border-brand-100" : "bg-gray-50 border-gray-200")}>
-              <s.icon className={cn("h-4 w-4 mx-auto mb-1", s.accent ? "text-brand-600" : "text-gray-500")} />
-              <p className="text-xs text-gray-500 mb-0.5">{s.label}</p>
+            <div key={s.label} className={cn("rounded-none border p-4 text-center", s.accent ? "bg-brand-50 border-brand-100" : "bg-gray-50 border-gray-200")}>
+              <s.icon className={cn("h-4 w-4 mx-auto mb-1", s.accent ? "text-brand-600" : "text-gray-700")} />
+              <p className="text-xs text-gray-700 mb-0.5">{s.label}</p>
               <p className="text-lg font-bold text-gray-900">{s.value}</p>
             </div>
           ))}
         </div>
 
         {fairPrice && (
-          <div className="mx-6 mt-4 flex items-center gap-3 rounded-xl bg-gray-50 border border-gray-200 px-4 py-3">
+          <div className="mx-6 mt-4 flex items-center gap-3 rounded-none bg-gray-50 border border-gray-200 px-4 py-3">
             <BarChart3 className="h-4 w-4 text-brand-600 flex-shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-gray-500">FairPrice Estimate</p>
+              <p className="text-xs font-semibold text-gray-700">FairPrice Estimate</p>
               <p className="text-sm text-gray-900 font-medium">
                 {formatCurrency(fairPrice.low)} – {formatCurrency(fairPrice.high)}
               </p>
@@ -383,14 +384,14 @@ function BidDialog({
         )}
 
         <div className="px-6 mt-5">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Cover Letter</p>
-          <p className="text-sm text-gray-700 leading-relaxed">{bid.coverLetter}</p>
+          <p className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">Cover Letter</p>
+          <p className="text-sm text-gray-900 leading-relaxed">{bid.coverLetter}</p>
         </div>
 
         <Separator className="mx-6 mt-5" />
 
         <div className="px-6 mt-4">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Contractor Stats</p>
+          <p className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-3">Contractor Stats</p>
           <div className="flex items-center gap-6 text-center">
             {[
               { icon: Briefcase, val: contractor.jobsCompleted, label: "Jobs" },
@@ -398,13 +399,13 @@ function BidDialog({
               { icon: DollarSign, val: `$${contractor.hourlyRate}`, label: "/hr" },
             ].map((s) => (
               <div key={s.label} className="flex items-center gap-2">
-                <s.icon className="h-3.5 w-3.5 text-gray-400" />
+                <s.icon className="h-3.5 w-3.5 text-gray-600" />
                 <span className="text-sm font-bold text-gray-900">{s.val}</span>
-                <span className="text-xs text-gray-400">{s.label}</span>
+                <span className="text-xs text-gray-600">{s.label}</span>
               </div>
             ))}
           </div>
-          <p className="text-sm text-gray-600 leading-relaxed mt-3">{contractor.bio}</p>
+          <p className="text-sm text-gray-800 leading-relaxed mt-3">{contractor.bio}</p>
         </div>
 
         <div className="flex items-center gap-3 px-6 py-5 mt-2 border-t border-border">
@@ -420,7 +421,7 @@ function BidDialog({
               </div>
             </>
           ) : isDeclined ? (
-            <div className="flex items-center gap-1.5 text-sm text-gray-500">
+            <div className="flex items-center gap-1.5 text-sm text-gray-700">
               <XCircle className="h-4 w-4" />
               Bid Declined
             </div>
@@ -469,7 +470,7 @@ function scoreBid(bid: Bid, allBids: Bid[]): { score: number; breakdown: { label
 function compareRows(bids: Bid[], minAmt: number, maxRating: number, maxExp: number) {
   const fastest = Math.min(...bids.map((b) => parseFloat(b.timeline)));
   const c = (bid: Bid) => mockContractors.find((x) => x.id === bid.contractorId)!;
-  const hi = (v: boolean) => v ? "text-brand-600" : "text-gray-700";
+  const hi = (v: boolean) => v ? "text-brand-600" : "text-gray-900";
   return [
     { label: "Price", render: (bid: Bid) => <span className={cn("text-sm font-bold", hi(bid.amount === minAmt))}>{formatCurrency(bid.amount)}</span> },
     { label: "Rating", render: (bid: Bid) => {
@@ -478,7 +479,7 @@ function compareRows(bids: Bid[], minAmt: number, maxRating: number, maxExp: num
     }},
     { label: "Timeline", render: (bid: Bid) => <span className={cn("text-sm font-semibold", hi(parseFloat(bid.timeline) === fastest))}>{bid.timeline}</span> },
     { label: "Experience", render: (bid: Bid) => <span className={cn("text-sm font-bold", hi(c(bid).yearsExperience === maxExp))}>{c(bid).yearsExperience} yrs</span> },
-    { label: "Reviews", render: (bid: Bid) => <span className="text-sm font-semibold text-gray-700">{c(bid).reviewCount}</span> },
+    { label: "Reviews", render: (bid: Bid) => <span className="text-sm font-semibold text-gray-900">{c(bid).reviewCount}</span> },
     { label: "Verified", render: (bid: Bid) => <BoolCell value={c(bid).verified} /> },
     { label: "Licensed", render: (bid: Bid) => <BoolCell value={c(bid).licensed} /> },
     { label: "Insured", render: (bid: Bid) => <BoolCell value={c(bid).insured} /> },
@@ -537,7 +538,7 @@ function CompareModal({
 
         <div className="px-6 pt-6 pb-2">
           <h2 className="text-lg font-bold text-gray-900">Compare Bids</h2>
-          <p className="text-sm text-gray-500 mt-0.5">Side-by-side comparison to find the best value</p>
+          <p className="text-sm text-gray-700 mt-0.5">Side-by-side comparison to find the best value</p>
         </div>
 
         <div className="px-6 overflow-x-auto">
@@ -551,13 +552,13 @@ function CompareModal({
                     <th key={bid.id} className={cn("text-center px-4 py-4 min-w-[150px]", isTop && "bg-brand-50")}>
                       <div className="flex flex-col items-center gap-2">
                         {isTop && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-brand-700 bg-brand-100 rounded-full px-2 py-0.5 uppercase tracking-wide">
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-brand-700 bg-brand-100 rounded-none px-2 py-0.5 uppercase tracking-wide">
                             <Award className="h-3 w-3" /> Best Match
                           </span>
                         )}
                         <div
                           className={cn(
-                            "flex h-10 w-10 items-center justify-center rounded-full text-white text-sm font-bold",
+                            "flex h-10 w-10 items-center justify-center rounded-none text-white text-sm font-bold",
                             avatarColor(contractor.id)
                           )}
                         >
@@ -565,7 +566,7 @@ function CompareModal({
                         </div>
                         <div>
                           <p className="text-sm font-bold text-gray-900">{contractor.name}</p>
-                          <p className="text-xs text-gray-500">{contractor.company}</p>
+                          <p className="text-xs text-gray-700">{contractor.company}</p>
                         </div>
                       </div>
                     </th>
@@ -594,7 +595,7 @@ function CompareModal({
               {(compareRows(effectiveBids, minAmt, maxRating, maxExp)).map((row, ri) => (
                 <tr key={row.label} className={cn("border-b border-gray-100 last:border-0", ri % 2 === 0 ? "bg-white" : "bg-gray-50/50")}>
                   <td className="border-r border-gray-100 px-3 py-3 bg-gray-50">
-                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">
+                    <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide whitespace-nowrap">
                       {row.label}
                     </span>
                   </td>
@@ -607,7 +608,7 @@ function CompareModal({
               ))}
               <tr className="bg-gray-50 border-t border-gray-200">
                 <td className="border-r border-gray-100 px-3 py-4">
-                  <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Action</span>
+                  <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Action</span>
                 </td>
                 {scored.map(({ bid }, idx) => (
                   <td key={bid.id} className={cn("text-center px-4 py-4", idx === 0 && "bg-brand-50/40")}>
@@ -634,15 +635,15 @@ function CompareModal({
 
         {/* Recommendation */}
         {topScore && (
-          <div className="mx-6 mb-6 mt-4 rounded-xl border border-brand-100 bg-brand-50/50 p-5">
+          <div className="mx-6 mb-6 mt-4 rounded-none border border-brand-100 bg-brand-50/50 p-5">
             <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-brand-600 text-white">
+              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-none bg-brand-600 text-white">
                 <Award className="h-4 w-4" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-bold text-brand-600 uppercase tracking-wider mb-1">Our Recommendation</p>
                 <p className="text-sm font-bold text-gray-900">{topScore.contractor.name} — {topScore.contractor.company}</p>
-                <p className="text-sm text-gray-600 mt-1 leading-relaxed">
+                <p className="text-sm text-gray-800 mt-1 leading-relaxed">
                   Scores highest with{" "}
                   <span className="font-semibold text-gray-900">{topScore.score}/100</span>.
                   Their <span className="font-semibold text-gray-900">{formatCurrency(topScore.bid.amount)}</span> bid is{" "}
@@ -656,10 +657,10 @@ function CompareModal({
                 <div className="flex items-center gap-4 mt-3 flex-wrap">
                   {topScore.breakdown.map((b) => (
                     <div key={b.label} className="text-center">
-                      <p className="text-xs text-gray-400">{b.label}</p>
+                      <p className="text-xs text-gray-600">{b.label}</p>
                       <p className="text-sm font-bold text-gray-900">
                         {b.pts}
-                        <span className="text-xs font-normal text-gray-400">
+                        <span className="text-xs font-normal text-gray-600">
                           /{b.label === "Price" ? 35 : b.label === "Rating" ? 30 : b.label === "Experience" ? 20 : 15}
                         </span>
                       </p>
@@ -667,9 +668,9 @@ function CompareModal({
                   ))}
                   <Separator orientation="vertical" className="h-8" />
                   <div className="text-center">
-                    <p className="text-xs text-gray-400">Overall</p>
+                    <p className="text-xs text-gray-600">Overall</p>
                     <p className="text-lg font-bold text-brand-600">
-                      {topScore.score}<span className="text-xs font-normal text-gray-400">/100</span>
+                      {topScore.score}<span className="text-xs font-normal text-gray-600">/100</span>
                     </p>
                   </div>
                 </div>
@@ -701,10 +702,10 @@ function InlineBidCard({
   const isAccepted = bid.status === "accepted";
 
   return (
-    <div className="flex items-start gap-3 p-4 rounded-xl border border-gray-200 bg-white hover:border-gray-300 transition-colors">
+    <div className="flex items-start gap-3 p-4 rounded-none border border-gray-200 bg-white hover:border-gray-300 transition-colors">
       <div
         className={cn(
-          "flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-white text-xs font-bold",
+          "flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-none text-white text-xs font-bold",
           avatarColor(contractor.id)
         )}
       >
@@ -715,15 +716,15 @@ function InlineBidCard({
         <div className="flex items-center gap-2 flex-wrap">
           <p className="text-sm font-semibold text-gray-900">{contractor.name}</p>
           {contractor.verified && (
-            <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-brand-700 bg-brand-50 border border-brand-100 rounded-full px-1.5 py-0.5">
+            <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-brand-700 bg-brand-50 border border-brand-100 rounded-none px-1.5 py-0.5">
               <Shield className="h-2.5 w-2.5" /> Verified
             </span>
           )}
         </div>
         <div className="flex items-center gap-2 mt-0.5">
           <StarRating rating={contractor.rating} />
-          <span className="text-xs font-medium text-gray-700">{contractor.rating}</span>
-          <span className="text-xs text-gray-400">({contractor.reviewCount})</span>
+          <span className="text-xs font-medium text-gray-900">{contractor.rating}</span>
+          <span className="text-xs text-gray-600">({contractor.reviewCount})</span>
         </div>
 
         <div className="flex items-center gap-3 mt-2 flex-wrap">
@@ -732,20 +733,20 @@ function InlineBidCard({
             <span className="font-bold text-gray-900">{formatCurrency(bid.amount)}</span>
           </div>
           {fairPrice && <FairPriceTag bidAmount={bid.amount} fairPrice={fairPrice} />}
-          <div className="flex items-center gap-1 text-xs text-gray-500">
+          <div className="flex items-center gap-1 text-xs text-gray-700">
             <Clock className="h-3 w-3" />
             {bid.timeline}
           </div>
         </div>
 
-        <p className="text-xs text-gray-500 mt-2 line-clamp-2 leading-relaxed">
+        <p className="text-xs text-gray-700 mt-2 line-clamp-2 leading-relaxed">
           {bid.coverLetter}
         </p>
       </div>
 
       <div className="flex flex-col gap-2 flex-shrink-0">
         {isAccepted ? (
-          <div className="inline-flex items-center gap-1 text-xs font-semibold text-brand-600 bg-brand-50 border border-brand-200 rounded-full px-2.5 py-1">
+          <div className="inline-flex items-center gap-1 text-xs font-semibold text-brand-600 bg-brand-50 border border-brand-200 rounded-none px-2.5 py-1">
             <CheckCircle2 className="h-3 w-3" /> Accepted
           </div>
         ) : (
@@ -764,6 +765,7 @@ function InlineBidCard({
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function JobsPage() {
+  usePageTitle("My Jobs");
   const [jobs, setJobs] = useState(INITIAL_JOBS);
   const [filter, setFilter] = useState<StatusFilter>("all");
   const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
@@ -833,7 +835,7 @@ export default function JobsPage() {
       {/* Shadow header */}
       <div className="px-6 pt-5 pb-4 bg-white shadow-[0_4px_16px_-2px_rgba(0,0,0,0.1)] relative z-10">
         <h1 className="text-[22px] font-semibold text-gray-900 tracking-tight">My Jobs</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Track jobs, review bids, and compare contractors.</p>
+        <p className="text-sm text-gray-700 mt-0.5">Track jobs, review bids, and compare contractors.</p>
       </div>
 
       {/* Content */}
@@ -846,17 +848,17 @@ export default function JobsPage() {
                 key={f.value}
                 onClick={() => setFilter(f.value)}
                 className={cn(
-                  "text-sm font-medium rounded-full px-3.5 py-1.5 border transition-colors",
+                  "text-sm font-medium rounded-none px-3.5 py-1.5 border transition-colors",
                   filter === f.value
                     ? "bg-gray-900 text-white border-gray-900"
-                    : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                    : "bg-white text-gray-800 border-gray-200 hover:border-gray-300"
                 )}
               >
                 {f.label}
               </button>
             ))}
           </div>
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-gray-700">
             {filteredJobs.length} job{filteredJobs.length !== 1 ? "s" : ""}
           </span>
         </div>
@@ -864,11 +866,11 @@ export default function JobsPage() {
         {/* Job list */}
         {filteredJobs.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
-              <FileText className="h-7 w-7 text-gray-400" />
+            <div className="w-14 h-14 rounded-none bg-gray-100 flex items-center justify-center mb-4">
+              <FileText className="h-7 w-7 text-gray-600" />
             </div>
-            <p className="text-base font-semibold text-gray-700">No jobs yet.</p>
-            <p className="text-sm text-gray-400 mt-1">
+            <p className="text-base font-semibold text-gray-900">No jobs yet.</p>
+            <p className="text-sm text-gray-600 mt-1">
               Post one from your{" "}
               <Link href="/homeowner/dashboard" className="text-brand-600 font-medium hover:underline">
                 Dashboard
@@ -887,7 +889,7 @@ export default function JobsPage() {
               const fairPrice = getFairPriceForJob(job.category, job.budget.min, job.budget.max, job.location);
 
               return (
-                <div key={job.id} className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+                <div key={job.id} className="rounded-none border border-gray-200 bg-white overflow-hidden">
                   {/* Job row */}
                   <button
                     onClick={() => setExpandedJobId(isExpanded ? null : job.id)}
@@ -900,16 +902,16 @@ export default function JobsPage() {
                         <h3 className="text-sm font-semibold text-gray-900 truncate">{job.title}</h3>
                         <span
                           className={cn(
-                            "text-[11px] font-medium border rounded-full px-2 py-0.5",
+                            "text-[11px] font-medium border rounded-none px-2 py-0.5",
                             statusBadge.className
                           )}
                         >
                           {statusBadge.label}
                         </span>
                       </div>
-                      <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
+                      <div className="flex items-center gap-4 mt-1 text-xs text-gray-700">
                         <span>{formatDate(job.postedDate)}</span>
-                        <span className="font-medium text-gray-700">
+                        <span className="font-medium text-gray-900">
                           {bids.length} bid{bids.length !== 1 ? "s" : ""}
                         </span>
                         <span>
@@ -918,7 +920,7 @@ export default function JobsPage() {
                       </div>
                     </div>
 
-                    <div className="flex-shrink-0 text-gray-400">
+                    <div className="flex-shrink-0 text-gray-600">
                       {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                     </div>
                   </button>
@@ -927,17 +929,17 @@ export default function JobsPage() {
                   {isExpanded && (
                     <div className="border-t border-gray-100 px-5 py-4 bg-gray-50/30">
                       {/* Description */}
-                      <p className="text-sm text-gray-600 leading-relaxed mb-3">{job.description}</p>
+                      <p className="text-sm text-gray-800 leading-relaxed mb-3">{job.description}</p>
 
                       {/* FairScope — detailed scope if available */}
                       {job.detailedScope && (
-                        <details className="mb-4 rounded-lg border border-gray-200 bg-white overflow-hidden group">
-                          <summary className="flex items-center gap-2 px-3 py-2.5 cursor-pointer text-xs font-semibold text-gray-500 uppercase tracking-wider hover:bg-gray-50 transition-colors">
+                        <details className="mb-4 rounded-none border border-gray-200 bg-white overflow-hidden group">
+                          <summary className="flex items-center gap-2 px-3 py-2.5 cursor-pointer text-xs font-semibold text-gray-700 uppercase tracking-wider hover:bg-gray-50 transition-colors">
                             <Sparkles className="h-3.5 w-3.5 text-brand-600" />
                             FairScope — Detailed Scope of Work
                           </summary>
                           <div className="px-3 py-3 border-t border-gray-100">
-                            <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{job.detailedScope}</p>
+                            <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-line">{job.detailedScope}</p>
                           </div>
                         </details>
                       )}
@@ -946,16 +948,16 @@ export default function JobsPage() {
                       {job.photos.length > 0 && (
                         <div className="flex gap-2 mb-4">
                           {job.photos.slice(0, 3).map((photo, idx) => (
-                            <div key={idx} className="w-20 h-20 rounded-lg bg-gray-200 border border-gray-300 flex items-center justify-center">
-                              <span className="text-[10px] text-gray-400">Photo</span>
+                            <div key={idx} className="w-20 h-20 rounded-none bg-gray-200 border border-gray-300 flex items-center justify-center">
+                              <span className="text-[10px] text-gray-600">Photo</span>
                             </div>
                           ))}
                         </div>
                       )}
 
                       {/* FairPrice estimate banner */}
-                      <div className="flex items-center gap-3 rounded-xl bg-brand-50/50 border border-brand-100 px-4 py-3 mb-4">
-                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-brand-100">
+                      <div className="flex items-center gap-3 rounded-none bg-brand-50/50 border border-brand-100 px-4 py-3 mb-4">
+                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-none bg-brand-100">
                           <BarChart3 className="h-4 w-4 text-brand-600" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -964,14 +966,14 @@ export default function JobsPage() {
                             {formatCurrency(fairPrice.low)} – {formatCurrency(fairPrice.high)}
                           </p>
                         </div>
-                        <p className="text-[10px] text-gray-400 max-w-[140px] text-right leading-tight">
+                        <p className="text-[10px] text-gray-600 max-w-[140px] text-right leading-tight">
                           AI-estimated market rate for this project
                         </p>
                       </div>
 
                       {/* Bids section header */}
                       <div className="flex items-center justify-between mb-3">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        <p className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
                           Bids Received ({bids.length})
                         </p>
                         {comparableBids.length >= 2 && (
@@ -991,7 +993,7 @@ export default function JobsPage() {
                       </div>
 
                       {bids.length === 0 ? (
-                        <p className="text-sm text-gray-400 py-4 text-center">No bids yet. Check back soon.</p>
+                        <p className="text-sm text-gray-600 py-4 text-center">No bids yet. Check back soon.</p>
                       ) : (
                         <div className="space-y-2">
                           {bids.map((bid) => (

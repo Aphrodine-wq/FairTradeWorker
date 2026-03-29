@@ -18,7 +18,7 @@ export default function PrivacyPage() {
           <h1 className="text-4xl font-bold text-[#0F1419] tracking-tight">
             Privacy Policy
           </h1>
-          <p className="mt-4 text-sm text-gray-500">
+          <p className="mt-4 text-sm text-gray-700">
             Last updated: March 26, 2026
           </p>
 
@@ -28,7 +28,7 @@ export default function PrivacyPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 Introduction
               </h2>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-800 leading-relaxed">
                 FairTradeWorker is operated by Strata Software Group
                 (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;), based in
                 Oxford, Mississippi. This Privacy Policy explains how we
@@ -45,7 +45,7 @@ export default function PrivacyPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 Information We Collect
               </h2>
-              <p className="text-gray-600 leading-relaxed mb-4">
+              <p className="text-gray-800 leading-relaxed mb-4">
                 We collect information you provide directly, information
                 generated through your use of the platform, and information from
                 third-party services integrated with your account.
@@ -54,7 +54,7 @@ export default function PrivacyPage() {
               <h3 className="text-lg font-medium text-[#0F1419] mb-2">
                 Account Information
               </h3>
-              <ul className="list-disc pl-6 space-y-2 text-gray-600 leading-relaxed mb-4">
+              <ul className="list-disc pl-6 space-y-2 text-gray-800 leading-relaxed mb-4">
                 <li>
                   Name, email address, phone number, and mailing address when
                   you create an account
@@ -72,7 +72,7 @@ export default function PrivacyPage() {
               <h3 className="text-lg font-medium text-[#0F1419] mb-2">
                 Job and Transaction Data
               </h3>
-              <ul className="list-disc pl-6 space-y-2 text-gray-600 leading-relaxed mb-4">
+              <ul className="list-disc pl-6 space-y-2 text-gray-800 leading-relaxed mb-4">
                 <li>
                   Job descriptions, photos, bids, estimates, messages between
                   users, and project timelines
@@ -89,7 +89,7 @@ export default function PrivacyPage() {
               <h3 className="text-lg font-medium text-[#0F1419] mb-2">
                 Usage and Analytics Data
               </h3>
-              <ul className="list-disc pl-6 space-y-2 text-gray-600 leading-relaxed mb-4">
+              <ul className="list-disc pl-6 space-y-2 text-gray-800 leading-relaxed mb-4">
                 <li>
                   Pages viewed, features used, search queries, and interaction
                   patterns collected through PostHog analytics
@@ -104,7 +104,7 @@ export default function PrivacyPage() {
               <h3 className="text-lg font-medium text-[#0F1419] mb-2">
                 Verification Data
               </h3>
-              <ul className="list-disc pl-6 space-y-2 text-gray-600 leading-relaxed">
+              <ul className="list-disc pl-6 space-y-2 text-gray-800 leading-relaxed">
                 <li>
                   Identity verification results from third-party providers used
                   during contractor onboarding
@@ -121,7 +121,7 @@ export default function PrivacyPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 How We Use Your Information
               </h2>
-              <ul className="list-disc pl-6 space-y-2 text-gray-600 leading-relaxed">
+              <ul className="list-disc pl-6 space-y-2 text-gray-800 leading-relaxed">
                 <li>
                   Match homeowners with qualified, verified contractors based on
                   trade, location, availability, and track record
@@ -164,11 +164,11 @@ export default function PrivacyPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 Information Sharing
               </h2>
-              <p className="text-gray-600 leading-relaxed mb-4">
+              <p className="text-gray-800 leading-relaxed mb-4">
                 We do not sell your personal information. We share data only in
                 the following circumstances:
               </p>
-              <ul className="list-disc pl-6 space-y-2 text-gray-600 leading-relaxed">
+              <ul className="list-disc pl-6 space-y-2 text-gray-800 leading-relaxed">
                 <li>
                   <span className="font-medium text-[#0F1419]">
                     Between users:
@@ -219,7 +219,7 @@ export default function PrivacyPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 Data Security
               </h2>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-800 leading-relaxed">
                 We take reasonable measures to protect your information from
                 unauthorized access, alteration, disclosure, or destruction.
                 Data is encrypted in transit using TLS and at rest in our
@@ -237,11 +237,11 @@ export default function PrivacyPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 Your Rights
               </h2>
-              <p className="text-gray-600 leading-relaxed mb-4">
+              <p className="text-gray-800 leading-relaxed mb-4">
                 Depending on your location, you may have the following rights
                 regarding your personal information:
               </p>
-              <ul className="list-disc pl-6 space-y-2 text-gray-600 leading-relaxed">
+              <ul className="list-disc pl-6 space-y-2 text-gray-800 leading-relaxed">
                 <li>
                   <span className="font-medium text-[#0F1419]">Access:</span>{" "}
                   Request a copy of the personal information we hold about you
@@ -269,7 +269,7 @@ export default function PrivacyPage() {
                   unsubscribing or updating your notification preferences
                 </li>
               </ul>
-              <p className="text-gray-600 leading-relaxed mt-4">
+              <p className="text-gray-800 leading-relaxed mt-4">
                 These rights apply to residents of California (under the CCPA),
                 the European Economic Area (under the GDPR), and other
                 jurisdictions with applicable data protection laws. To exercise
@@ -289,11 +289,11 @@ export default function PrivacyPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 Cookies and Tracking
               </h2>
-              <p className="text-gray-600 leading-relaxed mb-4">
+              <p className="text-gray-800 leading-relaxed mb-4">
                 FairTradeWorker uses cookies and similar technologies for the
                 following purposes:
               </p>
-              <ul className="list-disc pl-6 space-y-2 text-gray-600 leading-relaxed">
+              <ul className="list-disc pl-6 space-y-2 text-gray-800 leading-relaxed">
                 <li>
                   <span className="font-medium text-[#0F1419]">
                     Essential cookies:
@@ -311,7 +311,7 @@ export default function PrivacyPage() {
                   configured to respect Do Not Track browser settings.
                 </li>
               </ul>
-              <p className="text-gray-600 leading-relaxed mt-4">
+              <p className="text-gray-800 leading-relaxed mt-4">
                 You can opt out of analytics tracking by enabling Do Not Track
                 in your browser settings, using a browser extension that blocks
                 tracking scripts, or contacting us to request opt-out at the
@@ -324,7 +324,7 @@ export default function PrivacyPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 Children&apos;s Privacy
               </h2>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-800 leading-relaxed">
                 FairTradeWorker is not intended for use by anyone under the age
                 of 18. We do not knowingly collect personal information from
                 minors. If we become aware that we have collected information
@@ -346,7 +346,7 @@ export default function PrivacyPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 Changes to This Policy
               </h2>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-800 leading-relaxed">
                 We may update this Privacy Policy from time to time to reflect
                 changes in our practices, technology, or legal requirements. If
                 we make material changes, we will notify you by email or through
@@ -361,11 +361,11 @@ export default function PrivacyPage() {
               <h2 className="text-2xl font-semibold text-[#0F1419] mb-4">
                 Contact Us
               </h2>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-800 leading-relaxed">
                 If you have questions about this Privacy Policy or how we handle
                 your data, contact us at:
               </p>
-              <div className="mt-4 text-gray-600 leading-relaxed">
+              <div className="mt-4 text-gray-800 leading-relaxed">
                 <p className="font-medium text-[#0F1419]">
                   Strata Software Group
                 </p>
