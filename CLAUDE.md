@@ -18,44 +18,45 @@ Next.js 15 App Router deployed as a server-side app on Vercel. Two user roles (c
 
 The data layer (`src/shared/lib/data.ts`) tries the real Elixir API first and falls back to mock data. Pages import from `data.ts` instead of `mock-data.ts` directly.
 
-The realtime client layer (`src/shared/lib/realtime.ts`) connects to the Elixir/Phoenix backend at `NEXT_PUBLIC_REALTIME_URL` via WebSocket and a comprehensive REST API wrapper.
+The realtime client layer (`src/shared/lib/realtime.ts`) connects to the `ftw-realtime` backend at `NEXT_PUBLIC_REALTIME_URL` via STOMP/SockJS WebSocket and a comprehensive REST API wrapper.
 
 Middleware (`src/middleware.ts`) handles auth route protection (JWT via `ftw-token` cookie), rate limiting on auth paths (10 req/min per IP), and security headers on all responses.
 
 ```
 src/app/              # Pages (App Router)
-  (auth)/             # Login/Signup route group
+  (auth)/             # Login/Signup/Forgot-Password/Reset-Password route group
   contractor/         # 13 pages, layout has sidebar + global top bar
-  homeowner/          # 11 pages + 3 planned empty dirs, layout has sidebar only
+  homeowner/          # 12 pages (incl. milestones), layout has sidebar only
   fairprice/          # Public FairPrice estimator
   record/[id]/        # Public FairRecord detail
-  api/                # 23 API route files (see below)
+  api/                # 27 API route files (see below)
   [marketing pages]   # Landing, pricing, features, how-it-works, testimonials,
-                      #   about, blog, careers, contact, faq
+                      #   about, blog, careers, contact, faq, terms, privacy
 
 src/app/api/          # Next.js API routes
-  auth/               # signup, login
+  auth/               # signup, login, forgot-password, reset-password, sync-token
   jobs/               # CRUD, bids, AI estimates
   bids/               # Accept bids
   contractor/         # Profile, licenses, insurance, estimates, estimate PDFs
   homeowner/          # Property management
+  contact/            # Contact form submission
   integrations/       # QuickBooks OAuth2, invoices, estimates, payouts, receipts, webhooks
 
 src/domains/          # Domain-specific components
   contractor/         # VoiceRecorder, EstimateCard, JobCard, BidDialog, StatCard
   marketplace/        # Navbar, Hero, Features, HowItWorks, StatsBar,
-                      #   Testimonials, PricingSection, CtaSection, Footer
+                      #   Testimonials, PricingSection, CtaSection, Footer, MobileNav
 
 src/shared/
-  components/         # Sidebar, AppHeader, AiEstimateCard
-  hooks/              # use-realtime.ts, use-estimate.ts
-  ui/                 # Radix-based primitives (Button, Badge, Card, Dialog,
-                      #   Input, Textarea, Tabs, Progress, Separator)
+  components/         # Sidebar, AppHeader, AiEstimateCard, BrandMark, CookieConsent, EmptyState
+  hooks/              # use-realtime.ts, use-estimate.ts, use-page-title.ts
+  ui/                 # Radix-based primitives (AlertDialog, Button, Badge, Card, Dialog,
+                      #   Input, Progress, Separator, Skeleton, Tabs, Textarea, Toaster)
   lib/utils.ts        # cn(), formatCurrency(), formatDate(), getInitials()
   lib/constants.ts    # Brand config, nav links, pricing tiers, job categories
   lib/mock-data.ts    # All TypeScript types + mock data
   lib/data.ts         # Data layer — tries real API, falls back to mock
-  lib/realtime.ts     # Phoenix Channels client + full REST API wrapper
+  lib/realtime.ts     # STOMP/SockJS client + full REST API wrapper
   lib/db.ts           # Prisma client singleton (PrismaClient + pg adapter)
   lib/auth.ts         # JWT sign/verify, bcrypt hash/compare, getAuthUser
   lib/auth-store.ts   # Client-side auth state (localStorage + realtime sync)
@@ -114,13 +115,14 @@ Middleware redirects unauthenticated users from `/contractor/*` and `/homeowner/
 
 ## API Routes
 
-23 route files in `src/app/api/`:
+27 route files in `src/app/api/`:
 
-- **Auth**: `POST /api/auth/signup`, `POST /api/auth/login`
+- **Auth**: `POST /api/auth/signup`, `POST /api/auth/login`, `POST /api/auth/forgot-password`, `POST /api/auth/reset-password`, `POST /api/auth/sync-token`
 - **Jobs**: `GET/POST /api/jobs`, `GET /api/jobs/[id]`, `POST /api/jobs/[id]/bids`, `POST /api/jobs/[id]/estimate`
 - **Bids**: `POST /api/bids/[id]/accept` (also creates QB invoice + queues contractor payout)
 - **Contractor**: `GET/PUT /api/contractor/profile`, `GET/POST /api/contractor/licenses`, `GET/POST /api/contractor/insurance`, `GET/POST /api/contractor/estimates`, `GET/DELETE /api/contractor/estimates/[id]`, `GET /api/contractor/estimates/[id]/pdf`
 - **Homeowner**: `GET/PUT /api/homeowner/property`
+- **Contact**: `POST /api/contact`
 - **QuickBooks**: 9 routes under `/api/integrations/quickbooks/` (connect, callback, disconnect, status, create-invoice, sync-estimate, payout, receipt, webhook)
 
 All database routes use `prisma` from `src/shared/lib/db.ts`. Auth-required routes call `getAuthUser(req)`.
@@ -175,11 +177,11 @@ Client-side hooks in `src/shared/hooks/use-estimate.ts`:
 
 `src/shared/lib/realtime.ts` exports:
 
-- `realtimeClient` -- singleton `RealtimeClient` instance. Call `.connect(token)` to open the WebSocket (requires auth token).
+- `realtimeClient` -- singleton `RealtimeClient` instance. Call `.connect(token)` to open the STOMP/SockJS WebSocket (requires auth token).
 - `api` -- REST API wrapper with methods for all backend endpoints (auth, jobs, bids, chat, estimates, invoices, projects, clients, reviews, notifications, AI estimation, file uploads, settings, verification, FairRecords).
 - `setAuthToken(token)` / `getAuthToken()` -- token management for both REST and WebSocket.
 
-WebSocket channels: `jobs:feed`, `job:<id>`, `chat:<id>`, `user:<id>`.
+WebSocket topics (STOMP): `/topic/jobs.feed`, `/topic/job.{id}`, `/topic/chat.{id}`, `/topic/user.{id}`.
 
 `src/shared/hooks/use-realtime.ts` exports three hooks:
 

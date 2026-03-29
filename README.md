@@ -4,7 +4,7 @@ Two-sided construction marketplace connecting homeowners with verified contracto
 
 ## Status
 
-Frontend pages built with mock data fallback. Backend API routes implemented for auth, jobs, bids, AI estimation, and QuickBooks integration. Prisma schema defined with PostgreSQL. Middleware handles auth protection and rate limiting. Pages use a data layer (`data.ts`) that tries the real API first and falls back to mock data. Realtime client layer wired to the Elixir/Phoenix backend (`ftw-realtime`).
+Frontend pages built with mock data fallback. Backend API routes implemented for auth, jobs, bids, AI estimation, and QuickBooks integration. Prisma schema defined with PostgreSQL. Middleware handles auth protection and rate limiting. Pages use a data layer (`data.ts`) that tries the real API first and falls back to mock data. Realtime client layer wired to the `ftw-realtime` backend via STOMP/SockJS WebSocket.
 
 ## Stack
 
@@ -18,7 +18,7 @@ Frontend pages built with mock data fallback. Backend API routes implemented for
 | Auth | JWT (`jsonwebtoken`) + bcrypt (`bcryptjs`) + middleware route protection |
 | Payments | QuickBooks Online API (direct Intuit OAuth2, no Stripe Connect) |
 | AI Estimation | ConstructionAI FastAPI service (custom fine-tuned model) |
-| Realtime | Phoenix Channels (`phoenix` npm package) |
+| Realtime | STOMP over WebSocket (`@stomp/stompjs` + `sockjs-client`) |
 | Desktop | Electron 33.4 (macOS dmg) |
 | Language | TypeScript 5.8+ |
 | Package Manager | pnpm |
@@ -54,6 +54,7 @@ Requires `DATABASE_URL` pointing to a PostgreSQL instance for API routes to func
 | `JWT_SECRET` | `ftw-dev-secret-change-in-production` | Secret for signing auth JWTs |
 | `NEXT_PUBLIC_REALTIME_URL` | `http://localhost:4000` | URL of the Elixir/Phoenix realtime backend |
 | `CONSTRUCTIONAI_API_URL` | `http://localhost:8000/api/estimate` | ConstructionAI FastAPI endpoint |
+| `NEXT_PUBLIC_APP_URL` | `http://localhost:3000` | Base URL for password reset links |
 | `NEXT_PUBLIC_POSTHOG_KEY` | — | PostHog project API key |
 | `NEXT_PUBLIC_POSTHOG_HOST` | `https://us.i.posthog.com` | PostHog ingest host |
 | `QB_CLIENT_ID` | — | Intuit OAuth2 client ID |
@@ -82,7 +83,7 @@ src/
       settings/                  # 12-section settings panel
       onboarding/                # Multi-step contractor onboarding
       records/                   # FairRecord history
-    homeowner/                   # 11 homeowner pages (+ 3 planned empty dirs)
+    homeowner/                   # 12 homeowner pages
       dashboard/                 # KPI cards + projects
       jobs/                      # Posted jobs
       post-job/                  # Multi-step job posting form
@@ -94,35 +95,34 @@ src/
       reviews/                   # Ratings & feedback
       settings/                  # Account settings
       onboarding/                # Homeowner onboarding
-      compare/                   # (planned) Compare contractors
-      inspections/               # (planned) Inspection tracking
-      warranties/                # (planned) Warranty management
+      milestones/                # Project milestones
     fairprice/                   # Public FairPrice estimator landing
     record/[id]/                 # Public FairRecord detail page
-    api/                         # API routes (see below)
+    api/                         # 27 API route files (see below)
     pricing/                     # Pricing page
     features/                    # Features page
     how-it-works/                # How It Works page
     testimonials/                # Testimonials page
-    about/ blog/ careers/ contact/ faq/
+    about/ blog/ careers/ contact/ faq/ terms/ privacy/
     page.tsx                     # Landing page
   domains/                       # Domain-specific components
     contractor/components/       # VoiceRecorder, EstimateCard, JobCard, BidDialog, StatCard
     marketplace/components/      # Navbar, Hero, Features, HowItWorks, StatsBar,
-                                 #   Testimonials, PricingSection, CtaSection, Footer
+                                 #   Testimonials, PricingSection, CtaSection, Footer, MobileNav
   shared/
-    components/                  # Sidebar, AppHeader, AiEstimateCard
+    components/                  # Sidebar, AppHeader, AiEstimateCard, BrandMark, CookieConsent, EmptyState
     hooks/
       use-realtime.ts            # useRealtimeJobs, useRealtimeBids, useRealtimeChat
       use-estimate.ts            # useJobEstimate, useBidSuggestion (AI-powered)
-    ui/                          # Button, Badge, Card, Dialog, Input, Textarea,
-                                 #   Tabs, Progress, Separator
+      use-page-title.ts          # Dynamic page title hook
+    ui/                          # AlertDialog, Button, Badge, Card, Dialog, Input,
+                                 #   Progress, Separator, Skeleton, Tabs, Textarea, Toaster
     lib/
       utils.ts                   # cn(), formatCurrency(), formatDate(), getInitials()
       constants.ts               # Brand config, nav links, pricing tiers, categories
       mock-data.ts               # All types + mock data
       data.ts                    # Data layer — tries real API, falls back to mock
-      realtime.ts                # Phoenix Channels client + full REST API wrapper
+      realtime.ts                # STOMP/SockJS client + full REST API wrapper
       db.ts                      # Prisma client singleton (PrismaClient + pg pool)
       auth.ts                    # JWT helpers: hash, verify, createToken, getAuthUser
       auth-store.ts              # Client-side auth state (localStorage + realtime sync)
@@ -134,7 +134,7 @@ src/
   __tests__/                     # Vitest unit tests (utils, constants, mock-data)
   styles/globals.css             # Global styles
 prisma/
-  schema.prisma                  # 15 models (see Database section)
+  schema.prisma                  # 19 models (see Database section)
 backend/                         # Placeholder READMEs (no code yet)
   contractor/                    # Planned edge functions
   homeowner/                     # Planned edge functions
@@ -160,6 +160,9 @@ docs/                            # Business intelligence + research
 |--------|------|-------------|
 | POST | `/api/auth/signup` | Create account (creates User + Contractor/Homeowner) |
 | POST | `/api/auth/login` | Login, returns JWT + sets `ftw-token` cookie |
+| POST | `/api/auth/forgot-password` | Send password reset link (JWT-based) |
+| POST | `/api/auth/reset-password` | Reset password with token |
+| POST | `/api/auth/sync-token` | Sync auth token to httpOnly cookie |
 
 ### Jobs
 
@@ -194,6 +197,12 @@ docs/                            # Business intelligence + research
 |--------|------|-------------|
 | GET/PUT | `/api/homeowner/property` | Homeowner property management |
 
+### Contact
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/contact` | Submit contact form (forwards to Elixir backend if available) |
+
 ### QuickBooks Integration
 
 | Method | Path | Description |
@@ -213,7 +222,7 @@ docs/                            # Business intelligence + research
 `src/middleware.ts` runs on all routes (except static assets):
 
 - **Auth protection**: `/contractor/*` and `/homeowner/*` require `ftw-token` cookie. Redirects to `/login` if missing. Checks JWT role to prevent cross-role access.
-- **Rate limiting**: Auth paths (`/login`, `/signup`, `/api/auth/*`) limited to 10 req/min per IP (in-memory fixed-window counter).
+- **Rate limiting**: Auth paths (`/login`, `/signup`, `/forgot-password`, `/api/auth/*`) limited to 10 req/min per IP (in-memory fixed-window counter).
 - **Security headers**: X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Referrer-Policy, Permissions-Policy on all responses.
 
 ## Database
@@ -258,12 +267,16 @@ Prisma client is generated to `src/generated/prisma/` using `@prisma/adapter-pg`
 | `/how-it-works` | How It Works page |
 | `/testimonials` | Testimonials page |
 | `/about` | About page |
-| `/blog` | Blog (placeholder) |
+| `/blog` | Blog index + articles (escrow guide, Hunter voice AI, killing lead fees, Mississippi launch) |
 | `/careers` | Careers |
 | `/contact` | Contact form |
 | `/faq` | FAQ |
+| `/terms` | Terms of Service |
+| `/privacy` | Privacy Policy |
 | `/login` | Auth |
 | `/signup` | Auth — supports `?role=contractor` or `?role=homeowner` |
+| `/forgot-password` | Request password reset email |
+| `/reset-password` | Reset password with token from email |
 
 ### Contractor Dashboard
 
@@ -300,33 +313,34 @@ Contractor sidebar nav: Dashboard, Browse Jobs, Estimates, Projects, Invoices, P
 | `/homeowner/reviews` | Ratings & feedback |
 | `/homeowner/settings` | Account settings |
 | `/homeowner/onboarding` | Homeowner onboarding flow |
+| `/homeowner/milestones` | Project milestones tracking |
 
 ## Realtime Layer
 
-The `phoenix` npm package is installed and a full client is implemented in `src/shared/lib/realtime.ts`. It connects to the Elixir backend (`ftw-realtime`) via Phoenix Channels over WebSocket and exposes a comprehensive REST fallback via `api.*`.
+A full realtime client is implemented in `src/shared/lib/realtime.ts`. It connects to the `ftw-realtime` backend via STOMP/SockJS WebSocket and exposes a comprehensive REST API wrapper via `api.*`.
 
-### WebSocket Channels
+### WebSocket Topics (STOMP)
 
-| Channel | Description |
-|---------|-------------|
-| `jobs:feed` | Live job feed — new jobs push in as they're posted |
-| `job:<id>` | Live bids on a specific job, bid accepted events |
-| `chat:<id>` | Live chat messages, typing indicators, presence |
-| `user:<id>` | User-level notifications |
+| Topic | Description |
+|-------|-------------|
+| `/topic/jobs.feed` | Live job feed — new jobs push in as they're posted |
+| `/topic/job.{id}` | Live bids on a specific job, bid accepted events |
+| `/topic/chat.{id}` | Live chat messages, typing indicators, presence |
+| `/topic/user.{id}` | User-level notifications |
 
-Channel methods support pushing events back: `sendViaChannel`, `sendTyping`, `placeBidViaChannel`, `postJobViaChannel`.
+STOMP methods support sending events back: `sendChatMessage`, `sendTypingIndicator`, `placeBidViaWS`, `postJobViaWS`.
 
 ### REST API Wrapper
 
-The `api` object in `realtime.ts` wraps the Elixir backend REST endpoints for: auth, jobs, bids, chat, estimates, invoices, projects, clients, reviews, notifications, AI estimation, file uploads, settings, verification, and FairRecords.
+The `api` object in `realtime.ts` wraps the `ftw-realtime` backend REST endpoints for: auth, jobs, bids, chat, estimates, invoices, projects, clients, reviews, notifications, AI estimation, file uploads, settings, verification, and FairRecords.
 
 ### React Hooks
 
-| Hook | Channel | Description |
-|------|---------|-------------|
-| `useRealtimeJobs()` | `jobs:feed` | Live job feed — new jobs push in as they're posted |
-| `useRealtimeBids(jobId)` | `job:<id>` | Live bids on a specific job |
-| `useRealtimeChat(conversationId)` | `chat:<id>` | Live chat messages |
+| Hook | Topic | Description |
+|------|-------|-------------|
+| `useRealtimeJobs()` | `/topic/jobs.feed` | Live job feed — new jobs push in as they're posted |
+| `useRealtimeBids(jobId)` | `/topic/job.{id}` | Live bids on a specific job |
+| `useRealtimeChat(conversationId)` | `/topic/chat.{id}` | Live chat messages |
 | `useJobEstimate(jobId)` | — (REST) | Fetch AI estimate for a job |
 | `useBidSuggestion(jobId)` | — (REST) | AI-powered bid suggestion based on estimate |
 
