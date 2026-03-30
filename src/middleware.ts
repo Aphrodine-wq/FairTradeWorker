@@ -83,7 +83,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Route protection for authenticated areas
-  if (pathname.startsWith("/contractor") || pathname.startsWith("/homeowner")) {
+  if (pathname.startsWith("/contractor") || pathname.startsWith("/homeowner") || pathname.startsWith("/subcontractor")) {
     const token = request.cookies.get("ftw-token")?.value;
     if (!token) {
       const loginUrl = new URL("/login", request.url);
@@ -91,14 +91,27 @@ export function middleware(request: NextRequest) {
       return addSecurityHeaders(NextResponse.redirect(loginUrl));
     }
 
+    // Skip role checking for demo tokens — they bypass auth entirely
+    if (token.startsWith("demo.")) {
+      const response = NextResponse.next();
+      return addSecurityHeaders(response);
+    }
+
     // Check role from JWT payload (full verification in API routes)
     try {
       const payload = JSON.parse(atob(token.split(".")[1]));
-      if (pathname.startsWith("/contractor") && payload.role !== "CONTRACTOR") {
-        return addSecurityHeaders(NextResponse.redirect(new URL("/homeowner/dashboard", request.url)));
+      const activeRole = payload.role;
+      if (pathname.startsWith("/contractor") && activeRole !== "CONTRACTOR") {
+        const fallback = activeRole === "SUBCONTRACTOR" ? "/subcontractor/dashboard" : "/homeowner/dashboard";
+        return addSecurityHeaders(NextResponse.redirect(new URL(fallback, request.url)));
       }
-      if (pathname.startsWith("/homeowner") && payload.role !== "HOMEOWNER") {
-        return addSecurityHeaders(NextResponse.redirect(new URL("/contractor/dashboard", request.url)));
+      if (pathname.startsWith("/homeowner") && activeRole !== "HOMEOWNER") {
+        const fallback = activeRole === "SUBCONTRACTOR" ? "/subcontractor/dashboard" : "/contractor/dashboard";
+        return addSecurityHeaders(NextResponse.redirect(new URL(fallback, request.url)));
+      }
+      if (pathname.startsWith("/subcontractor") && activeRole !== "SUBCONTRACTOR") {
+        const fallback = activeRole === "CONTRACTOR" ? "/contractor/dashboard" : "/homeowner/dashboard";
+        return addSecurityHeaders(NextResponse.redirect(new URL(fallback, request.url)));
       }
     } catch {
       const resp = NextResponse.redirect(new URL("/login", request.url));

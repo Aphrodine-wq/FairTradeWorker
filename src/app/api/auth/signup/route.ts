@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (!["CONTRACTOR", "HOMEOWNER"].includes(role)) {
+  if (!["CONTRACTOR", "HOMEOWNER", "SUBCONTRACTOR"].includes(role)) {
     return NextResponse.json({ error: "Invalid role" }, { status: 400 });
   }
 
@@ -24,27 +24,45 @@ export async function POST(req: NextRequest) {
 
   const passwordHash = await hashPassword(password);
 
+  const roleRelation =
+    role === "CONTRACTOR"
+      ? { contractor: { create: {} } }
+      : role === "SUBCONTRACTOR"
+        ? { subContractor: { create: {} } }
+        : { homeowner: { create: {} } };
+
   const user = await prisma.user.create({
     data: {
       email,
       passwordHash,
       name,
-      role,
+      roles: [role],
+      activeRole: role,
       phone: phone || null,
-      ...(role === "CONTRACTOR"
-        ? { contractor: { create: {} } }
-        : { homeowner: { create: {} } }),
+      ...roleRelation,
     },
     include: {
       contractor: role === "CONTRACTOR",
       homeowner: role === "HOMEOWNER",
+      subContractor: role === "SUBCONTRACTOR",
     },
   });
 
-  const token = createToken({ userId: user.id, email: user.email, role: user.role });
+  const token = createToken({
+    userId: user.id,
+    email: user.email,
+    role: user.activeRole,
+    roles: user.roles as ("CONTRACTOR" | "HOMEOWNER" | "SUBCONTRACTOR")[],
+  });
 
   const response = NextResponse.json({
-    user: { id: user.id, email: user.email, name: user.name, role: user.role },
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.activeRole,
+      roles: user.roles,
+    },
     token,
   }, { status: 201 });
 

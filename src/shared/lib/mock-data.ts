@@ -1272,6 +1272,232 @@ export const mockFairRecords: FairRecord[] = [
   },
 ];
 
+// ── SubContractor Types ──────────────────────────────────────────────────────
+
+export type SubPaymentPath = "contractor_escrow" | "passthrough_escrow";
+export type SubJobStatus = "open" | "in_progress" | "completed" | "cancelled";
+
+export interface SubJob {
+  id: string;
+  contractorId: string;
+  contractorName: string;
+  contractorCompany: string;
+  contractorRating: number;
+  projectId: string;
+  projectTitle: string;
+  milestoneLabel: string;
+  milestoneIndex: number;
+  title: string;
+  description: string;
+  category: string;
+  skills: string[];
+  location: string;
+  budgetMin: number;
+  budgetMax: number;
+  paymentPath: SubPaymentPath;
+  disclosedToOwner: boolean;
+  status: SubJobStatus;
+  deadline: string;
+  bidsCount: number;
+  postedDate: string;
+  urgency: "low" | "medium" | "high";
+}
+
+export interface SubBid {
+  id: string;
+  subJobId: string;
+  subContractorId: string;
+  subContractorName: string;
+  subContractorCompany: string;
+  subContractorRating: number;
+  amount: number;
+  message: string;
+  timeline: string;
+  status: "pending" | "accepted" | "declined" | "withdrawn";
+  createdDate: string;
+}
+
+export const mockSubJobs: SubJob[] = [
+  {
+    id: "sj1",
+    contractorId: "c1",
+    contractorName: "Marcus Johnson",
+    contractorCompany: "Johnson & Sons Construction",
+    contractorRating: 4.9,
+    projectId: "j1",
+    projectTitle: "Kitchen Remodel - Full Gut",
+    milestoneLabel: "Countertops",
+    milestoneIndex: 3,
+    title: "Quartz Countertop Fabrication & Install",
+    description: "Fabricate and install quartz countertops for a full kitchen remodel. Template already complete. Need precise cutouts for undermount sink and cooktop. Edge profile: eased. Material on site.",
+    category: "General Contracting",
+    skills: ["Countertops", "Stone Fabrication", "Templating"],
+    location: "Austin, TX",
+    budgetMin: 4500,
+    budgetMax: 6000,
+    paymentPath: "contractor_escrow",
+    disclosedToOwner: false,
+    status: "open",
+    deadline: "2026-04-10",
+    bidsCount: 2,
+    postedDate: "2026-03-28",
+    urgency: "medium",
+  },
+  {
+    id: "sj2",
+    contractorId: "c1",
+    contractorName: "Marcus Johnson",
+    contractorCompany: "Johnson & Sons Construction",
+    contractorRating: 4.9,
+    projectId: "j1",
+    projectTitle: "Kitchen Remodel - Full Gut",
+    milestoneLabel: "Tile & flooring",
+    milestoneIndex: 4,
+    title: "Kitchen Tile Backsplash & Floor Install",
+    description: "Install subway tile backsplash (approx 45 sqft) and LVP flooring (180 sqft). Subfloor is prepped and level. Backsplash layout to be confirmed with homeowner. Grout color: warm gray.",
+    category: "Flooring",
+    skills: ["Tile Setting", "LVP Install", "Backsplash"],
+    location: "Austin, TX",
+    budgetMin: 5000,
+    budgetMax: 7000,
+    paymentPath: "passthrough_escrow",
+    disclosedToOwner: true,
+    status: "open",
+    deadline: "2026-04-18",
+    bidsCount: 3,
+    postedDate: "2026-03-27",
+    urgency: "low",
+  },
+  {
+    id: "sj3",
+    contractorId: "c4",
+    contractorName: "James Mitchell",
+    contractorCompany: "Mitchell Roofing Co.",
+    contractorRating: 4.9,
+    projectId: "j4",
+    projectTitle: "Roof Replacement",
+    milestoneLabel: "Gutter install",
+    milestoneIndex: 4,
+    title: "Seamless Gutter Install — Full Perimeter",
+    description: "Install 5-inch seamless aluminum gutters on a 2,400 sqft single-story home. Include downspouts (6 runs), splash blocks, and leaf guards. Color: bronze. Fascia in good shape — no rot.",
+    category: "Roofing",
+    skills: ["Gutters", "Seamless Install", "Downspouts"],
+    location: "Houston, TX",
+    budgetMin: 2800,
+    budgetMax: 3800,
+    paymentPath: "contractor_escrow",
+    disclosedToOwner: false,
+    status: "open",
+    deadline: "2026-04-05",
+    bidsCount: 1,
+    postedDate: "2026-03-29",
+    urgency: "high",
+  },
+  {
+    id: "sj4",
+    contractorId: "c1",
+    contractorName: "Marcus Johnson",
+    contractorCompany: "Johnson & Sons Construction",
+    contractorRating: 4.9,
+    projectId: "j2",
+    projectTitle: "Bathroom Renovation",
+    milestoneLabel: "Plumbing rough-in",
+    milestoneIndex: 1,
+    title: "Bathroom Plumbing Rough-In",
+    description: "Rough-in plumbing for a full bathroom remodel. Relocate toilet flange 6 inches, run new supply lines for dual vanity, and stub for freestanding tub. All PEX. Existing is copper — need transition fittings.",
+    category: "Plumbing",
+    skills: ["Rough-In", "PEX", "Copper Transition", "Drain/Waste/Vent"],
+    location: "Austin, TX",
+    budgetMin: 3200,
+    budgetMax: 4500,
+    paymentPath: "passthrough_escrow",
+    disclosedToOwner: true,
+    status: "in_progress",
+    deadline: "2026-04-02",
+    bidsCount: 4,
+    postedDate: "2026-03-20",
+    urgency: "high",
+  },
+  {
+    id: "sj5",
+    contractorId: "c4",
+    contractorName: "James Mitchell",
+    contractorCompany: "Mitchell Roofing Co.",
+    contractorRating: 4.9,
+    projectId: "j4",
+    projectTitle: "Roof Replacement",
+    milestoneLabel: "Flashings & ridge",
+    milestoneIndex: 3,
+    title: "Flashing & Ridge Cap Install",
+    description: "Install step flashing around 2 chimneys, pipe boots (4), and ridge cap (85 LF). Material: GAF TimberCrest. Underlayment already down. Need to coordinate with shingle crew for timing.",
+    category: "Roofing",
+    skills: ["Flashing", "Ridge Cap", "Waterproofing"],
+    location: "Houston, TX",
+    budgetMin: 1800,
+    budgetMax: 2600,
+    paymentPath: "contractor_escrow",
+    disclosedToOwner: false,
+    status: "open",
+    deadline: "2026-04-08",
+    bidsCount: 0,
+    postedDate: "2026-03-30",
+    urgency: "medium",
+  },
+];
+
+export const mockSubBids: SubBid[] = [
+  {
+    id: "sb1",
+    subJobId: "sj1",
+    subContractorId: "c3",
+    subContractorName: "Robert Garcia",
+    subContractorCompany: "Garcia Plumbing Services",
+    subContractorRating: 4.7,
+    amount: 5200,
+    message: "I can template and install within 5 business days. I work with the same quartz supplier your client picked — Silestone Eternal Calacatta Gold. Clean cuts, no chips.",
+    timeline: "5 days",
+    status: "pending",
+    createdDate: "2026-03-29",
+  },
+  {
+    id: "sb2",
+    subJobId: "sj2",
+    subContractorId: "c6",
+    subContractorName: "Derek Williams",
+    subContractorCompany: "DW Flooring Solutions",
+    subContractorRating: 4.8,
+    amount: 5800,
+    message: "LVP and tile are both in my wheelhouse. I'll handle the backsplash layout meeting with the homeowner directly if you want. Can start Monday.",
+    timeline: "6 days",
+    status: "pending",
+    createdDate: "2026-03-28",
+  },
+  {
+    id: "sb3",
+    subJobId: "sj4",
+    subContractorId: "c3",
+    subContractorName: "Robert Garcia",
+    subContractorCompany: "Garcia Plumbing Services",
+    subContractorRating: 4.7,
+    amount: 3800,
+    message: "PEX rough-in with copper transitions is standard for us. I'll pull the permit and handle inspection scheduling. 20 years doing this exact work.",
+    timeline: "3 days",
+    status: "accepted",
+    createdDate: "2026-03-21",
+  },
+];
+
+export const subContractorDashboardStats = {
+  activeSubJobs: 2,
+  completedSubJobs: 14,
+  monthlyRevenue: 18700,
+  revenueChange: 8.3,
+  avgRating: 4.7,
+  winRate: 72,
+  responseTime: "1.8 hrs",
+  pendingBids: 3,
+};
+
 export const contractorDashboardStats = {
   estimatesSent: 23,
   estimatesAccepted: 18,

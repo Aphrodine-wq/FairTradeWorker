@@ -12,13 +12,27 @@ datasource db {
 enum UserRole {
   CONTRACTOR
   HOMEOWNER
+  SUBCONTRACTOR
+}
+
+enum SubJobStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum SubPaymentPath {
+  CONTRACTOR_ESCROW
+  PASSTHROUGH_ESCROW
 }
 
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
   passwordHash  String
-  role          UserRole
+  roles         UserRole[]
+  activeRole    UserRole
   name          String
   phone         String?
   avatar        String?
@@ -28,6 +42,7 @@ model User {
 
   contractor    Contractor?
   homeowner     Homeowner?
+  subContractor SubContractor?
   sentMessages  Message[]     @relation("MessageSender")
   notifications Notification[]
 
@@ -65,6 +80,7 @@ model Contractor {
   qbConnection     QuickBooksConnection?
   payouts          Payout[]
   savedEstimates   SavedEstimate[]
+  subJobs          SubJob[]
 
   @@index([location])
   @@index([specialty])
@@ -84,6 +100,98 @@ model Homeowner {
   reviewsGiven  Review[]  @relation("HomeownerReviewAuthor")
   conversations ConversationParticipant[]
   receipts      Receipt[]
+}
+
+// ── SubContractors ───────────────────────────────────────────────
+
+model SubContractor {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company          String?
+  bio              String?
+  specialty        String?
+  skills           String[]
+  location         String?
+  serviceRadius    Int?     @default(50)
+  yearsExperience  Int?
+  hourlyRate       Float?
+  verified         Boolean  @default(false)
+  licensed         Boolean  @default(false)
+  insured          Boolean  @default(false)
+  rating           Float    @default(0)
+  reviewCount      Int      @default(0)
+  subJobsCompleted Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  subBids          SubBid[]
+
+  @@index([location])
+  @@index([specialty])
+}
+
+model SubJob {
+  id               String         @id @default(cuid())
+  contractorId     String
+  contractor       Contractor     @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  projectId        String
+  milestoneLabel   String
+  milestoneIndex   Int
+  title            String
+  description      String
+  category         String
+  skills           String[]
+  location         String
+  budgetMin        Float
+  budgetMax        Float
+  paymentPath      SubPaymentPath
+  disclosedToOwner Boolean        @default(false)
+  status           SubJobStatus   @default(OPEN)
+  deadline         DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  subBids          SubBid[]
+  subPayout        SubPayout?
+
+  @@index([contractorId])
+  @@index([status])
+  @@index([category])
+}
+
+model SubBid {
+  id              String        @id @default(cuid())
+  subJobId        String
+  subJob          SubJob        @relation(fields: [subJobId], references: [id], onDelete: Cascade)
+  subContractorId String
+  subContractor   SubContractor @relation(fields: [subContractorId], references: [id], onDelete: Cascade)
+  amount          Float
+  message         String?
+  timeline        String?
+  status          BidStatus     @default(PENDING)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@unique([subJobId, subContractorId])
+  @@index([subJobId])
+  @@index([subContractorId])
+}
+
+model SubPayout {
+  id              String         @id @default(cuid())
+  subJobId        String         @unique
+  subJob          SubJob         @relation(fields: [subJobId], references: [id], onDelete: Cascade)
+  subContractorId String
+  grossAmount     Float
+  platformFee     Float
+  netAmount       Float
+  feePercent      Float          @default(5.0)
+  paymentPath     SubPaymentPath
+  status          String         @default("queued")
+  paidAt          DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 }
 
 // ── Verification ─────────────────────────────────────────────────

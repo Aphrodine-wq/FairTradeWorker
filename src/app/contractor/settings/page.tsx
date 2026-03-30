@@ -998,6 +998,154 @@ function SecuritySection() {
   );
 }
 
+// ─── Sub Mode Section ───────────────────────────────────────────────────────
+
+function SubModeSection() {
+  const [activated, setActivated] = useState(false);
+  const [specialty, setSpecialty] = useState("");
+  const [hourlyRate, setHourlyRate] = useState("");
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+
+  const SUB_SKILLS = [
+    "Countertops", "Stone Fabrication", "Tile Setting", "LVP Install", "Backsplash",
+    "Gutters", "Rough-In", "PEX", "Flashing", "Waterproofing", "Framing",
+    "Finish Carpentry", "Drywall", "Painting", "Demolition", "Concrete", "HVAC Ductwork",
+  ];
+
+  function toggleSkill(skill: string) {
+    setSelectedSkills((prev) =>
+      prev.includes(skill) ? prev.filter((s) => s !== skill) : [...prev, skill]
+    );
+  }
+
+  function handleActivate() {
+    if (!specialty) {
+      toast.error("Select a specialty");
+      return;
+    }
+    setActivated(true);
+    toast.success("SubContractor mode activated — use the role switcher in the sidebar to toggle");
+  }
+
+  return (
+    <div>
+      <div>
+        <h2 className="text-lg font-bold text-gray-900">SubContractor Mode</h2>
+        <p className="text-sm text-gray-700 mt-1">Activate sub mode to browse and bid on Sub Jobs posted by other contractors</p>
+      </div>
+
+      {activated ? (
+        <div className="space-y-4">
+          <div className="bg-brand-50 border border-brand-200 p-4 flex items-start gap-3">
+            <CheckCircle2 className="w-5 h-5 text-brand-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-[14px] font-semibold text-brand-700">Sub Mode Active</p>
+              <p className="text-[13px] text-brand-600 mt-0.5">Use the role switcher at the top of the sidebar to toggle between Contractor and Sub modes.</p>
+            </div>
+          </div>
+          <div className="bg-white border border-gray-200 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[13px] text-gray-500">Specialty</span>
+              <span className="text-[13px] font-semibold text-gray-900">{specialty}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-[13px] text-gray-500">Hourly Rate</span>
+              <span className="text-[13px] font-semibold text-gray-900">${hourlyRate}/hr</span>
+            </div>
+            <div>
+              <span className="text-[13px] text-gray-500">Skills</span>
+              <div className="flex flex-wrap gap-1.5 mt-1.5">
+                {selectedSkills.map((s) => (
+                  <span key={s} className="text-[11px] font-medium bg-brand-50 text-brand-700 px-2 py-0.5">{s}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-5">
+          <div className="bg-gray-50 p-4 border border-gray-200">
+            <p className="text-[14px] font-semibold text-gray-900">How it works</p>
+            <ul className="mt-2 space-y-1.5 text-[13px] text-gray-600">
+              <li>Other contractors post Sub Jobs from milestones they need help with</li>
+              <li>You browse and bid on work that matches your trade</li>
+              <li>Payment flows through FTW escrow — same trust, same protections</li>
+              <li>Your Sub reputation is tracked separately on your FairRecord</li>
+            </ul>
+          </div>
+
+          {/* Specialty */}
+          <div>
+            <label className="text-[12px] font-semibold text-gray-900 uppercase tracking-wider">Sub Specialty</label>
+            <select
+              value={specialty}
+              onChange={(e) => setSpecialty(e.target.value)}
+              className="mt-2 w-full h-10 rounded-none border border-gray-200 px-3 text-[13px] text-gray-900 bg-white"
+            >
+              <option value="">Select your trade...</option>
+              <option>Plumbing</option>
+              <option>Electrical</option>
+              <option>HVAC</option>
+              <option>Roofing</option>
+              <option>Flooring</option>
+              <option>Tile</option>
+              <option>Painting</option>
+              <option>Concrete</option>
+              <option>Drywall</option>
+              <option>Framing</option>
+              <option>Finish Carpentry</option>
+              <option>Countertops</option>
+              <option>Gutters</option>
+              <option>Demolition</option>
+            </select>
+          </div>
+
+          {/* Hourly Rate */}
+          <div>
+            <label className="text-[12px] font-semibold text-gray-900 uppercase tracking-wider">Hourly Rate for Sub Work</label>
+            <Input
+              type="number"
+              value={hourlyRate}
+              onChange={(e) => setHourlyRate(e.target.value)}
+              placeholder="85"
+              className="mt-2 h-10 rounded-none text-[13px]"
+            />
+          </div>
+
+          {/* Skills */}
+          <div>
+            <label className="text-[12px] font-semibold text-gray-900 uppercase tracking-wider">Skills</label>
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {SUB_SKILLS.map((skill) => (
+                <button
+                  key={skill}
+                  onClick={() => toggleSkill(skill)}
+                  className={cn(
+                    "text-[11px] font-medium px-2 py-1 transition-colors",
+                    selectedSkills.includes(skill)
+                      ? "bg-brand-600 text-white"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  )}
+                >
+                  {skill}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <button
+            onClick={handleActivate}
+            className="w-full h-10 rounded-none bg-brand-600 text-white text-[14px] font-semibold hover:bg-brand-700 transition-colors flex items-center justify-center gap-2"
+          >
+            <Users className="w-4 h-4" />
+            Activate SubContractor Mode
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Sidebar Nav Config ──────────────────────────────────────────────────────
 
 const NAV_SECTIONS = [
@@ -1013,6 +1161,7 @@ const NAV_SECTIONS = [
   { id: "account", label: "Account", icon: CreditCard },
   { id: "security", label: "Security", icon: Lock },
   { id: "notifications", label: "Notifications", icon: Bell },
+  { id: "sub-mode", label: "Sub Mode", icon: Users },
 ];
 
 // ─── Main Page ───────────────────────────────────────────────────────────────
@@ -1035,6 +1184,7 @@ export default function SettingsPage() {
       case "account": return <AccountSection />;
       case "security": return <SecuritySection />;
       case "notifications": return <NotificationsSection />;
+      case "sub-mode": return <SubModeSection />;
       default: return <ProfileSection />;
     }
   };

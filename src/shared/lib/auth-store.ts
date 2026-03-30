@@ -5,11 +5,14 @@
  */
 import { api, setAuthToken } from "./realtime";
 
+export type UserRoleClient = "homeowner" | "contractor" | "subcontractor";
+
 export interface AuthUser {
   id: string;
   email: string;
   name: string;
-  role: "homeowner" | "contractor";
+  role: UserRoleClient;
+  roles: UserRoleClient[];
 }
 
 interface AuthState {
@@ -159,11 +162,18 @@ export const authStore = {
     try {
       // Try Spring Boot backend first
       const result = await api.login(email, password);
+      const apiUser = result.user as Record<string, unknown>;
+      const role = (String(apiUser.role)).toLowerCase() as UserRoleClient;
+      const apiRoles = apiUser.roles as string[] | undefined;
+      const roles = apiRoles
+        ? apiRoles.map((r) => r.toLowerCase() as UserRoleClient)
+        : [role];
       const user: AuthUser = {
-        id: result.user.id,
-        email: result.user.email,
-        name: result.user.name,
-        role: result.user.role.toLowerCase() as "homeowner" | "contractor",
+        id: String(apiUser.id),
+        email: String(apiUser.email),
+        name: String(apiUser.name),
+        role,
+        roles,
       };
       _state = { token: result.token, user };
       save(_state);
@@ -174,10 +184,19 @@ export const authStore = {
       return user;
     } catch {
       // Fall back to Next.js Prisma route (dev/offline)
-      const { token, user } = await authFetch<{ token: string; user: AuthUser }>(
+      const { token, user: rawUser } = await authFetch<{ token: string; user: Record<string, unknown> }>(
         "/api/auth/login",
         { email, password }
       );
+      const rawRole = (String(rawUser.role)).toLowerCase() as UserRoleClient;
+      const rawRoles = rawUser.roles as string[] | undefined;
+      const user: AuthUser = {
+        id: String(rawUser.id),
+        email: String(rawUser.email),
+        name: String(rawUser.name),
+        role: rawRole,
+        roles: rawRoles ? rawRoles.map((r) => r.toLowerCase() as UserRoleClient) : [rawRole],
+      };
       _state = { token, user };
       save(_state);
       setAuthToken(token);
@@ -192,7 +211,7 @@ export const authStore = {
     email: string;
     password: string;
     name: string;
-    role: "homeowner" | "contractor";
+    role: UserRoleClient;
     phone?: string;
   }): Promise<AuthUser> {
     try {
@@ -201,16 +220,23 @@ export const authStore = {
         email: attrs.email,
         password: attrs.password,
         name: attrs.name,
-        role: attrs.role,
+        role: attrs.role as "homeowner" | "contractor",
         location: undefined,
       });
       // Spring Boot register may not return a token — login after registration
       const loginResult = await api.login(attrs.email, attrs.password);
+      const apiUser = loginResult.user as Record<string, unknown>;
+      const role = (String(apiUser.role)).toLowerCase() as UserRoleClient;
+      const apiRoles = apiUser.roles as string[] | undefined;
+      const roles = apiRoles
+        ? apiRoles.map((r) => r.toLowerCase() as UserRoleClient)
+        : [role];
       const user: AuthUser = {
-        id: loginResult.user.id,
-        email: loginResult.user.email,
-        name: loginResult.user.name,
-        role: loginResult.user.role.toLowerCase() as "homeowner" | "contractor",
+        id: String(apiUser.id),
+        email: String(apiUser.email),
+        name: String(apiUser.name),
+        role,
+        roles,
       };
       _state = { token: loginResult.token, user };
       save(_state);
@@ -221,15 +247,57 @@ export const authStore = {
       return user;
     } catch {
       // Fall back to Next.js Prisma route
-      const { token, user } = await authFetch<{ token: string; user: AuthUser }>(
+      const { token, user: rawUser } = await authFetch<{ token: string; user: Record<string, unknown> }>(
         "/api/auth/signup",
         { ...attrs, role: attrs.role.toUpperCase() }
       );
+      const rawRole = (String(rawUser.role)).toLowerCase() as UserRoleClient;
+      const rawRoles = rawUser.roles as string[] | undefined;
+      const user: AuthUser = {
+        id: String(rawUser.id),
+        email: String(rawUser.email),
+        name: String(rawUser.name),
+        role: rawRole,
+        roles: rawRoles ? rawRoles.map((r) => r.toLowerCase() as UserRoleClient) : [rawRole],
+      };
       _state = { token, user };
       save(_state);
       setAuthToken(token);
       await syncTokenCookie(token);
       startSessionCheck();
+      notify();
+      return user;
+    }
+  },
+
+  async switchRole(targetRole: UserRoleClient): Promise<AuthUser> {
+    if (!_state.user || !_state.user.roles.includes(targetRole)) {
+      throw new Error(`Cannot switch to role: ${targetRole}`);
+    }
+    try {
+      const { token, user: rawUser } = await authFetch<{ token: string; user: Record<string, unknown> }>(
+        "/api/auth/switch-role",
+        { role: targetRole.toUpperCase() }
+      );
+      const rawRoles = rawUser.roles as string[] | undefined;
+      const user: AuthUser = {
+        id: String(rawUser.id),
+        email: String(rawUser.email),
+        name: String(rawUser.name),
+        role: (String(rawUser.role)).toLowerCase() as UserRoleClient,
+        roles: rawRoles ? rawRoles.map((r) => r.toLowerCase() as UserRoleClient) : _state.user.roles,
+      };
+      _state = { token, user };
+      save(_state);
+      setAuthToken(token);
+      await syncTokenCookie(token);
+      notify();
+      return user;
+    } catch {
+      // Optimistic local switch if API not available
+      const user: AuthUser = { ..._state.user!, role: targetRole };
+      _state = { ..._state, user };
+      save(_state);
       notify();
       return user;
     }

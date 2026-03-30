@@ -9,13 +9,12 @@ import {
   FileText,
   FolderOpen,
   MessageSquare,
-  Star,
-  Receipt,
   Bell,
-  Users,
+  Receipt,
   Settings,
   Award,
   Wallet,
+  Users,
 } from "lucide-react";
 import { Sidebar } from "@shared/components/sidebar";
 import { cn } from "@shared/lib/utils";
@@ -23,31 +22,30 @@ import { authStore } from "@shared/lib/auth-store";
 import { realtimeClient } from "@shared/lib/realtime";
 
 const NAV_ITEMS = [
-  { label: "Dashboard",      href: "/contractor/dashboard",      icon: LayoutDashboard },
-  { label: "Browse Jobs",    href: "/contractor/work",            icon: Briefcase },
-  { label: "Estimates",      href: "/contractor/estimates",       icon: FileText },
-  { label: "Projects",       href: "/contractor/projects",       icon: FolderOpen },
-  { label: "Invoices",       href: "/contractor/invoices",       icon: Receipt },
-  { label: "Payments",       href: "/contractor/payments",       icon: Wallet },
-  { label: "Clients",        href: "/contractor/clients",        icon: Users },
-  { label: "FairRecord",    href: "/contractor/records",        icon: Award },
-  { label: "Settings",       href: "/contractor/settings",       icon: Settings },
+  { label: "Dashboard",        href: "/subcontractor/dashboard",    icon: LayoutDashboard },
+  { label: "Browse Sub Jobs",  href: "/subcontractor/work",         icon: Briefcase },
+  { label: "Estimates",        href: "/subcontractor/estimates",    icon: FileText },
+  { label: "Projects",          href: "/subcontractor/jobs",         icon: FolderOpen },
+  { label: "Invoices",         href: "/subcontractor/invoices",     icon: Receipt },
+  { label: "Payments",         href: "/subcontractor/payments",     icon: Wallet },
+  { label: "Clients",          href: "/subcontractor/clients",      icon: Users },
+  { label: "FairRecord",       href: "/subcontractor/records",      icon: Award },
+  { label: "Settings",         href: "/subcontractor/settings",     icon: Settings },
 ];
 
-// Pages that have their own inner sidebar — outer sidebar auto-collapses
-const INNER_SIDEBAR_ROUTES = ["/contractor/estimates", "/contractor/settings"];
+const INNER_SIDEBAR_ROUTES = ["/subcontractor/estimates", "/subcontractor/settings"];
 
-const UNREAD_MESSAGES = 3;
-const UNREAD_NOTIFICATIONS = 5;
+const UNREAD_MESSAGES = 1;
+const UNREAD_NOTIFICATIONS = 3;
 
 function GlobalTopBar({ pathname }: { pathname: string }) {
   return (
     <div className="h-11 flex items-center justify-end gap-2 px-4 bg-white border-b border-gray-200 flex-shrink-0">
       <Link
-        href="/contractor/messages"
+        href="/subcontractor/messages"
         className={cn(
           "relative w-8 h-8 rounded-none hover:bg-gray-100 flex items-center justify-center transition-colors",
-          pathname === "/contractor/messages" && "bg-gray-100"
+          pathname === "/subcontractor/messages" && "bg-gray-100"
         )}
       >
         <MessageSquare className="w-[18px] h-[18px] text-gray-700" />
@@ -56,10 +54,10 @@ function GlobalTopBar({ pathname }: { pathname: string }) {
         )}
       </Link>
       <Link
-        href="/contractor/notifications"
+        href="/subcontractor/notifications"
         className={cn(
           "relative w-8 h-8 rounded-none hover:bg-gray-100 flex items-center justify-center transition-colors",
-          pathname === "/contractor/notifications" && "bg-gray-100"
+          pathname === "/subcontractor/notifications" && "bg-gray-100"
         )}
       >
         <Bell className="w-[18px] h-[18px] text-gray-700" />
@@ -71,14 +69,13 @@ function GlobalTopBar({ pathname }: { pathname: string }) {
   );
 }
 
-export default function ContractorLayout({
+export default function SubContractorLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
 
-  // Connect realtime WebSocket if authenticated
   React.useEffect(() => {
     const token = authStore.getToken();
     if (token) {
@@ -92,7 +89,7 @@ export default function ContractorLayout({
       <Sidebar
         items={NAV_ITEMS}
         currentPath={pathname}
-        userRole="contractor"
+        userRole="subcontractor"
         roles={["contractor", "subcontractor"]}
         autoCollapse={INNER_SIDEBAR_ROUTES.some((r) => pathname === r || pathname.startsWith(r + "/"))}
       />

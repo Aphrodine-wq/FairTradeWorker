@@ -3,7 +3,7 @@
  * Pages import from here instead of mock-data directly.
  */
 import { api, type RealtimeJob, type RealtimeBid } from "./realtime";
-import { mockJobs, mockEstimates, mockFairRecords, type Job, type Estimate, type FairRecord } from "./mock-data";
+import { mockJobs, mockEstimates, mockFairRecords, mockSubJobs, mockSubBids, subContractorDashboardStats, type Job, type Estimate, type FairRecord, type SubJob, type SubBid } from "./mock-data";
 
 // Convert a RealtimeJob from the API to the mock Job shape pages expect
 function toJob(rj: RealtimeJob): Job {
@@ -163,4 +163,25 @@ export async function fetchPublicRecord(publicId: string): Promise<FairRecord | 
     // Fall through to mock
   }
   return mockFairRecords.find((r) => r.publicId === publicId) || null;
+}
+
+/**
+ * Fetch sub jobs — mock data for now.
+ */
+export async function fetchSubJobs(): Promise<SubJob[]> {
+  return mockSubJobs;
+}
+
+/**
+ * Fetch bids for a specific sub job — mock data for now.
+ */
+export async function fetchSubBids(subJobId: string): Promise<SubBid[]> {
+  return mockSubBids.filter((b) => b.subJobId === subJobId);
+}
+
+/**
+ * Fetch sub contractor dashboard stats — mock data for now.
+ */
+export async function fetchSubContractorStats() {
+  return subContractorDashboardStats;
 }

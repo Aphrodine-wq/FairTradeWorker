@@ -14,7 +14,7 @@ pnpm build:electron   # Build macOS dmg
 
 ## Architecture
 
-Next.js 15 App Router deployed as a server-side app on Vercel. Two user roles (contractor, homeowner) with separate route groups and layouts. API routes handle auth, jobs, bids, AI estimation, and QuickBooks integration. Database is PostgreSQL via Prisma 7. Analytics via PostHog (`posthog-js`).
+Next.js 15 App Router deployed as a server-side app on Vercel. Three user roles (contractor, homeowner, subcontractor) with separate route groups and layouts. Contractors can toggle into SubContractor mode via a role switcher (Uber-style). API routes handle auth, jobs, bids, sub jobs, AI estimation, and QuickBooks integration. Database is PostgreSQL via Prisma 7. Analytics via PostHog (`posthog-js`).
 
 The data layer (`src/shared/lib/data.ts`) tries the real Elixir API first and falls back to mock data. Pages import from `data.ts` instead of `mock-data.ts` directly.
 
@@ -25,7 +25,8 @@ Middleware (`src/middleware.ts`) handles auth route protection (JWT via `ftw-tok
 ```
 src/app/              # Pages (App Router)
   (auth)/             # Login/Signup/Forgot-Password/Reset-Password route group
-  contractor/         # 13 pages, layout has sidebar + global top bar
+  contractor/         # 13 pages, layout has sidebar + global top bar + role switcher
+  subcontractor/      # 11 pages, mirrors contractor layout scoped to sub jobs
   homeowner/          # 12 pages (incl. milestones), layout has sidebar only
   fairprice/          # Public FairPrice estimator
   record/[id]/        # Public FairRecord detail
@@ -44,11 +45,12 @@ src/app/api/          # Next.js API routes
 
 src/domains/          # Domain-specific components
   contractor/         # VoiceRecorder, EstimateCard, JobCard, BidDialog, StatCard
+  subcontractor/      # SubJobCard
   marketplace/        # Navbar, Hero, Features, HowItWorks, StatsBar,
                       #   Testimonials, PricingSection, CtaSection, Footer, MobileNav
 
 src/shared/
-  components/         # Sidebar, AppHeader, AiEstimateCard, BrandMark, CookieConsent, EmptyState
+  components/         # Sidebar, RoleSwitcher, AppHeader, AiEstimateCard, BrandMark, CookieConsent, EmptyState
   hooks/              # use-realtime.ts, use-estimate.ts, use-page-title.ts
   ui/                 # Radix-based primitives (AlertDialog, Button, Badge, Card, Dialog,
                       #   Input, Progress, Separator, Skeleton, Tabs, Textarea, Toaster)
@@ -69,8 +71,9 @@ src/generated/prisma/ # Generated Prisma client + model types
 src/__tests__/        # Vitest unit tests (utils.test.ts, constants.test.ts, mock-data.test.ts)
 src/styles/globals.css
 
-prisma/schema.prisma  # 19 models: User, Contractor, Homeowner, License,
-                      #   InsuranceCert, Job, JobPhoto, Bid, AiEstimate,
+prisma/schema.prisma  # 23 models: User (roles[] + activeRole), Contractor, Homeowner,
+                      #   SubContractor, SubJob, SubBid, SubPayout,
+                      #   License, InsuranceCert, Job, JobPhoto, Bid, AiEstimate,
                       #   SavedEstimate, Conversation, ConversationParticipant,
                       #   Message, Review, QuickBooksConnection, Invoice,
                       #   Payout, Receipt, Notification
@@ -92,7 +95,8 @@ prisma/schema.prisma  # 19 models: User, Contractor, Homeowner, License,
 
 ## Layout Pattern
 
-- **Contractor**: `contractor/layout.tsx` -- collapsible Sidebar (7 items) + GlobalTopBar with message/notification badge links. Messages, Notifications, Reviews, and Records are pages but not in the sidebar; Messages and Notifications are in the top bar.
+- **Contractor**: `contractor/layout.tsx` -- collapsible Sidebar (9 items) + GlobalTopBar with message/notification badge links + RoleSwitcher (when sub mode activated). Messages, Notifications, Reviews, and Records are pages but not in the sidebar; Messages and Notifications are in the top bar.
+- **SubContractor**: `subcontractor/layout.tsx` -- mirrors Contractor layout, scoped to Sub Jobs. RoleSwitcher toggles back to Contractor mode.
 - **Homeowner**: `homeowner/layout.tsx` -- Sidebar only, no top bar.
 - **Marketing**: Root layout, no sidebar, standard page container.
 
@@ -111,7 +115,7 @@ Client-side auth state managed by `src/shared/lib/auth-store.ts`:
 - Syncs token to realtime client via `setAuthToken()`
 - Exposes `authStore.login()`, `authStore.register()`, `authStore.logout()`
 
-Middleware redirects unauthenticated users from `/contractor/*` and `/homeowner/*` to `/login`. Checks JWT role to prevent cross-role access (contractor can't access homeowner pages and vice versa).
+Middleware redirects unauthenticated users from `/contractor/*`, `/subcontractor/*`, and `/homeowner/*` to `/login`. Checks JWT `activeRole` to prevent cross-role access. SubContractor routes require `SUBCONTRACTOR` as the active role.
 
 ## API Routes
 

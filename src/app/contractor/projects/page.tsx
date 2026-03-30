@@ -60,6 +60,7 @@ import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
 import { fetchProjects } from "@shared/lib/data";
 import { toast } from "sonner";
 import { usePageTitle } from "@shared/hooks/use-page-title";
+import { PostSubJobDialog } from "./components/post-sub-job-dialog";
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -1791,6 +1792,7 @@ function MilestonesTab({
   const [showAdd, setShowAdd] = useState(false);
   const [expandedIndex, setExpandedIndex] = useState<number | null>(initialExpandIndex ?? null);
   const [submitNote, setSubmitNote] = useState("");
+  const [subJobDialog, setSubJobDialog] = useState<{ open: boolean; milestoneIndex: number; label: string; amount: number } | null>(null);
   const milestones = project.milestones as Milestone[];
 
   const totalAmount = milestones.reduce((s, m) => s + m.amount, 0);
@@ -1897,6 +1899,21 @@ function MilestonesTab({
                 </div>
 
                 <p className={cn("text-[15px] font-bold tabular-nums shrink-0", m.status === "paid" ? "text-emerald-950" : "text-gray-900")}>{formatCurrency(m.amount)}</p>
+
+                {/* Post Sub Job button for in_progress / pending milestones */}
+                {(m.status === "in_progress" || m.status === "pending") && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSubJobDialog({ open: true, milestoneIndex: i, label: m.label, amount: m.amount });
+                    }}
+                    className="shrink-0 flex items-center gap-1 h-6 px-2 text-[11px] font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors opacity-0 group-hover:opacity-100"
+                    title="Find a sub for this milestone"
+                  >
+                    <Users className="w-3 h-3" />
+                    Post Sub
+                  </button>
+                )}
 
                 <div className="shrink-0 w-8 flex justify-end">
                   {canExpand && (
@@ -2018,6 +2035,23 @@ function MilestonesTab({
             <button onClick={() => { setShowAdd(false); setNewLabel(""); setNewAmount(""); }} className="h-9 px-4 rounded-none border border-border text-[13px] font-medium text-gray-800 hover:bg-gray-50 transition-colors">Cancel</button>
           </div>
         </div>
+      )}
+
+      {/* Post Sub Job Dialog */}
+      {subJobDialog && (
+        <PostSubJobDialog
+          open={subJobDialog.open}
+          onOpenChange={(open) => {
+            if (!open) setSubJobDialog(null);
+          }}
+          milestoneLabel={subJobDialog.label}
+          milestoneAmount={subJobDialog.amount}
+          milestoneIndex={subJobDialog.milestoneIndex}
+          projectId={project.id}
+          projectName={project.name}
+          projectCategory="General Contracting"
+          projectLocation="Austin, TX"
+        />
       )}
     </div>
   );

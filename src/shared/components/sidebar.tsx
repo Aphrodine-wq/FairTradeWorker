@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 import { cn, getInitials } from "@shared/lib/utils";
 import { BrandMark } from "@shared/components/brand-mark";
+import { RoleSwitcher } from "@shared/components/role-switcher";
+import type { UserRoleClient } from "@shared/lib/auth-store";
 
 interface NavItem {
   label: string;
@@ -16,17 +18,19 @@ interface NavItem {
 interface SidebarProps {
   items: NavItem[];
   currentPath: string;
-  userRole: "contractor" | "homeowner";
+  userRole: "contractor" | "homeowner" | "subcontractor";
+  roles?: UserRoleClient[];
   topAction?: React.ReactNode;
   autoCollapse?: boolean;
 }
 
-const MOCK_USER = {
+const MOCK_USER: Record<string, { name: string; email: string; rating: number }> = {
   contractor: { name: "Marcus Johnson", email: "marcus@johnson.com", rating: 4.8 },
   homeowner: { name: "Michael Brown", email: "michael@brown.com", rating: 4.9 },
+  subcontractor: { name: "Marcus Johnson", email: "marcus@johnson.com", rating: 4.7 },
 };
 
-export function Sidebar({ items, currentPath, userRole, topAction, autoCollapse }: SidebarProps) {
+export function Sidebar({ items, currentPath, userRole, roles, topAction, autoCollapse }: SidebarProps) {
   const [manualOverride, setManualOverride] = useState<boolean | null>(null);
   const collapsed = manualOverride ?? (autoCollapse || false);
   const router = useRouter();
@@ -57,6 +61,11 @@ export function Sidebar({ items, currentPath, userRole, topAction, autoCollapse 
           </Link>
         )}
       </div>
+
+      {/* Role Switcher */}
+      {roles && roles.length > 1 && (
+        <RoleSwitcher activeRole={userRole} roles={roles} collapsed={collapsed} />
+      )}
 
       {/* Top Action */}
       {topAction && !collapsed && (

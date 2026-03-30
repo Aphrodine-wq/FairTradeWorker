@@ -21,6 +21,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "@contractor/*": ["./src/domains/contractor/*"],
+      "@subcontractor/*": ["./src/domains/subcontractor/*"],
       "@homeowner/*": ["./src/domains/homeowner/*"],
       "@marketplace/*": ["./src/domains/marketplace/*"],
       "@shared/*": ["./src/shared/*"]

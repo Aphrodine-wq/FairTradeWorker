@@ -253,7 +253,7 @@ function LoginContent() {
                 size="sm"
                 className="w-full text-xs text-gray-700"
                 onClick={() => {
-                  const payload = btoa(JSON.stringify({ sub: "demo-contractor", role: "CONTRACTOR", demo: true }));
+                  const payload = btoa(JSON.stringify({ sub: "demo-contractor", role: "CONTRACTOR", roles: ["CONTRACTOR", "SUBCONTRACTOR"], demo: true }));
                   document.cookie = `ftw-token=demo.${payload}.demo; path=/`;
                   router.push("/contractor/dashboard");
                 }}
@@ -267,12 +267,26 @@ function LoginContent() {
                 size="sm"
                 className="w-full text-xs text-gray-700"
                 onClick={() => {
-                  const payload = btoa(JSON.stringify({ sub: "demo-homeowner", role: "HOMEOWNER", demo: true }));
+                  const payload = btoa(JSON.stringify({ sub: "demo-homeowner", role: "HOMEOWNER", roles: ["HOMEOWNER"], demo: true }));
                   document.cookie = `ftw-token=demo.${payload}.demo; path=/`;
                   router.push("/homeowner/dashboard");
                 }}
               >
                 Homeowner Demo
+              </Button>
+            </div>
+            <div className="flex-1">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full text-xs text-gray-700"
+                onClick={() => {
+                  const payload = btoa(JSON.stringify({ sub: "demo-sub", role: "SUBCONTRACTOR", roles: ["CONTRACTOR", "SUBCONTRACTOR"], demo: true }));
+                  document.cookie = `ftw-token=demo.${payload}.demo; path=/`;
+                  router.push("/subcontractor/dashboard");
+                }}
+              >
+                Sub Demo
               </Button>
             </div>
           </div>
