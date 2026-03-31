@@ -1,0 +1,61 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e4]:
+    - link "FairTradeWorker" [ref=e6] [cursor=pointer]:
+      - /url: /
+      - img [ref=e7]
+      - generic [ref=e12]: FairTradeWorker
+    - generic [ref=e14]:
+      - generic [ref=e15]:
+        - heading "Welcome back" [level=1] [ref=e16]
+        - paragraph [ref=e17]: Sign in to your account
+      - generic [ref=e18]:
+        - generic [ref=e19]:
+          - generic [ref=e20]: Email address
+          - textbox "Email address" [ref=e21]:
+            - /placeholder: you@example.com
+        - generic [ref=e22]:
+          - generic [ref=e23]:
+            - generic [ref=e24]: Password
+            - link "Forgot password?" [ref=e25] [cursor=pointer]:
+              - /url: /forgot-password
+          - generic [ref=e26]:
+            - textbox "Password" [ref=e27]:
+              - /placeholder: Enter your password
+            - button "Show password" [ref=e28] [cursor=pointer]:
+              - img [ref=e29]
+        - button "Sign In" [ref=e32] [cursor=pointer]
+      - generic [ref=e37]: or continue with
+      - generic [ref=e38]:
+        - button "Google" [ref=e39] [cursor=pointer]:
+          - img [ref=e40]
+          - text: Google
+        - button "Apple" [ref=e45] [cursor=pointer]:
+          - img [ref=e46]
+          - text: Apple
+      - paragraph [ref=e48]:
+        - text: Don't have an account?
+        - link "Sign up" [ref=e49] [cursor=pointer]:
+          - /url: /signup
+    - generic [ref=e50]:
+      - button "Contractor Demo" [ref=e52] [cursor=pointer]
+      - button "Homeowner Demo" [ref=e54] [cursor=pointer]
+    - paragraph [ref=e55]:
+      - text: By signing in, you agree to our
+      - link "Terms" [ref=e56] [cursor=pointer]:
+        - /url: /terms
+      - text: and
+      - link "Privacy Policy" [ref=e57] [cursor=pointer]:
+        - /url: /privacy
+      - text: .
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e63] [cursor=pointer]:
+    - img [ref=e64]
+  - alert [ref=e67]
+  - generic [ref=e69]:
+    - paragraph [ref=e70]:
+      - text: We use cookies to improve your experience and analyze site traffic.
+      - link "Privacy Policy" [ref=e71] [cursor=pointer]:
+        - /url: /privacy
+    - generic [ref=e72]:
+      - button "Decline" [ref=e73] [cursor=pointer]
+      - button "Accept" [ref=e74] [cursor=pointer]
