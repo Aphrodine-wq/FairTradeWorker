@@ -4,7 +4,11 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import bcrypt from "bcryptjs";
 
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+const isRemote = process.env.DATABASE_URL?.includes("render.com");
+const pool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: isRemote ? { rejectUnauthorized: false } : undefined,
+});
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
