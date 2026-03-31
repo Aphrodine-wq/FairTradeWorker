@@ -1026,7 +1026,7 @@ function NewEstimateTab() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const __REMOVED_CALCULATOR = true; // Calculator now lives in Estimates page
-const _UNUSED_PITCH_MULTIPLIERS = [
+const PITCH_MULTIPLIERS = [
   { label: "Flat (1.00)", value: 1.0 },
   { label: "4/12 (1.05)", value: 1.05 },
   { label: "6/12 (1.12)", value: 1.12 },

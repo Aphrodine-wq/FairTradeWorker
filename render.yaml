@@ -1,0 +1,42 @@
+databases:
+  - name: ftw-db
+    plan: free
+    databaseName: ftw
+    user: ftw
+
+services:
+  - type: web
+    name: fairtradeworker
+    runtime: node
+    plan: free
+    buildCommand: pnpm install && pnpm build
+    startCommand: pnpm start
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ftw-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false
+      - key: NEXT_PUBLIC_REALTIME_URL
+        sync: false
+      - key: CONSTRUCTIONAI_API_URL
+        sync: false
+      - key: QB_CLIENT_ID
+        sync: false
+      - key: QB_CLIENT_SECRET
+        sync: false
+      - key: QB_REDIRECT_URI
+        sync: false
+      - key: QB_SANDBOX
+        value: "true"
+      - key: QB_WEBHOOK_VERIFIER_TOKEN
+        sync: false
+      - key: NEXT_PUBLIC_POSTHOG_KEY
+        sync: false
+      - key: NEXT_PUBLIC_POSTHOG_HOST
+        value: "https://us.i.posthog.com"
