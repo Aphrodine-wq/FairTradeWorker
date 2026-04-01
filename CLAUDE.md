@@ -5,43 +5,48 @@
 ```bash
 pnpm install          # Install deps
 pnpm dev              # Dev server (Turbopack) on :3000
-pnpm build            # Production build
+pnpm build            # Production build (prisma generate + migrate deploy + next build)
+pnpm start            # Serve production build
 pnpm lint             # ESLint
 pnpm test             # Vitest unit tests (vitest run)
 pnpm dev:electron     # Dev + Electron
 pnpm build:electron   # Build macOS dmg
+pnpm db:migrate       # Run Prisma migrations (prisma migrate deploy)
+pnpm db:seed          # Seed database (tsx prisma/seed.ts)
+pnpm db:reset         # Reset database (prisma migrate reset)
 ```
 
 ## Architecture
 
-Next.js 15 App Router deployed as a server-side app on Vercel. Three user roles (contractor, homeowner, subcontractor) with separate route groups and layouts. Contractors can toggle into SubContractor mode via a role switcher (Uber-style). API routes handle auth, jobs, bids, sub jobs, AI estimation, and QuickBooks integration. Database is PostgreSQL via Prisma 7. Analytics via PostHog (`posthog-js`).
+Next.js 15 App Router deployed as a server-side app on Render (primary) with Vercel config also present. Three user roles (contractor, homeowner, subcontractor) with separate route groups and layouts. Users can hold multiple roles and switch via `/api/auth/switch-role`. API routes handle auth, jobs, bids, sub jobs, AI estimation, and QuickBooks integration. Database is PostgreSQL via Prisma 7 (23 models). Analytics via PostHog (`posthog-js`).
 
-The data layer (`src/shared/lib/data.ts`) tries the real Elixir API first and falls back to mock data. Pages import from `data.ts` instead of `mock-data.ts` directly.
+The data layer (`src/shared/lib/data.ts`) tries the real Spring Boot API first and falls back to mock data. Pages import from `data.ts` instead of `mock-data.ts` directly.
 
-The realtime client layer (`src/shared/lib/realtime.ts`) connects to the `ftw-realtime` backend at `NEXT_PUBLIC_REALTIME_URL` via STOMP/SockJS WebSocket and a comprehensive REST API wrapper.
+The realtime client layer (`src/shared/lib/realtime.ts`) connects to the `ftw-realtime` Spring Boot/Kotlin backend at `NEXT_PUBLIC_REALTIME_URL` via STOMP/SockJS WebSocket and a comprehensive REST API wrapper.
 
-Middleware (`src/middleware.ts`) handles auth route protection (JWT via `ftw-token` cookie), rate limiting on auth paths (10 req/min per IP), and security headers on all responses.
+Middleware (`src/middleware.ts`) handles auth route protection (JWT via `ftw-token` cookie), role-based routing (prevents cross-role access), rate limiting on auth paths (10 req/min per IP), and security headers on all responses. Demo tokens (`demo.*` prefix) bypass role checking.
 
 ```
 src/app/              # Pages (App Router)
   (auth)/             # Login/Signup/Forgot-Password/Reset-Password route group
   contractor/         # 13 pages, layout has sidebar + global top bar + role switcher
-  subcontractor/      # 11 pages, mirrors contractor layout scoped to sub jobs
+  subcontractor/      # 12 pages, mirrors contractor layout scoped to sub jobs
   homeowner/          # 12 pages (incl. milestones), layout has sidebar only
   fairprice/          # Public FairPrice estimator
   record/[id]/        # Public FairRecord detail
-  api/                # 27 API route files (see below)
+  api/                # 29 API route files (see below)
   [marketing pages]   # Landing, pricing, features, how-it-works, testimonials,
                       #   about, blog, careers, contact, faq, terms, privacy
 
 src/app/api/          # Next.js API routes
-  auth/               # signup, login, forgot-password, reset-password, sync-token
+  auth/               # signup, login, forgot-password, reset-password, switch-role, sync-token
   jobs/               # CRUD, bids, AI estimates
   bids/               # Accept bids
   contractor/         # Profile, licenses, insurance, estimates, estimate PDFs
   homeowner/          # Property management
   contact/            # Contact form submission
   integrations/       # QuickBooks OAuth2, invoices, estimates, payouts, receipts, webhooks
+  seed/               # Database seed endpoint (POST, requires x-seed-secret header)
 
 src/domains/          # Domain-specific components
   contractor/         # VoiceRecorder, EstimateCard, JobCard, BidDialog, StatCard
@@ -81,7 +86,7 @@ prisma/schema.prisma  # 23 models: User (roles[] + activeRole), Contractor, Home
 
 ## Conventions
 
-- **Path aliases**: `@/*`, `@contractor/*`, `@homeowner/*`, `@marketplace/*`, `@shared/*`
+- **Path aliases**: `@/*`, `@contractor/*`, `@subcontractor/*`, `@homeowner/*`, `@marketplace/*`, `@shared/*`
 - **Component variants**: Use `class-variance-authority` (cva) for button/badge variants
 - **Class merging**: Always use `cn()` from `@shared/lib/utils` (clsx + tailwind-merge)
 - **Styling**: Tailwind utility classes. No CSS modules. Global styles in `src/styles/globals.css`
@@ -119,15 +124,16 @@ Middleware redirects unauthenticated users from `/contractor/*`, `/subcontractor
 
 ## API Routes
 
-27 route files in `src/app/api/`:
+29 route files in `src/app/api/`:
 
-- **Auth**: `POST /api/auth/signup`, `POST /api/auth/login`, `POST /api/auth/forgot-password`, `POST /api/auth/reset-password`, `POST /api/auth/sync-token`
+- **Auth**: `POST /api/auth/signup`, `POST /api/auth/login`, `POST /api/auth/forgot-password`, `POST /api/auth/reset-password`, `POST /api/auth/switch-role`, `POST /api/auth/sync-token`
 - **Jobs**: `GET/POST /api/jobs`, `GET /api/jobs/[id]`, `POST /api/jobs/[id]/bids`, `POST /api/jobs/[id]/estimate`
 - **Bids**: `POST /api/bids/[id]/accept` (also creates QB invoice + queues contractor payout)
 - **Contractor**: `GET/PUT /api/contractor/profile`, `GET/POST /api/contractor/licenses`, `GET/POST /api/contractor/insurance`, `GET/POST /api/contractor/estimates`, `GET/DELETE /api/contractor/estimates/[id]`, `GET /api/contractor/estimates/[id]/pdf`
 - **Homeowner**: `GET/PUT /api/homeowner/property`
 - **Contact**: `POST /api/contact`
 - **QuickBooks**: 9 routes under `/api/integrations/quickbooks/` (connect, callback, disconnect, status, create-invoice, sync-estimate, payout, receipt, webhook)
+- **Seed**: `POST /api/seed` (requires `x-seed-secret` header matching `JWT_SECRET`, populates demo data)
 
 All database routes use `prisma` from `src/shared/lib/db.ts`. Auth-required routes call `getAuthUser(req)`.
 

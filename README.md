@@ -4,7 +4,7 @@ Two-sided construction marketplace connecting homeowners with verified contracto
 
 ## Status
 
-Frontend pages built with mock data fallback. Backend API routes implemented for auth, jobs, bids, AI estimation, and QuickBooks integration. Prisma schema defined with PostgreSQL. Middleware handles auth protection and rate limiting. Pages use a data layer (`data.ts`) that tries the real API first and falls back to mock data. Realtime client layer wired to the `ftw-realtime` backend via STOMP/SockJS WebSocket.
+Frontend pages built with mock data fallback. Backend API routes implemented for auth, jobs, bids, AI estimation, and QuickBooks integration. Prisma schema defined with PostgreSQL (23 models). Middleware handles auth protection, role-based routing, and rate limiting. Pages use a data layer (`data.ts`) that tries the real API first and falls back to mock data. Realtime client layer wired to the `ftw-realtime` Spring Boot/Kotlin backend via STOMP/SockJS WebSocket. Deployed to Render (primary) with Vercel config also present.
 
 ## Stack
 
@@ -45,6 +45,9 @@ Requires `DATABASE_URL` pointing to a PostgreSQL instance for API routes to func
 | `pnpm test` | Run Vitest test suite (`vitest run`) |
 | `pnpm dev:electron` | Dev server + Electron window |
 | `pnpm build:electron` | Build macOS dmg |
+| `pnpm db:migrate` | Run Prisma migrations (`prisma migrate deploy`) |
+| `pnpm db:seed` | Seed database (`tsx prisma/seed.ts`) |
+| `pnpm db:reset` | Reset database (`prisma migrate reset`) |
 
 ## Environment Variables
 
@@ -52,7 +55,7 @@ Requires `DATABASE_URL` pointing to a PostgreSQL instance for API routes to func
 |----------|---------|-------------|
 | `DATABASE_URL` | — (required for API) | PostgreSQL connection string |
 | `JWT_SECRET` | `ftw-dev-secret-change-in-production` | Secret for signing auth JWTs |
-| `NEXT_PUBLIC_REALTIME_URL` | `http://localhost:4000` | URL of the Elixir/Phoenix realtime backend |
+| `NEXT_PUBLIC_REALTIME_URL` | `http://localhost:4000` | URL of the Spring Boot/Kotlin realtime backend (`ftw-realtime`) |
 | `CONSTRUCTIONAI_API_URL` | `http://localhost:8000/api/estimate` | ConstructionAI FastAPI endpoint |
 | `NEXT_PUBLIC_APP_URL` | `http://localhost:3000` | Base URL for password reset links |
 | `NEXT_PUBLIC_POSTHOG_KEY` | — | PostHog project API key |
@@ -68,8 +71,8 @@ Requires `DATABASE_URL` pointing to a PostgreSQL instance for API routes to func
 ```
 src/
   app/                           # Next.js App Router
-    (auth)/                      # Login, Signup
-    contractor/                  # 13 contractor pages
+    (auth)/                      # Login, Signup, Forgot-Password, Reset-Password
+    contractor/                  # 13 contractor pages + error boundary
       dashboard/                 # Bento grid dashboard
       work/                      # Browse job marketplace
       estimates/                 # Estimates + voice recorder agent
@@ -83,7 +86,20 @@ src/
       settings/                  # 12-section settings panel
       onboarding/                # Multi-step contractor onboarding
       records/                   # FairRecord history
-    homeowner/                   # 12 homeowner pages
+    subcontractor/               # 12 subcontractor pages + layout
+      dashboard/                 # Sub dashboard
+      work/                      # Browse sub jobs
+      jobs/                      # Assigned sub jobs
+      estimates/                 # Sub estimates
+      invoices/                  # Sub invoice history
+      payments/                  # Sub payment history
+      clients/                   # Sub client list
+      messages/                  # Chat interface
+      notifications/             # Alert center
+      records/                   # FairRecord history
+      settings/                  # Sub settings
+      onboarding/                # Sub onboarding
+    homeowner/                   # 12 homeowner pages + error boundary
       dashboard/                 # KPI cards + projects
       jobs/                      # Posted jobs
       post-job/                  # Multi-step job posting form
@@ -98,19 +114,23 @@ src/
       milestones/                # Project milestones
     fairprice/                   # Public FairPrice estimator landing
     record/[id]/                 # Public FairRecord detail page
-    api/                         # 27 API route files (see below)
+    api/                         # 29 API route files (see below)
     pricing/                     # Pricing page
     features/                    # Features page
     how-it-works/                # How It Works page
     testimonials/                # Testimonials page
+    sitemap.ts                   # Dynamic sitemap generation
+    not-found.tsx                # Custom 404 page
+    global-error.tsx             # Global error boundary
     about/ blog/ careers/ contact/ faq/ terms/ privacy/
     page.tsx                     # Landing page
   domains/                       # Domain-specific components
     contractor/components/       # VoiceRecorder, EstimateCard, JobCard, BidDialog, StatCard
+    subcontractor/components/    # SubJobCard
     marketplace/components/      # Navbar, Hero, Features, HowItWorks, StatsBar,
                                  #   Testimonials, PricingSection, CtaSection, Footer, MobileNav
   shared/
-    components/                  # Sidebar, AppHeader, AiEstimateCard, BrandMark, CookieConsent, EmptyState
+    components/                  # Sidebar, RoleSwitcher, AppHeader, AiEstimateCard, BrandMark, CookieConsent, EmptyState
     hooks/
       use-realtime.ts            # useRealtimeJobs, useRealtimeBids, useRealtimeChat
       use-estimate.ts            # useJobEstimate, useBidSuggestion (AI-powered)
@@ -134,7 +154,7 @@ src/
   __tests__/                     # Vitest unit tests (utils, constants, mock-data)
   styles/globals.css             # Global styles
 prisma/
-  schema.prisma                  # 19 models (see Database section)
+  schema.prisma                  # 23 models (see Database section)
 backend/                         # Placeholder READMEs (no code yet)
   contractor/                    # Planned edge functions
   homeowner/                     # Planned edge functions
@@ -154,14 +174,17 @@ docs/                            # Business intelligence + research
 
 ## API Routes
 
+29 route files in `src/app/api/`.
+
 ### Auth
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | `/api/auth/signup` | Create account (creates User + Contractor/Homeowner) |
+| POST | `/api/auth/signup` | Create account (creates User + Contractor/Homeowner/SubContractor) |
 | POST | `/api/auth/login` | Login, returns JWT + sets `ftw-token` cookie |
 | POST | `/api/auth/forgot-password` | Send password reset link (JWT-based) |
 | POST | `/api/auth/reset-password` | Reset password with token |
+| POST | `/api/auth/switch-role` | Switch active role (requires role in user's roles array, issues new JWT) |
 | POST | `/api/auth/sync-token` | Sync auth token to httpOnly cookie |
 
 ### Jobs
@@ -201,7 +224,7 @@ docs/                            # Business intelligence + research
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | `/api/contact` | Submit contact form (forwards to Elixir backend if available) |
+| POST | `/api/contact` | Submit contact form (forwards to Spring Boot backend if available) |
 
 ### QuickBooks Integration
 
@@ -217,23 +240,33 @@ docs/                            # Business intelligence + research
 | GET | `/api/integrations/quickbooks/receipt` | Generate payment receipt |
 | POST | `/api/integrations/quickbooks/webhook` | Intuit webhook receiver |
 
+### Seed
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/seed` | Seed database with demo data (requires `x-seed-secret` header matching `JWT_SECRET`) |
+
 ## Middleware
 
 `src/middleware.ts` runs on all routes (except static assets):
 
-- **Auth protection**: `/contractor/*` and `/homeowner/*` require `ftw-token` cookie. Redirects to `/login` if missing. Checks JWT role to prevent cross-role access.
+- **Auth protection**: `/contractor/*`, `/subcontractor/*`, and `/homeowner/*` require `ftw-token` cookie. Redirects to `/login` if missing. Checks JWT `activeRole` to prevent cross-role access (e.g., a contractor cannot access homeowner pages). Supports demo tokens (`demo.*` prefix) that bypass role checking.
 - **Rate limiting**: Auth paths (`/login`, `/signup`, `/forgot-password`, `/api/auth/*`) limited to 10 req/min per IP (in-memory fixed-window counter).
 - **Security headers**: X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Referrer-Policy, Permissions-Policy on all responses.
 
 ## Database
 
-Prisma schema (`prisma/schema.prisma`) with PostgreSQL, 19 models:
+Prisma schema (`prisma/schema.prisma`) with PostgreSQL, 23 models:
 
 | Model | Description |
 |-------|-------------|
-| `User` | Base user with email/password, role enum (CONTRACTOR/HOMEOWNER) |
+| `User` | Base user with email/password, `roles[]` enum array (CONTRACTOR/HOMEOWNER/SUBCONTRACTOR), `activeRole` |
 | `Contractor` | Profile: company, bio, specialty, skills, rating, verification flags |
 | `Homeowner` | Profile: location |
+| `SubContractor` | Subcontractor profile linked to a user |
+| `SubJob` | Jobs posted by contractors for subcontractors (status enum: OPEN/IN_PROGRESS/COMPLETED/CANCELLED) |
+| `SubBid` | Subcontractor bids on sub jobs |
+| `SubPayout` | Subcontractor payouts (payment path: CONTRACTOR_ESCROW or PASSTHROUGH_ESCROW) |
 | `License` | Contractor licenses with verification status |
 | `InsuranceCert` | Insurance certs with coverage details |
 | `Job` | Posted jobs with full property details, budget range, urgency, tags |
@@ -315,9 +348,26 @@ Contractor sidebar nav: Dashboard, Browse Jobs, Estimates, Projects, Invoices, P
 | `/homeowner/onboarding` | Homeowner onboarding flow |
 | `/homeowner/milestones` | Project milestones tracking |
 
+### SubContractor Dashboard
+
+| Path | Description |
+|------|-------------|
+| `/subcontractor/dashboard` | Sub dashboard |
+| `/subcontractor/work` | Browse available sub jobs |
+| `/subcontractor/jobs` | Assigned sub jobs |
+| `/subcontractor/estimates` | Sub estimates |
+| `/subcontractor/invoices` | Sub invoice history |
+| `/subcontractor/payments` | Sub payment history |
+| `/subcontractor/clients` | Sub client list |
+| `/subcontractor/messages` | Messaging |
+| `/subcontractor/notifications` | Notifications |
+| `/subcontractor/records` | FairRecord history |
+| `/subcontractor/settings` | Sub settings |
+| `/subcontractor/onboarding` | Sub onboarding flow |
+
 ## Realtime Layer
 
-A full realtime client is implemented in `src/shared/lib/realtime.ts`. It connects to the `ftw-realtime` backend via STOMP/SockJS WebSocket and exposes a comprehensive REST API wrapper via `api.*`.
+A full realtime client is implemented in `src/shared/lib/realtime.ts`. It connects to the `ftw-realtime` Spring Boot/Kotlin backend via STOMP/SockJS WebSocket and exposes a comprehensive REST API wrapper via `api.*`.
 
 ### WebSocket Topics (STOMP)
 
@@ -347,11 +397,12 @@ The `api` object in `realtime.ts` wraps the `ftw-realtime` backend REST endpoint
 ## Path Aliases
 
 ```
-@/*            -> src/*
-@contractor/*  -> src/domains/contractor/*
-@homeowner/*   -> src/domains/homeowner/*
-@marketplace/* -> src/domains/marketplace/*
-@shared/*      -> src/shared/*
+@/*               -> src/*
+@contractor/*     -> src/domains/contractor/*
+@subcontractor/*  -> src/domains/subcontractor/*
+@homeowner/*      -> src/domains/homeowner/*
+@marketplace/*    -> src/domains/marketplace/*
+@shared/*         -> src/shared/*
 ```
 
 ## Design System
@@ -383,4 +434,4 @@ Prisma models in `prisma/schema.prisma` define the database-level types (see Dat
 
 ## Deployment
 
-Deployed to Vercel as a server-side Next.js app (not static export). `vercel.json` sets security headers (X-Frame-Options, HSTS, Referrer-Policy) and long-lived cache headers for static assets. `next.config.ts` adds CSP and Permissions-Policy headers.
+Primary deployment is **Render** (`render.yaml`) with PostgreSQL on Render free tier. `vercel.json` is also present for Vercel deployment. Both are server-side Next.js (not static export). `vercel.json` sets security headers (X-Frame-Options, HSTS, Referrer-Policy), long-lived cache headers for static assets, and no-store for API routes. `next.config.ts` adds CSP, HSTS, and Permissions-Policy headers. `render.yaml` defines the web service, database, and all required env vars.
