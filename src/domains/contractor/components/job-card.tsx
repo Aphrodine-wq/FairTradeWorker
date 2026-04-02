@@ -738,7 +738,7 @@ export function JobCard({ job }: { job: Job }) {
       <DialogTrigger asChild>
         <Card className="overflow-hidden hover:shadow-sm transition-shadow duration-200 flex flex-col cursor-pointer group">
           {/* Thumbnail */}
-          <div className="relative h-40 bg-gray-100 overflow-hidden flex-shrink-0">
+          <div className="relative h-56 bg-gray-100 overflow-hidden flex-shrink-0">
             <Image
               src={job.thumbnail}
               alt={job.title}

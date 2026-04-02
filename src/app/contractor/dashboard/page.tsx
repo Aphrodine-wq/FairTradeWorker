@@ -163,7 +163,7 @@ function TileHeader({ title, count, linkHref, linkLabel }: { title: string; coun
   return (
     <div className="flex items-center justify-between px-5 pt-4 pb-3">
       <div className="flex items-center gap-2.5">
-        <h2 className="text-[26px] font-bold text-gray-900">{title}</h2>
+        <h2 className="text-[36px] font-bold text-gray-900">{title}</h2>
         {count !== undefined && (
           <span className="text-[13px] font-semibold text-gray-600 bg-gray-100 rounded-none px-2 py-0.5 tabular-nums">{count}</span>
         )}
@@ -274,7 +274,12 @@ export default function ContractorDashboardPage() {
 
           {/* Scorecard */}
           <BentoTile className="col-span-1 xl:col-span-2 bg-white border border-gray-200">
-            <TileHeader title="Scorecard" linkHref="/contractor/estimates?tab=my-estimates" linkLabel="Details" />
+            <div className="flex items-center justify-between px-5 pt-4 pb-3">
+              <h2 className="text-[48px] font-bold text-gray-900">Scorecard</h2>
+              <Link href="/contractor/estimates?tab=my-estimates" className="text-[14px] font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-0.5 group">
+                Details <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
             <div className="px-5 pb-4 flex-1 flex flex-col justify-center">
               {/* Revenue + Rating */}
               <div className="flex items-start justify-between pb-4 border-b border-gray-100">
