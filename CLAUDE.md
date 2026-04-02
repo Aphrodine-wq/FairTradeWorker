@@ -5,7 +5,7 @@
 ```bash
 pnpm install          # Install deps
 pnpm dev              # Dev server (Turbopack) on :3000
-pnpm build            # Production build (prisma generate + migrate deploy + next build)
+pnpm build            # Production build (prisma generate + next build)
 pnpm start            # Serve production build
 pnpm lint             # ESLint
 pnpm test             # Vitest unit tests (vitest run)
