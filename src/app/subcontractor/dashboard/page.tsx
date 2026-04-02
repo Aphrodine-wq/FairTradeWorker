@@ -142,7 +142,7 @@ function TileHeader({ title, count, linkHref, linkLabel }: { title: string; coun
   return (
     <div className="flex items-center justify-between px-5 pt-4 pb-3">
       <div className="flex items-center gap-2.5">
-        <h2 className="text-[26px] font-bold text-gray-900">{title}</h2>
+        <h2 className="text-[20px] font-bold text-gray-900">{title}</h2>
         {count !== undefined && (
           <span className="text-[13px] font-semibold text-gray-600 bg-gray-100 rounded-none px-2 py-0.5 tabular-nums">{count}</span>
         )}
