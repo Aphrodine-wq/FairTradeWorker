@@ -275,31 +275,56 @@ export const authStore = {
       throw new Error(`Cannot switch to role: ${targetRole}`);
     }
     try {
-      const { token, user: rawUser } = await authFetch<{ token: string; user: Record<string, unknown> }>(
-        "/api/auth/switch-role",
-        { role: targetRole.toUpperCase() }
-      );
-      const rawRoles = rawUser.roles as string[] | undefined;
+      // Try Spring Boot backend first
+      const result = await api.switchRole(targetRole);
+      const apiUser = result.user as Record<string, unknown>;
+      const role = (String(apiUser.role)).toLowerCase() as UserRoleClient;
+      const apiRoles = apiUser.roles as string[] | undefined;
+      const roles = apiRoles
+        ? apiRoles.map((r) => r.toLowerCase() as UserRoleClient)
+        : _state.user.roles;
       const user: AuthUser = {
-        id: String(rawUser.id),
-        email: String(rawUser.email),
-        name: String(rawUser.name),
-        role: (String(rawUser.role)).toLowerCase() as UserRoleClient,
-        roles: rawRoles ? rawRoles.map((r) => r.toLowerCase() as UserRoleClient) : _state.user.roles,
+        id: String(apiUser.id),
+        email: String(apiUser.email),
+        name: String(apiUser.name || _state.user.name),
+        role,
+        roles,
       };
-      _state = { token, user };
+      _state = { token: result.token, user };
       save(_state);
-      setAuthToken(token);
-      await syncTokenCookie(token);
+      setAuthToken(result.token);
+      await syncTokenCookie(result.token);
       notify();
       return user;
     } catch {
-      // Optimistic local switch if API not available
-      const user: AuthUser = { ..._state.user!, role: targetRole };
-      _state = { ..._state, user };
-      save(_state);
-      notify();
-      return user;
+      try {
+        // Fall back to Next.js Prisma route
+        const { token, user: rawUser } = await authFetch<{ token: string; user: Record<string, unknown> }>(
+          "/api/auth/switch-role",
+          { role: targetRole.toUpperCase() }
+        );
+        const rawRoles = rawUser.roles as string[] | undefined;
+        const user: AuthUser = {
+          id: String(rawUser.id),
+          email: String(rawUser.email),
+          name: String(rawUser.name),
+          role: (String(rawUser.role)).toLowerCase() as UserRoleClient,
+          roles: rawRoles ? rawRoles.map((r) => r.toLowerCase() as UserRoleClient) : _state.user!.roles,
+        };
+        _state = { token, user };
+        save(_state);
+        setAuthToken(token);
+        await syncTokenCookie(token);
+        notify();
+        return user;
+      } catch {
+        // Optimistic local switch if both APIs unavailable
+        const user: AuthUser = { ..._state.user!, role: targetRole };
+        _state = { ..._state, user };
+        save(_state);
+        notify();
+        return user;
+      }
     }
   },
 

@@ -63,7 +63,8 @@ export interface AuthResponse {
     id: string;
     email: string;
     name: string;
-    role: "homeowner" | "contractor";
+    role: string;
+    roles?: string[];
   };
 }
 
@@ -131,17 +132,27 @@ export const api = {
     email: string;
     password: string;
     name: string;
-    role: "homeowner" | "contractor";
+    role: "homeowner" | "contractor" | "subcontractor";
     location?: string;
   }): Promise<{ user: AuthResponse["user"] }> {
     return apiFetch("/api/auth/register", {
       method: "POST",
-      body: JSON.stringify(attrs),
+      body: JSON.stringify({
+        ...attrs,
+        role: attrs.role.toUpperCase(),
+      }),
     });
   },
 
   async me(): Promise<{ user: AuthResponse["user"] }> {
     return apiFetch("/api/auth/me");
+  },
+
+  async switchRole(role: string): Promise<AuthResponse> {
+    return apiFetch("/api/auth/switch-role", {
+      method: "POST",
+      body: JSON.stringify({ role: role.toUpperCase() }),
+    });
   },
 
   // Jobs (public — no auth required for listing)
