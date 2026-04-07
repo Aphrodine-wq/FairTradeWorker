@@ -2,8 +2,8 @@ import { NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
-const JWT_SECRET = process.env.JWT_SECRET || "ftw-dev-secret-change-in-production";
-const TOKEN_EXPIRY = "7d";
+const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-key-change-in-production";
+const TOKEN_EXPIRY = "24h";
 
 export interface TokenPayload {
   userId: string;
