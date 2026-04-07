@@ -20,6 +20,11 @@ interface AuthState {
   user: AuthUser | null;
 }
 
+/** Normalize backend role names (e.g. "sub_contractor" -> "subcontractor") */
+function normalizeRole(role: string): UserRoleClient {
+  return role.toLowerCase().replace(/_/g, "") as UserRoleClient;
+}
+
 const STORAGE_KEY = "ftw-auth";
 const SESSION_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutes
 
@@ -163,10 +168,10 @@ export const authStore = {
       // Try Spring Boot backend first
       const result = await api.login(email, password);
       const apiUser = result.user as Record<string, unknown>;
-      const role = (String(apiUser.role)).toLowerCase() as UserRoleClient;
+      const role = normalizeRole(String(apiUser.role));
       const apiRoles = apiUser.roles as string[] | undefined;
       const roles = apiRoles
-        ? apiRoles.map((r) => r.toLowerCase() as UserRoleClient)
+        ? apiRoles.map((r) => normalizeRole(r))
         : [role];
       const user: AuthUser = {
         id: String(apiUser.id),
@@ -188,14 +193,14 @@ export const authStore = {
         "/api/auth/login",
         { email, password }
       );
-      const rawRole = (String(rawUser.role)).toLowerCase() as UserRoleClient;
+      const rawRole = normalizeRole(String(rawUser.role));
       const rawRoles = rawUser.roles as string[] | undefined;
       const user: AuthUser = {
         id: String(rawUser.id),
         email: String(rawUser.email),
         name: String(rawUser.name),
         role: rawRole,
-        roles: rawRoles ? rawRoles.map((r) => r.toLowerCase() as UserRoleClient) : [rawRole],
+        roles: rawRoles ? rawRoles.map((r) => normalizeRole(r)) : [rawRole],
       };
       _state = { token, user };
       save(_state);
@@ -226,10 +231,10 @@ export const authStore = {
       // Spring Boot register may not return a token — login after registration
       const loginResult = await api.login(attrs.email, attrs.password);
       const apiUser = loginResult.user as Record<string, unknown>;
-      const role = (String(apiUser.role)).toLowerCase() as UserRoleClient;
+      const role = normalizeRole(String(apiUser.role));
       const apiRoles = apiUser.roles as string[] | undefined;
       const roles = apiRoles
-        ? apiRoles.map((r) => r.toLowerCase() as UserRoleClient)
+        ? apiRoles.map((r) => normalizeRole(r))
         : [role];
       const user: AuthUser = {
         id: String(apiUser.id),
@@ -251,14 +256,14 @@ export const authStore = {
         "/api/auth/signup",
         { ...attrs, role: attrs.role.toUpperCase() }
       );
-      const rawRole = (String(rawUser.role)).toLowerCase() as UserRoleClient;
+      const rawRole = normalizeRole(String(rawUser.role));
       const rawRoles = rawUser.roles as string[] | undefined;
       const user: AuthUser = {
         id: String(rawUser.id),
         email: String(rawUser.email),
         name: String(rawUser.name),
         role: rawRole,
-        roles: rawRoles ? rawRoles.map((r) => r.toLowerCase() as UserRoleClient) : [rawRole],
+        roles: rawRoles ? rawRoles.map((r) => normalizeRole(r)) : [rawRole],
       };
       _state = { token, user };
       save(_state);
@@ -278,10 +283,10 @@ export const authStore = {
       // Try Spring Boot backend first
       const result = await api.switchRole(targetRole);
       const apiUser = result.user as Record<string, unknown>;
-      const role = (String(apiUser.role)).toLowerCase() as UserRoleClient;
+      const role = normalizeRole(String(apiUser.role));
       const apiRoles = apiUser.roles as string[] | undefined;
       const roles = apiRoles
-        ? apiRoles.map((r) => r.toLowerCase() as UserRoleClient)
+        ? apiRoles.map((r) => normalizeRole(r))
         : _state.user.roles;
       const user: AuthUser = {
         id: String(apiUser.id),
@@ -308,8 +313,8 @@ export const authStore = {
           id: String(rawUser.id),
           email: String(rawUser.email),
           name: String(rawUser.name),
-          role: (String(rawUser.role)).toLowerCase() as UserRoleClient,
-          roles: rawRoles ? rawRoles.map((r) => r.toLowerCase() as UserRoleClient) : _state.user!.roles,
+          role: normalizeRole(String(rawUser.role)),
+          roles: rawRoles ? rawRoles.map((r) => normalizeRole(r)) : _state.user!.roles,
         };
         _state = { token, user };
         save(_state);

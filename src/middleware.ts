@@ -98,19 +98,20 @@ export function middleware(request: NextRequest) {
     }
 
     // Check role from JWT payload (full verification in API routes)
+    // Backend sends lowercase enum names (e.g. "contractor", "sub_contractor")
     try {
       const payload = JSON.parse(atob(token.split(".")[1]));
-      const activeRole = payload.role;
-      if (pathname.startsWith("/contractor") && activeRole !== "CONTRACTOR") {
-        const fallback = activeRole === "SUBCONTRACTOR" ? "/subcontractor/dashboard" : "/homeowner/dashboard";
+      const rawRole = String(payload.role).toLowerCase().replace("_", "");
+      if (pathname.startsWith("/contractor") && rawRole !== "contractor") {
+        const fallback = rawRole === "subcontractor" ? "/subcontractor/dashboard" : "/homeowner/dashboard";
         return addSecurityHeaders(NextResponse.redirect(new URL(fallback, request.url)));
       }
-      if (pathname.startsWith("/homeowner") && activeRole !== "HOMEOWNER") {
-        const fallback = activeRole === "SUBCONTRACTOR" ? "/subcontractor/dashboard" : "/contractor/dashboard";
+      if (pathname.startsWith("/homeowner") && rawRole !== "homeowner") {
+        const fallback = rawRole === "subcontractor" ? "/subcontractor/dashboard" : "/contractor/dashboard";
         return addSecurityHeaders(NextResponse.redirect(new URL(fallback, request.url)));
       }
-      if (pathname.startsWith("/subcontractor") && activeRole !== "SUBCONTRACTOR") {
-        const fallback = activeRole === "CONTRACTOR" ? "/contractor/dashboard" : "/homeowner/dashboard";
+      if (pathname.startsWith("/subcontractor") && rawRole !== "subcontractor") {
+        const fallback = rawRole === "contractor" ? "/contractor/dashboard" : "/homeowner/dashboard";
         return addSecurityHeaders(NextResponse.redirect(new URL(fallback, request.url)));
       }
     } catch {
