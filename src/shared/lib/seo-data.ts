@@ -20,12 +20,31 @@ export interface Trade {
   subServices: SubService[];
 }
 
+export interface Neighborhood {
+  name: string;
+  slug: string;
+  description: string;
+}
+
+export interface CityProfile {
+  slug: string;
+  tagline: string;
+  description: string;
+  population: string;
+  highlights: string[];
+  neighborhoods: Neighborhood[];
+  localFaqs: { question: string; answer: string }[];
+  seasonalTips: { season: string; title: string; description: string }[];
+  nearbyLandmarks: string[];
+}
+
 export interface ServiceLocation {
   city: string;
   state: string;
   stateAbbr: string;
   slug: string;
   metro?: string;
+  profile?: CityProfile;
 }
 
 export const TRADES: Trade[] = [
@@ -556,8 +575,132 @@ export const SERVICE_LOCATIONS: ServiceLocation[] = [
   { city: "Nesbit", state: "Mississippi", stateAbbr: "MS", slug: "nesbit-ms", metro: "Memphis Metro" },
 
   // North Mississippi
-  { city: "Oxford", state: "Mississippi", stateAbbr: "MS", slug: "oxford-ms", metro: "North Mississippi" },
-  { city: "Tupelo", state: "Mississippi", stateAbbr: "MS", slug: "tupelo-ms", metro: "North Mississippi" },
+  {
+    city: "Oxford", state: "Mississippi", stateAbbr: "MS", slug: "oxford-ms", metro: "North Mississippi",
+    profile: {
+      slug: "oxford-ms",
+      tagline: "Home of Ole Miss — Find Trusted Contractors in Oxford",
+      description: "Oxford, Mississippi is a growing college town with a mix of historic homes near the Square, new construction off Highway 6, and student housing around the University of Mississippi campus. Whether you're renovating a century-old Victorian on South Lamar or building new in Brittany Woods, FairTradeWorker connects you with verified local contractors who know Oxford's building codes, soil conditions, and architectural character.",
+      population: "28,000+",
+      highlights: [
+        "University of Mississippi (Ole Miss) drives steady housing demand",
+        "Historic Square district with protected architectural standards",
+        "Rapid growth along Highway 6 and Highway 7 corridors",
+        "Hot, humid summers mean HVAC is critical — systems work harder here",
+        "Clay-heavy soil causes foundation movement in older neighborhoods",
+        "Lafayette County building permits required for most projects",
+      ],
+      neighborhoods: [
+        { name: "The Square", slug: "the-square", description: "Oxford's historic downtown — older buildings, character renovations, strict preservation guidelines." },
+        { name: "South Lamar", slug: "south-lamar", description: "Tree-lined residential streets with early 1900s homes. Popular for renovations and additions." },
+        { name: "North Lamar", slug: "north-lamar", description: "Mix of residential and commercial. Growing area with new construction and rehab projects." },
+        { name: "Old Taylor Road", slug: "old-taylor-road", description: "Established family neighborhood south of town. Larger lots, mature landscaping." },
+        { name: "Highway 6 Corridor", slug: "highway-6", description: "Oxford's growth corridor — new subdivisions, commercial builds, and modern construction." },
+        { name: "College Hill", slug: "college-hill", description: "Quiet area north of Oxford with rural properties and custom homes." },
+        { name: "Brittany Woods", slug: "brittany-woods", description: "Popular subdivision with newer homes. Common projects: fencing, landscaping, interior updates." },
+        { name: "Campus Area", slug: "campus-area", description: "Student housing and rental properties near Ole Miss. High turnover drives constant renovation demand." },
+        { name: "Wellsgate", slug: "wellsgate", description: "Upscale subdivision south of town. Custom homes, pools, outdoor living spaces." },
+        { name: "Grand Oaks", slug: "grand-oaks", description: "Newer development with family homes. Common projects: decks, fencing, garage builds." },
+      ],
+      localFaqs: [
+        {
+          question: "Do I need a building permit in Oxford, MS?",
+          answer: "Yes — Lafayette County and the City of Oxford require permits for most construction, renovation, and mechanical work. Your FairTradeWorker contractor handles permitting as part of the job. The Oxford Building Department is located at City Hall on University Avenue.",
+        },
+        {
+          question: "What are common home issues in Oxford, MS?",
+          answer: "Oxford's clay-heavy soil causes foundation settling and cracking in older homes. High humidity leads to mold and moisture issues, especially in crawl spaces. Aging electrical panels in pre-1980s homes often need upgrading. And Mississippi's hot summers mean HVAC systems work overtime — regular maintenance is essential.",
+        },
+        {
+          question: "How much do contractors charge in Oxford, MS?",
+          answer: "Oxford contractor rates are competitive with the North Mississippi average. General contractors charge $30-$60/hour, electricians $50-$100/hour, and plumbers $60-$120/hour. FairTradeWorker gives you project-based estimates upfront, so you never get surprised by hourly billing.",
+        },
+        {
+          question: "Are there contractor licensing requirements in Mississippi?",
+          answer: "Mississippi requires a state license from the MS State Board of Contractors for commercial projects over $50,000 and residential projects over $50,000. Many trades (electrical, plumbing, HVAC) require separate specialty licenses. All FairTradeWorker contractors are license-verified before they can bid.",
+        },
+      ],
+      seasonalTips: [
+        { season: "Spring", title: "Storm season prep", description: "March through May brings severe storms to North Mississippi. Get your roof inspected, clean gutters, and trim overhanging branches before storm season hits. Roofers and tree services book up fast after major storms." },
+        { season: "Summer", title: "HVAC overload season", description: "Oxford summers hit 95+ degrees with high humidity. Get your AC serviced before June. If your system is 10+ years old, consider replacement before it fails mid-July when every HVAC tech in Lafayette County is booked solid." },
+        { season: "Fall", title: "Renovation season", description: "September through November is prime renovation time in Oxford. Weather is mild, contractors have more availability, and you can finish projects before the holidays. Ole Miss football season also drives rental property upgrades." },
+        { season: "Winter", title: "Interior project season", description: "December through February is ideal for interior work — painting, flooring, kitchen and bathroom remodels. Contractors offer better rates during the slower season. Plan spring landscaping projects now." },
+      ],
+      nearbyLandmarks: [
+        "University of Mississippi (Ole Miss)",
+        "The Square (Oxford Town Square)",
+        "Rowan Oak (William Faulkner's home)",
+        "Oxford Conference Center",
+        "Baptist Memorial Hospital - North Mississippi",
+        "Lafayette County Courthouse",
+        "Oxford Commons Shopping Center",
+      ],
+    },
+  },
+  {
+    city: "Tupelo", state: "Mississippi", stateAbbr: "MS", slug: "tupelo-ms", metro: "North Mississippi",
+    profile: {
+      slug: "tupelo-ms",
+      tagline: "Northeast Mississippi's Largest City — Verified Contractors in Tupelo",
+      description: "Tupelo is the commercial hub of Northeast Mississippi with a population of 38,000+ and growing. From historic homes in the downtown core to new construction in the suburbs off McCullough Boulevard, Tupelo has a diverse housing stock that keeps contractors busy year-round. The city's strong economy, driven by manufacturing and healthcare, supports steady residential and commercial construction demand.",
+      population: "38,000+",
+      highlights: [
+        "Largest city in Northeast Mississippi — strong contractor market",
+        "North Mississippi Medical Center drives healthcare construction",
+        "Toyota-Wellspring manufacturing corridor creates commercial demand",
+        "Mix of historic bungalows, mid-century ranch homes, and modern subdivisions",
+        "Tornado-prone region — storm damage repair is constant demand",
+        "Lee County building permits required for most projects",
+      ],
+      neighborhoods: [
+        { name: "Downtown Tupelo", slug: "downtown", description: "Historic commercial core with loft conversions, mixed-use renovations, and restaurant build-outs." },
+        { name: "Joyner", slug: "joyner", description: "Established family neighborhood. Older homes needing updates — HVAC, electrical, roofing." },
+        { name: "Parkway", slug: "parkway", description: "Growing area along the Natchez Trace Parkway corridor. New construction and lot development." },
+        { name: "McCullough Boulevard", slug: "mccullough", description: "Tupelo's growth corridor with new subdivisions, retail, and commercial construction." },
+        { name: "Saltillo Area", slug: "saltillo", description: "Adjacent community with rapid residential growth. New homes, custom builds, and land development." },
+        { name: "Verona Area", slug: "verona", description: "South Lee County suburb with affordable housing and steady renovation demand." },
+        { name: "Plantersville", slug: "plantersville", description: "Rural residential area east of Tupelo. Custom homes, barns, and outbuilding construction." },
+        { name: "Tupelo Country Club", slug: "country-club", description: "Upscale neighborhood with established homes. Pool installation, outdoor living, and whole-house remodels." },
+        { name: "Cliff Gookin", slug: "cliff-gookin", description: "Popular residential area near North Mississippi Medical Center. Steady renovation and maintenance demand." },
+        { name: "Elvis Presley Heights", slug: "elvis-presley-heights", description: "Historic neighborhood near the Elvis Birthplace. Character homes with renovation potential." },
+      ],
+      localFaqs: [
+        {
+          question: "Do I need a building permit in Tupelo, MS?",
+          answer: "Yes — the City of Tupelo and Lee County require building permits for most construction and renovation work. Your FairTradeWorker contractor handles permitting. The Tupelo Building Department is located at the Lee County Government Complex on West Main Street.",
+        },
+        {
+          question: "What are common home issues in Tupelo, MS?",
+          answer: "Tupelo sits in the heart of tornado alley — storm damage repair for roofing, siding, and fencing is constant demand. The region's clay soil causes foundation issues in older homes. High humidity creates moisture problems in crawl spaces and attics. Many homes built in the 1950s-1970s need electrical panel upgrades and HVAC replacement.",
+        },
+        {
+          question: "How much do contractors charge in Tupelo, MS?",
+          answer: "Tupelo contractor rates are typically 10-15% lower than national averages. General contractors charge $25-$55/hour, electricians $45-$90/hour, and plumbers $55-$110/hour. FairTradeWorker provides project-based estimates so you get a clear price before work starts.",
+        },
+        {
+          question: "Is Tupelo a good market for home renovation?",
+          answer: "Yes — Tupelo's growing economy, affordable housing stock, and steady population growth make it an active renovation market. Homes in established neighborhoods like Joyner and Cliff Gookin regularly undergo kitchen/bath remodels, and the McCullough corridor is driving new construction demand.",
+        },
+      ],
+      seasonalTips: [
+        { season: "Spring", title: "Tornado season readiness", description: "Northeast Mississippi sees severe weather from March through May. Get your roof inspected, ensure your home's structural integrity, and trim trees near your house. After storms, FairTradeWorker contractors respond fast — post storm damage jobs for priority bidding." },
+        { season: "Summer", title: "Beat the heat", description: "Tupelo summers are hot and humid. Service your HVAC before June. If your system struggles to keep up, it's time for an upgrade. Also a great time for exterior painting — long dry days mean faster completion." },
+        { season: "Fall", title: "Build season peak", description: "Fall is peak construction season in Tupelo. Mild weather, no storm interruptions, and the holidays create urgency. Book renovation projects early — September fills up fast for general contractors and remodelers." },
+        { season: "Winter", title: "Indoor renovation time", description: "Tupelo winters are mild enough for year-round construction, but interior projects are ideal December through February. Kitchen remodels, flooring, drywall — contractors have more availability and often better pricing." },
+      ],
+      nearbyLandmarks: [
+        "Elvis Presley Birthplace",
+        "Tupelo Automobile Museum",
+        "North Mississippi Medical Center",
+        "Natchez Trace Parkway",
+        "Tupelo Furniture Market",
+        "BancorpSouth Arena",
+        "Mall at Barnes Crossing",
+        "Tupelo Buffalo Park & Zoo",
+        "Lee County Library",
+      ],
+    },
+  },
   { city: "Corinth", state: "Mississippi", stateAbbr: "MS", slug: "corinth-ms", metro: "North Mississippi" },
   { city: "New Albany", state: "Mississippi", stateAbbr: "MS", slug: "new-albany-ms", metro: "North Mississippi" },
   { city: "Batesville", state: "Mississippi", stateAbbr: "MS", slug: "batesville-ms", metro: "North Mississippi" },
@@ -680,6 +823,16 @@ export function getTradeLocationKeywords(trade: Trade, location: ServiceLocation
     `${trade.slug} contractors ${city} ${state}`,
     ...(location.metro ? [`${trade.slug} ${location.metro.toLowerCase()}`] : []),
   ];
+}
+
+/** Get all locations that have a full city profile */
+export function getProfileLocations(): ServiceLocation[] {
+  return SERVICE_LOCATIONS.filter((l) => l.profile != null);
+}
+
+/** Get a neighborhood by slug within a city profile */
+export function getNeighborhoodBySlug(profile: CityProfile, slug: string): Neighborhood | undefined {
+  return profile.neighborhoods.find((n) => n.slug === slug);
 }
 
 /** Generate title for sub-service + location page */

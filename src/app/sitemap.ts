@@ -80,6 +80,28 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ),
   );
 
+  // City hub pages: /services/city/[city]
+  const cityHubEntries: MetadataRoute.Sitemap = SERVICE_LOCATIONS
+    .filter((loc) => loc.profile != null)
+    .map((loc) => ({
+      url: `${baseUrl}/services/city/${loc.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.9,
+    }));
+
+  // Neighborhood pages: /services/city/[city]/[neighborhood]
+  const neighborhoodEntries: MetadataRoute.Sitemap = SERVICE_LOCATIONS
+    .filter((loc) => loc.profile != null)
+    .flatMap((loc) =>
+      loc.profile!.neighborhoods.map((hood) => ({
+        url: `${baseUrl}/services/city/${loc.slug}/${hood.slug}`,
+        lastModified: new Date(),
+        changeFrequency: "weekly" as const,
+        priority: 0.8,
+      })),
+    );
+
   // Blog posts (static slugs)
   const blogSlugs = [
     "fair-pricing-construction",
@@ -102,6 +124,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...tradeLocationEntries,
     ...subServiceIndexEntries,
     ...subServiceEntries,
+    ...cityHubEntries,
+    ...neighborhoodEntries,
     ...blogEntries,
   ];
 }

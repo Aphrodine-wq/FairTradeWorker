@@ -96,14 +96,39 @@ export default function ServicesIndexPage() {
           </div>
         </section>
 
-        {/* Browse by Location */}
+        {/* Featured Cities */}
         <section className="py-16 lg:py-20 bg-white border-t border-[#E5E1DB]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-2xl sm:text-3xl font-bold text-[#111318]">
-              Browse by Location
+              Featured Cities
             </h2>
             <p className="mt-2 text-[#4B5563]">
-              We're launching market by market — Mississippi first, then Texas.
+              Full city guides with neighborhood coverage, local tips, and every trade.
+            </p>
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+              {SERVICE_LOCATIONS.filter((l) => l.profile).map((loc) => (
+                <Link key={loc.slug} href={`/services/city/${loc.slug}`}
+                  className="group bg-[#FAFAFA] border border-[#E5E1DB] p-6 hover:border-[#C41E3A]/30 transition-colors duration-150">
+                  <h3 className="text-xl font-bold text-[#111318] group-hover:text-[#C41E3A] transition-colors duration-150">
+                    <MapPin className="w-5 h-5 inline mr-2 text-[#C41E3A]" />
+                    {loc.city}, {loc.stateAbbr}
+                  </h3>
+                  <p className="mt-2 text-sm text-[#4B5563] leading-relaxed line-clamp-2">{loc.profile!.tagline}</p>
+                  <p className="mt-3 text-xs text-[#9CA3AF]">{loc.profile!.neighborhoods.length} neighborhoods covered</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Browse by Location */}
+        <section className="py-16 lg:py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#111318]">
+              All Mississippi Cities
+            </h2>
+            <p className="mt-2 text-[#4B5563]">
+              We serve every city in Mississippi — launching market by market, starting with North MS.
             </p>
 
             <div className="mt-8 space-y-10">
