@@ -12,19 +12,12 @@ import {
   getProfileLocations,
 } from "@shared/lib/seo-data";
 
+export const revalidate = 86400;
+
 interface Props {
   params: Promise<{ city: string; neighborhood: string }>;
 }
 
-export async function generateStaticParams() {
-  const params: { city: string; neighborhood: string }[] = [];
-  for (const loc of getProfileLocations()) {
-    for (const hood of loc.profile!.neighborhoods) {
-      params.push({ city: loc.slug, neighborhood: hood.slug });
-    }
-  }
-  return params;
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { city, neighborhood } = await params;

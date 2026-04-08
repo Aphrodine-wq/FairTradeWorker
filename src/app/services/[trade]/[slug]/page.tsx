@@ -17,23 +17,13 @@ import {
 } from "@shared/lib/seo-data";
 import type { Trade, ServiceLocation, SubService } from "@shared/lib/seo-data";
 
+export const revalidate = 86400;
+
 interface Props {
   params: Promise<{ trade: string; slug: string }>;
 }
 
 // Generate params for both locations AND sub-services
-export async function generateStaticParams() {
-  const params: { trade: string; slug: string }[] = [];
-  for (const trade of TRADES) {
-    for (const loc of SERVICE_LOCATIONS) {
-      params.push({ trade: trade.slug, slug: loc.slug });
-    }
-    for (const sub of trade.subServices) {
-      params.push({ trade: trade.slug, slug: sub.slug });
-    }
-  }
-  return params;
-}
 
 function resolve(tradeSlug: string, slug: string) {
   const trade = getTradeBySlug(tradeSlug);

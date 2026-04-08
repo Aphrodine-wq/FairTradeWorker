@@ -12,13 +12,12 @@ import {
   getProfileLocations,
 } from "@shared/lib/seo-data";
 
+export const revalidate = 86400;
+
 interface Props {
   params: Promise<{ city: string }>;
 }
 
-export async function generateStaticParams() {
-  return getProfileLocations().map((l) => ({ city: l.slug }));
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { city } = await params;

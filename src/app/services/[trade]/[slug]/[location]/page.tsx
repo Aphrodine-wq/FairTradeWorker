@@ -15,21 +15,12 @@ import {
   getSubServiceLocationDescription,
 } from "@shared/lib/seo-data";
 
+export const revalidate = 86400;
+
 interface Props {
   params: Promise<{ trade: string; slug: string; location: string }>;
 }
 
-export async function generateStaticParams() {
-  const params: { trade: string; slug: string; location: string }[] = [];
-  for (const trade of TRADES) {
-    for (const sub of trade.subServices) {
-      for (const loc of SERVICE_LOCATIONS) {
-        params.push({ trade: trade.slug, slug: sub.slug, location: loc.slug });
-      }
-    }
-  }
-  return params;
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { trade: ts, slug: ss, location: ls } = await params;

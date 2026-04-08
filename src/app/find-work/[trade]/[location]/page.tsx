@@ -7,17 +7,10 @@ import { Footer } from "@marketplace/components/footer";
 import { Button } from "@shared/ui/button";
 import { TRADES, SERVICE_LOCATIONS, getTradeBySlug, getLocationBySlug } from "@shared/lib/seo-data";
 
+export const revalidate = 86400;
+
 interface Props { params: Promise<{ trade: string; location: string }> }
 
-export async function generateStaticParams() {
-  const params: { trade: string; location: string }[] = [];
-  for (const trade of TRADES) {
-    for (const loc of SERVICE_LOCATIONS) {
-      params.push({ trade: trade.slug, location: loc.slug });
-    }
-  }
-  return params;
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { trade: ts, location: ls } = await params;

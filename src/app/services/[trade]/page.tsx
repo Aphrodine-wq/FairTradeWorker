@@ -11,13 +11,12 @@ import {
   getTradeBySlug,
 } from "@shared/lib/seo-data";
 
+export const revalidate = 86400;
+
 interface Props {
   params: Promise<{ trade: string }>;
 }
 
-export async function generateStaticParams() {
-  return TRADES.map((t) => ({ trade: t.slug }));
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { trade: slug } = await params;
