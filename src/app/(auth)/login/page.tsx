@@ -134,14 +134,14 @@ function LoginContent() {
               </div>
 
               {expired && (
-                <div className="rounded-none bg-blue-50 border border-blue-200 p-3 text-sm text-blue-700 mb-5">
+                <div className="rounded-sm bg-blue-50 border border-blue-200 p-3 text-sm text-blue-700 mb-5">
                   Your session has expired. Please sign in again.
                 </div>
               )}
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-none">
+                  <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-sm">
                     {error}
                   </div>
                 )}

@@ -277,7 +277,7 @@ export default function ClientsPage() {
                 Add Client
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[520px] p-0 overflow-hidden bg-white rounded-none">
+            <DialogContent className="sm:max-w-[520px] p-0 overflow-hidden bg-white rounded-sm">
               {/* Header */}
               <div className="px-6 pt-6 pb-4">
                 <DialogHeader>
@@ -289,7 +289,7 @@ export default function ClientsPage() {
               <div className="px-6 pb-6">
                 {/* Avatar placeholder */}
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 rounded-none bg-gray-100 flex items-center justify-center flex-shrink-0">
+                  <div className="w-16 h-16 rounded-sm bg-gray-100 flex items-center justify-center flex-shrink-0">
                     <User className="w-7 h-7 text-gray-300" />
                   </div>
                   <div>
@@ -304,11 +304,11 @@ export default function ClientsPage() {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="text-[12px] font-semibold text-gray-900 block mb-1.5">First Name</label>
-                      <input type="text" placeholder="John" className="w-full h-10 rounded-none border border-gray-200 bg-white px-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
+                      <input type="text" placeholder="John" className="w-full h-10 rounded-sm border border-gray-200 bg-white px-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
                     </div>
                     <div>
                       <label className="text-[12px] font-semibold text-gray-900 block mb-1.5">Last Name</label>
-                      <input type="text" placeholder="Smith" className="w-full h-10 rounded-none border border-gray-200 bg-white px-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
+                      <input type="text" placeholder="Smith" className="w-full h-10 rounded-sm border border-gray-200 bg-white px-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
                     </div>
                   </div>
 
@@ -317,7 +317,7 @@ export default function ClientsPage() {
                     <label className="text-[12px] font-semibold text-gray-900 block mb-1.5">Email</label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                      <input type="email" placeholder="john@example.com" className="w-full h-10 rounded-none border border-gray-200 bg-white pl-10 pr-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
+                      <input type="email" placeholder="john@example.com" className="w-full h-10 rounded-sm border border-gray-200 bg-white pl-10 pr-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
                     </div>
                   </div>
 
@@ -325,7 +325,7 @@ export default function ClientsPage() {
                     <label className="text-[12px] font-semibold text-gray-900 block mb-1.5">Phone</label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                      <input type="tel" placeholder="(512) 555-0000" className="w-full h-10 rounded-none border border-gray-200 bg-white pl-10 pr-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
+                      <input type="tel" placeholder="(512) 555-0000" className="w-full h-10 rounded-sm border border-gray-200 bg-white pl-10 pr-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
                     </div>
                   </div>
 
@@ -334,14 +334,14 @@ export default function ClientsPage() {
                     <label className="text-[12px] font-semibold text-gray-900 block mb-1.5">Address</label>
                     <div className="relative">
                       <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                      <input type="text" placeholder="1234 Main St, Austin, TX 78701" className="w-full h-10 rounded-none border border-gray-200 bg-white pl-10 pr-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
+                      <input type="text" placeholder="1234 Main St, Austin, TX 78701" className="w-full h-10 rounded-sm border border-gray-200 bg-white pl-10 pr-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
                     </div>
                   </div>
 
                   {/* Status */}
                   <div>
                     <label className="text-[12px] font-semibold text-gray-900 block mb-1.5">Status</label>
-                    <select className="w-full h-10 rounded-none border border-gray-200 bg-white px-3 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow appearance-none">
+                    <select className="w-full h-10 rounded-sm border border-gray-200 bg-white px-3 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow appearance-none">
                       <option value="lead">Lead</option>
                       <option value="active">Active</option>
                       <option value="past">Past</option>
@@ -351,7 +351,7 @@ export default function ClientsPage() {
                   {/* Notes */}
                   <div>
                     <label className="text-[12px] font-semibold text-gray-900 block mb-1.5">Notes</label>
-                    <textarea rows={3} placeholder="Any details about this client..." className="w-full rounded-none border border-gray-200 bg-white px-3 py-2.5 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow resize-none" />
+                    <textarea rows={3} placeholder="Any details about this client..." className="w-full rounded-sm border border-gray-200 bg-white px-3 py-2.5 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow resize-none" />
                   </div>
                 </div>
 
@@ -401,7 +401,7 @@ export default function ClientsPage() {
                   key={f}
                   onClick={() => setFilter(f)}
                   className={cn(
-                    "text-[13px] font-medium px-3 py-1.5 rounded-none transition-colors",
+                    "text-[13px] font-medium px-3 py-1.5 rounded-sm transition-colors",
                     filter === f
                       ? "bg-gray-900 text-white"
                       : "bg-white text-gray-700 hover:bg-gray-100"
@@ -418,7 +418,7 @@ export default function ClientsPage() {
                 placeholder="Search clients..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="h-9 rounded-none border border-gray-200 bg-white pl-9 pr-3 text-[13px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 w-[220px]"
+                className="h-9 rounded-sm border border-gray-200 bg-white pl-9 pr-3 text-[13px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 w-[220px]"
               />
             </div>
           </div>
@@ -434,7 +434,7 @@ export default function ClientsPage() {
                     key={client.id}
                     onClick={() => setSelectedId(client.id)}
                     className={cn(
-                      "w-full text-left rounded-none p-4 transition-all",
+                      "w-full text-left rounded-sm p-4 transition-all",
                       isSelected
                         ? "bg-white shadow-[0_2px_12px_-2px_rgba(0,0,0,0.08)] ring-1 ring-gray-200"
                         : "bg-white hover:bg-gray-50"
@@ -442,7 +442,7 @@ export default function ClientsPage() {
                   >
                     <div className="flex items-center justify-between mb-1.5">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-none bg-brand-100 flex items-center justify-center flex-shrink-0">
+                        <div className="w-9 h-9 rounded-sm bg-brand-100 flex items-center justify-center flex-shrink-0">
                           <span className="text-brand-700 text-[13px] font-bold">
                             {client.name.split(" ").map((n) => n[0]).join("")}
                           </span>
@@ -472,11 +472,11 @@ export default function ClientsPage() {
 
             {/* Detail panel */}
             {selected && (
-              <div className="w-[460px] flex-shrink-0 bg-white rounded-none shadow-[0_2px_12px_-2px_rgba(0,0,0,0.08)] ring-1 ring-gray-200 self-start sticky top-5 overflow-hidden">
+              <div className="w-[460px] flex-shrink-0 bg-white rounded-sm shadow-[0_2px_12px_-2px_rgba(0,0,0,0.08)] ring-1 ring-gray-200 self-start sticky top-5 overflow-hidden">
                 {/* Header */}
                 <div className="px-6 pt-5 pb-4">
                   <div className="flex items-center gap-4 mb-3">
-                    <div className="w-14 h-14 rounded-none bg-brand-100 flex items-center justify-center flex-shrink-0">
+                    <div className="w-14 h-14 rounded-sm bg-brand-100 flex items-center justify-center flex-shrink-0">
                       <span className="text-brand-700 text-[20px] font-bold">
                         {selected.name.split(" ").map((n) => n[0]).join("")}
                       </span>
@@ -498,7 +498,7 @@ export default function ClientsPage() {
                   {/* Tags */}
                   <div className="flex flex-wrap gap-1.5">
                     {selected.tags.map((tag) => (
-                      <span key={tag} className="text-[10px] font-medium text-gray-700 bg-gray-100 rounded-none px-2 py-0.5">{tag}</span>
+                      <span key={tag} className="text-[10px] font-medium text-gray-700 bg-gray-100 rounded-sm px-2 py-0.5">{tag}</span>
                     ))}
                   </div>
                 </div>
@@ -605,7 +605,7 @@ export default function ClientsPage() {
                       <div className="space-y-3">
                         {selected.communications.map((comm, i) => (
                           <div key={i} className="flex gap-3">
-                            <div className="w-1 rounded-none bg-gray-200 flex-shrink-0" />
+                            <div className="w-1 rounded-sm bg-gray-200 flex-shrink-0" />
                             <div>
                               <div className="flex items-center gap-2">
                                 <span className="text-[11px] font-semibold text-gray-900">{comm.type}</span>

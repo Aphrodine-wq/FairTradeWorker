@@ -120,19 +120,19 @@ export default function ContractorPaymentsPage() {
               </p>
               <div className="flex items-center gap-5 mt-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-none bg-emerald-700" />
+                  <div className="w-2 h-2 rounded-sm bg-emerald-700" />
                   <span className="text-[13px] text-gray-700">
                     {formatCurrency(totalEarned)} earned
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-none bg-amber-600" />
+                  <div className="w-2 h-2 rounded-sm bg-amber-600" />
                   <span className="text-[13px] text-gray-700">
                     {formatCurrency(totalPending)} incoming
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-none bg-gray-400" />
+                  <div className="w-2 h-2 rounded-sm bg-gray-400" />
                   <span className="text-[13px] text-gray-700">
                     {paid.length + pending.length} jobs
                   </span>
@@ -161,9 +161,9 @@ export default function ContractorPaymentsPage() {
                     Needs Attention
                   </h2>
                   {failed.map((p) => (
-                    <div key={p.id} className="bg-red-50 border border-red-200 rounded-none p-4">
+                    <div key={p.id} className="bg-red-50 border border-red-200 rounded-sm p-4">
                       <div className="flex items-start gap-3">
-                        <div className="w-9 h-9 rounded-none bg-red-100 flex items-center justify-center shrink-0">
+                        <div className="w-9 h-9 rounded-sm bg-red-100 flex items-center justify-center shrink-0">
                           <AlertCircle className="w-5 h-5 text-red-600" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -197,9 +197,9 @@ export default function ContractorPaymentsPage() {
                   </h2>
                   <div className="space-y-2">
                     {pending.map((p) => (
-                      <div key={p.id} className="bg-white rounded-none border border-gray-200 p-4">
+                      <div key={p.id} className="bg-white rounded-sm border border-gray-200 p-4">
                         <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-none bg-amber-50 flex items-center justify-center shrink-0">
+                          <div className="w-10 h-10 rounded-sm bg-amber-50 flex items-center justify-center shrink-0">
                             <ArrowDownLeft className="w-5 h-5 text-amber-600" />
                           </div>
                           <div className="flex-1 min-w-0">
@@ -212,7 +212,7 @@ export default function ContractorPaymentsPage() {
                               <span className="text-[12px] text-gray-700">{p.homeownerName}</span>
                               <span className="text-gray-300">--</span>
                               <span className={cn(
-                                "text-[11px] font-semibold px-2 py-0.5 rounded-none",
+                                "text-[11px] font-semibold px-2 py-0.5 rounded-sm",
                                 p.status === "processing" ? "bg-blue-950/10 text-blue-900" :
                                 "bg-gray-100 text-gray-800"
                               )}>
@@ -245,7 +245,7 @@ export default function ContractorPaymentsPage() {
                     </button>
                   )}
                 </div>
-                <div className="bg-white rounded-none border border-gray-200 divide-y divide-gray-100">
+                <div className="bg-white rounded-sm border border-gray-200 divide-y divide-gray-100">
                   {historyPayouts.map((p) => (
                     <button
                       key={p.id}
@@ -253,7 +253,7 @@ export default function ContractorPaymentsPage() {
                       className="w-full text-left"
                     >
                       <div className="flex items-center gap-4 px-4 py-3.5 hover:bg-gray-50/50 transition-colors">
-                        <div className="w-9 h-9 rounded-none bg-emerald-950/10 flex items-center justify-center shrink-0">
+                        <div className="w-9 h-9 rounded-sm bg-emerald-950/10 flex items-center justify-center shrink-0">
                           <CheckCircle2 className="w-4 h-4 text-emerald-950" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -274,7 +274,7 @@ export default function ContractorPaymentsPage() {
 
                       {expandedId === p.id && (
                         <div className="px-4 pb-4" onClick={(e) => e.stopPropagation()}>
-                          <div className="ml-[52px] bg-gray-50 rounded-none p-4 space-y-2">
+                          <div className="ml-[52px] bg-gray-50 rounded-sm p-4 space-y-2">
                             <div className="flex justify-between">
                               <span className="text-[13px] text-gray-700">Job</span>
                               <span className="text-[13px] text-gray-900 font-medium">{p.jobTitle}</span>
@@ -306,7 +306,7 @@ export default function ContractorPaymentsPage() {
             <div className="space-y-5">
 
               {/* This Month */}
-              <div className="bg-white rounded-none border border-gray-200 p-5">
+              <div className="bg-white rounded-sm border border-gray-200 p-5">
                 <h3 className="text-[13px] font-bold text-gray-900 uppercase tracking-wider mb-4">This Month</h3>
                 <div className="space-y-4">
                   <div>
@@ -336,7 +336,7 @@ export default function ContractorPaymentsPage() {
               </div>
 
               {/* All Time */}
-              <div className="bg-white rounded-none border border-gray-200 p-5">
+              <div className="bg-white rounded-sm border border-gray-200 p-5">
                 <h3 className="text-[13px] font-bold text-gray-900 uppercase tracking-wider mb-4">All Time</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between items-baseline">
@@ -357,10 +357,10 @@ export default function ContractorPaymentsPage() {
               </div>
 
               {/* Payout Method */}
-              <div className="bg-white rounded-none border border-gray-200 p-5">
+              <div className="bg-white rounded-sm border border-gray-200 p-5">
                 <h3 className="text-[13px] font-bold text-gray-900 uppercase tracking-wider mb-3">Payout Method</h3>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-none bg-emerald-950/10 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-sm bg-emerald-950/10 flex items-center justify-center">
                     <span className="text-[12px] font-bold text-emerald-950">QB</span>
                   </div>
                   <div>

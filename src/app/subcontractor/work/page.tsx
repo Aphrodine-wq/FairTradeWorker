@@ -136,7 +136,7 @@ export default function BrowseSubJobsPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search sub jobs..."
-                className="pl-8 h-8 text-[13px] rounded-none"
+                className="pl-8 h-8 text-[13px] rounded-sm"
               />
             </div>
           </div>
@@ -151,7 +151,7 @@ export default function BrowseSubJobsPage() {
                     type="checkbox"
                     checked={selectedCategories.includes(cat)}
                     onChange={() => toggleCategory(cat)}
-                    className="w-3.5 h-3.5 rounded-none border-gray-300 text-brand-600 focus:ring-brand-500"
+                    className="w-3.5 h-3.5 rounded-sm border-gray-300 text-brand-600 focus:ring-brand-500"
                   />
                   <span className="text-[13px] text-gray-700">{cat}</span>
                 </label>
@@ -251,7 +251,7 @@ export default function BrowseSubJobsPage() {
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as SortOption)}
-              className="h-7 px-2 text-[12px] font-semibold bg-gray-100 border-none text-gray-700 rounded-none"
+              className="h-7 px-2 text-[12px] font-semibold bg-gray-100 border-none text-gray-700 rounded-sm"
             >
               {SORT_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>

@@ -36,7 +36,7 @@ export default function SubContractorEstimatesPage() {
       <div className="px-6 pt-5 pb-4 bg-white border-b border-gray-200">
         <div className="flex items-center justify-between">
           <h1 className="text-[24px] font-semibold text-gray-900">Estimates</h1>
-          <button className="flex items-center gap-1.5 h-8 px-3 rounded-none bg-brand-600 text-white text-[12px] font-semibold hover:bg-brand-700 transition-colors">
+          <button className="flex items-center gap-1.5 h-8 px-3 rounded-sm bg-brand-600 text-white text-[12px] font-semibold hover:bg-brand-700 transition-colors">
             <Plus className="w-3.5 h-3.5" />
             New Estimate
           </button>

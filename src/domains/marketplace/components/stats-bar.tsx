@@ -49,30 +49,29 @@ export function StatsBar() {
           observer.disconnect();
         }
       },
-      { threshold: 0.3 }
+      { threshold: 0.3 },
     );
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
 
   return (
-    <section ref={ref} className="border-y border-border bg-white">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex items-center justify-between">
-          {STATS.map((stat, i) => {
+    <section ref={ref} className="bg-white border-y border-border">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+          {STATS.map((stat) => {
             const count = useCountUp(stat.value, 1800, active);
             return (
-              <React.Fragment key={stat.label}>
-                {i > 0 && <div className="hidden sm:block w-px h-8 bg-border" />}
-                <div className="flex items-center gap-2 px-2">
-                  <span className="text-2xl font-bold text-gray-900 tabular-nums">
-                    {stat.prefix}{count.toLocaleString()}{stat.suffix}
-                  </span>
-                  <span className="text-sm text-gray-600 hidden sm:inline">
-                    {stat.label}
-                  </span>
+              <div key={stat.label} className="text-center">
+                <div className="text-3xl sm:text-4xl font-bold text-gray-900 tabular-nums">
+                  {stat.prefix}
+                  {count.toLocaleString()}
+                  {stat.suffix}
                 </div>
-              </React.Fragment>
+                <div className="mt-1.5 text-sm text-gray-500">
+                  {stat.label}
+                </div>
+              </div>
             );
           })}
         </div>

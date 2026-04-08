@@ -171,7 +171,7 @@ export default function BidsPage() {
               key={job.id}
               onClick={() => setSelectedJobId(job.id)}
               className={cn(
-                "flex-shrink-0 px-4 py-2 rounded-none border text-sm font-medium transition-colors",
+                "flex-shrink-0 px-4 py-2 rounded-sm border text-sm font-medium transition-colors",
                 activeJob === job.id
                   ? "border-brand-600 bg-brand-50 text-brand-700"
                   : "border-gray-200 text-gray-800 hover:border-gray-300"
@@ -179,7 +179,7 @@ export default function BidsPage() {
             >
               {job.title}
               <span className={cn(
-                "ml-2 px-1.5 py-0.5 rounded-none text-xs",
+                "ml-2 px-1.5 py-0.5 rounded-sm text-xs",
                 activeJob === job.id ? "bg-brand-600 text-white" : "bg-gray-100 text-gray-700"
               )}>
                 {count}
@@ -194,7 +194,7 @@ export default function BidsPage() {
         <Card className="mb-6 border-brand-200 bg-brand-50/50">
           <CardContent className="p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-none bg-brand-100 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-sm bg-brand-100 flex items-center justify-center">
                 <DollarSign className="w-4 h-4 text-brand-600" />
               </div>
               <div>
@@ -229,7 +229,7 @@ export default function BidsPage() {
                 <div className="flex items-start justify-between">
                   {/* Contractor Info */}
                   <div className="flex gap-4">
-                    <div className="w-12 h-12 rounded-none bg-gray-100 flex items-center justify-center text-gray-600">
+                    <div className="w-12 h-12 rounded-sm bg-gray-100 flex items-center justify-center text-gray-600">
                       <User className="w-6 h-6" />
                     </div>
                     <div>

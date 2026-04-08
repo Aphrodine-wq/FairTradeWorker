@@ -261,7 +261,7 @@ function JobModalContent({ job }: { job: Job }) {
               urgency.color
             )}
           >
-            <span className={cn("w-1.5 h-1.5 rounded-none mr-1.5", urgency.dot)} />
+            <span className={cn("w-1.5 h-1.5 rounded-sm mr-1.5", urgency.dot)} />
             {urgency.label}
           </Badge>
           <div className="flex items-center gap-1.5">
@@ -277,19 +277,19 @@ function JobModalContent({ job }: { job: Job }) {
         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             {photoCount > 0 && (
-              <span className="flex items-center gap-1 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded-none">
+              <span className="flex items-center gap-1 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded-sm">
                 <Camera className="w-3 h-3" />
                 {photoCount}
               </span>
             )}
             {videoCount > 0 && (
-              <span className="flex items-center gap-1 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded-none">
+              <span className="flex items-center gap-1 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded-sm">
                 <Video className="w-3 h-3" />
                 {videoCount}
               </span>
             )}
           </div>
-          <span className="flex items-center gap-1 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded-none">
+          <span className="flex items-center gap-1 bg-black/60 text-white text-[11px] px-2 py-0.5 rounded-sm">
             <Eye className="w-3 h-3" />
             {job.viewCount} views
           </span>
@@ -328,7 +328,7 @@ function JobModalContent({ job }: { job: Job }) {
             </div>
           </div>
           {/* FairPrice context for contractor */}
-          <div className="flex items-center gap-2 mt-2 px-3 py-2 rounded-none bg-gray-50 border border-gray-200">
+          <div className="flex items-center gap-2 mt-2 px-3 py-2 rounded-sm bg-gray-50 border border-gray-200">
             <BarChart3 className="w-4 h-4 text-brand-600 flex-shrink-0" />
             <FairPriceRange job={job} />
           </div>
@@ -366,7 +366,7 @@ function JobModalContent({ job }: { job: Job }) {
               <Home className="w-4 h-4 text-gray-600" />
               Property Details
             </h4>
-            <div className="bg-gray-50 rounded-none border border-border p-4 space-y-4">
+            <div className="bg-gray-50 rounded-sm border border-border p-4 space-y-4">
               {/* Structure */}
               <div className="grid grid-cols-3 gap-x-6 gap-y-2.5 text-sm">
                 <div>
@@ -474,25 +474,25 @@ function JobModalContent({ job }: { job: Job }) {
         {/* Status pills row */}
         <div className="flex flex-wrap gap-2">
           {job.permitsRequired && (
-            <span className="inline-flex items-center gap-1 text-xs text-blue-700 bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-none font-medium">
+            <span className="inline-flex items-center gap-1 text-xs text-blue-700 bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-sm font-medium">
               <FileCheck className="w-3 h-3" />
               Permits Required
             </span>
           )}
           {job.inspectionRequired && (
-            <span className="inline-flex items-center gap-1 text-xs text-violet-700 bg-violet-50 border border-violet-100 px-2.5 py-1 rounded-none font-medium">
+            <span className="inline-flex items-center gap-1 text-xs text-violet-700 bg-violet-50 border border-violet-100 px-2.5 py-1 rounded-sm font-medium">
               <Wrench className="w-3 h-3" />
               Inspection Required
             </span>
           )}
           {job.materialsProvided && (
-            <span className="inline-flex items-center gap-1 text-xs text-emerald-950 bg-emerald-950/10 border border-emerald-800/20 px-2.5 py-1 rounded-none font-medium">
+            <span className="inline-flex items-center gap-1 text-xs text-emerald-950 bg-emerald-950/10 border border-emerald-800/20 px-2.5 py-1 rounded-sm font-medium">
               <CheckCircle2 className="w-3 h-3" />
               Materials Provided
             </span>
           )}
           {job.insuranceClaim && (
-            <span className="inline-flex items-center gap-1 text-xs text-amber-700 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded-none font-medium">
+            <span className="inline-flex items-center gap-1 text-xs text-amber-700 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded-sm font-medium">
               <Shield className="w-3 h-3" />
               Insurance Claim
             </span>
@@ -525,7 +525,7 @@ function JobModalContent({ job }: { job: Job }) {
             <div className="grid grid-cols-3 gap-2">
               {job.photos.map((photo: JobPhoto, i: number) => (
                 <div key={i} className="group">
-                  <div className="relative aspect-square rounded-none overflow-hidden bg-gray-100 border border-border">
+                  <div className="relative aspect-square rounded-sm overflow-hidden bg-gray-100 border border-border">
                     {photo.type === "photo" ? (
                       <Image
                         src={photo.url}
@@ -582,7 +582,7 @@ function JobModalContent({ job }: { job: Job }) {
               {job.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="inline-flex items-center gap-1 text-xs text-gray-800 bg-gray-100 px-2.5 py-1 rounded-none"
+                  className="inline-flex items-center gap-1 text-xs text-gray-800 bg-gray-100 px-2.5 py-1 rounded-sm"
                 >
                   <Tag className="w-2.5 h-2.5 text-gray-600" />
                   {tag}
@@ -606,7 +606,7 @@ function JobModalContent({ job }: { job: Job }) {
 
         {/* Special Instructions callout */}
         {job.specialInstructions && (
-          <div className="bg-amber-50 border border-amber-200 rounded-none p-4">
+          <div className="bg-amber-50 border border-amber-200 rounded-sm p-4">
             <div className="flex items-center gap-2 mb-2">
               <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0" />
               <h4 className="text-sm font-semibold text-amber-800">
@@ -638,10 +638,10 @@ function JobModalContent({ job }: { job: Job }) {
                 {risks.map((r, i) => {
                   const style = LIKELIHOOD_STYLE[r.likelihood];
                   return (
-                    <div key={i} className="flex items-start gap-3 bg-gray-50 border border-border rounded-none p-3">
+                    <div key={i} className="flex items-start gap-3 bg-gray-50 border border-border rounded-sm p-3">
                       <div className="flex-shrink-0 mt-0.5">
-                        <span className={cn("inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-none", style.bg, style.text)}>
-                          <span className={cn("w-1.5 h-1.5 rounded-none", style.dot)} />
+                        <span className={cn("inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-sm", style.bg, style.text)}>
+                          <span className={cn("w-1.5 h-1.5 rounded-sm", style.dot)} />
                           {style.label}
                         </span>
                       </div>
@@ -666,7 +666,7 @@ function JobModalContent({ job }: { job: Job }) {
 
         {/* Address + deadline info boxes */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-gray-50 rounded-none p-3 border border-border">
+          <div className="bg-gray-50 rounded-sm p-3 border border-border">
             <span className="text-[10px] text-gray-600 font-medium uppercase tracking-wide block mb-1">
               Bid Deadline
             </span>
@@ -675,7 +675,7 @@ function JobModalContent({ job }: { job: Job }) {
             </span>
             <DeadlinePill deadline={job.deadline} />
           </div>
-          <div className="bg-gray-50 rounded-none p-3 border border-border">
+          <div className="bg-gray-50 rounded-sm p-3 border border-border">
             <span className="text-[10px] text-gray-600 font-medium uppercase tracking-wide block mb-1">
               Full Address
             </span>
@@ -686,8 +686,8 @@ function JobModalContent({ job }: { job: Job }) {
         </div>
 
         {/* Posted by */}
-        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-none border border-border">
-          <div className="w-10 h-10 rounded-none bg-brand-100 flex items-center justify-center flex-shrink-0">
+        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-sm border border-border">
+          <div className="w-10 h-10 rounded-sm bg-brand-100 flex items-center justify-center flex-shrink-0">
             <User className="w-5 h-5 text-brand-700" />
           </div>
           <div className="flex-1 min-w-0">
@@ -756,7 +756,7 @@ export function JobCard({ job }: { job: Job }) {
                 )}
               >
                 <span
-                  className={cn("w-1.5 h-1.5 rounded-none mr-1", urgency.dot)}
+                  className={cn("w-1.5 h-1.5 rounded-sm mr-1", urgency.dot)}
                 />
                 {urgency.label}
               </Badge>
@@ -865,25 +865,25 @@ export function JobCard({ job }: { job: Job }) {
             {/* Status pills */}
             <div className="flex flex-wrap gap-1 mb-3">
               {job.permitsRequired && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded-none font-medium">
+                <span className="inline-flex items-center gap-0.5 text-[10px] text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded-sm font-medium">
                   <FileCheck className="w-2.5 h-2.5" />
                   Permits
                 </span>
               )}
               {job.inspectionRequired && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] text-violet-700 bg-violet-50 px-1.5 py-0.5 rounded-none font-medium">
+                <span className="inline-flex items-center gap-0.5 text-[10px] text-violet-700 bg-violet-50 px-1.5 py-0.5 rounded-sm font-medium">
                   <Wrench className="w-2.5 h-2.5" />
                   Inspection
                 </span>
               )}
               {job.materialsProvided && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] text-emerald-950 bg-emerald-950/10 px-1.5 py-0.5 rounded-none font-medium">
+                <span className="inline-flex items-center gap-0.5 text-[10px] text-emerald-950 bg-emerald-950/10 px-1.5 py-0.5 rounded-sm font-medium">
                   <CheckCircle2 className="w-2.5 h-2.5" />
                   Materials Incl.
                 </span>
               )}
               {job.yearBuilt > 0 && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] text-gray-800 bg-gray-100 px-1.5 py-0.5 rounded-none font-medium">
+                <span className="inline-flex items-center gap-0.5 text-[10px] text-gray-800 bg-gray-100 px-1.5 py-0.5 rounded-sm font-medium">
                   Built {job.yearBuilt}
                 </span>
               )}
@@ -892,7 +892,7 @@ export function JobCard({ job }: { job: Job }) {
             {/* Footer — posted by + bid count */}
             <div className="flex items-center justify-between pt-2.5 border-t border-border mt-auto">
               <div className="flex items-center gap-1.5">
-                <div className="w-6 h-6 rounded-none bg-brand-100 flex items-center justify-center">
+                <div className="w-6 h-6 rounded-sm bg-brand-100 flex items-center justify-center">
                   <User className="w-3 h-3 text-brand-700" />
                 </div>
                 <div className="min-w-0">

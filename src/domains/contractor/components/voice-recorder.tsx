@@ -151,15 +151,15 @@ export function VoiceRecorder({ onItemsExtracted }: VoiceRecorderProps) {
         <div className="relative flex items-center justify-center">
           {state === "recording" && (
             <>
-              <span className="absolute inline-flex h-[88px] w-[88px] rounded-none bg-brand-600 opacity-20 animate-ping" />
-              <span className="absolute inline-flex h-[104px] w-[104px] rounded-none bg-brand-600 opacity-10 animate-ping [animation-delay:200ms]" />
+              <span className="absolute inline-flex h-[88px] w-[88px] rounded-sm bg-brand-600 opacity-20 animate-ping" />
+              <span className="absolute inline-flex h-[104px] w-[104px] rounded-sm bg-brand-600 opacity-10 animate-ping [animation-delay:200ms]" />
             </>
           )}
           <button
             onClick={handleToggleRecording}
             disabled={state === "processing"}
             className={cn(
-              "relative z-10 w-20 h-20 rounded-none flex items-center justify-center transition-colors duration-150 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-600",
+              "relative z-10 w-20 h-20 rounded-sm flex items-center justify-center transition-colors duration-150 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-600",
               state === "idle" &&
                 "bg-brand-600 hover:bg-brand-700 text-white",
               state === "recording" &&
@@ -198,7 +198,7 @@ export function VoiceRecorder({ onItemsExtracted }: VoiceRecorderProps) {
             {Array.from({ length: 24 }).map((_, i) => (
               <div
                 key={i}
-                className="w-1.5 rounded-none bg-brand-600"
+                className="w-1.5 rounded-sm bg-brand-600"
                 style={{
                   height: `${20 + Math.random() * 60}%`,
                   animation: `pulse ${0.4 + (i % 5) * 0.1}s ease-in-out infinite alternate`,
@@ -225,7 +225,7 @@ export function VoiceRecorder({ onItemsExtracted }: VoiceRecorderProps) {
 
       {/* Transcript */}
       {(state === "recording" || transcript) && (
-        <div className="rounded-none border border-border bg-gray-50 p-4">
+        <div className="rounded-sm border border-border bg-gray-50 p-4">
           <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
             Transcript
           </p>
@@ -240,7 +240,7 @@ export function VoiceRecorder({ onItemsExtracted }: VoiceRecorderProps) {
 
       {/* Extracted line items table */}
       {state === "done" && lineItems.length > 0 && (
-        <div className="rounded-none border border-border overflow-hidden">
+        <div className="rounded-sm border border-border overflow-hidden">
           <div className="bg-gray-50 px-4 py-2.5 flex items-center justify-between border-b border-border">
             <p className="text-xs font-semibold text-gray-800 uppercase tracking-wide">
               Extracted Line Items

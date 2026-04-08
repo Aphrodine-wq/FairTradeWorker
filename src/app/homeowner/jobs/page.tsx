@@ -123,7 +123,7 @@ function CategoryIcon({ category }: { category: string }) {
   const style = CATEGORY_STYLE[category] ?? { icon: Hammer, color: "text-gray-700", bg: "bg-gray-100" };
   const Icon = style.icon;
   return (
-    <div className={cn("flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-none", style.bg)}>
+    <div className={cn("flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-sm", style.bg)}>
       <Icon className={cn("h-4.5 w-4.5", style.color)} />
     </div>
   );
@@ -186,7 +186,7 @@ function FairPriceTag({ bidAmount, fairPrice }: { bidAmount: number; fairPrice: 
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 text-[10px] font-semibold rounded-none px-2 py-0.5 border whitespace-nowrap",
+        "inline-flex items-center gap-1 text-[10px] font-semibold rounded-sm px-2 py-0.5 border whitespace-nowrap",
         comparison.sentiment === "below"
           ? "text-brand-700 bg-brand-50 border-brand-100"
           : comparison.sentiment === "above"
@@ -311,7 +311,7 @@ function BidDialog({
         </DialogHeader>
 
         {isAccepted && (
-          <div className="mx-6 mt-6 flex items-start gap-3 rounded-none bg-brand-50 border border-brand-200 p-4">
+          <div className="mx-6 mt-6 flex items-start gap-3 rounded-sm bg-brand-50 border border-brand-200 p-4">
             <CheckCircle2 className="h-5 w-5 text-brand-600 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-semibold text-brand-800">Bid Accepted</p>
@@ -325,7 +325,7 @@ function BidDialog({
         <div className="flex items-start gap-4 px-6 pt-6">
           <div
             className={cn(
-              "flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-none text-white text-base font-bold",
+              "flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-sm text-white text-base font-bold",
               avatarColor(contractor.id)
             )}
           >
@@ -348,7 +348,7 @@ function BidDialog({
             { show: contractor.licensed, label: "Licensed", style: "text-blue-700 bg-blue-50 border-blue-100" },
             { show: contractor.insured,  label: "Insured",  style: "text-violet-700 bg-violet-50 border-violet-100" },
           ] as const).filter((b) => b.show).map((b) => (
-            <span key={b.label} className={cn("inline-flex items-center gap-1 text-xs font-medium border rounded-none px-2.5 py-0.5", b.style)}>
+            <span key={b.label} className={cn("inline-flex items-center gap-1 text-xs font-medium border rounded-sm px-2.5 py-0.5", b.style)}>
               <Shield className="h-3 w-3" /> {b.label}
             </span>
           ))}
@@ -362,7 +362,7 @@ function BidDialog({
             { icon: Clock, label: "Timeline", value: bid.timeline, accent: false },
             { icon: CalendarDays, label: "Submitted", value: formatDate(bid.submittedDate), accent: false },
           ].map((s) => (
-            <div key={s.label} className={cn("rounded-none border p-4 text-center", s.accent ? "bg-brand-50 border-brand-100" : "bg-gray-50 border-gray-200")}>
+            <div key={s.label} className={cn("rounded-sm border p-4 text-center", s.accent ? "bg-brand-50 border-brand-100" : "bg-gray-50 border-gray-200")}>
               <s.icon className={cn("h-4 w-4 mx-auto mb-1", s.accent ? "text-brand-600" : "text-gray-700")} />
               <p className="text-xs text-gray-700 mb-0.5">{s.label}</p>
               <p className="text-lg font-bold text-gray-900">{s.value}</p>
@@ -371,7 +371,7 @@ function BidDialog({
         </div>
 
         {fairPrice && (
-          <div className="mx-6 mt-4 flex items-center gap-3 rounded-none bg-gray-50 border border-gray-200 px-4 py-3">
+          <div className="mx-6 mt-4 flex items-center gap-3 rounded-sm bg-gray-50 border border-gray-200 px-4 py-3">
             <BarChart3 className="h-4 w-4 text-brand-600 flex-shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-gray-700">FairPrice Estimate</p>
@@ -552,13 +552,13 @@ function CompareModal({
                     <th key={bid.id} className={cn("text-center px-4 py-4 min-w-[150px]", isTop && "bg-brand-50")}>
                       <div className="flex flex-col items-center gap-2">
                         {isTop && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-brand-700 bg-brand-100 rounded-none px-2 py-0.5 uppercase tracking-wide">
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-brand-700 bg-brand-100 rounded-sm px-2 py-0.5 uppercase tracking-wide">
                             <Award className="h-3 w-3" /> Best Match
                           </span>
                         )}
                         <div
                           className={cn(
-                            "flex h-10 w-10 items-center justify-center rounded-none text-white text-sm font-bold",
+                            "flex h-10 w-10 items-center justify-center rounded-sm text-white text-sm font-bold",
                             avatarColor(contractor.id)
                           )}
                         >
@@ -635,9 +635,9 @@ function CompareModal({
 
         {/* Recommendation */}
         {topScore && (
-          <div className="mx-6 mb-6 mt-4 rounded-none border border-brand-100 bg-brand-50/50 p-5">
+          <div className="mx-6 mb-6 mt-4 rounded-sm border border-brand-100 bg-brand-50/50 p-5">
             <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-none bg-brand-600 text-white">
+              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-sm bg-brand-600 text-white">
                 <Award className="h-4 w-4" />
               </div>
               <div className="flex-1 min-w-0">
@@ -702,10 +702,10 @@ function InlineBidCard({
   const isAccepted = bid.status === "accepted";
 
   return (
-    <div className="flex items-start gap-3 p-4 rounded-none border border-gray-200 bg-white hover:border-gray-300 transition-colors">
+    <div className="flex items-start gap-3 p-4 rounded-sm border border-gray-200 bg-white hover:border-gray-300 transition-colors">
       <div
         className={cn(
-          "flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-none text-white text-xs font-bold",
+          "flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-sm text-white text-xs font-bold",
           avatarColor(contractor.id)
         )}
       >
@@ -716,7 +716,7 @@ function InlineBidCard({
         <div className="flex items-center gap-2 flex-wrap">
           <p className="text-sm font-semibold text-gray-900">{contractor.name}</p>
           {contractor.verified && (
-            <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-brand-700 bg-brand-50 border border-brand-100 rounded-none px-1.5 py-0.5">
+            <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-brand-700 bg-brand-50 border border-brand-100 rounded-sm px-1.5 py-0.5">
               <Shield className="h-2.5 w-2.5" /> Verified
             </span>
           )}
@@ -746,7 +746,7 @@ function InlineBidCard({
 
       <div className="flex flex-col gap-2 flex-shrink-0">
         {isAccepted ? (
-          <div className="inline-flex items-center gap-1 text-xs font-semibold text-brand-600 bg-brand-50 border border-brand-200 rounded-none px-2.5 py-1">
+          <div className="inline-flex items-center gap-1 text-xs font-semibold text-brand-600 bg-brand-50 border border-brand-200 rounded-sm px-2.5 py-1">
             <CheckCircle2 className="h-3 w-3" /> Accepted
           </div>
         ) : (
@@ -848,7 +848,7 @@ export default function JobsPage() {
                 key={f.value}
                 onClick={() => setFilter(f.value)}
                 className={cn(
-                  "text-sm font-medium rounded-none px-3.5 py-1.5 border transition-colors",
+                  "text-sm font-medium rounded-sm px-3.5 py-1.5 border transition-colors",
                   filter === f.value
                     ? "bg-gray-900 text-white border-gray-900"
                     : "bg-white text-gray-800 border-gray-200 hover:border-gray-300"
@@ -866,7 +866,7 @@ export default function JobsPage() {
         {/* Job list */}
         {filteredJobs.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="w-14 h-14 rounded-none bg-gray-100 flex items-center justify-center mb-4">
+            <div className="w-14 h-14 rounded-sm bg-gray-100 flex items-center justify-center mb-4">
               <FileText className="h-7 w-7 text-gray-600" />
             </div>
             <p className="text-base font-semibold text-gray-900">No jobs yet.</p>
@@ -889,7 +889,7 @@ export default function JobsPage() {
               const fairPrice = getFairPriceForJob(job.category, job.budget.min, job.budget.max, job.location);
 
               return (
-                <div key={job.id} className="rounded-none border border-gray-200 bg-white overflow-hidden">
+                <div key={job.id} className="rounded-sm border border-gray-200 bg-white overflow-hidden">
                   {/* Job row */}
                   <button
                     onClick={() => setExpandedJobId(isExpanded ? null : job.id)}
@@ -902,7 +902,7 @@ export default function JobsPage() {
                         <h3 className="text-sm font-semibold text-gray-900 truncate">{job.title}</h3>
                         <span
                           className={cn(
-                            "text-[11px] font-medium border rounded-none px-2 py-0.5",
+                            "text-[11px] font-medium border rounded-sm px-2 py-0.5",
                             statusBadge.className
                           )}
                         >
@@ -933,7 +933,7 @@ export default function JobsPage() {
 
                       {/* FairScope — detailed scope if available */}
                       {job.detailedScope && (
-                        <details className="mb-4 rounded-none border border-gray-200 bg-white overflow-hidden group">
+                        <details className="mb-4 rounded-sm border border-gray-200 bg-white overflow-hidden group">
                           <summary className="flex items-center gap-2 px-3 py-2.5 cursor-pointer text-xs font-semibold text-gray-700 uppercase tracking-wider hover:bg-gray-50 transition-colors">
                             <Sparkles className="h-3.5 w-3.5 text-brand-600" />
                             FairScope — Detailed Scope of Work
@@ -948,7 +948,7 @@ export default function JobsPage() {
                       {job.photos.length > 0 && (
                         <div className="flex gap-2 mb-4">
                           {job.photos.slice(0, 3).map((photo, idx) => (
-                            <div key={idx} className="w-20 h-20 rounded-none bg-gray-200 border border-gray-300 flex items-center justify-center">
+                            <div key={idx} className="w-20 h-20 rounded-sm bg-gray-200 border border-gray-300 flex items-center justify-center">
                               <span className="text-[10px] text-gray-600">Photo</span>
                             </div>
                           ))}
@@ -956,8 +956,8 @@ export default function JobsPage() {
                       )}
 
                       {/* FairPrice estimate banner */}
-                      <div className="flex items-center gap-3 rounded-none bg-brand-50/50 border border-brand-100 px-4 py-3 mb-4">
-                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-none bg-brand-100">
+                      <div className="flex items-center gap-3 rounded-sm bg-brand-50/50 border border-brand-100 px-4 py-3 mb-4">
+                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-sm bg-brand-100">
                           <BarChart3 className="h-4 w-4 text-brand-600" />
                         </div>
                         <div className="flex-1 min-w-0">

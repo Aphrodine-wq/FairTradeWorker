@@ -133,7 +133,7 @@ export default function ContactPage() {
                       id="subject"
                       value={subject}
                       onChange={(e) => setSubject(e.target.value as typeof subject)}
-                      className="w-full rounded-none border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-brand-600 transition-colors"
+                      className="w-full rounded-sm border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-brand-600 transition-colors"
                     >
                       {SUBJECTS.map((s) => (
                         <option key={s} value={s}>

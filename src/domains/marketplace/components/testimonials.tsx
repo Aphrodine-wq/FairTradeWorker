@@ -68,7 +68,7 @@ export function Testimonials() {
           {testimonials.map((t) => (
             <div
               key={t.name}
-              className="bg-white border border-border rounded-none p-8 flex flex-col"
+              className="bg-white border border-border rounded-sm p-8 flex flex-col"
             >
               <blockquote className="text-base text-gray-900 leading-relaxed flex-1">
                 &ldquo;{t.quote}&rdquo;

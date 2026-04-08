@@ -45,7 +45,7 @@ export function StatCard({ title, value, change, icon: Icon, prefix }: StatCardP
               </div>
             )}
           </div>
-          <div className="w-11 h-11 rounded-none bg-brand-50 flex items-center justify-center flex-shrink-0">
+          <div className="w-11 h-11 rounded-sm bg-brand-50 flex items-center justify-center flex-shrink-0">
             <Icon className="w-5 h-5 text-brand-600" />
           </div>
         </div>

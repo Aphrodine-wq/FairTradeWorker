@@ -139,7 +139,7 @@ export default function HomeownerPaymentsPage() {
             {awaitingReview > 0 && (
               <Link
                 href="/homeowner/milestones"
-                className="flex items-center gap-1.5 h-8 px-3 rounded-none bg-amber-50 border border-amber-200 text-[12px] font-semibold text-amber-700 hover:bg-amber-100 transition-colors"
+                className="flex items-center gap-1.5 h-8 px-3 rounded-sm bg-amber-50 border border-amber-200 text-[12px] font-semibold text-amber-700 hover:bg-amber-100 transition-colors"
               >
                 <Clock className="w-3.5 h-3.5" />
                 {awaitingReview} awaiting review
@@ -147,7 +147,7 @@ export default function HomeownerPaymentsPage() {
             )}
             <button
               onClick={() => setShowBalances(!showBalances)}
-              className="flex items-center gap-1.5 h-8 px-3 rounded-none border border-border text-[12px] font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1.5 h-8 px-3 rounded-sm border border-border text-[12px] font-medium text-gray-800 hover:bg-gray-50 transition-colors"
             >
               {showBalances ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
               {showBalances ? "Hide" : "Show"}
@@ -159,7 +159,7 @@ export default function HomeownerPaymentsPage() {
       <div className="flex-1 px-6 py-5 overflow-y-auto">
         {/* Finance cards */}
         <div className="grid grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-none border border-border p-5">
+          <div className="bg-white rounded-sm border border-border p-5">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wider">In Escrow</p>
               <Lock className="w-4 h-4 text-blue-600" />
@@ -167,7 +167,7 @@ export default function HomeownerPaymentsPage() {
             <p className="text-2xl font-bold text-gray-900 tabular-nums">{showBalances ? formatCurrency(totalHeld) : "****"}</p>
             <p className="text-[11px] text-gray-600 mt-1">Held until milestones approved</p>
           </div>
-          <div className="bg-white rounded-none border border-border p-5">
+          <div className="bg-white rounded-sm border border-border p-5">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wider">Paid Out</p>
               <Check className="w-4 h-4 text-emerald-950" />
@@ -175,7 +175,7 @@ export default function HomeownerPaymentsPage() {
             <p className="text-2xl font-bold text-emerald-950 tabular-nums">{showBalances ? formatCurrency(totalPaid) : "****"}</p>
             <p className="text-[11px] text-gray-600 mt-1">Released to contractors</p>
           </div>
-          <div className="bg-white rounded-none border border-border p-5">
+          <div className="bg-white rounded-sm border border-border p-5">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wider">Processing</p>
               <Clock className="w-4 h-4 text-blue-600" />
@@ -183,7 +183,7 @@ export default function HomeownerPaymentsPage() {
             <p className="text-2xl font-bold text-blue-700 tabular-nums">{showBalances ? formatCurrency(totalProcessing) : "****"}</p>
             <p className="text-[11px] text-gray-600 mt-1">Approved, releasing soon</p>
           </div>
-          <div className="bg-white rounded-none border border-border p-5">
+          <div className="bg-white rounded-sm border border-border p-5">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wider">Fees Paid</p>
               <FileText className="w-4 h-4 text-gray-600" />
@@ -203,7 +203,7 @@ export default function HomeownerPaymentsPage() {
               const nextAction = project.milestones.find((m) => m.status === "submitted");
 
               return (
-                <div key={project.id} className="bg-white rounded-none border border-border overflow-hidden">
+                <div key={project.id} className="bg-white rounded-sm border border-border overflow-hidden">
                   {/* Project header */}
                   <button
                     onClick={() => setExpandedProject(isExpanded ? null : project.id)}
@@ -236,7 +236,7 @@ export default function HomeownerPaymentsPage() {
                           <span className="text-[11px] font-medium text-gray-700">Escrow progress</span>
                           <span className="text-[11px] font-bold text-gray-900 tabular-nums">{formatCurrency(paid)} / {formatCurrency(project.contractValue)}</span>
                         </div>
-                        <div className="h-1.5 bg-gray-200 rounded-none overflow-hidden flex">
+                        <div className="h-1.5 bg-gray-200 rounded-sm overflow-hidden flex">
                           {(() => {
                             const paidPct = (project.milestones.filter((m) => m.status === "paid").reduce((s, m) => s + m.amount, 0) / project.contractValue) * 100;
                             const approvedPct = (project.milestones.filter((m) => m.status === "approved").reduce((s, m) => s + m.amount, 0) / project.contractValue) * 100;
@@ -264,13 +264,13 @@ export default function HomeownerPaymentsPage() {
                             >
                               {/* Status dot */}
                               <div className={cn(
-                                "w-6 h-6 rounded-none flex items-center justify-center shrink-0",
+                                "w-6 h-6 rounded-sm flex items-center justify-center shrink-0",
                                 m.status === "paid" ? "bg-emerald-950/10" : m.status === "approved" ? "bg-blue-100" : m.status === "submitted" ? "bg-amber-100" : "bg-gray-50"
                               )}>
                                 {m.status === "paid" && <Check className="w-3.5 h-3.5 text-emerald-950" strokeWidth={2.5} />}
                                 {m.status === "approved" && <Clock className="w-3.5 h-3.5 text-blue-700" />}
                                 {m.status === "submitted" && <Clock className="w-3.5 h-3.5 text-amber-700" />}
-                                {m.status === "in_progress" && <div className="w-2 h-2 rounded-none bg-gray-400" />}
+                                {m.status === "in_progress" && <div className="w-2 h-2 rounded-sm bg-gray-400" />}
                                 {m.status === "pending" && <Circle className="w-3.5 h-3.5 text-gray-300" />}
                               </div>
 
@@ -290,7 +290,7 @@ export default function HomeownerPaymentsPage() {
                                 {m.status === "submitted" && (
                                   <Link
                                     href="/homeowner/milestones"
-                                    className="text-[11px] font-semibold text-amber-700 bg-amber-100 hover:bg-amber-200 border border-amber-300 px-2.5 py-1 rounded-none transition-colors"
+                                    className="text-[11px] font-semibold text-amber-700 bg-amber-100 hover:bg-amber-200 border border-amber-300 px-2.5 py-1 rounded-sm transition-colors"
                                   >
                                     Review
                                   </Link>
@@ -342,10 +342,10 @@ export default function HomeownerPaymentsPage() {
           {/* Right sidebar */}
           <div className="space-y-4">
             {/* Payment method */}
-            <div className="bg-white rounded-none border border-border p-5">
+            <div className="bg-white rounded-sm border border-border p-5">
               <p className="text-[12px] font-semibold text-gray-900 uppercase tracking-wider mb-4">Payment Method</p>
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-none border border-border">
-                <div className="w-10 h-10 rounded-none bg-dark flex items-center justify-center shrink-0">
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-sm border border-border">
+                <div className="w-10 h-10 rounded-sm bg-dark flex items-center justify-center shrink-0">
                   <CreditCard className="w-5 h-5 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -353,20 +353,20 @@ export default function HomeownerPaymentsPage() {
                   <p className="text-[11px] text-gray-600">Expires {PAYMENT_METHOD.expiry}</p>
                 </div>
               </div>
-              <button className="w-full mt-3 h-8 rounded-none border border-border text-[12px] font-medium text-gray-800 hover:bg-gray-50 transition-colors">
+              <button className="w-full mt-3 h-8 rounded-sm border border-border text-[12px] font-medium text-gray-800 hover:bg-gray-50 transition-colors">
                 Update payment method
               </button>
             </div>
 
             {/* Quick actions */}
-            <div className="bg-white rounded-none border border-border p-5">
+            <div className="bg-white rounded-sm border border-border p-5">
               <p className="text-[12px] font-semibold text-gray-900 uppercase tracking-wider mb-3">Quick Actions</p>
               <div className="space-y-2">
                 <Link
                   href="/homeowner/milestones"
-                  className="flex items-center gap-3 p-3 rounded-none border border-border hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-sm border border-border hover:bg-gray-50 transition-colors"
                 >
-                  <div className="w-8 h-8 rounded-none bg-amber-50 flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-sm bg-amber-50 flex items-center justify-center shrink-0">
                     <Clock className="w-4 h-4 text-amber-600" />
                   </div>
                   <div className="flex-1">
@@ -377,9 +377,9 @@ export default function HomeownerPaymentsPage() {
                 </Link>
                 <Link
                   href="/homeowner/projects"
-                  className="flex items-center gap-3 p-3 rounded-none border border-border hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-sm border border-border hover:bg-gray-50 transition-colors"
                 >
-                  <div className="w-8 h-8 rounded-none bg-brand-50 flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-sm bg-brand-50 flex items-center justify-center shrink-0">
                     <FileText className="w-4 h-4 text-brand-600" />
                   </div>
                   <div className="flex-1">
@@ -392,9 +392,9 @@ export default function HomeownerPaymentsPage() {
             </div>
 
             {/* Security */}
-            <div className="bg-white rounded-none border border-border p-5">
+            <div className="bg-white rounded-sm border border-border p-5">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 rounded-none bg-emerald-950/10 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-sm bg-emerald-950/10 flex items-center justify-center">
                   <Shield className="w-4 h-4 text-emerald-950" />
                 </div>
                 <div>

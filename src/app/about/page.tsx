@@ -5,6 +5,13 @@ import { Navbar } from "@marketplace/components/navbar";
 export const metadata: Metadata = {
   title: "About",
   description: "FairTradeWorker is building a fairer construction marketplace. No lead fees, no hidden costs, just honest connections between homeowners and contractors.",
+  openGraph: {
+    title: "About | FairTradeWorker",
+    description: "FairTradeWorker is building a fairer construction marketplace. No lead fees, no hidden costs, just honest connections between homeowners and contractors.",
+  },
+  alternates: {
+    canonical: "/about",
+  },
 };
 import { Footer } from "@marketplace/components/footer";
 import { Button } from "@shared/ui/button";
@@ -124,7 +131,7 @@ export default function AboutPage() {
                   desc: "Every contractor is license-checked, insurance-verified, and identity-confirmed. We'd rather have 500 verified contractors than 5,000 unvetted ones flooding homeowner feeds.",
                 },
               ].map((item) => (
-                <div key={item.title} className="bg-surface rounded-none p-6">
+                <div key={item.title} className="bg-surface rounded-sm p-6">
                   <p className="text-sm font-bold text-gray-900 mb-2">
                     {item.title}
                   </p>
@@ -166,7 +173,7 @@ export default function AboutPage() {
           <Separator className="my-14" />
 
           {/* CTA */}
-          <section className="bg-dark rounded-none p-10 text-center">
+          <section className="bg-dark rounded-sm p-10 text-center">
             <h2 className="text-2xl font-bold text-white mb-3">
               Ready to see it for yourself?
             </h2>

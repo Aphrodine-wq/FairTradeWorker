@@ -106,7 +106,7 @@ export function Features() {
                 {/* Left — content */}
                 <div className="lg:flex-1">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-none bg-brand-50 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-sm bg-brand-50 flex items-center justify-center flex-shrink-0">
                       <Icon className="w-5 h-5 text-brand-600" />
                     </div>
                     <p className="text-sm font-bold text-brand-600 uppercase tracking-widest">
@@ -128,7 +128,7 @@ export function Features() {
                         key={detail}
                         className="flex items-start gap-3 text-sm text-gray-800"
                       >
-                        <span className="w-1.5 h-1.5 rounded-none bg-brand-600 mt-1.5 flex-shrink-0" />
+                        <span className="w-1.5 h-1.5 rounded-sm bg-brand-600 mt-1.5 flex-shrink-0" />
                         {detail}
                       </li>
                     ))}

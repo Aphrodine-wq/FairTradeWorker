@@ -102,7 +102,7 @@ export default function ContractorRecordsPage() {
           {/* Profile row */}
           <div className="flex items-start gap-5 mb-6">
             {/* Avatar */}
-            <div className="w-[72px] h-[72px] rounded-none bg-brand-100 flex items-center justify-center shrink-0">
+            <div className="w-[72px] h-[72px] rounded-sm bg-brand-100 flex items-center justify-center shrink-0">
               <span className="text-brand-700 text-[24px] font-bold">{initials}</span>
             </div>
 
@@ -139,10 +139,10 @@ export default function ContractorRecordsPage() {
               </div>
               {contractor.licensed && contractor.insured && (
                 <div className="flex items-center gap-3 mt-2">
-                  <span className="text-[11px] font-medium text-emerald-950 bg-emerald-950/10 px-2 py-0.5 rounded-none">Licensed</span>
-                  <span className="text-[11px] font-medium text-emerald-950 bg-emerald-950/10 px-2 py-0.5 rounded-none">Insured</span>
+                  <span className="text-[11px] font-medium text-emerald-950 bg-emerald-950/10 px-2 py-0.5 rounded-sm">Licensed</span>
+                  <span className="text-[11px] font-medium text-emerald-950 bg-emerald-950/10 px-2 py-0.5 rounded-sm">Insured</span>
                   {contractor.skills.slice(0, 3).map((skill) => (
-                    <span key={skill} className="text-[11px] font-medium text-gray-800 bg-gray-100 px-2 py-0.5 rounded-none">{skill}</span>
+                    <span key={skill} className="text-[11px] font-medium text-gray-800 bg-gray-100 px-2 py-0.5 rounded-sm">{skill}</span>
                   ))}
                 </div>
               )}
@@ -164,22 +164,22 @@ export default function ContractorRecordsPage() {
 
           {/* ── Performance Stats ─────────────────────────────────── */}
           <div className="grid grid-cols-4 gap-3">
-            <div className="rounded-none border border-gray-200 p-4 text-center">
+            <div className="rounded-sm border border-gray-200 p-4 text-center">
               <p className="text-[11px] font-medium text-gray-600 uppercase tracking-wider mb-2">FairRecords</p>
               <p className="text-[32px] font-bold text-gray-900 leading-none tabular-nums">{stats.total}</p>
               <p className="text-[11px] text-gray-600 mt-1">verified by homeowners</p>
             </div>
-            <div className="rounded-none border border-gray-200 p-4 text-center">
+            <div className="rounded-sm border border-gray-200 p-4 text-center">
               <p className="text-[11px] font-medium text-gray-600 uppercase tracking-wider mb-2">Budget Accuracy</p>
               <p className="text-[32px] font-bold text-emerald-950 leading-none tabular-nums">{stats.avg_budget_accuracy}%</p>
               <p className="text-[11px] text-gray-600 mt-1">avg across projects</p>
             </div>
-            <div className="rounded-none border border-gray-200 p-4 text-center">
+            <div className="rounded-sm border border-gray-200 p-4 text-center">
               <p className="text-[11px] font-medium text-gray-600 uppercase tracking-wider mb-2">On-Time Rate</p>
               <p className="text-[32px] font-bold text-gray-900 leading-none tabular-nums">{stats.on_time_rate}%</p>
               <p className="text-[11px] text-gray-600 mt-1">delivered on schedule</p>
             </div>
-            <div className="rounded-none border border-gray-200 p-4 text-center">
+            <div className="rounded-sm border border-gray-200 p-4 text-center">
               <p className="text-[11px] font-medium text-gray-600 uppercase tracking-wider mb-2">Project Volume</p>
               <p className="text-[32px] font-bold text-gray-900 leading-none tabular-nums">{formatCurrency(totalEarnings)}</p>
               <p className="text-[11px] text-gray-600 mt-1">total verified value</p>
@@ -191,7 +191,7 @@ export default function ContractorRecordsPage() {
       {/* ── How FairRecord Works (explainer for new contractors) ── */}
       {records.length <= 3 && (
         <div className="px-6 pt-5 max-w-[1100px]">
-          <div className="rounded-none bg-brand-50 border border-brand-200 px-5 py-4">
+          <div className="rounded-sm bg-brand-50 border border-brand-200 px-5 py-4">
             <p className="text-[13px] font-semibold text-brand-900 mb-1">How FairRecord works</p>
             <p className="text-[12px] text-brand-700 leading-relaxed">
               When a homeowner verifies your completed work through FairTradeWorker&apos;s escrow system,
@@ -214,7 +214,7 @@ export default function ContractorRecordsPage() {
           </div>
 
           {/* Records as a clean table-like list */}
-          <div className="bg-white rounded-none border border-gray-100 divide-y divide-gray-100">
+          <div className="bg-white rounded-sm border border-gray-100 divide-y divide-gray-100">
             {records.map((record) => (
               <div key={record.id} className="px-5 py-4 hover:bg-gray-50/50 transition-colors">
                 <div className="flex items-start gap-4">

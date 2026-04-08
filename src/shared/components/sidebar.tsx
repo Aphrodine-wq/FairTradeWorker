@@ -83,7 +83,7 @@ export function Sidebar({ items, currentPath, userRole, roles, topAction, autoCo
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-2.5 rounded-none px-2.5 py-2.5 text-[13px] font-medium transition-colors",
+                "flex items-center gap-2.5 rounded-sm px-2.5 py-2.5 text-[13px] font-medium transition-colors",
                 isActive
                   ? "bg-brand-600 text-white"
                   : "text-gray-800 hover:bg-gray-100 hover:text-gray-900",
@@ -102,7 +102,7 @@ export function Sidebar({ items, currentPath, userRole, roles, topAction, autoCo
       <div className="border-t border-border flex-shrink-0">
         <button
           onClick={() => setManualOverride((prev) => !(prev ?? autoCollapse ?? false))}
-          className="absolute bottom-16 -right-3 w-6 h-12 bg-white border border-gray-200 rounded-none-lg flex items-center justify-center hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm z-20"
+          className="absolute bottom-16 -right-3 w-6 h-12 bg-white border border-gray-200 rounded-sm-lg flex items-center justify-center hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm z-20"
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {collapsed ? (
@@ -118,7 +118,7 @@ export function Sidebar({ items, currentPath, userRole, roles, topAction, autoCo
               collapsed && "flex-col gap-2"
             )}
           >
-            <div className="w-8 h-8 rounded-none bg-brand-100 border border-brand-200 flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 rounded-sm bg-brand-100 border border-brand-200 flex items-center justify-center flex-shrink-0">
               <span className="text-brand-700 text-xs font-bold">
                 {getInitials(user.name)}
               </span>
@@ -136,7 +136,7 @@ export function Sidebar({ items, currentPath, userRole, roles, topAction, autoCo
             <button
               onClick={() => router.push("/login")}
               className={cn(
-                "flex-shrink-0 w-7 h-7 rounded-none hover:bg-red-50 flex items-center justify-center text-gray-600 hover:text-red-500 transition-colors",
+                "flex-shrink-0 w-7 h-7 rounded-sm hover:bg-red-50 flex items-center justify-center text-gray-600 hover:text-red-500 transition-colors",
                 collapsed && "mx-auto"
               )}
               title="Log out"

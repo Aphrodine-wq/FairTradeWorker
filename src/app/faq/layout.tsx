@@ -4,6 +4,10 @@ export const metadata: Metadata = {
   title: "FAQ — Frequently Asked Questions",
   description:
     "Frequently asked questions about FairTradeWorker for homeowners and contractors. Pricing, plans, escrow payments, contractor verification, and more.",
+  openGraph: {
+    title: "FAQ — Frequently Asked Questions | FairTradeWorker",
+    description: "Frequently asked questions about FairTradeWorker for homeowners and contractors. Pricing, plans, escrow payments, contractor verification, and more.",
+  },
   alternates: {
     canonical: "/faq",
   },

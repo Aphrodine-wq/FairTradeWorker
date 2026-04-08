@@ -43,9 +43,9 @@ function Toggle({ checked, onChange, label, description }: {
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
-        className={cn("relative flex-shrink-0 mt-0.5 w-10 h-[22px] rounded-none transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2", checked ? "bg-brand-600" : "bg-gray-200")}
+        className={cn("relative flex-shrink-0 mt-0.5 w-10 h-[22px] rounded-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2", checked ? "bg-brand-600" : "bg-gray-200")}
       >
-        <span className={cn("absolute top-0.5 left-0.5 w-[18px] h-[18px] rounded-none bg-white shadow transition-transform duration-200", checked ? "translate-x-[18px]" : "translate-x-0")} />
+        <span className={cn("absolute top-0.5 left-0.5 w-[18px] h-[18px] rounded-sm bg-white shadow transition-transform duration-200", checked ? "translate-x-[18px]" : "translate-x-0")} />
       </button>
     </div>
   );
@@ -84,7 +84,7 @@ function ProfileSection() {
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="w-16 h-16 rounded-none bg-brand-100 border-2 border-brand-200 flex items-center justify-center">
+        <div className="w-16 h-16 rounded-sm bg-brand-100 border-2 border-brand-200 flex items-center justify-center">
           <span className="text-brand-700 font-bold text-xl">SM</span>
         </div>
         <div>
@@ -136,7 +136,7 @@ function PropertiesSection() {
 
       <div className="space-y-3">
         {properties.map((prop) => (
-          <div key={prop.id} className="bg-white border border-border rounded-none p-5">
+          <div key={prop.id} className="bg-white border border-border rounded-sm p-5">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <p className="text-sm font-semibold text-gray-900">{prop.label}</p>
@@ -189,9 +189,9 @@ function PaymentSection() {
 
       <div className="space-y-3">
         {methods.map((m) => (
-          <div key={m.id} className="flex items-center justify-between p-4 bg-white border border-border rounded-none">
+          <div key={m.id} className="flex items-center justify-between p-4 bg-white border border-border rounded-sm">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-none bg-gray-100 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-sm bg-gray-100 flex items-center justify-center">
                 {m.type === "Visa" ? (
                   <CreditCard className="w-5 h-5 text-gray-700" />
                 ) : (
@@ -411,9 +411,9 @@ function SecuritySection() {
           {sessions.map((s) => {
             const DeviceIcon = s.icon;
             return (
-              <div key={s.id} className="flex items-center justify-between p-4 bg-white border border-border rounded-none">
+              <div key={s.id} className="flex items-center justify-between p-4 bg-white border border-border rounded-sm">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-none bg-gray-100 flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-sm bg-gray-100 flex items-center justify-center">
                     <DeviceIcon className="w-4 h-4 text-gray-700" />
                   </div>
                   <div>
@@ -482,7 +482,7 @@ export default function HomeownerSettingsPage() {
                 key={section.id}
                 onClick={() => setActive(section.id)}
                 className={cn(
-                  "w-full flex items-center gap-2 rounded-none px-2.5 py-2 text-[13px] font-medium transition-colors mb-0.5",
+                  "w-full flex items-center gap-2 rounded-sm px-2.5 py-2 text-[13px] font-medium transition-colors mb-0.5",
                   isActive
                     ? "bg-brand-600 text-white"
                     : "text-gray-800 hover:bg-gray-100 hover:text-gray-900"

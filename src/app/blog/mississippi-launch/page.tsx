@@ -8,6 +8,25 @@ export const metadata: Metadata = {
   title: "Mississippi Launch: Building Density Market by Market | FairTradeWorker",
   description:
     "We're not going national on day one. Here's why we're building density in Mississippi and Texas first, and what that means for contractors in those markets.",
+  openGraph: {
+    title: "Mississippi Launch: Building Density Market by Market | FairTradeWorker",
+    description: "We're building density in Mississippi first. Here's why and what it means for contractors.",
+    type: "article",
+    publishedTime: "2026-02-15T00:00:00Z",
+    authors: ["FairTradeWorker"],
+  },
+  alternates: { canonical: "/blog/mississippi-launch" },
+};
+
+const blogPostSchema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: "Mississippi Launch: Building Density Market by Market",
+  description: "We're not going national on day one. Here's why we're building density in Mississippi first.",
+  datePublished: "2026-02-15",
+  author: { "@type": "Organization", name: "FairTradeWorker", url: "https://fairtradeworker.com" },
+  publisher: { "@type": "Organization", name: "FairTradeWorker", url: "https://fairtradeworker.com" },
+  mainEntityOfPage: "https://fairtradeworker.com/blog/mississippi-launch",
 };
 
 export default function MississippiLaunchPage() {
@@ -15,6 +34,7 @@ export default function MississippiLaunchPage() {
     <>
       <Navbar />
       <main className="bg-[#FAFAFA] min-h-screen">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostSchema) }} />
         <article className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
           <Link
             href="/blog"

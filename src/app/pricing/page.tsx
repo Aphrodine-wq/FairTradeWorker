@@ -493,13 +493,13 @@ function BillingToggle({
         type="button"
         onClick={onToggle}
         className={cn(
-          "relative inline-flex h-6 w-11 items-center rounded-none transition-colors",
+          "relative inline-flex h-6 w-11 items-center rounded-sm transition-colors",
           yearly ? "bg-brand-600" : "bg-gray-200"
         )}
       >
         <span
           className={cn(
-            "inline-block h-4 w-4 transform rounded-none bg-white transition-transform",
+            "inline-block h-4 w-4 transform rounded-sm bg-white transition-transform",
             yearly ? "translate-x-6" : "translate-x-1"
           )}
         />
@@ -529,12 +529,12 @@ function AudienceToggle({
   onChange: (a: Audience) => void;
 }) {
   return (
-    <div className="flex items-center justify-center gap-1 bg-gray-100 rounded-none p-1 w-fit mx-auto">
+    <div className="flex items-center justify-center gap-1 bg-gray-100 rounded-sm p-1 w-fit mx-auto">
       <button
         type="button"
         onClick={() => onChange("contractor")}
         className={cn(
-          "px-5 py-2 text-sm font-medium rounded-none transition-colors",
+          "px-5 py-2 text-sm font-medium rounded-sm transition-colors",
           audience === "contractor"
             ? "bg-white text-gray-900 shadow-sm"
             : "text-gray-700 hover:text-gray-900"
@@ -546,7 +546,7 @@ function AudienceToggle({
         type="button"
         onClick={() => onChange("homeowner")}
         className={cn(
-          "px-5 py-2 text-sm font-medium rounded-none transition-colors",
+          "px-5 py-2 text-sm font-medium rounded-sm transition-colors",
           audience === "homeowner"
             ? "bg-white text-gray-900 shadow-sm"
             : "text-gray-700 hover:text-gray-900"
@@ -573,7 +573,7 @@ function PricingCard({
   return (
     <div
       className={cn(
-        "relative bg-white rounded-none border p-8 flex flex-col",
+        "relative bg-white rounded-sm border p-8 flex flex-col",
         tier.featured
           ? "border-brand-600 shadow-lg ring-1 ring-brand-600 lg:scale-[1.03] lg:z-10"
           : "border-border shadow-sm"
@@ -591,7 +591,7 @@ function PricingCard({
         <div className="flex items-center gap-3 mb-2">
           <div
             className={cn(
-              "w-10 h-10 rounded-none flex items-center justify-center",
+              "w-10 h-10 rounded-sm flex items-center justify-center",
               tier.featured ? "bg-brand-50" : "bg-gray-50"
             )}
           >
@@ -967,7 +967,7 @@ export default function PricingPage() {
               </p>
             </div>
 
-            <div className="bg-white rounded-none border border-border overflow-hidden shadow-sm">
+            <div className="bg-white rounded-sm border border-border overflow-hidden shadow-sm">
               {/* Table header */}
               <div
                 className="border-b border-border"

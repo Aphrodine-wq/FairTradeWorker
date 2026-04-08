@@ -460,8 +460,8 @@ function OverviewTab({ project }: { project: typeof PROJECTS[0] }) {
           <p className="text-[13px] text-gray-600 mt-1">{completedMilestones} of {project.milestones.length} milestones</p>
         </div>
         <div className="flex-1 pt-2">
-          <div className="h-3 bg-gray-100 rounded-none overflow-hidden mb-2">
-            <div className="h-full bg-brand-600 rounded-none" style={{ width: `${project.progress}%` }} />
+          <div className="h-3 bg-gray-100 rounded-sm overflow-hidden mb-2">
+            <div className="h-full bg-brand-600 rounded-sm" style={{ width: `${project.progress}%` }} />
           </div>
           <div className="flex justify-between text-[12px] text-gray-600">
             <span>{formatDate(project.startDate)}</span>
@@ -490,12 +490,12 @@ function OverviewTab({ project }: { project: typeof PROJECTS[0] }) {
       {/* Next Steps + Project Notes row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Next Steps */}
-        <div className="bg-white border border-border rounded-none p-5">
+        <div className="bg-white border border-border rounded-sm p-5">
           <p className="text-sm font-semibold text-gray-900 mb-4">Next Steps</p>
           <div className="space-y-3">
             {nextSteps.map((step, i) => (
               <div key={i} className="flex gap-3">
-                <div className="flex-shrink-0 w-5 h-5 rounded-none bg-amber-50 border border-amber-200 flex items-center justify-center mt-0.5">
+                <div className="flex-shrink-0 w-5 h-5 rounded-sm bg-amber-50 border border-amber-200 flex items-center justify-center mt-0.5">
                   <span className="text-xs font-bold text-amber-600">{i + 1}</span>
                 </div>
                 <div>
@@ -514,7 +514,7 @@ function OverviewTab({ project }: { project: typeof PROJECTS[0] }) {
         </div>
 
         {/* Project Notes */}
-        <div className="bg-white border border-border rounded-none p-5">
+        <div className="bg-white border border-border rounded-sm p-5">
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm font-semibold text-gray-900">Project Notes</p>
             <span className="text-xs text-gray-600">Saved locally</span>
@@ -565,7 +565,7 @@ function DailyLogTab({ projectId }: { projectId: string }) {
       <div className="flex items-center gap-2">
         <span className="text-sm font-medium text-gray-700 mr-1">Week of Mar 17:</span>
         {WEEK_DAYS.map((d) => (
-          <button key={d.date} onClick={() => setSelectedDate(d.date)} className={cn("flex flex-col items-center px-3 py-2 rounded-none border text-sm font-medium transition-colors", selectedDate === d.date ? "bg-brand-600 text-white border-brand-600" : "bg-white text-gray-900 border-border hover:bg-gray-50")}>
+          <button key={d.date} onClick={() => setSelectedDate(d.date)} className={cn("flex flex-col items-center px-3 py-2 rounded-sm border text-sm font-medium transition-colors", selectedDate === d.date ? "bg-brand-600 text-white border-brand-600" : "bg-white text-gray-900 border-border hover:bg-gray-50")}>
             <span className="text-xs">{d.short}</span>
             <span className="font-bold">{d.num}</span>
           </button>
@@ -574,7 +574,7 @@ function DailyLogTab({ projectId }: { projectId: string }) {
 
       <div className="grid grid-cols-[1fr_300px] gap-5">
         {/* Entry form */}
-        <div className="bg-white border border-border rounded-none p-5 space-y-4">
+        <div className="bg-white border border-border rounded-sm p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-gray-900">Log Entry — {formatDate(selectedDate)}</h3>
             {saved && <span className="flex items-center gap-1.5 text-xs text-brand-600 font-medium"><CheckCircle2 className="w-3.5 h-3.5" />Saved</span>}
@@ -598,7 +598,7 @@ function DailyLogTab({ projectId }: { projectId: string }) {
               {WEATHER_OPTIONS.map((w) => {
                 const Icon = w.icon;
                 return (
-                  <button key={w.label} onClick={() => setWeather(w.label)} className={cn("flex items-center gap-1.5 px-3 py-1.5 rounded-none border text-xs font-medium transition-colors", weather === w.label ? "bg-brand-600 text-white border-brand-600" : "bg-white text-gray-800 border-border hover:bg-gray-50")}>
+                  <button key={w.label} onClick={() => setWeather(w.label)} className={cn("flex items-center gap-1.5 px-3 py-1.5 rounded-sm border text-xs font-medium transition-colors", weather === w.label ? "bg-brand-600 text-white border-brand-600" : "bg-white text-gray-800 border-border hover:bg-gray-50")}>
                     <Icon className="w-3.5 h-3.5" />{w.label}
                   </button>
                 );
@@ -610,7 +610,7 @@ function DailyLogTab({ projectId }: { projectId: string }) {
             <label className="text-sm font-medium text-gray-900">Crew on Site</label>
             <div className="flex flex-wrap gap-2">
               {CREW_NAMES.map((name) => (
-                <button key={name} onClick={() => toggleCrew(name)} className={cn("px-3 py-1.5 rounded-none border text-sm font-medium transition-colors", crew.includes(name) ? "bg-brand-600 text-white border-brand-600" : "bg-white text-gray-800 border-border hover:bg-gray-50")}>
+                <button key={name} onClick={() => toggleCrew(name)} className={cn("px-3 py-1.5 rounded-sm border text-sm font-medium transition-colors", crew.includes(name) ? "bg-brand-600 text-white border-brand-600" : "bg-white text-gray-800 border-border hover:bg-gray-50")}>
                   {name}
                 </button>
               ))}
@@ -641,7 +641,7 @@ function DailyLogTab({ projectId }: { projectId: string }) {
             {safetyIncidents && <p className="text-xs text-red-600 flex items-center gap-1"><AlertTriangle className="w-3 h-3" />Safety incidents are flagged in the log</p>}
           </div>
 
-          <div className="border-2 border-dashed border-gray-200 rounded-none p-4 text-center hover:border-brand-300 transition-colors cursor-pointer">
+          <div className="border-2 border-dashed border-gray-200 rounded-sm p-4 text-center hover:border-brand-300 transition-colors cursor-pointer">
             <Upload className="w-5 h-5 text-gray-300 mx-auto mb-1" />
             <p className="text-xs text-gray-600">Drop photos or click to upload</p>
           </div>
@@ -653,7 +653,7 @@ function DailyLogTab({ projectId }: { projectId: string }) {
         <div className="space-y-3">
           <h3 className="text-sm font-semibold text-gray-900">Recent Entries</h3>
           {MOCK_LOGS.map((log) => (
-            <div key={log.id} className="bg-white border border-border rounded-none overflow-hidden">
+            <div key={log.id} className="bg-white border border-border rounded-sm overflow-hidden">
               <button className="w-full text-left px-4 py-3.5 hover:bg-gray-50 transition-colors" onClick={() => setExpanded(expanded === log.id ? null : log.id)}>
                 {log.milestone && (
                   <span className="inline-block text-[10px] font-semibold text-brand-700 bg-brand-50 border border-brand-200 rounded px-1.5 py-0.5 mb-1.5">{log.milestone}</span>
@@ -856,10 +856,10 @@ function CalendarView({ project }: { project: typeof PROJECTS[0] }) {
         <div className="flex items-center gap-4">
           <h2 className="text-[22px] font-bold text-gray-900">{monthName}</h2>
           <div className="flex gap-1">
-            <button onClick={prevMonth} className="w-8 h-8 rounded-none hover:bg-gray-100 flex items-center justify-center transition-colors">
+            <button onClick={prevMonth} className="w-8 h-8 rounded-sm hover:bg-gray-100 flex items-center justify-center transition-colors">
               <ChevronLeft className="w-4 h-4 text-gray-700" />
             </button>
-            <button onClick={nextMonth} className="w-8 h-8 rounded-none hover:bg-gray-100 flex items-center justify-center transition-colors">
+            <button onClick={nextMonth} className="w-8 h-8 rounded-sm hover:bg-gray-100 flex items-center justify-center transition-colors">
               <ChevronRight className="w-4 h-4 text-gray-700" />
             </button>
           </div>
@@ -872,7 +872,7 @@ function CalendarView({ project }: { project: typeof PROJECTS[0] }) {
             <span className="text-gray-600">{deliveryCount} deliveries</span>
           </div>
           {/* View toggle */}
-          <div className="flex rounded-none ring-1 ring-gray-200 overflow-hidden">
+          <div className="flex rounded-sm ring-1 ring-gray-200 overflow-hidden">
             <button onClick={() => setView("month")} className={cn("px-3 py-1.5 text-[13px] font-medium transition-colors", view === "month" ? "bg-gray-900 text-white" : "bg-white text-gray-700 hover:bg-gray-50")}>Month</button>
             <button onClick={() => setView("week")} className={cn("px-3 py-1.5 text-[13px] font-medium transition-colors", view === "week" ? "bg-gray-900 text-white" : "bg-white text-gray-700 hover:bg-gray-50")}>Week</button>
           </div>
@@ -884,7 +884,7 @@ function CalendarView({ project }: { project: typeof PROJECTS[0] }) {
         <div className="flex-1">
           {view === "month" ? (
             <>
-              <div className="grid grid-cols-7 gap-px bg-gray-200 rounded-none overflow-hidden">
+              <div className="grid grid-cols-7 gap-px bg-gray-200 rounded-sm overflow-hidden">
                 {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
                   <div key={d} className="bg-gray-50 px-2 py-2 text-center text-[11px] font-bold text-gray-600">{d}</div>
                 ))}
@@ -909,7 +909,7 @@ function CalendarView({ project }: { project: typeof PROJECTS[0] }) {
                       )}
                     >
                       <span className={cn(
-                        "text-[13px] tabular-nums inline-flex items-center justify-center w-6 h-6 rounded-none",
+                        "text-[13px] tabular-nums inline-flex items-center justify-center w-6 h-6 rounded-sm",
                         isToday ? "bg-gray-900 text-white font-bold" : isWeekend ? "text-gray-600 font-medium" : "text-gray-900 font-medium"
                       )}>
                         {day}
@@ -933,7 +933,7 @@ function CalendarView({ project }: { project: typeof PROJECTS[0] }) {
               <div className="flex items-center gap-5 mt-3">
                 {Object.entries(EVENT_COLORS).map(([type, color]) => (
                   <div key={type} className="flex items-center gap-1.5">
-                    <span className={cn("w-2 h-2 rounded-none", color)} />
+                    <span className={cn("w-2 h-2 rounded-sm", color)} />
                     <span className="text-[11px] text-gray-600 capitalize">{type}</span>
                   </div>
                 ))}
@@ -975,7 +975,7 @@ function CalendarView({ project }: { project: typeof PROJECTS[0] }) {
                         <div className="space-y-1.5">
                           {events.map((ev, j) => (
                             <div key={j} className="flex items-center gap-2">
-                              <span className={cn("w-2 h-2 rounded-none flex-shrink-0", EVENT_COLORS[ev.type])} />
+                              <span className={cn("w-2 h-2 rounded-sm flex-shrink-0", EVENT_COLORS[ev.type])} />
                               <span className="text-[13px] font-medium text-gray-900 truncate">{ev.label}</span>
                               <span className="text-[12px] text-gray-600 flex-shrink-0">{ev.time}{ev.endTime ? `–${ev.endTime}` : ""}</span>
                               {ev.crew && <span className="text-[11px] text-gray-600 flex-shrink-0">{ev.crew.join(", ")}</span>}
@@ -1006,9 +1006,9 @@ function CalendarView({ project }: { project: typeof PROJECTS[0] }) {
             {selectedEvents.length > 0 ? (
               <div className="space-y-4">
                 {selectedEvents.map((ev, i) => (
-                  <div key={i} className="bg-white rounded-none p-4 ring-1 ring-gray-200/80">
+                  <div key={i} className="bg-white rounded-sm p-4 ring-1 ring-gray-200/80">
                     <div className="flex items-start gap-3 mb-2">
-                      <span className={cn("w-3 h-3 rounded-none flex-shrink-0 mt-1", EVENT_COLORS[ev.type])} />
+                      <span className={cn("w-3 h-3 rounded-sm flex-shrink-0 mt-1", EVENT_COLORS[ev.type])} />
                       <div className="flex-1 min-w-0">
                         <p className="text-[15px] font-bold text-gray-900">{ev.label}</p>
                         <p className="text-[12px] text-gray-600 capitalize">{ev.type}{ev.project ? ` — ${ev.project}` : ""}</p>
@@ -1041,7 +1041,7 @@ function CalendarView({ project }: { project: typeof PROJECTS[0] }) {
                 ))}
               </div>
             ) : (
-              <div className="bg-white rounded-none p-6 ring-1 ring-gray-200/80 text-center">
+              <div className="bg-white rounded-sm p-6 ring-1 ring-gray-200/80 text-center">
                 <p className="text-[14px] text-gray-600">No events scheduled</p>
                 <p className="text-[12px] text-gray-300 mt-1">Click a day to see details</p>
               </div>
@@ -1107,11 +1107,11 @@ function ScheduleTab() {
       {/* Header row */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <button className="w-8 h-8 flex items-center justify-center rounded-none border border-border bg-white hover:bg-gray-50 transition-colors">
+          <button className="w-8 h-8 flex items-center justify-center rounded-sm border border-border bg-white hover:bg-gray-50 transition-colors">
             <ChevronLeft className="w-4 h-4 text-gray-800" />
           </button>
           <span className="text-sm font-semibold text-gray-900">This Week — Mon Mar 17 – Fri Mar 21, 2026</span>
-          <button className="w-8 h-8 flex items-center justify-center rounded-none border border-border bg-white hover:bg-gray-50 transition-colors">
+          <button className="w-8 h-8 flex items-center justify-center rounded-sm border border-border bg-white hover:bg-gray-50 transition-colors">
             <ChevronRight className="w-4 h-4 text-gray-800" />
           </button>
         </div>
@@ -1122,7 +1122,7 @@ function ScheduleTab() {
 
       {/* Add entry form */}
       {addingEntry && (
-        <div className="bg-white border border-border rounded-none p-4">
+        <div className="bg-white border border-border rounded-sm p-4">
           <div className="flex items-center justify-between mb-3">
             <p className="text-sm font-semibold text-gray-900">New Schedule Entry</p>
             <button onClick={() => setAddingEntry(false)} className="text-gray-600 hover:text-gray-800"><AlertCircle className="w-4 h-4" /></button>
@@ -1130,21 +1130,21 @@ function ScheduleTab() {
           <div className="grid grid-cols-4 gap-3">
             <div className="space-y-1">
               <label className="text-xs font-semibold text-gray-800">Project</label>
-              <select value={newProject} onChange={(e) => setNewProject(e.target.value)} className="h-9 w-full rounded-none border border-border bg-white px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600">
+              <select value={newProject} onChange={(e) => setNewProject(e.target.value)} className="h-9 w-full rounded-sm border border-border bg-white px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600">
                 <option value="">Select...</option>
                 {Object.keys(PROJECT_COLORS).map((p) => <option key={p} value={p}>{p}</option>)}
               </select>
             </div>
             <div className="space-y-1">
               <label className="text-xs font-semibold text-gray-800">Crew Member</label>
-              <select value={newCrew} onChange={(e) => setNewCrew(e.target.value)} className="h-9 w-full rounded-none border border-border bg-white px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600">
+              <select value={newCrew} onChange={(e) => setNewCrew(e.target.value)} className="h-9 w-full rounded-sm border border-border bg-white px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600">
                 <option value="">Select...</option>
                 {CREW.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div className="space-y-1">
               <label className="text-xs font-semibold text-gray-800">Day</label>
-              <select className="h-9 w-full rounded-none border border-border bg-white px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600">
+              <select className="h-9 w-full rounded-sm border border-border bg-white px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600">
                 <option value="">Select...</option>
                 {DAYS.map((d) => <option key={d} value={d}>{d}</option>)}
               </select>
@@ -1163,12 +1163,12 @@ function ScheduleTab() {
       {/* Project legend */}
       <div className="flex flex-wrap gap-2">
         {Object.entries(PROJECT_COLORS).map(([p, cls]) => (
-          <div key={p} className={cn("px-2.5 py-1 rounded-none border text-xs font-medium", cls)}>{p}</div>
+          <div key={p} className={cn("px-2.5 py-1 rounded-sm border text-xs font-medium", cls)}>{p}</div>
         ))}
       </div>
 
       {/* Weekly grid */}
-      <div className="bg-white border border-border rounded-none overflow-hidden">
+      <div className="bg-white border border-border rounded-sm overflow-hidden">
         <div className="grid grid-cols-[180px_repeat(5,1fr)] border-b border-border bg-gray-50">
           <div className="px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wide">Crew Member</div>
           {DAYS.map((d) => {
@@ -1196,7 +1196,7 @@ function ScheduleTab() {
         {CREW.map((member, ri) => (
           <div key={member} className={cn("grid grid-cols-[180px_repeat(5,1fr)] items-stretch", ri < CREW.length - 1 && "border-b border-border")}>
             <div className="px-4 py-3 flex items-center gap-2 border-r border-border">
-              <div className="w-7 h-7 rounded-none bg-gray-100 border border-gray-200 flex items-center justify-center flex-shrink-0">
+              <div className="w-7 h-7 rounded-sm bg-gray-100 border border-gray-200 flex items-center justify-center flex-shrink-0">
                 <User className="w-3.5 h-3.5 text-gray-700" />
               </div>
               <div>
@@ -1223,7 +1223,7 @@ function ScheduleTab() {
                       </div>
                     </div>
                   ) : assignment ? (
-                    <div className={cn("group relative h-14 flex flex-col justify-center px-2.5 rounded-none border text-xs cursor-pointer", colorClass)} onClick={() => startEdit(ri, di, assignment)}>
+                    <div className={cn("group relative h-14 flex flex-col justify-center px-2.5 rounded-sm border text-xs cursor-pointer", colorClass)} onClick={() => startEdit(ri, di, assignment)}>
                       <p className="font-semibold leading-tight truncate">{assignment.project}</p>
                       <p className="text-[11px] opacity-70 mt-0.5">{assignment.time}</p>
                       <button onClick={(e) => { e.stopPropagation(); clearCell(ri, di); }} className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity text-gray-600 hover:text-red-500" title="Remove">
@@ -1231,7 +1231,7 @@ function ScheduleTab() {
                       </button>
                     </div>
                   ) : (
-                    <div className="h-14 flex items-center justify-center rounded-none border border-dashed border-gray-200 cursor-pointer hover:border-brand-300 hover:bg-brand-50/30 transition-colors" onClick={() => startEdit(ri, di, null)}>
+                    <div className="h-14 flex items-center justify-center rounded-sm border border-dashed border-gray-200 cursor-pointer hover:border-brand-300 hover:bg-brand-50/30 transition-colors" onClick={() => startEdit(ri, di, null)}>
                       <span className="text-xs text-gray-300">Available</span>
                     </div>
                   )}
@@ -1244,7 +1244,7 @@ function ScheduleTab() {
 
       {/* Day detail panel */}
       {selectedDay && detail && (
-        <div className="bg-white border border-border rounded-none p-5 space-y-4">
+        <div className="bg-white border border-border rounded-sm p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-gray-900">{selectedDay} — Day Details</h3>
             <button onClick={() => setSelectedDay(null)} className="text-xs text-gray-600 hover:text-gray-800">Close</button>
@@ -1266,7 +1266,7 @@ function ScheduleTab() {
                   const assigned = dayIdx >= 0 && schedule[ri][dayIdx] !== null;
                   if (!assigned) return null;
                   return (
-                    <span key={member} className="text-xs font-medium text-gray-900 bg-gray-100 px-2 py-0.5 rounded-none">
+                    <span key={member} className="text-xs font-medium text-gray-900 bg-gray-100 px-2 py-0.5 rounded-sm">
                       {member.split(" ")[0]}
                     </span>
                   );
@@ -1296,7 +1296,7 @@ function ScheduleTab() {
               <div className="space-y-1.5">
                 {detail.deliveries.map((d, i) => (
                   <div key={i} className="flex items-center gap-2 text-sm text-gray-900">
-                    <div className="w-1.5 h-1.5 rounded-none bg-brand-500 flex-shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-sm bg-brand-500 flex-shrink-0" />
                     {d}
                   </div>
                 ))}
@@ -1315,7 +1315,7 @@ function ScheduleTab() {
       )}
 
       {/* Crew hours summary */}
-      <div className="bg-white border border-border rounded-none overflow-hidden">
+      <div className="bg-white border border-border rounded-sm overflow-hidden">
         <div className="px-5 py-3 border-b border-border">
           <p className="text-[11px] font-bold text-gray-600 uppercase tracking-wide">Crew Hours This Week</p>
         </div>
@@ -1323,15 +1323,15 @@ function ScheduleTab() {
           {crewHours.map((ch) => (
             <div key={ch.name} className="flex items-center justify-between px-5 py-3">
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-none bg-gray-100 flex items-center justify-center">
+                <div className="w-6 h-6 rounded-sm bg-gray-100 flex items-center justify-center">
                   <User className="w-3 h-3 text-gray-700" />
                 </div>
                 <span className="text-sm font-medium text-gray-900">{ch.name}</span>
               </div>
               <div className="flex items-center gap-4">
                 <span className="text-xs text-gray-600">{ch.daysAssigned} of 5 days</span>
-                <div className="w-20 h-1.5 bg-gray-100 rounded-none overflow-hidden">
-                  <div className="h-full bg-brand-600 rounded-none" style={{ width: `${(ch.daysAssigned / 5) * 100}%` }} />
+                <div className="w-20 h-1.5 bg-gray-100 rounded-sm overflow-hidden">
+                  <div className="h-full bg-brand-600 rounded-sm" style={{ width: `${(ch.daysAssigned / 5) * 100}%` }} />
                 </div>
                 <span className="text-sm font-bold text-gray-900 tabular-nums w-12 text-right">{ch.hoursEst}h</span>
               </div>
@@ -1356,7 +1356,7 @@ function ChangeOrdersTab({ projectId }: { projectId: string }) {
 
   if (cos.length === 0) {
     return (
-      <div className="bg-white border border-border rounded-none py-12 text-center">
+      <div className="bg-white border border-border rounded-sm py-12 text-center">
         <p className="text-gray-600 text-sm">No change orders for this project.</p>
         <Button className="gap-2 mt-4" onClick={() => setNewCOOpen(true)}><Plus className="w-4 h-4" />New Change Order</Button>
         <Dialog open={newCOOpen} onOpenChange={setNewCOOpen}>
@@ -1414,7 +1414,7 @@ function ChangeOrdersTab({ projectId }: { projectId: string }) {
       </div>
 
       <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-        <div className="bg-white border border-border rounded-none overflow-hidden">
+        <div className="bg-white border border-border rounded-sm overflow-hidden">
           <div className="px-5 py-3 border-b border-border bg-gray-50 grid grid-cols-[80px_2fr_110px_120px_120px] gap-4 text-xs font-semibold text-gray-700 uppercase tracking-wide">
             <span>CO #</span>
             <span>Description</span>
@@ -1519,7 +1519,7 @@ function PunchListTab({ projectId }: { projectId: string }) {
   });
 
   const addForm = addOpen && (
-    <div className="bg-gray-50 border border-border rounded-none p-4 space-y-3">
+    <div className="bg-gray-50 border border-border rounded-sm p-4 space-y-3">
       <div className="flex items-center justify-between mb-1">
         <p className="text-sm font-semibold text-gray-900">New Punch Item</p>
         <button onClick={handleCancelAdd} className="text-gray-600 hover:text-gray-800 transition-colors">
@@ -1558,7 +1558,7 @@ function PunchListTab({ projectId }: { projectId: string }) {
           <select
             value={newPriority}
             onChange={(e) => setNewPriority(e.target.value as Priority)}
-            className="w-full h-9 rounded-none border border-input bg-white px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-ring"
+            className="w-full h-9 rounded-sm border border-input bg-white px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-ring"
           >
             <option value="high">High</option>
             <option value="medium">Medium</option>
@@ -1578,7 +1578,7 @@ function PunchListTab({ projectId }: { projectId: string }) {
       <div className="space-y-4">
         {addForm}
         {!addOpen && (
-          <div className="bg-white border border-border rounded-none py-12 text-center">
+          <div className="bg-white border border-border rounded-sm py-12 text-center">
             <CheckSquare className="w-10 h-10 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-600 text-sm mb-4">No punch list items for this project yet.</p>
             <Button size="sm" onClick={() => setAddOpen(true)}>
@@ -1593,7 +1593,7 @@ function PunchListTab({ projectId }: { projectId: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="bg-white border border-border rounded-none p-4">
+      <div className="bg-white border border-border rounded-sm p-4">
         <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-semibold text-gray-900">{completed} of {items.length} items complete</p>
           <div className="flex items-center gap-3">
@@ -1612,7 +1612,7 @@ function PunchListTab({ projectId }: { projectId: string }) {
       {addForm}
 
       {pct === 100 && (
-        <div className="bg-brand-50 border border-brand-200 rounded-none px-5 py-4 flex items-center gap-3">
+        <div className="bg-brand-50 border border-brand-200 rounded-sm px-5 py-4 flex items-center gap-3">
           <CheckSquare className="w-5 h-5 text-brand-600 flex-shrink-0" />
           <div>
             <p className="text-sm font-bold text-brand-800">Ready for Final Walkthrough</p>
@@ -1621,7 +1621,7 @@ function PunchListTab({ projectId }: { projectId: string }) {
         </div>
       )}
 
-      <div className="bg-white border border-border rounded-none overflow-hidden">
+      <div className="bg-white border border-border rounded-sm overflow-hidden">
         <div className="grid grid-cols-[40px_1fr_100px_80px_100px_100px_44px_36px] gap-3 px-4 py-3 border-b border-border bg-gray-50">
           <div />
           <div className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Description</div>
@@ -1698,15 +1698,15 @@ function JobCostingTab({ projectId, project }: { projectId: string; project: typ
     <div className="space-y-6 max-w-[800px]">
       {/* Summary cards — 3 across */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white rounded-none border border-border p-5">
+        <div className="bg-white rounded-sm border border-border p-5">
           <p className="text-[11px] font-medium text-gray-600 uppercase tracking-wider">Budget</p>
           <p className="text-[28px] font-bold text-gray-900 tabular-nums leading-tight mt-1">{formatCurrency(totalEstimated)}</p>
         </div>
-        <div className="bg-white rounded-none border border-border p-5">
+        <div className="bg-white rounded-sm border border-border p-5">
           <p className="text-[11px] font-medium text-gray-600 uppercase tracking-wider">Spent</p>
           <p className="text-[28px] font-bold text-gray-900 tabular-nums leading-tight mt-1">{formatCurrency(totalActual)}</p>
         </div>
-        <div className="bg-white rounded-none border border-border p-5">
+        <div className="bg-white rounded-sm border border-border p-5">
           <p className="text-[11px] font-medium text-gray-600 uppercase tracking-wider">Remaining</p>
           <p className={cn("text-[28px] font-bold tabular-nums leading-tight mt-1", remaining >= 0 ? "text-brand-600" : "text-red-600")}>{formatCurrency(Math.abs(remaining))}</p>
           {remaining < 0 && <p className="text-[12px] font-semibold text-red-600 mt-0.5">Over budget</p>}
@@ -1714,7 +1714,7 @@ function JobCostingTab({ projectId, project }: { projectId: string; project: typ
       </div>
 
       {/* Cost breakdown with progress bars */}
-      <div className="bg-white rounded-none border border-border p-5">
+      <div className="bg-white rounded-sm border border-border p-5">
         <p className="text-[13px] font-bold text-gray-900 uppercase tracking-wider mb-4">Cost Breakdown</p>
         <div className="space-y-4">
           {categories.map((cat) => {
@@ -1731,9 +1731,9 @@ function JobCostingTab({ projectId, project }: { projectId: string; project: typ
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="flex-1 h-2.5 bg-gray-100 rounded-none overflow-hidden">
+                  <div className="flex-1 h-2.5 bg-gray-100 rounded-sm overflow-hidden">
                     <div
-                      className={cn("h-full rounded-none transition-all duration-500", isOver ? "bg-red-500" : "bg-brand-600")}
+                      className={cn("h-full rounded-sm transition-all duration-500", isOver ? "bg-red-500" : "bg-brand-600")}
                       style={{ width: `${Math.min(pct, 100)}%` }}
                     />
                   </div>
@@ -1749,7 +1749,7 @@ function JobCostingTab({ projectId, project }: { projectId: string; project: typ
 
       {/* Recent expenses */}
       {expenses.length > 0 && (
-        <div className="bg-white rounded-none border border-border p-5">
+        <div className="bg-white rounded-sm border border-border p-5">
           <p className="text-[13px] font-bold text-gray-900 uppercase tracking-wider mb-4">Recent Expenses</p>
           <div className="space-y-0">
             {expenses.map((exp, i) => (
@@ -1830,15 +1830,15 @@ function MilestonesTab({
     <div className="p-6">
       {/* Finance summary */}
       <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="bg-white rounded-none border border-border p-4">
+        <div className="bg-white rounded-sm border border-border p-4">
           <p className="text-[11px] font-medium text-gray-600 uppercase tracking-wider">Contract</p>
           <p className="text-xl font-bold text-gray-900 tabular-nums mt-1">{formatCurrency(project.contractValue)}</p>
         </div>
-        <div className="bg-white rounded-none border border-border p-4">
+        <div className="bg-white rounded-sm border border-border p-4">
           <p className="text-[11px] font-medium text-gray-600 uppercase tracking-wider">Released</p>
           <p className="text-xl font-bold text-emerald-950 tabular-nums mt-1">{formatCurrency(releasedAmount)}</p>
         </div>
-        <div className="bg-white rounded-none border border-border p-4">
+        <div className="bg-white rounded-sm border border-border p-4">
           <p className="text-[11px] font-medium text-gray-600 uppercase tracking-wider">Remaining</p>
           <p className="text-xl font-bold text-gray-900 tabular-nums mt-1">{formatCurrency(totalAmount - releasedAmount)}</p>
         </div>
@@ -1850,14 +1850,14 @@ function MilestonesTab({
           <span className="text-[13px] font-medium text-gray-800">Escrow progress</span>
           <span className="text-[13px] font-bold text-gray-900 tabular-nums">{pct}%</span>
         </div>
-        <div className="h-2 bg-gray-100 rounded-none overflow-hidden flex">
+        <div className="h-2 bg-gray-100 rounded-sm overflow-hidden flex">
           {paidAmount > 0 && <div className="bg-emerald-600 transition-all duration-500" style={{ width: `${(paidAmount / totalAmount) * 100}%` }} />}
           {approvedAmount > 0 && <div className="bg-blue-600 transition-all duration-500" style={{ width: `${(approvedAmount / totalAmount) * 100}%` }} />}
         </div>
         <div className="flex items-center gap-4 mt-2">
-          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-none bg-emerald-600" /><span className="text-[11px] text-gray-600">Paid</span></div>
-          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-none bg-blue-600" /><span className="text-[11px] text-gray-600">Approved</span></div>
-          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-none bg-gray-200" /><span className="text-[11px] text-gray-600">Remaining</span></div>
+          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-sm bg-emerald-600" /><span className="text-[11px] text-gray-600">Paid</span></div>
+          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-sm bg-blue-600" /><span className="text-[11px] text-gray-600">Approved</span></div>
+          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-sm bg-gray-200" /><span className="text-[11px] text-gray-600">Remaining</span></div>
         </div>
       </div>
 
@@ -1871,7 +1871,7 @@ function MilestonesTab({
             <div
               key={`${m.label}-${i}`}
               className={cn(
-                "group rounded-none border bg-white transition-all",
+                "group rounded-sm border bg-white transition-all",
                 m.status === "in_progress" ? "border-brand-200 shadow-sm" : m.status === "submitted" ? "border-amber-200" : "border-border"
               )}
             >
@@ -1881,12 +1881,12 @@ function MilestonesTab({
                 onClick={() => canExpand && toggleExpand(i)}
               >
                 <div className={cn(
-                  "w-7 h-7 rounded-none flex items-center justify-center shrink-0",
+                  "w-7 h-7 rounded-sm flex items-center justify-center shrink-0",
                   m.status === "paid" || m.status === "approved" ? "bg-emerald-950/10" : m.status === "submitted" ? "bg-amber-50" : m.status === "in_progress" ? "bg-brand-50" : "bg-gray-50"
                 )}>
                   {(m.status === "paid" || m.status === "approved") && <Check className="w-4 h-4 text-emerald-950" strokeWidth={2.5} />}
                   {m.status === "submitted" && <Clock className="w-4 h-4 text-amber-600" />}
-                  {m.status === "in_progress" && <div className="w-2.5 h-2.5 rounded-none bg-brand-600 animate-pulse" />}
+                  {m.status === "in_progress" && <div className="w-2.5 h-2.5 rounded-sm bg-brand-600 animate-pulse" />}
                   {m.status === "pending" && <Circle className="w-4 h-4 text-gray-300" />}
                 </div>
 
@@ -1940,14 +1940,14 @@ function MilestonesTab({
                       {(m.status === "paid" || m.status === "approved" || m.status === "submitted") ? (
                         <>
                           {[1, 2, 3].map((n) => (
-                            <div key={n} className="aspect-square rounded-none bg-gray-100 border border-border flex items-center justify-center">
+                            <div key={n} className="aspect-square rounded-sm bg-gray-100 border border-border flex items-center justify-center">
                               <Camera className="w-5 h-5 text-gray-300" />
                             </div>
                           ))}
                         </>
                       ) : (
                         <>
-                          <button className="aspect-square rounded-none border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-1 hover:border-brand-400 hover:bg-brand-50/30 transition-colors">
+                          <button className="aspect-square rounded-sm border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-1 hover:border-brand-400 hover:bg-brand-50/30 transition-colors">
                             <Upload className="w-5 h-5 text-gray-300" />
                             <span className="text-[10px] text-gray-600">Upload</span>
                           </button>
@@ -1958,7 +1958,7 @@ function MilestonesTab({
 
                   {/* Note */}
                   {(m.status === "paid" || m.status === "approved" || m.status === "submitted") && m.note && (
-                    <div className="mb-4 p-3 bg-gray-50 rounded-none">
+                    <div className="mb-4 p-3 bg-gray-50 rounded-sm">
                       <p className="text-[12px] font-semibold text-gray-900 uppercase tracking-wider mb-1">Contractor note</p>
                       <p className="text-[13px] text-gray-800">{m.note}</p>
                     </div>
@@ -1974,12 +1974,12 @@ function MilestonesTab({
                           onChange={(e) => setSubmitNote(e.target.value)}
                           placeholder="Describe what was completed, any changes, or things to note..."
                           rows={3}
-                          className="w-full rounded-none border border-border px-3 py-2 text-[13px] text-gray-900 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-1 resize-none"
+                          className="w-full rounded-sm border border-border px-3 py-2 text-[13px] text-gray-900 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-1 resize-none"
                         />
                       </div>
                       <button
                         onClick={() => submitMilestone(i)}
-                        className="w-full h-10 rounded-none bg-brand-600 text-white text-[13px] font-semibold hover:bg-brand-700 transition-colors flex items-center justify-center gap-2"
+                        className="w-full h-10 rounded-sm bg-brand-600 text-white text-[13px] font-semibold hover:bg-brand-700 transition-colors flex items-center justify-center gap-2"
                       >
                         Submit for Homeowner Review
                         <ArrowRight className="w-4 h-4" />
@@ -1989,7 +1989,7 @@ function MilestonesTab({
 
                   {/* Waiting message for submitted */}
                   {m.status === "submitted" && (
-                    <div className="flex items-center gap-2 p-3 bg-amber-50 rounded-none border border-amber-100">
+                    <div className="flex items-center gap-2 p-3 bg-amber-50 rounded-sm border border-amber-100">
                       <Clock className="w-4 h-4 text-amber-600 shrink-0" />
                       <p className="text-[13px] text-amber-700">Waiting for {project.client} to review and approve this milestone.</p>
                     </div>
@@ -1997,7 +1997,7 @@ function MilestonesTab({
 
                   {/* Paid confirmation */}
                   {m.status === "paid" && (
-                    <div className="flex items-center gap-2 p-3 bg-emerald-950/10 rounded-none border border-emerald-800/30">
+                    <div className="flex items-center gap-2 p-3 bg-emerald-950/10 rounded-sm border border-emerald-800/30">
                       <Check className="w-4 h-4 text-emerald-950 shrink-0" />
                       <p className="text-[13px] text-emerald-950">Payment of {formatCurrency(m.amount)} released to your account.</p>
                     </div>
@@ -2005,7 +2005,7 @@ function MilestonesTab({
 
                   {/* Approved message */}
                   {m.status === "approved" && (
-                    <div className="flex items-center gap-2 p-3 bg-blue-100 rounded-none border border-blue-300">
+                    <div className="flex items-center gap-2 p-3 bg-blue-100 rounded-sm border border-blue-300">
                       <Check className="w-4 h-4 text-blue-700 shrink-0" />
                       <p className="text-[13px] text-blue-700">Approved by {project.client}. Payment processing.</p>
                     </div>
@@ -2021,18 +2021,18 @@ function MilestonesTab({
       {!showAdd ? (
         <button
           onClick={() => setShowAdd(true)}
-          className="w-full flex items-center justify-center gap-2 rounded-none border border-dashed border-gray-200 py-3 text-[13px] font-medium text-gray-600 hover:text-gray-800 hover:border-gray-300 transition-colors"
+          className="w-full flex items-center justify-center gap-2 rounded-sm border border-dashed border-gray-200 py-3 text-[13px] font-medium text-gray-600 hover:text-gray-800 hover:border-gray-300 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add milestone
         </button>
       ) : (
-        <div className="rounded-none border border-brand-200 bg-white p-4 space-y-3">
-          <input type="text" value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder="Milestone name" className="w-full h-10 rounded-none border border-border px-3 text-[14px] text-gray-900 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-1" autoFocus />
-          <input type="text" inputMode="numeric" value={newAmount} onChange={(e) => setNewAmount(e.target.value.replace(/\D/g, ""))} placeholder="Amount ($)" className="w-full h-10 rounded-none border border-border px-3 text-[14px] text-gray-900 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-1" />
+        <div className="rounded-sm border border-brand-200 bg-white p-4 space-y-3">
+          <input type="text" value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder="Milestone name" className="w-full h-10 rounded-sm border border-border px-3 text-[14px] text-gray-900 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-1" autoFocus />
+          <input type="text" inputMode="numeric" value={newAmount} onChange={(e) => setNewAmount(e.target.value.replace(/\D/g, ""))} placeholder="Amount ($)" className="w-full h-10 rounded-sm border border-border px-3 text-[14px] text-gray-900 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-1" />
           <div className="flex gap-2">
-            <button onClick={addMilestone} disabled={!newLabel.trim()} className="flex-1 h-9 rounded-none bg-brand-600 text-white text-[13px] font-semibold hover:bg-brand-700 transition-colors disabled:opacity-40">Add Milestone</button>
-            <button onClick={() => { setShowAdd(false); setNewLabel(""); setNewAmount(""); }} className="h-9 px-4 rounded-none border border-border text-[13px] font-medium text-gray-800 hover:bg-gray-50 transition-colors">Cancel</button>
+            <button onClick={addMilestone} disabled={!newLabel.trim()} className="flex-1 h-9 rounded-sm bg-brand-600 text-white text-[13px] font-semibold hover:bg-brand-700 transition-colors disabled:opacity-40">Add Milestone</button>
+            <button onClick={() => { setShowAdd(false); setNewLabel(""); setNewAmount(""); }} className="h-9 px-4 rounded-sm border border-border text-[13px] font-medium text-gray-800 hover:bg-gray-50 transition-colors">Cancel</button>
           </div>
         </div>
       )}
@@ -2085,7 +2085,7 @@ function MilestoneScheduleTab({ project }: { project: typeof PROJECTS[0] }) {
               {/* Timeline */}
               <div className="flex flex-col items-center w-10 shrink-0">
                 <div className={cn(
-                  "w-3 h-3 rounded-none border-2 shrink-0 mt-1.5",
+                  "w-3 h-3 rounded-sm border-2 shrink-0 mt-1.5",
                   m.status === "paid" || m.status === "approved" ? "bg-emerald-600 border-emerald-600"
                     : m.status === "submitted" ? "bg-amber-400 border-amber-400"
                     : m.status === "in_progress" ? "bg-brand-600 border-brand-600"
@@ -2152,7 +2152,7 @@ function DocumentsTab() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => toast.info("Google Drive integration coming soon")}
-            className="h-8 px-3 text-[12px] font-medium rounded-none border border-border text-gray-800 hover:bg-gray-50 transition-colors flex items-center gap-1.5"
+            className="h-8 px-3 text-[12px] font-medium rounded-sm border border-border text-gray-800 hover:bg-gray-50 transition-colors flex items-center gap-1.5"
           >
             <Cloud className="w-3.5 h-3.5" />
             Connect Google Drive
@@ -2164,7 +2164,7 @@ function DocumentsTab() {
         </div>
       </div>
 
-      <div className="bg-white rounded-none border border-border overflow-hidden">
+      <div className="bg-white rounded-sm border border-border overflow-hidden">
         {MOCK_DOCUMENTS.map((doc, i) => {
           const status = DOC_STATUS_STYLE[doc.status] || DOC_STATUS_STYLE.pending;
           const typeLabel = DOC_TYPE_LABEL[doc.type] || doc.type;
@@ -2176,7 +2176,7 @@ function DocumentsTab() {
                 i < MOCK_DOCUMENTS.length - 1 && "border-b border-border"
               )}
             >
-              <div className="w-8 h-8 rounded-none bg-gray-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-sm bg-gray-100 flex items-center justify-center flex-shrink-0">
                 <FileText className="w-4 h-4 text-gray-600" />
               </div>
               <div className="min-w-0 flex-1">
@@ -2191,7 +2191,7 @@ function DocumentsTab() {
                 {status.label}
               </span>
               <button
-                className="flex items-center justify-center w-7 h-7 rounded-none hover:bg-gray-100 transition-colors text-gray-600 hover:text-gray-800"
+                className="flex items-center justify-center w-7 h-7 rounded-sm hover:bg-gray-100 transition-colors text-gray-600 hover:text-gray-800"
                 title="Download"
               >
                 <Download className="w-3.5 h-3.5" />
@@ -2201,10 +2201,10 @@ function DocumentsTab() {
         })}
       </div>
 
-      <div className="bg-gray-50 rounded-none border border-border p-4 mt-4">
+      <div className="bg-gray-50 rounded-sm border border-border p-4 mt-4">
         <p className="text-[12px] font-semibold text-gray-900 uppercase tracking-wider mb-3">Connected Storage</p>
-        <div className="flex items-center gap-3 p-3 bg-white rounded-none border border-border">
-          <div className="w-9 h-9 rounded-none bg-blue-50 flex items-center justify-center">
+        <div className="flex items-center gap-3 p-3 bg-white rounded-sm border border-border">
+          <div className="w-9 h-9 rounded-sm bg-blue-50 flex items-center justify-center">
             <Cloud className="w-4.5 h-4.5 text-blue-600" />
           </div>
           <div className="flex-1">
@@ -2299,7 +2299,7 @@ export default function ProjectsPage() {
                   key={p.id}
                   onClick={() => setSelectedProjectId(p.id)}
                   className={cn(
-                    "w-full text-left rounded-none px-2.5 py-2 transition-colors text-[12px] font-medium truncate",
+                    "w-full text-left rounded-sm px-2.5 py-2 transition-colors text-[12px] font-medium truncate",
                     isSelected
                       ? "bg-brand-600 text-white"
                       : "text-gray-900 hover:bg-gray-50"

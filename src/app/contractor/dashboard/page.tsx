@@ -114,17 +114,17 @@ function JobCarousel({ jobs }: { jobs: Job[] }) {
     <div className="px-5 pb-4 flex-1 flex flex-col min-h-0">
       <div className="relative flex-1 flex flex-col min-h-0">
         {/* Image */}
-        <div className="flex-1 min-h-[120px] bg-gray-100 rounded-none overflow-hidden relative">
+        <div className="flex-1 min-h-[120px] bg-gray-100 rounded-sm overflow-hidden relative">
           <Image src={job.thumbnail} alt={job.title} width={400} height={300} className="w-full h-full object-cover transition-opacity duration-300" />
-          <button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-none bg-white/90 flex items-center justify-center hover:bg-white transition-colors shadow-sm">
+          <button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-sm bg-white/90 flex items-center justify-center hover:bg-white transition-colors shadow-sm">
             <ChevronLeft className="w-3.5 h-3.5 text-gray-900" />
           </button>
-          <button onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-none bg-white/90 flex items-center justify-center hover:bg-white transition-colors shadow-sm">
+          <button onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-sm bg-white/90 flex items-center justify-center hover:bg-white transition-colors shadow-sm">
             <ChevronRight className="w-3.5 h-3.5 text-gray-900" />
           </button>
           <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex gap-1">
             {jobs.map((_, i) => (
-              <button key={i} onClick={() => setActive(i)} className={cn("w-1.5 h-1.5 rounded-none transition-all", i === active ? "bg-white w-3" : "bg-white/50")} />
+              <button key={i} onClick={() => setActive(i)} className={cn("w-1.5 h-1.5 rounded-sm transition-all", i === active ? "bg-white w-3" : "bg-white/50")} />
             ))}
           </div>
         </div>
@@ -165,7 +165,7 @@ function TileHeader({ title, count, linkHref, linkLabel }: { title: string; coun
       <div className="flex items-center gap-2.5">
         <h2 className="text-[20px] font-bold text-gray-900">{title}</h2>
         {count !== undefined && (
-          <span className="text-[13px] font-semibold text-gray-600 bg-gray-100 rounded-none px-2 py-0.5 tabular-nums">{count}</span>
+          <span className="text-[13px] font-semibold text-gray-600 bg-gray-100 rounded-sm px-2 py-0.5 tabular-nums">{count}</span>
         )}
       </div>
       {linkHref && (
@@ -207,11 +207,11 @@ export default function ContractorDashboardPage() {
         <div className="flex items-center justify-between">
           <h1 className="text-[24px] font-semibold text-gray-900 tracking-tight">{formatTodayDate()}</h1>
           <div className="flex items-center gap-3">
-            <Link href="/contractor/estimates?tab=agent" className="flex items-center gap-1.5 h-8 px-3 rounded-none bg-gray-900 text-white text-[12px] font-semibold hover:bg-gray-800 transition-colors">
+            <Link href="/contractor/estimates?tab=agent" className="flex items-center gap-1.5 h-8 px-3 rounded-sm bg-gray-900 text-white text-[12px] font-semibold hover:bg-gray-800 transition-colors">
               <Briefcase className="w-3.5 h-3.5" />
               Estimate Agent
             </Link>
-            <Link href="/contractor/estimates" className="flex items-center gap-1.5 h-8 px-3 rounded-none bg-brand-600 text-white text-[12px] font-semibold hover:bg-brand-700 transition-colors">
+            <Link href="/contractor/estimates" className="flex items-center gap-1.5 h-8 px-3 rounded-sm bg-brand-600 text-white text-[12px] font-semibold hover:bg-brand-700 transition-colors">
               <Plus className="w-3.5 h-3.5" />
               New Estimate
             </Link>

@@ -6,6 +6,13 @@ export const metadata: Metadata = {
   title: "Terms of Service",
   description:
     "Terms of Service for FairTradeWorker. Read the rules and agreements governing use of our construction marketplace.",
+  openGraph: {
+    title: "Terms of Service | FairTradeWorker",
+    description: "Terms of Service for FairTradeWorker. Read the rules and agreements governing use of our construction marketplace.",
+  },
+  alternates: {
+    canonical: "/terms",
+  },
 };
 
 export default function TermsPage() {

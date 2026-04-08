@@ -5,6 +5,13 @@ import { ArrowRight } from "lucide-react";
 export const metadata: Metadata = {
   title: "Careers",
   description: "Join FairTradeWorker and help build a fairer construction marketplace.",
+  openGraph: {
+    title: "Careers | FairTradeWorker",
+    description: "Join FairTradeWorker and help build a fairer construction marketplace.",
+  },
+  alternates: {
+    canonical: "/careers",
+  },
 };
 import { Navbar } from "@marketplace/components/navbar";
 import { Footer } from "@marketplace/components/footer";
@@ -66,7 +73,7 @@ export default function CareersPage() {
               {OPENINGS.map((role) => (
                 <div
                   key={role.title}
-                  className="border border-gray-100 rounded-none p-7 hover:border-gray-200 hover:shadow-sm transition-all duration-150"
+                  className="border border-gray-100 rounded-sm p-7 hover:border-gray-200 hover:shadow-sm transition-all duration-150"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div className="flex-1">

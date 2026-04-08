@@ -120,7 +120,7 @@ export default function SubContractorClientsPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search clients..."
-              className="pl-8 h-8 text-[13px] rounded-none"
+              className="pl-8 h-8 text-[13px] rounded-sm"
             />
           </div>
 

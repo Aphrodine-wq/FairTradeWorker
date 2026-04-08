@@ -8,6 +8,25 @@ export const metadata: Metadata = {
   title: "Voice AI: How Hunter Builds Estimates in 3 Minutes | FairTradeWorker",
   description:
     "Most contractors are on a job site, not at a desk. Hunter meets them there — walk through a scope out loud and get a structured estimate before you're back in the truck.",
+  openGraph: {
+    title: "Voice AI: How Hunter Builds Estimates in 3 Minutes | FairTradeWorker",
+    description: "Walk through a scope out loud and get a structured estimate before you're back in the truck.",
+    type: "article",
+    publishedTime: "2026-03-08T00:00:00Z",
+    authors: ["FairTradeWorker"],
+  },
+  alternates: { canonical: "/blog/hunter-voice-ai" },
+};
+
+const blogPostSchema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: "Voice AI: How Hunter Builds Estimates in 3 Minutes",
+  description: "Most contractors are on a job site, not at a desk. Hunter meets them there.",
+  datePublished: "2026-03-08",
+  author: { "@type": "Organization", name: "FairTradeWorker", url: "https://fairtradeworker.com" },
+  publisher: { "@type": "Organization", name: "FairTradeWorker", url: "https://fairtradeworker.com" },
+  mainEntityOfPage: "https://fairtradeworker.com/blog/hunter-voice-ai",
 };
 
 export default function HunterVoiceAiPage() {
@@ -15,6 +34,7 @@ export default function HunterVoiceAiPage() {
     <>
       <Navbar />
       <main className="bg-[#FAFAFA] min-h-screen">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostSchema) }} />
         <article className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
           <Link
             href="/blog"

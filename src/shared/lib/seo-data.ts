@@ -561,7 +561,238 @@ export const TRADES: Trade[] = [
       { name: "Plaster Repair", slug: "plaster-repair", description: "Historic plaster wall and ceiling restoration and repair.", costRange: "$300 - $1,500" },
     ],
   },
+  {
+    name: "Carpentry",
+    slug: "carpenters",
+    plural: "Carpenters",
+    description:
+      "Skilled carpenters for framing, trim work, custom cabinetry, decks, and structural repairs.",
+    keywords: [
+      "carpenter", "carpentry contractor", "trim carpenter", "framing contractor",
+      "custom cabinets", "deck builder", "finish carpentry", "wood repair",
+      "door installation", "stair building",
+    ],
+    faqs: [
+      { question: "How much does a carpenter charge?", answer: "Carpenters typically charge $40-$90 per hour in Mississippi. Project-based pricing is common — a custom deck runs $4,000-$12,000, trim work $500-$2,000 per room. FairTradeWorker gives you upfront bids." },
+      { question: "What's the difference between rough and finish carpentry?", answer: "Rough carpentry is structural — framing walls, roof trusses, subfloors. Finish carpentry is the visible stuff — trim, crown molding, built-ins, doors. Most residential projects involve finish carpentry." },
+      { question: "Can a carpenter fix water-damaged wood?", answer: "Yes. Carpenters repair or replace water-damaged framing, subfloors, trim, and siding. If the damage is structural, you want a carpenter, not a handyman." },
+    ],
+    avgCostRange: "$500 - $15,000",
+    commonProjects: [
+      "Deck building", "Trim and crown molding", "Custom shelving",
+      "Door installation", "Stair repair", "Framing",
+    ],
+    subServices: [
+      { name: "Deck Building", slug: "deck-building", description: "Custom wood and composite deck design and construction.", costRange: "$4,000 - $12,000" },
+      { name: "Trim and Molding", slug: "trim-molding", description: "Crown molding, baseboards, door casings, and wainscoting installation.", costRange: "$500 - $2,000" },
+      { name: "Door Installation", slug: "door-installation", description: "Interior and exterior door installation and replacement.", costRange: "$200 - $1,000" },
+      { name: "Custom Cabinetry", slug: "custom-cabinetry", description: "Built-in cabinets, bookshelves, and custom storage solutions.", costRange: "$2,000 - $10,000" },
+      { name: "Framing", slug: "framing", description: "Wall framing, structural framing, and additions.", costRange: "$2,000 - $8,000" },
+      { name: "Stair Building", slug: "stair-building", description: "New staircase construction, repair, and railing installation.", costRange: "$1,000 - $5,000" },
+    ],
+  },
+  {
+    name: "Siding",
+    slug: "siding",
+    plural: "Siding Contractors",
+    description:
+      "Siding installation and repair for vinyl, fiber cement, wood, and metal siding from verified contractors.",
+    keywords: [
+      "siding contractor", "vinyl siding", "fiber cement siding", "siding repair",
+      "siding installation", "hardie board", "siding company", "house siding",
+      "siding replacement", "exterior siding",
+    ],
+    faqs: [
+      { question: "How much does new siding cost?", answer: "Vinyl siding costs $3-$7/sqft installed, fiber cement (Hardie Board) $6-$13/sqft, and wood siding $7-$15/sqft. A full re-side on a 2,000 sqft home runs $7,000-$20,000." },
+      { question: "What siding lasts the longest?", answer: "Fiber cement (Hardie Board) lasts 50+ years and handles Mississippi humidity well. Vinyl lasts 20-40 years. Wood looks great but needs maintenance every 3-5 years in our climate." },
+      { question: "Can damaged siding be repaired?", answer: "Yes — individual panels can be replaced without re-siding the whole house. Storm damage, cracks, and holes are common repair jobs. Post a repair job on FairTradeWorker for quotes." },
+    ],
+    avgCostRange: "$3,000 - $20,000",
+    commonProjects: [
+      "Full re-siding", "Vinyl siding", "Hardie Board installation",
+      "Siding repair", "Soffit and fascia", "Storm damage repair",
+    ],
+    subServices: [
+      { name: "Vinyl Siding Installation", slug: "vinyl-siding", description: "New vinyl siding installation and replacement.", costRange: "$5,000 - $12,000" },
+      { name: "Fiber Cement Siding", slug: "fiber-cement-siding", description: "Hardie Board and fiber cement siding installation.", costRange: "$8,000 - $20,000" },
+      { name: "Siding Repair", slug: "siding-repair", description: "Patch, replace, and repair damaged siding panels.", costRange: "$200 - $1,500" },
+      { name: "Soffit and Fascia", slug: "soffit-fascia", description: "Soffit and fascia repair and replacement.", costRange: "$600 - $3,000" },
+      { name: "Wood Siding", slug: "wood-siding", description: "Cedar and wood lap siding installation and refinishing.", costRange: "$8,000 - $25,000" },
+    ],
+  },
+  {
+    name: "Windows and Doors",
+    slug: "windows-doors",
+    plural: "Window and Door Contractors",
+    description:
+      "Window and door installation, replacement, and repair from licensed contractors.",
+    keywords: [
+      "window installation", "door installation", "window replacement", "window contractor",
+      "energy efficient windows", "storm windows", "sliding door", "french doors",
+      "window repair", "door contractor",
+    ],
+    faqs: [
+      { question: "How much does window replacement cost?", answer: "Window replacement costs $300-$1,000 per window installed, depending on size, style, and energy rating. A full house (15-20 windows) runs $5,000-$15,000. Energy-efficient windows can cut cooling costs 15-25% in Mississippi summers." },
+      { question: "When should windows be replaced?", answer: "Replace windows if you feel drafts, see condensation between panes, notice rising energy bills, or they're 20+ years old. Single-pane windows in Mississippi waste significant money on cooling costs." },
+      { question: "How long does window installation take?", answer: "A professional crew can replace 10-15 windows in a single day. A full house typically takes 1-2 days." },
+    ],
+    avgCostRange: "$300 - $15,000",
+    commonProjects: [
+      "Window replacement", "Storm windows", "Sliding door installation",
+      "French door installation", "Energy-efficient upgrade", "Window repair",
+    ],
+    subServices: [
+      { name: "Window Replacement", slug: "window-replacement", description: "Remove old windows and install new energy-efficient replacements.", costRange: "$300 - $1,000/window" },
+      { name: "Storm Windows", slug: "storm-windows", description: "Storm window installation for weather protection and energy savings.", costRange: "$100 - $400/window" },
+      { name: "Sliding Door Installation", slug: "sliding-door", description: "Patio and sliding glass door installation and replacement.", costRange: "$1,000 - $3,000" },
+      { name: "French Door Installation", slug: "french-doors", description: "Interior and exterior French door installation.", costRange: "$1,500 - $4,000" },
+      { name: "Window Repair", slug: "window-repair", description: "Broken glass, seal failure, and hardware repair.", costRange: "$100 - $500" },
+    ],
+  },
+  {
+    name: "Insulation",
+    slug: "insulation",
+    plural: "Insulation Contractors",
+    description:
+      "Professional insulation installation for attics, walls, crawl spaces, and basements to cut energy costs and improve comfort.",
+    keywords: [
+      "insulation contractor", "attic insulation", "spray foam insulation", "blown-in insulation",
+      "insulation company", "home insulation", "crawl space insulation", "wall insulation",
+      "energy efficiency", "insulation installation",
+    ],
+    faqs: [
+      { question: "How much does insulation cost?", answer: "Blown-in attic insulation costs $1-$3/sqft. Spray foam runs $2-$6/sqft. Insulating a 1,500 sqft attic typically costs $1,500-$4,000. It pays for itself in 2-3 years through energy savings in Mississippi's climate." },
+      { question: "What type of insulation is best for Mississippi?", answer: "Spray foam is ideal for Mississippi's humid climate — it seals air gaps and acts as a moisture barrier. Blown-in fiberglass or cellulose works well for attics. Your contractor will recommend based on your specific situation." },
+      { question: "How do I know if I need more insulation?", answer: "If your energy bills are high, rooms are hard to heat or cool, or your attic insulation is less than 10 inches deep, you likely need more. Most homes built before 2000 in Mississippi are under-insulated." },
+    ],
+    avgCostRange: "$1,000 - $6,000",
+    commonProjects: [
+      "Attic insulation", "Spray foam insulation", "Crawl space insulation",
+      "Wall insulation", "Garage insulation", "Soundproofing",
+    ],
+    subServices: [
+      { name: "Attic Insulation", slug: "attic-insulation", description: "Blown-in or batt insulation for attic spaces.", costRange: "$1,000 - $3,000" },
+      { name: "Spray Foam Insulation", slug: "spray-foam", description: "Closed-cell and open-cell spray foam for superior air sealing.", costRange: "$2,000 - $6,000" },
+      { name: "Crawl Space Insulation", slug: "crawl-space-insulation", description: "Insulate and encapsulate crawl spaces to prevent moisture and energy loss.", costRange: "$1,500 - $5,000" },
+      { name: "Wall Insulation", slug: "wall-insulation", description: "Retrofit wall insulation for older homes.", costRange: "$1,500 - $4,000" },
+    ],
+  },
+  {
+    name: "Gutters",
+    slug: "gutters",
+    plural: "Gutter Contractors",
+    description:
+      "Seamless gutter installation, repair, cleaning, and gutter guard systems from verified contractors.",
+    keywords: [
+      "gutter contractor", "gutter installation", "seamless gutters", "gutter repair",
+      "gutter cleaning", "gutter guards", "gutter company", "downspout installation",
+      "rain gutters", "gutter replacement",
+    ],
+    faqs: [
+      { question: "How much do new gutters cost?", answer: "Seamless aluminum gutters cost $6-$12/linear foot installed. A typical home needs 150-200 linear feet, running $900-$2,400. Gutter guards add $3-$8/linear foot." },
+      { question: "How often should gutters be cleaned?", answer: "At least twice a year — after fall leaves drop and after spring pollen season. Clogged gutters cause foundation damage, fascia rot, and mosquito breeding in Mississippi's climate." },
+      { question: "Are gutter guards worth it?", answer: "In Mississippi, yes. Heavy spring pollen, fall leaves, and pine needles clog gutters fast. Gutter guards reduce cleaning to once a year and prevent water damage. They pay for themselves in 3-5 years." },
+    ],
+    avgCostRange: "$500 - $3,000",
+    commonProjects: [
+      "Seamless gutter installation", "Gutter repair", "Gutter cleaning",
+      "Gutter guard installation", "Downspout extension", "Gutter replacement",
+    ],
+    subServices: [
+      { name: "Gutter Installation", slug: "gutter-installation", description: "Seamless aluminum and copper gutter installation.", costRange: "$900 - $2,400" },
+      { name: "Gutter Repair", slug: "gutter-repair", description: "Fix leaks, sagging, and damaged gutter sections.", costRange: "$100 - $500" },
+      { name: "Gutter Cleaning", slug: "gutter-cleaning", description: "Full gutter and downspout cleaning and flushing.", costRange: "$100 - $250" },
+      { name: "Gutter Guards", slug: "gutter-guards", description: "Gutter guard and leaf protection system installation.", costRange: "$500 - $1,500" },
+    ],
+  },
+  {
+    name: "Pest Control",
+    slug: "pest-control",
+    plural: "Pest Control Companies",
+    description:
+      "Licensed pest control for termites, mosquitoes, ants, rodents, and general pest management in Mississippi.",
+    keywords: [
+      "pest control", "termite treatment", "mosquito control", "exterminator",
+      "pest control company", "ant removal", "rodent control", "pest inspection",
+      "termite inspection", "bug spray service",
+    ],
+    faqs: [
+      { question: "How much does pest control cost?", answer: "General pest control runs $100-$300/quarter. Termite treatment costs $500-$2,500 depending on home size and method. Mosquito treatment is $75-$150/month during season." },
+      { question: "Do I need termite treatment in Mississippi?", answer: "Mississippi is one of the highest-risk states for termite damage. Annual termite inspections are essential, and most homes should have preventive treatment. Termite damage costs homeowners $3,000-$8,000 on average to repair." },
+      { question: "How often should pest control be done?", answer: "Quarterly treatments are standard for general pest control in Mississippi. Monthly during mosquito season (April-October). Annual termite inspections are recommended for every home." },
+    ],
+    avgCostRange: "$100 - $2,500",
+    commonProjects: [
+      "Termite treatment", "General pest control", "Mosquito treatment",
+      "Rodent removal", "Ant treatment", "Pest inspection",
+    ],
+    subServices: [
+      { name: "Termite Treatment", slug: "termite-treatment", description: "Liquid treatment, bait systems, and preventive termite protection.", costRange: "$500 - $2,500" },
+      { name: "Mosquito Control", slug: "mosquito-control", description: "Yard spraying and misting system installation for mosquito prevention.", costRange: "$75 - $150/month" },
+      { name: "General Pest Control", slug: "general-pest-control", description: "Quarterly treatment for ants, roaches, spiders, and common pests.", costRange: "$100 - $300/quarter" },
+      { name: "Rodent Control", slug: "rodent-control", description: "Mouse and rat removal, exclusion, and prevention.", costRange: "$200 - $600" },
+      { name: "Termite Inspection", slug: "termite-inspection", description: "Professional termite inspection for home purchases and annual checks.", costRange: "$75 - $150" },
+    ],
+  },
+  {
+    name: "Handyman",
+    slug: "handyman",
+    plural: "Handyman Services",
+    description:
+      "Reliable handyman services for small repairs, odd jobs, furniture assembly, and general home maintenance.",
+    keywords: [
+      "handyman", "handyman service", "home repair", "odd jobs", "fix it",
+      "handyman near me", "small repairs", "home maintenance", "furniture assembly",
+      "honey do list",
+    ],
+    faqs: [
+      { question: "How much does a handyman charge?", answer: "Handyman rates in Mississippi run $40-$80/hour, with most jobs having a 1-2 hour minimum. Many handymen offer flat-rate pricing for common tasks — TV mounting ($75-$150), faucet replacement ($100-$200), door repair ($75-$150)." },
+      { question: "What can a handyman do vs a licensed contractor?", answer: "Handymen handle small repairs, installations, and maintenance — hanging shelves, fixing doors, patching drywall, assembling furniture. Licensed contractors are needed for electrical, plumbing, structural, and permit-required work." },
+      { question: "Do I need a handyman or a specialist?", answer: "If the job takes less than a day and doesn't involve electrical, plumbing, or structural changes, a handyman is your best bet. For trade-specific work, hire a licensed specialist through FairTradeWorker." },
+    ],
+    avgCostRange: "$75 - $500",
+    commonProjects: [
+      "TV mounting", "Furniture assembly", "Door repair",
+      "Shelf installation", "Drywall patching", "Caulking and sealing",
+    ],
+    subServices: [
+      { name: "Home Repairs", slug: "home-repairs", description: "General home repairs — doors, cabinets, fixtures, and hardware.", costRange: "$75 - $300" },
+      { name: "TV Mounting", slug: "tv-mounting", description: "Flat screen TV mounting with cable management.", costRange: "$75 - $200" },
+      { name: "Furniture Assembly", slug: "furniture-assembly", description: "Assemble furniture, shelving units, and storage systems.", costRange: "$50 - $200" },
+      { name: "Pressure Washing", slug: "pressure-washing", description: "House, driveway, deck, and patio pressure washing.", costRange: "$150 - $500" },
+      { name: "Caulking and Sealing", slug: "caulking-sealing", description: "Window, door, and bathroom caulking and weathersealing.", costRange: "$100 - $300" },
+    ],
+  },
+  {
+    name: "Garage Doors",
+    slug: "garage-doors",
+    plural: "Garage Door Companies",
+    description:
+      "Garage door installation, replacement, repair, and opener services from verified contractors.",
+    keywords: [
+      "garage door", "garage door repair", "garage door installation", "garage door opener",
+      "garage door company", "garage door replacement", "overhead door",
+      "garage door spring", "garage door contractor",
+    ],
+    faqs: [
+      { question: "How much does a new garage door cost?", answer: "A standard single garage door costs $800-$1,500 installed. Double doors run $1,200-$3,000. Insulated and custom doors range $2,000-$5,000. The opener adds $200-$500." },
+      { question: "How long do garage doors last?", answer: "Steel garage doors last 20-30 years. Springs last 7-12 years (10,000 cycles). Openers last 10-15 years. If your door is noisy, slow, or uneven, it's time for service." },
+      { question: "Can I replace a garage door spring myself?", answer: "No — garage door springs are under extreme tension and can cause serious injury. Always hire a professional. Spring replacement costs $150-$350 and takes about an hour." },
+    ],
+    avgCostRange: "$150 - $5,000",
+    commonProjects: [
+      "Garage door replacement", "Spring replacement", "Opener installation",
+      "Door repair", "Panel replacement", "Weatherstripping",
+    ],
+    subServices: [
+      { name: "Garage Door Installation", slug: "garage-door-installation", description: "New garage door installation and old door removal.", costRange: "$800 - $3,000" },
+      { name: "Garage Door Repair", slug: "garage-door-repair", description: "Fix tracks, panels, cables, and alignment issues.", costRange: "$100 - $400" },
+      { name: "Spring Replacement", slug: "spring-replacement", description: "Torsion and extension spring replacement.", costRange: "$150 - $350" },
+      { name: "Opener Installation", slug: "opener-installation", description: "New garage door opener installation with smart home integration.", costRange: "$200 - $500" },
+    ],
+  },
 ];
+
 
 // ── Mississippi locations ─────────────────────────────────────────────
 // Every city/town worth targeting in MS — organized by region

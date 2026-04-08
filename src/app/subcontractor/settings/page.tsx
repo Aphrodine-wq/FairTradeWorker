@@ -150,7 +150,7 @@ function ProfileSection() {
             rows={3}
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            className="flex w-full rounded-none border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
+            className="flex w-full rounded-sm border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
           />
         </div>
       </div>

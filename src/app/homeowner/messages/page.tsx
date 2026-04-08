@@ -355,7 +355,7 @@ export default function HomeownerMessagesPage() {
               >
                 <div
                   className={cn(
-                    "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-none text-white text-xs font-bold",
+                    "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-sm text-white text-xs font-bold",
                     avatarColor(conv.contractorId)
                   )}
                 >
@@ -369,7 +369,7 @@ export default function HomeownerMessagesPage() {
                     <div className="flex items-center gap-1.5 flex-shrink-0">
                       <span className="text-xs text-gray-600">{conv.lastTime}</span>
                       {conv.unread > 0 && (
-                        <span className="w-4 h-4 rounded-none bg-brand-600 text-white text-[10px] font-bold flex items-center justify-center">
+                        <span className="w-4 h-4 rounded-sm bg-brand-600 text-white text-[10px] font-bold flex items-center justify-center">
                           {conv.unread}
                         </span>
                       )}
@@ -389,7 +389,7 @@ export default function HomeownerMessagesPage() {
           <div className="flex items-center gap-3 px-5 py-3.5 bg-white border-b border-border flex-shrink-0">
             <div
               className={cn(
-                "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-none text-white text-xs font-bold",
+                "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-sm text-white text-xs font-bold",
                 avatarColor(activeConv.contractorId)
               )}
             >
@@ -400,7 +400,7 @@ export default function HomeownerMessagesPage() {
               <p className="text-xs text-gray-700">{activeConv.contractorCompany}</p>
             </div>
             <div className="ml-3">
-              <span className="text-xs text-gray-600 bg-gray-100 rounded-none px-2.5 py-1 border border-gray-200">
+              <span className="text-xs text-gray-600 bg-gray-100 rounded-sm px-2.5 py-1 border border-gray-200">
                 Re: {activeConv.jobTitle}
               </span>
             </div>
@@ -419,7 +419,7 @@ export default function HomeownerMessagesPage() {
                   {!isHomeowner && (
                     <div
                       className={cn(
-                        "flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-none text-white text-[10px] font-bold",
+                        "flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-sm text-white text-[10px] font-bold",
                         avatarColor(activeConv.contractorId)
                       )}
                     >
@@ -429,10 +429,10 @@ export default function HomeownerMessagesPage() {
 
                   <div
                     className={cn(
-                      "max-w-[68%] rounded-none px-4 py-2.5",
+                      "max-w-[68%] rounded-sm px-4 py-2.5",
                       isHomeowner
-                        ? "bg-brand-600 text-white rounded-none-sm"
-                        : "bg-white text-gray-900 border border-gray-200 rounded-none-sm shadow-sm"
+                        ? "bg-brand-600 text-white rounded-sm-sm"
+                        : "bg-white text-gray-900 border border-gray-200 rounded-sm-sm shadow-sm"
                     )}
                   >
                     <p className="text-sm leading-relaxed">{msg.text}</p>

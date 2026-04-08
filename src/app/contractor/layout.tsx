@@ -46,7 +46,7 @@ function GlobalTopBar({ pathname }: { pathname: string }) {
       <Link
         href="/contractor/messages"
         className={cn(
-          "relative w-8 h-8 rounded-none hover:bg-gray-100 flex items-center justify-center transition-colors",
+          "relative w-8 h-8 rounded-sm hover:bg-gray-100 flex items-center justify-center transition-colors",
           pathname === "/contractor/messages" && "bg-gray-100"
         )}
       >
@@ -58,7 +58,7 @@ function GlobalTopBar({ pathname }: { pathname: string }) {
       <Link
         href="/contractor/notifications"
         className={cn(
-          "relative w-8 h-8 rounded-none hover:bg-gray-100 flex items-center justify-center transition-colors",
+          "relative w-8 h-8 rounded-sm hover:bg-gray-100 flex items-center justify-center transition-colors",
           pathname === "/contractor/notifications" && "bg-gray-100"
         )}
       >

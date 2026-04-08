@@ -67,7 +67,7 @@ export function SubJobCard({ subJob, onBid }: SubJobCardProps) {
           <div className="flex-1 min-w-0">
             <p className="text-[16px] font-bold text-gray-900 leading-tight">{subJob.title}</p>
             <p className="text-[13px] text-gray-500 mt-1 flex items-center gap-1.5">
-              <span className={cn("w-2 h-2 rounded-none flex-shrink-0", catColor)} />
+              <span className={cn("w-2 h-2 rounded-sm flex-shrink-0", catColor)} />
               {subJob.milestoneLabel} — {subJob.projectTitle}
             </p>
           </div>
@@ -123,7 +123,7 @@ export function SubJobCard({ subJob, onBid }: SubJobCardProps) {
         <div className="flex items-center gap-3">
           {/* Posted by */}
           <div className="flex items-center gap-1.5">
-            <div className="w-5 h-5 rounded-none bg-gray-200 flex items-center justify-center">
+            <div className="w-5 h-5 rounded-sm bg-gray-200 flex items-center justify-center">
               <User className="w-3 h-3 text-gray-500" />
             </div>
             <div className="text-[11px]">
@@ -142,7 +142,7 @@ export function SubJobCard({ subJob, onBid }: SubJobCardProps) {
         <div className="px-4 pb-4">
           <Button
             onClick={() => onBid(subJob)}
-            className="w-full h-9 bg-brand-600 hover:bg-brand-700 text-white text-[13px] font-semibold rounded-none"
+            className="w-full h-9 bg-brand-600 hover:bg-brand-700 text-white text-[13px] font-semibold rounded-sm"
           >
             Place Bid
             <ArrowRight className="w-3.5 h-3.5 ml-1.5" />

@@ -84,7 +84,7 @@ export function PostSubJobDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[640px] rounded-none p-0 gap-0">
+      <DialogContent className="max-w-[640px] rounded-sm p-0 gap-0">
         <DialogHeader className="px-6 pt-5 pb-4 border-b border-gray-200">
           <DialogTitle className="text-[18px] font-bold text-gray-900">Post Sub Job</DialogTitle>
           <p className="text-[13px] text-gray-500 mt-1">
@@ -125,7 +125,7 @@ export function PostSubJobDialog({
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe the scope of work, materials on site, access notes..."
               rows={3}
-              className="mt-2 rounded-none text-[13px]"
+              className="mt-2 rounded-sm text-[13px]"
             />
           </div>
 
@@ -162,7 +162,7 @@ export function PostSubJobDialog({
                   value={budgetMin}
                   onChange={(e) => setBudgetMin(e.target.value)}
                   placeholder="Min"
-                  className="pl-8 h-9 rounded-none text-[13px]"
+                  className="pl-8 h-9 rounded-sm text-[13px]"
                 />
               </div>
               <span className="text-gray-400 text-[13px]">to</span>
@@ -173,7 +173,7 @@ export function PostSubJobDialog({
                   value={budgetMax}
                   onChange={(e) => setBudgetMax(e.target.value)}
                   placeholder="Max"
-                  className="pl-8 h-9 rounded-none text-[13px]"
+                  className="pl-8 h-9 rounded-sm text-[13px]"
                 />
               </div>
             </div>
@@ -186,7 +186,7 @@ export function PostSubJobDialog({
               type="date"
               value={deadline}
               onChange={(e) => setDeadline(e.target.value)}
-              className="mt-2 h-9 rounded-none text-[13px]"
+              className="mt-2 h-9 rounded-sm text-[13px]"
             />
           </div>
 
@@ -255,13 +255,13 @@ export function PostSubJobDialog({
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
-            className="h-9 rounded-none text-[13px]"
+            className="h-9 rounded-sm text-[13px]"
           >
             Cancel
           </Button>
           <Button
             onClick={handleSubmit}
-            className="h-9 rounded-none bg-brand-600 hover:bg-brand-700 text-white text-[13px] font-semibold"
+            className="h-9 rounded-sm bg-brand-600 hover:bg-brand-700 text-white text-[13px] font-semibold"
           >
             <Send className="w-3.5 h-3.5 mr-1.5" />
             Post Sub Job

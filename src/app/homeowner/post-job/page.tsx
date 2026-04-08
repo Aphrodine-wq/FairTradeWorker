@@ -156,7 +156,7 @@ export default function PostJobPage() {
       <div className="flex items-center gap-3 mb-8">
         <button
           onClick={() => (step > 1 ? setStep((s) => (s - 1) as Step) : router.back())}
-          className="w-9 h-9 rounded-none border border-gray-200 flex items-center justify-center text-gray-700 hover:bg-gray-50"
+          className="w-9 h-9 rounded-sm border border-gray-200 flex items-center justify-center text-gray-700 hover:bg-gray-50"
         >
           <ArrowLeft className="w-4 h-4" />
         </button>
@@ -172,7 +172,7 @@ export default function PostJobPage() {
           <div
             key={s}
             className={cn(
-              "h-1.5 flex-1 rounded-none transition-colors",
+              "h-1.5 flex-1 rounded-sm transition-colors",
               s <= step ? "bg-brand-600" : "bg-gray-200"
             )}
           />
@@ -180,7 +180,7 @@ export default function PostJobPage() {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-none mb-6">
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-sm mb-6">
           {error}
         </div>
       )}
@@ -250,7 +250,7 @@ function StepBasics({
               type="button"
               onClick={() => set("category", cat)}
               className={cn(
-                "px-3 py-2 text-sm rounded-none border transition-colors text-left",
+                "px-3 py-2 text-sm rounded-sm border transition-colors text-left",
                 form.category === cat
                   ? "border-brand-600 bg-brand-50 text-brand-700 font-medium"
                   : "border-gray-200 text-gray-800 hover:border-gray-300"
@@ -280,7 +280,7 @@ function StepBasics({
           placeholder="Describe what you need — the more detail, the better the bids you'll get."
           value={form.description}
           onChange={(e) => set("description", e.target.value)}
-          className="flex w-full rounded-none border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 ring-offset-white placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
+          className="flex w-full rounded-sm border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 ring-offset-white placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
         />
       </div>
 
@@ -289,18 +289,18 @@ function StepBasics({
         <label className="text-sm font-medium text-gray-900">Photos (optional)</label>
         <div className="flex flex-wrap gap-2">
           {photos.map((f, i) => (
-            <div key={i} className="relative w-20 h-20 rounded-none bg-gray-100 border border-gray-200 overflow-hidden">
+            <div key={i} className="relative w-20 h-20 rounded-sm bg-gray-100 border border-gray-200 overflow-hidden">
               <img src={URL.createObjectURL(f)} alt="" className="w-full h-full object-cover" />
               <button
                 onClick={() => onPhotoRemove(i)}
-                className="absolute top-0.5 right-0.5 w-5 h-5 rounded-none bg-gray-900/60 text-white flex items-center justify-center"
+                className="absolute top-0.5 right-0.5 w-5 h-5 rounded-sm bg-gray-900/60 text-white flex items-center justify-center"
               >
                 <X className="w-3 h-3" />
               </button>
             </div>
           ))}
           {photos.length < 10 && (
-            <label className="w-20 h-20 rounded-none border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-brand-600 hover:bg-brand-50/50 transition-colors">
+            <label className="w-20 h-20 rounded-sm border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-brand-600 hover:bg-brand-50/50 transition-colors">
               <Upload className="w-5 h-5 text-gray-600" />
               <span className="text-[10px] text-gray-600 mt-0.5">Add</span>
               <input type="file" accept="image/*" multiple onChange={onPhotoAdd} className="hidden" />
@@ -360,7 +360,7 @@ function StepLocation({
               type="button"
               onClick={() => set("propertyType", value)}
               className={cn(
-                "flex flex-col items-center gap-1.5 py-4 rounded-none border transition-colors",
+                "flex flex-col items-center gap-1.5 py-4 rounded-sm border transition-colors",
                 form.propertyType === value
                   ? "border-brand-600 bg-brand-50 text-brand-700"
                   : "border-gray-200 text-gray-700 hover:border-gray-300"
@@ -450,7 +450,7 @@ function StepDetails({
               type="button"
               onClick={() => set("urgency", value)}
               className={cn(
-                "w-full flex items-center gap-3 px-4 py-3 rounded-none border transition-colors text-left",
+                "w-full flex items-center gap-3 px-4 py-3 rounded-sm border transition-colors text-left",
                 form.urgency === value
                   ? "border-brand-600 bg-brand-50"
                   : "border-gray-200 hover:border-gray-300"
@@ -500,7 +500,7 @@ function StepDetails({
             type="button"
             onClick={() => set(key, !form[key])}
             className={cn(
-              "w-full flex items-center gap-3 px-4 py-2.5 rounded-none border transition-colors text-left text-sm",
+              "w-full flex items-center gap-3 px-4 py-2.5 rounded-sm border transition-colors text-left text-sm",
               form[key]
                 ? "border-brand-600 bg-brand-50 text-brand-700"
                 : "border-gray-200 text-gray-800 hover:border-gray-300"
@@ -525,7 +525,7 @@ function StepDetails({
           placeholder="Access codes, parking info, pet warnings..."
           value={form.specialInstructions}
           onChange={(e) => set("specialInstructions", e.target.value)}
-          className="flex w-full rounded-none border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 ring-offset-white placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
+          className="flex w-full rounded-sm border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 ring-offset-white placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
         />
       </div>
     </div>
@@ -575,7 +575,7 @@ function StepReview({ form, photos }: { form: JobForm; photos: File[] }) {
           {photos.length > 0 && (
             <div className="flex gap-2 pt-2">
               {photos.map((f, i) => (
-                <div key={i} className="w-16 h-16 rounded-none bg-gray-100 overflow-hidden">
+                <div key={i} className="w-16 h-16 rounded-sm bg-gray-100 overflow-hidden">
                   <img src={URL.createObjectURL(f)} alt="" className="w-full h-full object-cover" />
                 </div>
               ))}

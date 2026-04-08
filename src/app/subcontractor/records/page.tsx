@@ -22,7 +22,7 @@ export default function SubContractorRecordsPage() {
         <div className="bg-white border border-gray-200 p-5 mb-6">
           <div className="flex items-start gap-5">
             {/* Avatar */}
-            <div className="w-16 h-16 rounded-none bg-brand-100 flex items-center justify-center shrink-0">
+            <div className="w-16 h-16 rounded-sm bg-brand-100 flex items-center justify-center shrink-0">
               <span className="text-brand-700 text-[20px] font-bold">JD</span>
             </div>
 
@@ -57,7 +57,7 @@ export default function SubContractorRecordsPage() {
 
           {/* Empty state */}
           <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-            <div className="w-14 h-14 rounded-none bg-gray-100 flex items-center justify-center mb-4">
+            <div className="w-14 h-14 rounded-sm bg-gray-100 flex items-center justify-center mb-4">
               <Award className="w-7 h-7 text-gray-400" strokeWidth={1.5} />
             </div>
             <p className="text-[15px] font-semibold text-gray-900 mb-1">No records yet</p>

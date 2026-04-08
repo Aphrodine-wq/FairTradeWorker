@@ -115,7 +115,7 @@ export default function SubContractorNotificationsPage() {
                   !notif.read && "bg-brand-50/30"
                 )}
               >
-                <div className={cn("w-9 h-9 rounded-none flex items-center justify-center shrink-0", colorClass)}>
+                <div className={cn("w-9 h-9 rounded-sm flex items-center justify-center shrink-0", colorClass)}>
                   <Icon className="w-4 h-4" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -127,7 +127,7 @@ export default function SubContractorNotificationsPage() {
                       {notif.title}
                     </p>
                     {!notif.read && (
-                      <span className="w-2 h-2 rounded-none bg-brand-600 shrink-0" />
+                      <span className="w-2 h-2 rounded-sm bg-brand-600 shrink-0" />
                     )}
                   </div>
                   <p className="text-[13px] text-gray-700 line-clamp-2">{notif.body}</p>

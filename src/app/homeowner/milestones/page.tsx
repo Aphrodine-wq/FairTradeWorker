@@ -233,7 +233,7 @@ function ProjectSection({
   const submittedCount = milestones.filter((m) => m.status === "submitted").length;
 
   return (
-    <div className="rounded-none border border-border bg-white">
+    <div className="rounded-sm border border-border bg-white">
       {/* Project Header */}
       <div className="px-6 py-5 border-b border-border">
         <div className="flex items-start justify-between">
@@ -246,7 +246,7 @@ function ProjectSection({
             </div>
           </div>
           {submittedCount > 0 && (
-            <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 rounded-none px-3 py-1.5">
+            <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 rounded-sm px-3 py-1.5">
               <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
               <span className="text-[12px] font-medium text-amber-700">
                 {submittedCount} awaiting review
@@ -261,7 +261,7 @@ function ProjectSection({
             <span className="text-[13px] font-medium text-gray-800">Escrow progress</span>
             <span className="text-[13px] font-bold text-gray-900 tabular-nums">{pct}%</span>
           </div>
-          <div className="h-2 bg-gray-100 rounded-none overflow-hidden flex">
+          <div className="h-2 bg-gray-100 rounded-sm overflow-hidden flex">
             {paidAmount > 0 && (
               <div
                 className="bg-emerald-700 transition-all duration-500"
@@ -277,15 +277,15 @@ function ProjectSection({
           </div>
           <div className="flex items-center gap-4 mt-2">
             <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-none bg-emerald-700" />
+              <div className="w-2 h-2 rounded-sm bg-emerald-700" />
               <span className="text-[11px] text-gray-600">Paid</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-none bg-blue-400" />
+              <div className="w-2 h-2 rounded-sm bg-blue-400" />
               <span className="text-[11px] text-gray-600">Approved</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-none bg-gray-200" />
+              <div className="w-2 h-2 rounded-sm bg-gray-200" />
               <span className="text-[11px] text-gray-600">Remaining</span>
             </div>
           </div>
@@ -344,7 +344,7 @@ function MilestoneRow({
         {/* Status icon */}
         <div
           className={cn(
-            "w-7 h-7 rounded-none flex items-center justify-center shrink-0",
+            "w-7 h-7 rounded-sm flex items-center justify-center shrink-0",
             milestone.status === "paid" ? "bg-emerald-950/10" :
             milestone.status === "approved" ? "bg-blue-50" :
             milestone.status === "submitted" ? "bg-amber-50" :
@@ -365,7 +365,7 @@ function MilestoneRow({
             <span className="text-[14px] font-medium text-gray-900 truncate">{milestone.label}</span>
             <span
               className={cn(
-                "inline-flex items-center rounded-none border px-2 py-0.5 text-[11px] font-medium",
+                "inline-flex items-center rounded-sm border px-2 py-0.5 text-[11px] font-medium",
                 cfg.bg,
                 cfg.color
               )}
@@ -452,7 +452,7 @@ function MilestoneDetail({
             {milestone.photos.map((_, i) => (
               <div
                 key={i}
-                className="aspect-[4/3] rounded-none bg-gray-100 border border-border flex items-center justify-center"
+                className="aspect-[4/3] rounded-sm bg-gray-100 border border-border flex items-center justify-center"
               >
                 <Camera className="w-6 h-6 text-gray-300" />
               </div>
@@ -472,7 +472,7 @@ function MilestoneDetail({
           <p className="text-[12px] font-medium text-gray-700 uppercase tracking-wider mb-2">
             Contractor Notes
           </p>
-          <div className="bg-gray-50 rounded-none border border-border px-4 py-3">
+          <div className="bg-gray-50 rounded-sm border border-border px-4 py-3">
             <p className="text-[13px] text-gray-900 leading-relaxed">{milestone.contractorNote}</p>
           </div>
         </div>
@@ -480,7 +480,7 @@ function MilestoneDetail({
 
       {/* Waiting state */}
       {isWaiting && (
-        <div className="flex items-center gap-2 bg-gray-50 rounded-none border border-border px-4 py-3">
+        <div className="flex items-center gap-2 bg-gray-50 rounded-sm border border-border px-4 py-3">
           <HardHat className="w-4 h-4 text-gray-600" />
           <span className="text-[13px] text-gray-700">Waiting for contractor to submit</span>
         </div>
@@ -492,7 +492,7 @@ function MilestoneDetail({
           <p className="text-[12px] font-medium text-gray-700 uppercase tracking-wider mb-2">
             Verification Checklist
           </p>
-          <div className="rounded-none border border-border bg-white divide-y divide-border">
+          <div className="rounded-sm border border-border bg-white divide-y divide-border">
             {VERIFICATION_ITEMS.map((item, i) => {
               const checked = isCompleted ? true : checks[i];
               const disabled = isCompleted;

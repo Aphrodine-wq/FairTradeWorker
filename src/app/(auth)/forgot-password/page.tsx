@@ -55,7 +55,7 @@ export default function ForgotPasswordPage() {
             </div>
 
             {submitted ? (
-              <div className="rounded-none bg-emerald-950/10 border border-emerald-800/20 p-4 text-sm text-emerald-950">
+              <div className="rounded-sm bg-emerald-950/10 border border-emerald-800/20 p-4 text-sm text-emerald-950">
                 If an account exists with that email, we&apos;ve sent a reset link.
               </div>
             ) : (

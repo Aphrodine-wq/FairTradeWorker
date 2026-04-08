@@ -110,7 +110,7 @@ function EstimateRow({ est }: { est: Estimate }) {
         className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50/80 transition-colors text-left"
       >
         <div className="flex items-center gap-4 min-w-0">
-          <div className="w-9 h-9 rounded-none bg-gray-100 flex items-center justify-center flex-shrink-0">
+          <div className="w-9 h-9 rounded-sm bg-gray-100 flex items-center justify-center flex-shrink-0">
             <FileText className="w-4 h-4 text-gray-600" />
           </div>
           <div className="min-w-0">
@@ -171,17 +171,17 @@ function EstimateRow({ est }: { est: Estimate }) {
       {open && (
         <div className="px-5 pb-5">
           <div className="flex items-center justify-end gap-2 mb-3">
-            <button className="flex items-center gap-1.5 h-8 px-3 rounded-none border border-border text-[12px] font-medium text-gray-800 hover:bg-gray-50 transition-colors">
+            <button className="flex items-center gap-1.5 h-8 px-3 rounded-sm border border-border text-[12px] font-medium text-gray-800 hover:bg-gray-50 transition-colors">
               <Download className="w-3.5 h-3.5" />
               Download PDF
             </button>
-            <button className="flex items-center gap-1.5 h-8 px-3 rounded-none border border-border text-[12px] font-medium text-gray-800 hover:bg-gray-50 transition-colors">
+            <button className="flex items-center gap-1.5 h-8 px-3 rounded-sm border border-border text-[12px] font-medium text-gray-800 hover:bg-gray-50 transition-colors">
               <Send className="w-3.5 h-3.5" />
               Send to Client
             </button>
           </div>
           {/* PDF-style document */}
-          <div className="bg-white rounded-none shadow-[0_4px_30px_-6px_rgba(0,0,0,0.15)] ring-1 ring-gray-200/80 overflow-hidden max-w-[600px]">
+          <div className="bg-white rounded-sm shadow-[0_4px_30px_-6px_rgba(0,0,0,0.15)] ring-1 ring-gray-200/80 overflow-hidden max-w-[600px]">
             {/* Top accent line */}
             <div className="h-1.5 bg-brand-600" />
 
@@ -194,7 +194,7 @@ function EstimateRow({ est }: { est: Estimate }) {
                     alt="Marcus Johnson"
                     width={44}
                     height={44}
-                    className="w-11 h-11 rounded-none object-cover ring-2 ring-gray-100"
+                    className="w-11 h-11 rounded-sm object-cover ring-2 ring-gray-100"
                   />
                   <div>
                     <p className="text-[14px] font-bold text-gray-900 leading-tight">Johnson & Sons Construction</p>
@@ -251,10 +251,10 @@ function EstimateRow({ est }: { est: Estimate }) {
               <table className="w-full mb-4">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="text-left text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] px-3 py-2 rounded-none-lg">Description</th>
+                    <th className="text-left text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] px-3 py-2 rounded-sm-lg">Description</th>
                     <th className="text-right text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] px-3 py-2 w-[40px]">Qty</th>
                     <th className="text-right text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] px-3 py-2 w-[60px]">Rate</th>
-                    <th className="text-right text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] px-3 py-2 w-[70px] rounded-none-lg">Amount</th>
+                    <th className="text-right text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] px-3 py-2 w-[70px] rounded-sm-lg">Amount</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -276,7 +276,7 @@ function EstimateRow({ est }: { est: Estimate }) {
                     <span className="text-[10px] text-gray-600">Subtotal</span>
                     <span className="text-[11px] text-gray-900 tabular-nums">{formatCurrency(est.amount)}</span>
                   </div>
-                  <div className="flex justify-between py-2.5 px-3 bg-gray-900 rounded-none mt-1.5">
+                  <div className="flex justify-between py-2.5 px-3 bg-gray-900 rounded-sm mt-1.5">
                     <span className="text-[12px] font-bold text-white">Total</span>
                     <span className="text-[15px] font-bold text-white tabular-nums">{formatCurrency(est.amount)}</span>
                   </div>
@@ -284,7 +284,7 @@ function EstimateRow({ est }: { est: Estimate }) {
               </div>
 
               {/* Terms */}
-              <div className="bg-gray-50 rounded-none px-4 py-3 mb-5">
+              <div className="bg-gray-50 rounded-sm px-4 py-3 mb-5">
                 <p className="text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] mb-1">Terms & Conditions</p>
                 <p className="text-[10px] text-gray-700 leading-relaxed">This estimate is valid for 30 days from the date above. A 50% deposit is required to schedule and begin work. Remaining balance is due upon substantial completion. Price is subject to change if project scope changes after acceptance.</p>
               </div>
@@ -406,8 +406,8 @@ function NewEstimateTab() {
   const filledItems = lineItems.filter((i) => i.description && parseFloat(i.unitPrice) > 0);
   const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
-  const inputBase = "w-full h-11 rounded-none border border-gray-200 bg-white px-3.5 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow";
-  const selectBase = "h-11 w-full rounded-none border border-gray-200 bg-white px-3.5 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow appearance-none";
+  const inputBase = "w-full h-11 rounded-sm border border-gray-200 bg-white px-3.5 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow";
+  const selectBase = "h-11 w-full rounded-sm border border-gray-200 bg-white px-3.5 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow appearance-none";
   const labelBase = "text-[12px] font-semibold text-gray-900 block mb-1.5";
 
   const PAYMENT_LABELS: Record<string, string> = {
@@ -446,7 +446,7 @@ function NewEstimateTab() {
                 )}
               >
                 <span className={cn(
-                  "w-5 h-5 rounded-none text-[10px] font-bold flex items-center justify-center",
+                  "w-5 h-5 rounded-sm text-[10px] font-bold flex items-center justify-center",
                   buildStep === step.id ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-700"
                 )}>
                   {i + 1}
@@ -460,7 +460,7 @@ function NewEstimateTab() {
         {/* Client */}
         <div className={buildStep !== "client" ? "hidden" : ""}>
           <div className="flex items-center gap-2.5 mb-4">
-            <span className="w-7 h-7 rounded-none bg-brand-600 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">1</span>
+            <span className="w-7 h-7 rounded-sm bg-brand-600 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">1</span>
             <div className="flex-1">
               <p className="text-[15px] font-bold text-gray-900">Client</p>
               <p className="text-[12px] text-gray-600">Who is this estimate for?</p>
@@ -518,7 +518,7 @@ function NewEstimateTab() {
         {/* Job Details */}
         <div className={buildStep !== "job" ? "hidden" : ""}>
           <div className="flex items-center gap-2.5 mb-4">
-            <span className="w-7 h-7 rounded-none bg-brand-600 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">2</span>
+            <span className="w-7 h-7 rounded-sm bg-brand-600 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">2</span>
             <div>
               <p className="text-[15px] font-bold text-gray-900">Job Details</p>
               <p className="text-[12px] text-gray-600">What work is being estimated?</p>
@@ -574,7 +574,7 @@ function NewEstimateTab() {
         {/* Line Items */}
         <div className={buildStep !== "items" ? "hidden" : ""}>
           <div className="flex items-center gap-2.5 mb-4">
-            <span className="w-7 h-7 rounded-none bg-brand-600 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">3</span>
+            <span className="w-7 h-7 rounded-sm bg-brand-600 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">3</span>
             <div>
               <p className="text-[15px] font-bold text-gray-900">Line Items</p>
               <p className="text-[12px] text-gray-600">Materials, labor, and other charges</p>
@@ -600,7 +600,7 @@ function NewEstimateTab() {
                     {g}
                     {count > 0 && (
                       <span className={cn(
-                        "text-[10px] font-bold rounded-none px-1.5 py-0.5 min-w-[18px] text-center",
+                        "text-[10px] font-bold rounded-sm px-1.5 py-0.5 min-w-[18px] text-center",
                         activeGroup === g ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-700"
                       )}>
                         {count}
@@ -628,14 +628,14 @@ function NewEstimateTab() {
                     value={item.description}
                     onChange={(e) => updateLine(i, "description", e.target.value)}
                     placeholder="What was done or supplied..."
-                    className="h-10 rounded-none border border-gray-200 bg-white px-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
+                    className="h-10 rounded-sm border border-gray-200 bg-white px-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
                   />
                   <input
                     type="number"
                     min="0"
                     value={item.quantity}
                     onChange={(e) => updateLine(i, "quantity", e.target.value)}
-                    className="h-10 rounded-none border border-gray-200 bg-white px-2 text-[14px] text-gray-900 text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
+                    className="h-10 rounded-sm border border-gray-200 bg-white px-2 text-[14px] text-gray-900 text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
                   />
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-[13px]">$</span>
@@ -645,7 +645,7 @@ function NewEstimateTab() {
                       step="0.01"
                       value={item.unitPrice}
                       onChange={(e) => updateLine(i, "unitPrice", e.target.value)}
-                      className="h-10 w-full rounded-none border border-gray-200 bg-white pl-7 pr-2 text-[14px] text-gray-900 text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
+                      className="h-10 w-full rounded-sm border border-gray-200 bg-white pl-7 pr-2 text-[14px] text-gray-900 text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
                     />
                   </div>
                   <span className="text-[14px] font-semibold text-gray-900 text-right tabular-nums">
@@ -655,7 +655,7 @@ function NewEstimateTab() {
                     type="button"
                     onClick={() => removeLine(i)}
                     disabled={lineItems.length === 1}
-                    className="w-9 h-9 flex items-center justify-center rounded-none text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                    className="w-9 h-9 flex items-center justify-center rounded-sm text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -667,7 +667,7 @@ function NewEstimateTab() {
             <div className="grid grid-cols-[1fr_60px_90px_80px_36px] xl:grid-cols-[1fr_80px_110px_100px_40px] gap-2 xl:gap-3 px-4 xl:px-5 py-3 items-center border-t border-dashed border-gray-200 bg-gray-50/30">
               <input
                 placeholder={`Add ${activeGroup.toLowerCase()} item...`}
-                className="h-10 rounded-none border border-dashed border-gray-200 bg-transparent px-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent focus:bg-white focus:border-solid"
+                className="h-10 rounded-sm border border-dashed border-gray-200 bg-transparent px-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent focus:bg-white focus:border-solid"
                 onFocus={() => {
                   // If there isn't already an empty item for this group, add one
                   const hasEmpty = lineItems.some((li) => li.group === activeGroup && !li.description);
@@ -713,7 +713,7 @@ function NewEstimateTab() {
           const isBelow = fp.pct <= -8;
           const isAbove = fp.pct >= 8;
           return (
-            <div className="flex items-center gap-3 rounded-none bg-gray-50 border border-gray-200 px-4 py-3">
+            <div className="flex items-center gap-3 rounded-sm bg-gray-50 border border-gray-200 px-4 py-3">
               <BarChart3 className="w-5 h-5 text-brand-600 flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-[11px] font-bold text-gray-600 uppercase tracking-wider">FairPrice Market Rate</p>
@@ -722,7 +722,7 @@ function NewEstimateTab() {
                 </p>
               </div>
               <span className={cn(
-                "inline-flex items-center gap-1 text-[11px] font-semibold rounded-none px-2.5 py-1 border whitespace-nowrap",
+                "inline-flex items-center gap-1 text-[11px] font-semibold rounded-sm px-2.5 py-1 border whitespace-nowrap",
                 isBelow ? "text-brand-700 bg-brand-50 border-brand-100"
                   : isAbove ? "text-amber-700 bg-amber-50 border-amber-100"
                   : "text-gray-800 bg-white border-gray-200"
@@ -738,7 +738,7 @@ function NewEstimateTab() {
         {/* Terms */}
         <div className={buildStep !== "terms" ? "hidden" : ""}>
           <div className="flex items-center gap-2.5 mb-4">
-            <span className="w-7 h-7 rounded-none bg-brand-600 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">4</span>
+            <span className="w-7 h-7 rounded-sm bg-brand-600 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">4</span>
             <div>
               <p className="text-[15px] font-bold text-gray-900">Terms & Notes</p>
               <p className="text-[12px] text-gray-600">Payment schedule and scope details</p>
@@ -758,11 +758,11 @@ function NewEstimateTab() {
           </div>
           <div className="mb-3">
             <label className={labelBase}>Scope of Work</label>
-            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Describe the full scope — materials, approach, what's included..." className="w-full rounded-none border border-gray-200 bg-white px-3.5 py-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow resize-none min-h-[80px]" />
+            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Describe the full scope — materials, approach, what's included..." className="w-full rounded-sm border border-gray-200 bg-white px-3.5 py-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow resize-none min-h-[80px]" />
           </div>
           <div>
             <label className={labelBase}>Exclusions</label>
-            <textarea value={exclusions} onChange={(e) => setExclusions(e.target.value)} placeholder="What is NOT included..." className="w-full rounded-none border border-gray-200 bg-white px-3.5 py-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow resize-none min-h-[60px]" />
+            <textarea value={exclusions} onChange={(e) => setExclusions(e.target.value)} placeholder="What is NOT included..." className="w-full rounded-sm border border-gray-200 bg-white px-3.5 py-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow resize-none min-h-[60px]" />
           </div>
         </div>
 
@@ -779,14 +779,14 @@ function NewEstimateTab() {
       {/* Right: Live PDF Preview */}
       <div className="hidden xl:block w-[380px] 2xl:w-[480px] flex-shrink-0 sticky top-0">
         <p className="text-[12px] font-semibold text-gray-600 uppercase tracking-wider mb-2">Live Preview</p>
-        <div className="bg-white rounded-none shadow-[0_4px_30px_-6px_rgba(0,0,0,0.15)] ring-1 ring-gray-200/80 overflow-hidden transform scale-[0.95] origin-top-right">
+        <div className="bg-white rounded-sm shadow-[0_4px_30px_-6px_rgba(0,0,0,0.15)] ring-1 ring-gray-200/80 overflow-hidden transform scale-[0.95] origin-top-right">
           {/* Accent bar */}
           <div className="h-1.5 bg-brand-600" />
           <div className="px-6 pt-4 pb-5">
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-2.5">
-                <NextImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" alt="" width={36} height={36} className="w-9 h-9 rounded-none object-cover ring-2 ring-gray-100" />
+                <NextImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" alt="" width={36} height={36} className="w-9 h-9 rounded-sm object-cover ring-2 ring-gray-100" />
                 <div>
                   <p className="text-[12px] font-bold text-gray-900">Johnson & Sons Construction</p>
                   <p className="text-[8px] text-gray-600">Marcus Johnson — TX #R21445</p>
@@ -821,10 +821,10 @@ function NewEstimateTab() {
                 <table className="w-full mb-3">
                   <thead>
                     <tr className="bg-gray-50">
-                      <th className="text-left text-[7px] font-bold text-gray-600 uppercase tracking-[0.1em] px-2 py-1.5 rounded-none">Item</th>
+                      <th className="text-left text-[7px] font-bold text-gray-600 uppercase tracking-[0.1em] px-2 py-1.5 rounded-sm">Item</th>
                       <th className="text-right text-[7px] font-bold text-gray-600 uppercase tracking-[0.1em] px-2 py-1.5 w-[30px]">Qty</th>
                       <th className="text-right text-[7px] font-bold text-gray-600 uppercase tracking-[0.1em] px-2 py-1.5 w-[50px]">Rate</th>
-                      <th className="text-right text-[7px] font-bold text-gray-600 uppercase tracking-[0.1em] px-2 py-1.5 w-[55px] rounded-none">Amt</th>
+                      <th className="text-right text-[7px] font-bold text-gray-600 uppercase tracking-[0.1em] px-2 py-1.5 w-[55px] rounded-sm">Amt</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -839,7 +839,7 @@ function NewEstimateTab() {
                   </tbody>
                 </table>
                 <div className="flex justify-end mb-3">
-                  <div className="flex justify-between py-2 px-2.5 bg-gray-900 rounded-none w-[140px]">
+                  <div className="flex justify-between py-2 px-2.5 bg-gray-900 rounded-sm w-[140px]">
                     <span className="text-[10px] font-bold text-white">Total</span>
                     <span className="text-[12px] font-bold text-white tabular-nums">{formatCurrency(grandTotal)}</span>
                   </div>
@@ -853,7 +853,7 @@ function NewEstimateTab() {
 
             {/* Terms */}
             {(notes || paymentTerms) && (
-              <div className="bg-gray-50 rounded-none px-3 py-2 mb-3">
+              <div className="bg-gray-50 rounded-sm px-3 py-2 mb-3">
                 <p className="text-[7px] font-bold text-gray-600 uppercase tracking-[0.1em] mb-0.5">Terms</p>
                 <p className="text-[8px] text-gray-700 leading-relaxed">{PAYMENT_LABELS[paymentTerms]}{notes ? `. ${notes}` : ""}</p>
                 {exclusions && (
@@ -1559,7 +1559,7 @@ function CalculatorTab() {
   const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   const allItems = sections.flatMap((s) => s.items.filter((i) => i.desc && parseFloat(i.unitCost) > 0));
 
-  const inputBase = "w-full h-9 rounded-none border border-gray-200 bg-white px-3 text-[13px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow tabular-nums";
+  const inputBase = "w-full h-9 rounded-sm border border-gray-200 bg-white px-3 text-[13px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow tabular-nums";
 
   // Material calculator results
   const matSqft = parseFloat(materialSqft) || 0;
@@ -1696,7 +1696,7 @@ function CalculatorTab() {
             <select
               value={materialType}
               onChange={(e) => setMaterialType(e.target.value)}
-              className="h-11 w-full max-w-sm rounded-none border border-gray-200 bg-white px-3.5 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
+              className="h-11 w-full max-w-sm rounded-sm border border-gray-200 bg-white px-3.5 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
             >
               <option value="flooring">Flooring</option>
               <option value="drywall">Drywall</option>
@@ -1731,7 +1731,7 @@ function CalculatorTab() {
           )}
 
           {(matSqft > 0 || (materialType === "concrete" && (parseFloat(concLength) || 0) > 0)) && (
-            <div className="bg-white rounded-none border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-sm border border-gray-200 overflow-hidden">
               <div className="px-4 py-2.5 bg-gray-50 border-b border-gray-200">
                 <p className="text-[13px] font-bold text-gray-900">Results</p>
               </div>
@@ -1778,12 +1778,12 @@ function CalculatorTab() {
             <button
               onClick={() => setOvertimeEnabled(!overtimeEnabled)}
               className={cn(
-                "w-10 h-5 rounded-none transition-colors relative",
+                "w-10 h-5 rounded-sm transition-colors relative",
                 overtimeEnabled ? "bg-brand-600" : "bg-gray-200"
               )}
             >
               <div className={cn(
-                "w-4 h-4 bg-white rounded-none absolute top-0.5 transition-transform shadow-sm",
+                "w-4 h-4 bg-white rounded-sm absolute top-0.5 transition-transform shadow-sm",
                 overtimeEnabled ? "translate-x-5" : "translate-x-0.5"
               )} />
             </button>
@@ -1791,7 +1791,7 @@ function CalculatorTab() {
           </div>
 
           {totalLaborHours > 0 && (
-            <div className="bg-white rounded-none border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-sm border border-gray-200 overflow-hidden">
               <div className="px-4 py-2.5 bg-gray-50 border-b border-gray-200">
                 <p className="text-[13px] font-bold text-gray-900">Breakdown</p>
               </div>
@@ -1840,7 +1840,7 @@ function CalculatorTab() {
             <button
               onClick={() => setMarkupMode("markup")}
               className={cn(
-                "px-4 py-2 rounded-none text-[13px] font-medium transition-colors border",
+                "px-4 py-2 rounded-sm text-[13px] font-medium transition-colors border",
                 markupMode === "markup" ? "bg-gray-900 text-white border-gray-900" : "border-gray-200 text-gray-800 hover:bg-gray-50"
               )}
             >
@@ -1849,7 +1849,7 @@ function CalculatorTab() {
             <button
               onClick={() => setMarkupMode("margin")}
               className={cn(
-                "px-4 py-2 rounded-none text-[13px] font-medium transition-colors border",
+                "px-4 py-2 rounded-sm text-[13px] font-medium transition-colors border",
                 markupMode === "margin" ? "bg-gray-900 text-white border-gray-900" : "border-gray-200 text-gray-800 hover:bg-gray-50"
               )}
             >
@@ -1868,7 +1868,7 @@ function CalculatorTab() {
           </div>
 
           {markupCalc && (
-            <div className="bg-white rounded-none border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-sm border border-gray-200 overflow-hidden">
               <div className="px-4 py-2.5 bg-gray-50 border-b border-gray-200">
                 <p className="text-[13px] font-bold text-gray-900">Results</p>
               </div>
@@ -1920,13 +1920,13 @@ function CalculatorTab() {
           </div>
 
           {costPerSqft > 0 && (
-            <div className="bg-gray-900 rounded-none px-5 py-4 flex items-center justify-between">
+            <div className="bg-gray-900 rounded-sm px-5 py-4 flex items-center justify-between">
               <span className="text-[13px] font-bold text-white">Your Cost Per Sq Ft</span>
               <span className="text-[24px] font-bold text-white tabular-nums">${costPerSqft.toFixed(2)}</span>
             </div>
           )}
 
-          <div className="bg-white rounded-none border border-gray-200 overflow-hidden">
+          <div className="bg-white rounded-sm border border-gray-200 overflow-hidden">
             <div className="px-4 py-2.5 bg-gray-50 border-b border-gray-200">
               <p className="text-[13px] font-bold text-gray-900">Typical $/sqft by Project Type</p>
             </div>
@@ -2186,7 +2186,7 @@ function CalculatorTab() {
           <select
             value={template}
             onChange={(e) => loadTemplate(e.target.value)}
-            className="h-11 w-full max-w-sm rounded-none border border-gray-200 bg-white px-3.5 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
+            className="h-11 w-full max-w-sm rounded-sm border border-gray-200 bg-white px-3.5 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
           >
             {TEMPLATE_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -2196,7 +2196,7 @@ function CalculatorTab() {
 
         {/* Sections */}
         {sections.map((sec, si) => (
-          <div key={si} className="rounded-none ring-1 ring-gray-200 overflow-hidden">
+          <div key={si} className="rounded-sm ring-1 ring-gray-200 overflow-hidden">
             <div className="flex items-center justify-between px-4 py-2.5 bg-gray-50">
               <input
                 value={sec.name}
@@ -2224,7 +2224,7 @@ function CalculatorTab() {
               <div key={ii} className="grid grid-cols-[1fr_50px_50px_70px_65px_28px] xl:grid-cols-[1fr_60px_60px_85px_80px_32px] gap-1 xl:gap-1.5 px-3 xl:px-4 py-1 items-center border-t border-gray-100">
                 <input value={item.desc} onChange={(e) => updateItem(si, ii, "desc", e.target.value)} placeholder="Item..." className={inputBase} />
                 <input type="number" min="0" value={item.qty} onChange={(e) => updateItem(si, ii, "qty", e.target.value)} className={cn(inputBase, "text-right px-2")} />
-                <select value={item.unit} onChange={(e) => updateItem(si, ii, "unit", e.target.value)} className="h-9 text-[11px] text-center rounded-none border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent">
+                <select value={item.unit} onChange={(e) => updateItem(si, ii, "unit", e.target.value)} className="h-9 text-[11px] text-center rounded-sm border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent">
                   {UNIT_OPTIONS.map((u) => <option key={u} value={u}>{u}</option>)}
                 </select>
                 <div className="relative">
@@ -2232,7 +2232,7 @@ function CalculatorTab() {
                   <input type="number" min="0" step="0.01" value={item.unitCost} onChange={(e) => updateItem(si, ii, "unitCost", e.target.value)} className={cn(inputBase, "text-right pl-5 pr-2")} />
                 </div>
                 <span className="text-[13px] font-semibold text-gray-900 text-right tabular-nums">{itemTotal(item) > 0 ? formatCurrency(itemTotal(item)) : "—"}</span>
-                <button onClick={() => removeItem(si, ii)} disabled={sec.items.length === 1} className="w-8 h-8 flex items-center justify-center rounded-none text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-20">
+                <button onClick={() => removeItem(si, ii)} disabled={sec.items.length === 1} className="w-8 h-8 flex items-center justify-center rounded-sm text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-20">
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -2289,13 +2289,13 @@ function CalculatorTab() {
       {/* Right: Live Breakdown */}
       <div className="hidden xl:block w-[280px] 2xl:w-[340px] flex-shrink-0 sticky top-0">
         <p className="text-[12px] font-semibold text-gray-600 uppercase tracking-wider mb-2">Live Breakdown</p>
-        <div className="bg-white rounded-none shadow-[0_4px_30px_-6px_rgba(0,0,0,0.15)] ring-1 ring-gray-200/80 overflow-hidden">
+        <div className="bg-white rounded-sm shadow-[0_4px_30px_-6px_rgba(0,0,0,0.15)] ring-1 ring-gray-200/80 overflow-hidden">
           <div className="h-1.5 bg-brand-600" />
           <div className="px-5 pt-4 pb-5">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <NextImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" alt="" width={32} height={32} className="w-8 h-8 rounded-none object-cover ring-2 ring-gray-100" />
+                <NextImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" alt="" width={32} height={32} className="w-8 h-8 rounded-sm object-cover ring-2 ring-gray-100" />
                 <div>
                   <p className="text-[11px] font-bold text-gray-900">Johnson & Sons</p>
                   <p className="text-[8px] text-gray-600">Cost Calculator</p>
@@ -2363,7 +2363,7 @@ function CalculatorTab() {
             </div>
 
             {/* Bid price */}
-            <div className="flex justify-between py-3 px-3 bg-gray-900 rounded-none">
+            <div className="flex justify-between py-3 px-3 bg-gray-900 rounded-sm">
               <span className="text-[13px] font-bold text-white">Bid Price</span>
               <span className="text-[18px] font-bold text-white tabular-nums">{formatCurrency(grandTotal)}</span>
             </div>
@@ -2429,7 +2429,7 @@ function ProGate({ onUnlock }: { onUnlock: () => void }) {
         <div className="flex items-center gap-5">
           <button
             onClick={onUnlock}
-            className="h-12 px-8 rounded-none bg-gray-900 hover:bg-gray-800 text-white text-[15px] font-bold transition-colors"
+            className="h-12 px-8 rounded-sm bg-gray-900 hover:bg-gray-800 text-white text-[15px] font-bold transition-colors"
           >
             Start 14-Day Free Trial
           </button>
@@ -2632,7 +2632,7 @@ function EstimateAgentTab() {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-[17px] font-bold text-gray-900">Estimate Agent</h2>
-                <span className="text-[10px] font-bold uppercase tracking-wide bg-brand-600 text-white px-2 py-0.5 rounded-none flex items-center gap-1">
+                <span className="text-[10px] font-bold uppercase tracking-wide bg-brand-600 text-white px-2 py-0.5 rounded-sm flex items-center gap-1">
                   <Crown className="w-2.5 h-2.5" />Pro
                 </span>
               </div>
@@ -2647,13 +2647,13 @@ function EstimateAgentTab() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto rounded-none bg-white shadow-[0_2px_12px_-2px_rgba(0,0,0,0.06)] ring-1 ring-gray-200/80 p-5 space-y-5 mb-3">
+        <div className="flex-1 overflow-y-auto rounded-sm bg-white shadow-[0_2px_12px_-2px_rgba(0,0,0,0.06)] ring-1 ring-gray-200/80 p-5 space-y-5 mb-3">
           {messages.map((msg) => {
             if (msg.role === "tool") {
               return (
                 <div key={msg.id} className="flex justify-center">
                   <div className={cn(
-                    "flex items-center gap-2 text-[12px] font-medium px-4 py-2 rounded-none",
+                    "flex items-center gap-2 text-[12px] font-medium px-4 py-2 rounded-sm",
                     msg.toolStatus === "complete"
                       ? "bg-brand-50 text-brand-700"
                       : "bg-gray-50 text-gray-700"
@@ -2673,23 +2673,23 @@ function EstimateAgentTab() {
             return (
               <div key={msg.id} className={cn("flex gap-3", isAgent ? "items-start" : "items-start flex-row-reverse")}>
                 {!isAgent && (
-                  <div className="w-9 h-9 rounded-none bg-brand-100 flex items-center justify-center flex-shrink-0">
+                  <div className="w-9 h-9 rounded-sm bg-brand-100 flex items-center justify-center flex-shrink-0">
                     <span className="text-brand-700 text-[12px] font-bold">MJ</span>
                   </div>
                 )}
                 <div className={cn("max-w-[80%]", !isAgent && "items-end")}>
                   <div className={cn(
-                    "px-4 py-3 rounded-none text-[14px] leading-relaxed whitespace-pre-wrap",
+                    "px-4 py-3 rounded-sm text-[14px] leading-relaxed whitespace-pre-wrap",
                     isAgent
-                      ? "bg-gray-50 text-gray-900 rounded-none-md"
-                      : "bg-gray-900 text-white rounded-none-md"
+                      ? "bg-gray-50 text-gray-900 rounded-sm-md"
+                      : "bg-gray-900 text-white rounded-sm-md"
                   )}>
                     {msg.content}
                   </div>
                   {msg.attachments && msg.attachments.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       {msg.attachments.map((att, i) => (
-                        <span key={i} className="inline-flex items-center gap-1 text-[11px] font-medium text-gray-800 bg-gray-100 rounded-none px-2.5 py-1">
+                        <span key={i} className="inline-flex items-center gap-1 text-[11px] font-medium text-gray-800 bg-gray-100 rounded-sm px-2.5 py-1">
                           {att.type.startsWith("image") ? <ImageIcon className="w-3 h-3" /> : <FileText className="w-3 h-3" />}
                           {att.name}
                         </span>
@@ -2704,14 +2704,14 @@ function EstimateAgentTab() {
 
           {isThinking && (
             <div className="flex gap-3 items-start">
-              <div className="w-9 h-9 rounded-none bg-gray-900 flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 rounded-sm bg-gray-900 flex items-center justify-center flex-shrink-0">
                 <span className="text-white text-[11px] font-bold">AI</span>
               </div>
-              <div className="bg-gray-50 rounded-none rounded-none-md px-5 py-4">
+              <div className="bg-gray-50 rounded-sm rounded-sm-md px-5 py-4">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-gray-400 rounded-none animate-bounce" style={{ animationDelay: "0ms" }} />
-                  <span className="w-2 h-2 bg-gray-400 rounded-none animate-bounce" style={{ animationDelay: "150ms" }} />
-                  <span className="w-2 h-2 bg-gray-400 rounded-none animate-bounce" style={{ animationDelay: "300ms" }} />
+                  <span className="w-2 h-2 bg-gray-400 rounded-sm animate-bounce" style={{ animationDelay: "0ms" }} />
+                  <span className="w-2 h-2 bg-gray-400 rounded-sm animate-bounce" style={{ animationDelay: "150ms" }} />
+                  <span className="w-2 h-2 bg-gray-400 rounded-sm animate-bounce" style={{ animationDelay: "300ms" }} />
                 </div>
               </div>
             </div>
@@ -2724,7 +2724,7 @@ function EstimateAgentTab() {
         {uploadedFiles.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-2">
             {uploadedFiles.map((f, i) => (
-              <span key={i} className="inline-flex items-center gap-1.5 text-[12px] font-medium text-gray-900 bg-white ring-1 ring-gray-200 rounded-none px-3 py-1.5">
+              <span key={i} className="inline-flex items-center gap-1.5 text-[12px] font-medium text-gray-900 bg-white ring-1 ring-gray-200 rounded-sm px-3 py-1.5">
                 {f.type.startsWith("image") ? <ImageIcon className="w-3.5 h-3.5 text-gray-600" /> : <FileText className="w-3.5 h-3.5 text-gray-600" />}
                 {f.name}
                 <button onClick={() => setUploadedFiles((prev) => prev.filter((_, j) => j !== i))} className="text-gray-300 hover:text-red-500 ml-1">
@@ -2736,15 +2736,15 @@ function EstimateAgentTab() {
         )}
 
         {/* Input */}
-        <div className="flex items-center gap-2 bg-white rounded-none shadow-[0_2px_12px_-2px_rgba(0,0,0,0.06)] ring-1 ring-gray-200/80 px-4 py-3">
+        <div className="flex items-center gap-2 bg-white rounded-sm shadow-[0_2px_12px_-2px_rgba(0,0,0,0.06)] ring-1 ring-gray-200/80 px-4 py-3">
           <input type="file" ref={fileInputRef} className="hidden" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.txt" onChange={handleFileUpload} />
-          <button onClick={() => fileInputRef.current?.click()} className="w-9 h-9 flex items-center justify-center rounded-none text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-colors">
+          <button onClick={() => fileInputRef.current?.click()} className="w-9 h-9 flex items-center justify-center rounded-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-colors">
             <Paperclip className="w-[18px] h-[18px]" />
           </button>
           <button
             onClick={toggleRecording}
             className={cn(
-              "w-9 h-9 flex items-center justify-center rounded-none transition-colors",
+              "w-9 h-9 flex items-center justify-center rounded-sm transition-colors",
               isRecording
                 ? "bg-red-500 text-white animate-pulse"
                 : "text-gray-600 hover:text-gray-800 hover:bg-gray-100"
@@ -2760,7 +2760,7 @@ function EstimateAgentTab() {
             className={cn("flex-1 text-[14px] bg-transparent outline-none placeholder:text-gray-300", isRecording && "text-red-500 placeholder:text-red-400")}
             disabled={isRecording}
           />
-          <Button onClick={handleSend} disabled={!input.trim() && uploadedFiles.length === 0} className="gap-2 h-10 px-5 rounded-none">
+          <Button onClick={handleSend} disabled={!input.trim() && uploadedFiles.length === 0} className="gap-2 h-10 px-5 rounded-sm">
             <Send className="w-4 h-4" />
             Send
           </Button>
@@ -2827,7 +2827,7 @@ function EstimatesPageContent() {
                 key={item.id}
                 onClick={() => setActiveSection(item.id)}
                 className={cn(
-                  "w-full flex items-center justify-between rounded-none px-2.5 py-2 text-[13px] font-medium transition-colors mb-0.5",
+                  "w-full flex items-center justify-between rounded-sm px-2.5 py-2 text-[13px] font-medium transition-colors mb-0.5",
                   isActive
                     ? "bg-brand-600 text-white"
                     : "text-gray-800 hover:bg-gray-100 hover:text-gray-900"
@@ -2843,7 +2843,7 @@ function EstimatesPageContent() {
                   )}
                 </div>
                 {badge != null && badge > 0 && (
-                  <span className={cn("text-[10px] font-bold rounded-none px-1.5 py-0.5 min-w-[20px] text-center", isActive ? "bg-white/20 text-white" : "bg-gray-100 text-gray-700")}>
+                  <span className={cn("text-[10px] font-bold rounded-sm px-1.5 py-0.5 min-w-[20px] text-center", isActive ? "bg-white/20 text-white" : "bg-gray-100 text-gray-700")}>
                     {badge}
                   </span>
                 )}

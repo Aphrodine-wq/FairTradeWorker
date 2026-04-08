@@ -250,7 +250,7 @@ function StatusBannerSection({ banner }: { banner: StatusBanner }) {
   }[banner.type];
 
   return (
-    <div className={cn("flex items-center gap-3 rounded-none border p-4", config.bg)}>
+    <div className={cn("flex items-center gap-3 rounded-sm border p-4", config.bg)}>
       {config.icon}
       <p className={cn("text-sm font-medium flex-1", config.text)}>{banner.message}</p>
       {banner.actionLabel && (
@@ -269,7 +269,7 @@ function ContractorCard({ contractor }: { contractor: Contractor }) {
     <Card>
       <CardContent className="p-5">
         <div className="flex items-center gap-4">
-          <div className="h-12 w-12 rounded-none bg-brand-600 flex items-center justify-center flex-shrink-0">
+          <div className="h-12 w-12 rounded-sm bg-brand-600 flex items-center justify-center flex-shrink-0">
             <span className="text-sm font-bold text-white">{contractor.initials}</span>
           </div>
           <div className="flex-1 min-w-0">
@@ -332,15 +332,15 @@ function MilestonesSection({ project }: { project: HomeownerProject }) {
                 {/* Timeline line + dot */}
                 <div className="flex flex-col items-center">
                   {milestone.status === "completed" ? (
-                    <div className="h-6 w-6 rounded-none bg-emerald-600 flex items-center justify-center flex-shrink-0">
+                    <div className="h-6 w-6 rounded-sm bg-emerald-600 flex items-center justify-center flex-shrink-0">
                       <Check className="h-3.5 w-3.5 text-white" />
                     </div>
                   ) : milestone.status === "in-progress" ? (
-                    <div className="h-6 w-6 rounded-none bg-blue-600 flex items-center justify-center flex-shrink-0">
+                    <div className="h-6 w-6 rounded-sm bg-blue-600 flex items-center justify-center flex-shrink-0">
                       <Clock className="h-3.5 w-3.5 text-white" />
                     </div>
                   ) : (
-                    <div className="h-6 w-6 rounded-none border-2 border-gray-200 flex items-center justify-center flex-shrink-0">
+                    <div className="h-6 w-6 rounded-sm border-2 border-gray-200 flex items-center justify-center flex-shrink-0">
                       <Circle className="h-2.5 w-2.5 text-gray-300" />
                     </div>
                   )}
@@ -397,15 +397,15 @@ function MilestonesSection({ project }: { project: HomeownerProject }) {
 
         {/* Budget summary */}
         <div className="grid grid-cols-3 gap-3 text-center">
-          <div className="p-2.5 bg-surface rounded-none">
+          <div className="p-2.5 bg-surface rounded-sm">
             <p className="text-xs text-gray-700 mb-0.5">Total Budget</p>
             <p className="text-sm font-bold text-gray-900">{formatCurrency(project.budget)}</p>
           </div>
-          <div className="p-2.5 bg-surface rounded-none">
+          <div className="p-2.5 bg-surface rounded-sm">
             <p className="text-xs text-gray-700 mb-0.5">Paid</p>
             <p className="text-sm font-bold text-emerald-950">{formatCurrency(totalPaid)}</p>
           </div>
-          <div className="p-2.5 bg-surface rounded-none">
+          <div className="p-2.5 bg-surface rounded-sm">
             <p className="text-xs text-gray-700 mb-0.5">Remaining</p>
             <p className="text-sm font-bold text-gray-900">{formatCurrency(remaining)}</p>
           </div>
@@ -426,7 +426,7 @@ function PaymentsSection({ payments }: { payments: Payment[] }) {
         <h3 className="text-sm font-bold text-gray-900 mb-4">Payments</h3>
 
         {nextDue && (
-          <div className="flex items-center justify-between rounded-none border border-amber-200 bg-amber-50 p-4 mb-4">
+          <div className="flex items-center justify-between rounded-sm border border-amber-200 bg-amber-50 p-4 mb-4">
             <div>
               <p className="text-xs text-amber-700 font-medium">Payment Due</p>
               <p className="text-lg font-bold text-amber-900">{formatCurrency(nextDue.amount)}</p>
@@ -492,9 +492,9 @@ function DocumentsSection({ documents }: { documents: Document[] }) {
           {documents.map((doc, i) => (
             <button
               key={i}
-              className="flex items-center gap-3 w-full rounded-none p-2.5 hover:bg-gray-50 transition-colors text-left"
+              className="flex items-center gap-3 w-full rounded-sm p-2.5 hover:bg-gray-50 transition-colors text-left"
             >
-              <div className="h-8 w-8 rounded-none bg-surface flex items-center justify-center flex-shrink-0">
+              <div className="h-8 w-8 rounded-sm bg-surface flex items-center justify-center flex-shrink-0">
                 {iconForType(doc.type)}
               </div>
               <div className="flex-1 min-w-0">
@@ -532,7 +532,7 @@ function ChangeOrdersSection({ changeOrders }: { changeOrders: ChangeOrder[] }) 
           {changeOrders.map((order) => (
             <div
               key={order.id}
-              className="rounded-none border border-gray-200 p-4"
+              className="rounded-sm border border-gray-200 p-4"
             >
               <div className="flex items-start justify-between gap-3 mb-2">
                 <p className="text-sm font-medium text-gray-900">{order.description}</p>
@@ -611,15 +611,15 @@ function FairRecordSection({ project }: { project: HomeownerProject }) {
         </p>
 
         <div className="grid grid-cols-3 gap-3 text-center">
-          <div className="p-3 bg-surface rounded-none">
+          <div className="p-3 bg-surface rounded-sm">
             <p className="text-[10px] text-gray-700 uppercase tracking-wider font-medium mb-0.5">Budget Accuracy</p>
             <p className="text-lg font-bold text-emerald-950">{budgetAccuracy}%</p>
           </div>
-          <div className="p-3 bg-surface rounded-none">
+          <div className="p-3 bg-surface rounded-sm">
             <p className="text-[10px] text-gray-700 uppercase tracking-wider font-medium mb-0.5">Timeline</p>
             <p className="text-lg font-bold text-emerald-950">On Time</p>
           </div>
-          <div className="p-3 bg-surface rounded-none">
+          <div className="p-3 bg-surface rounded-sm">
             <p className="text-[10px] text-gray-700 uppercase tracking-wider font-medium mb-0.5">Disputes</p>
             <p className="text-lg font-bold text-emerald-950">0</p>
           </div>
@@ -659,7 +659,7 @@ function SidebarProjectItem({
     <button
       onClick={onClick}
       className={cn(
-        "w-full text-left rounded-none p-3.5 transition-colors relative overflow-hidden",
+        "w-full text-left rounded-sm p-3.5 transition-colors relative overflow-hidden",
         selected
           ? "bg-white border-l-4 border-l-brand-600 border-y border-r border-gray-200"
           : "bg-white hover:bg-gray-100 border border-transparent"
@@ -668,7 +668,7 @@ function SidebarProjectItem({
       <div className="flex items-center gap-2 mb-1">
         <span
           className={cn(
-            "h-2 w-2 rounded-none flex-shrink-0",
+            "h-2 w-2 rounded-sm flex-shrink-0",
             project.status === "in-progress" ? "bg-emerald-700" : "bg-blue-500"
           )}
         />
@@ -727,7 +727,7 @@ export default function HomeownerProjectsPage() {
         </div>
 
         {/* Summary Section */}
-        <div className="mx-5 mb-4 rounded-none border border-gray-200 bg-white p-4">
+        <div className="mx-5 mb-4 rounded-sm border border-gray-200 bg-white p-4">
           <div className="grid grid-cols-3 gap-3 text-center">
             <div>
               <p className="text-lg font-bold text-gray-900">{projects.length}</p>

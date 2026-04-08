@@ -244,7 +244,7 @@ function BrowseJobsTab() {
             if (e.target.value === "") { setSelectedCategories(new Set()); }
             else { setSelectedCategories(new Set([e.target.value])); }
           }}
-          className="h-10 rounded-none border border-gray-200 bg-white px-3 pr-8 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 appearance-none"
+          className="h-10 rounded-sm border border-gray-200 bg-white px-3 pr-8 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 appearance-none"
         >
           <option value="">All Categories</option>
           {Object.entries(categoryCounts).sort((a, b) => b[1] - a[1]).map(([cat, count]) => (
@@ -259,7 +259,7 @@ function BrowseJobsTab() {
             if (e.target.value === "") { setSelectedCities(new Set()); }
             else { setSelectedCities(new Set([e.target.value])); }
           }}
-          className="h-10 rounded-none border border-gray-200 bg-white px-3 pr-8 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 appearance-none"
+          className="h-10 rounded-sm border border-gray-200 bg-white px-3 pr-8 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 appearance-none"
         >
           <option value="">All Locations</option>
           {Object.entries(cityCounts).sort((a, b) => b[1] - a[1]).map(([city, count]) => (
@@ -268,7 +268,7 @@ function BrowseJobsTab() {
         </select>
 
         {/* Urgency pills */}
-        <div className="flex rounded-none ring-1 ring-gray-200 overflow-hidden">
+        <div className="flex rounded-sm ring-1 ring-gray-200 overflow-hidden">
           {[
             { value: "all", label: "All" },
             { value: "high", label: "Urgent" },
@@ -292,7 +292,7 @@ function BrowseJobsTab() {
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as SortOption)}
-          className="h-10 rounded-none border border-gray-200 bg-white px-3 pr-8 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 appearance-none"
+          className="h-10 rounded-sm border border-gray-200 bg-white px-3 pr-8 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 appearance-none"
         >
           <option value="newest">Newest</option>
           <option value="budget-high">Budget: High</option>
@@ -301,7 +301,7 @@ function BrowseJobsTab() {
         </select>
 
         {/* View toggle */}
-        <div className="flex rounded-none ring-1 ring-gray-200 overflow-hidden">
+        <div className="flex rounded-sm ring-1 ring-gray-200 overflow-hidden">
           <button onClick={() => setViewMode("grid")} className={cn("px-2.5 py-2 transition-colors", viewMode === "grid" ? "bg-gray-900 text-white" : "bg-white text-gray-600 hover:bg-gray-50")}>
             <LayoutGrid className="w-4 h-4" />
           </button>
@@ -334,7 +334,7 @@ function BrowseJobsTab() {
             ))}
           </div>
         ) : (
-          <div className="bg-white border border-border rounded-none py-16 text-center">
+          <div className="bg-white border border-border rounded-sm py-16 text-center">
             <Briefcase className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-700 text-sm mb-1 font-medium">No jobs found</p>
             <p className="text-gray-600 text-sm mb-4">Try adjusting your filters or search terms.</p>
@@ -383,7 +383,7 @@ function EstimateDetailDialog({ estimate, open, onClose }: { estimate: Estimate 
             <Badge variant={config.variant}>{config.label}</Badge>
           </DialogTitle>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-none">
+        <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-sm">
           <div>
             <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1">Client</p>
             <p className="text-sm font-semibold text-gray-900">{estimate.clientName}</p>
@@ -393,7 +393,7 @@ function EstimateDetailDialog({ estimate, open, onClose }: { estimate: Estimate 
             <p className="text-sm text-gray-900">{formatDate(estimate.createdDate)}</p>
           </div>
         </div>
-        <div className="rounded-none border border-border overflow-hidden">
+        <div className="rounded-sm border border-border overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 border-b border-border">
@@ -482,22 +482,22 @@ function MyEstimatesTab() {
     <div className="space-y-5">
       {/* Quick stats */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white border border-border rounded-none p-4 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-none bg-brand-50 flex items-center justify-center"><DollarSign className="w-4 h-4 text-brand-600" /></div>
+        <div className="bg-white border border-border rounded-sm p-4 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-sm bg-brand-50 flex items-center justify-center"><DollarSign className="w-4 h-4 text-brand-600" /></div>
           <div>
             <p className="text-xs text-gray-700">Total Value</p>
             <p className="text-lg font-bold text-gray-900 tabular-nums">{formatCurrency(totalValue)}</p>
           </div>
         </div>
-        <div className="bg-white border border-border rounded-none p-4 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-none bg-blue-50 flex items-center justify-center"><TrendingUp className="w-4 h-4 text-blue-600" /></div>
+        <div className="bg-white border border-border rounded-sm p-4 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-sm bg-blue-50 flex items-center justify-center"><TrendingUp className="w-4 h-4 text-blue-600" /></div>
           <div>
             <p className="text-xs text-gray-700">Acceptance Rate</p>
             <p className="text-lg font-bold text-gray-900">{acceptanceRate}%</p>
           </div>
         </div>
-        <div className="bg-white border border-border rounded-none p-4 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-none bg-amber-50 flex items-center justify-center"><FileText className="w-4 h-4 text-amber-600" /></div>
+        <div className="bg-white border border-border rounded-sm p-4 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-sm bg-amber-50 flex items-center justify-center"><FileText className="w-4 h-4 text-amber-600" /></div>
           <div>
             <p className="text-xs text-gray-700">Total Estimates</p>
             <p className="text-lg font-bold text-gray-900">{mockEstimates.length}</p>
@@ -527,7 +527,7 @@ function MyEstimatesTab() {
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={cn(
-                "px-3 py-1.5 rounded-none text-xs font-medium transition-colors border",
+                "px-3 py-1.5 rounded-sm text-xs font-medium transition-colors border",
                 activeTab === tab
                   ? "bg-brand-600 text-white border-brand-600"
                   : "bg-white text-gray-800 border-border hover:bg-gray-50"
@@ -535,7 +535,7 @@ function MyEstimatesTab() {
             >
               {tab === "all" ? "All" : tab.charAt(0).toUpperCase() + tab.slice(1)}
               {tabCounts[tab] > 0 && (
-                <span className={cn("ml-1.5 text-[10px] rounded-none px-1.5 py-0.5", activeTab === tab ? "bg-white/20 text-white" : "bg-gray-100 text-gray-800")}>
+                <span className={cn("ml-1.5 text-[10px] rounded-sm px-1.5 py-0.5", activeTab === tab ? "bg-white/20 text-white" : "bg-gray-100 text-gray-800")}>
                   {tabCounts[tab]}
                 </span>
               )}
@@ -545,7 +545,7 @@ function MyEstimatesTab() {
       </div>
 
       {/* Table */}
-      <div className="bg-white border border-border rounded-none overflow-hidden">
+      <div className="bg-white border border-border rounded-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -606,12 +606,12 @@ function MyEstimatesTab() {
                     <td className="px-2 py-3.5 relative" onClick={(e) => e.stopPropagation()}>
                       <button
                         onClick={() => setOpenMenu(openMenu === estimate.id ? null : estimate.id)}
-                        className="w-7 h-7 rounded-none hover:bg-gray-100 flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
+                        className="w-7 h-7 rounded-sm hover:bg-gray-100 flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors"
                       >
                         <MoreHorizontal className="w-4 h-4" />
                       </button>
                       {openMenu === estimate.id && (
-                        <div className="absolute right-2 top-full mt-1 z-20 bg-white border border-border rounded-none shadow-lg py-1 w-44" onMouseLeave={() => setOpenMenu(null)}>
+                        <div className="absolute right-2 top-full mt-1 z-20 bg-white border border-border rounded-sm shadow-lg py-1 w-44" onMouseLeave={() => setOpenMenu(null)}>
                           <button className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-gray-900 hover:bg-gray-50" onClick={() => { openDetail(estimate); setOpenMenu(null); }}>
                             <Eye className="w-3.5 h-3.5 text-gray-600" />View Details<ChevronRight className="w-3 h-3 text-gray-300 ml-auto" />
                           </button>
@@ -795,7 +795,7 @@ function NewEstimateTab() {
                 key={template.id}
                 onClick={() => applyTemplate(template)}
                 className={cn(
-                  "text-left rounded-none border-2 p-3.5 transition-colors",
+                  "text-left rounded-sm border-2 p-3.5 transition-colors",
                   isActive ? "border-brand-600 bg-brand-50" : "border-border hover:border-gray-300 hover:bg-gray-50"
                 )}
               >
@@ -834,7 +834,7 @@ function NewEstimateTab() {
                 onDragLeave={() => setIsDragOver(false)}
                 onDrop={(e) => { e.preventDefault(); setIsDragOver(false); }}
                 className={cn(
-                  "border-2 border-dashed rounded-none p-6 flex flex-col items-center justify-center gap-2 transition-colors cursor-pointer",
+                  "border-2 border-dashed rounded-sm p-6 flex flex-col items-center justify-center gap-2 transition-colors cursor-pointer",
                   isDragOver ? "border-brand-600 bg-brand-50" : "border-border hover:border-gray-300 hover:bg-gray-50"
                 )}
               >
@@ -875,7 +875,7 @@ function NewEstimateTab() {
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-gray-800">Select Existing Client</label>
                 <select
-                  className="w-full border border-border rounded-none px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-brand-600"
+                  className="w-full border border-border rounded-sm px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-brand-600"
                   value={selectedClientIdx ?? ""}
                   onChange={(e) => { const val = e.target.value; if (val !== "") handleClientSelect(Number(val)); }}
                 >
@@ -913,11 +913,11 @@ function NewEstimateTab() {
               <CardTitle className="text-base">Estimate Builder</CardTitle>
             </CardHeader>
             <CardContent className="pt-0 space-y-4">
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-none">
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-sm">
                 <Clock className="w-4 h-4 text-brand-600" />
                 <span className="text-xs font-semibold text-gray-800">Valid For</span>
                 <select
-                  className="border border-border rounded-none px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-600"
+                  className="border border-border rounded-sm px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-600"
                   value={validityDays}
                   onChange={(e) => setValidityDays(Number(e.target.value))}
                 >
@@ -932,7 +932,7 @@ function NewEstimateTab() {
                     <Plus className="w-3.5 h-3.5" />Add row
                   </button>
                 </div>
-                <div className="rounded-none border border-border overflow-hidden">
+                <div className="rounded-sm border border-border overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs">
                       <thead>
@@ -981,7 +981,7 @@ function NewEstimateTab() {
                       <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">By Category</p>
                       {(Object.entries(categoryTotals) as [LineCategory, number][]).map(([cat, amt]) => (
                         <div key={cat} className="flex items-center justify-between">
-                          <span className={cn("text-xs px-2 py-0.5 rounded-none font-medium", CATEGORY_COLORS[cat])}>{cat}</span>
+                          <span className={cn("text-xs px-2 py-0.5 rounded-sm font-medium", CATEGORY_COLORS[cat])}>{cat}</span>
                           <span className="text-xs font-semibold text-gray-900 tabular-nums">{formatCurrency(amt)}</span>
                         </div>
                       ))}
@@ -1053,12 +1053,12 @@ function CalcLayout({ inputs, results, ready, copied, onCopy }: {
 }) {
   return (
     <div className="grid grid-cols-2 gap-6">
-      <div className="bg-white border border-border rounded-none p-5 space-y-4">
+      <div className="bg-white border border-border rounded-sm p-5 space-y-4">
         <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">Inputs</h3>
         <Separator />
         {inputs}
       </div>
-      <div className="bg-white border border-border rounded-none p-5 flex flex-col">
+      <div className="bg-white border border-border rounded-sm p-5 flex flex-col">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">Material Summary</h3>
           {ready && (
@@ -1116,7 +1116,7 @@ function RoofingCalc() {
       inputs={<>
         <FieldGroup label="Roof Area (sq ft)"><Input type="number" placeholder="e.g. 2800" value={area} onChange={(e) => setArea(e.target.value)} /></FieldGroup>
         <FieldGroup label="Roof Pitch">
-          <select className="w-full h-10 rounded-none border border-border bg-white px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600" value={pitch} onChange={(e) => setPitch(parseFloat(e.target.value))}>
+          <select className="w-full h-10 rounded-sm border border-border bg-white px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600" value={pitch} onChange={(e) => setPitch(parseFloat(e.target.value))}>
             {PITCH_MULTIPLIERS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
           </select>
         </FieldGroup>
@@ -1200,7 +1200,7 @@ function FramingCalc() {
         <FieldGroup label="Stud Spacing">
           <div className="flex gap-2">
             {([16, 24] as const).map((s) => (
-              <button key={s} onClick={() => setSpacing(s)} className={cn("flex-1 h-10 rounded-none border text-sm font-medium transition-colors", spacing === s ? "border-brand-600 bg-brand-600 text-white" : "border-border bg-white text-gray-900 hover:bg-gray-50")}>
+              <button key={s} onClick={() => setSpacing(s)} className={cn("flex-1 h-10 rounded-sm border text-sm font-medium transition-colors", spacing === s ? "border-brand-600 bg-brand-600 text-white" : "border-border bg-white text-gray-900 hover:bg-gray-50")}>
                 {s}&quot; OC
               </button>
             ))}
@@ -1293,7 +1293,7 @@ function FencingCalc() {
         <FieldGroup label="Fence Height">
           <div className="flex gap-2">
             {([4, 6, 8] as const).map((h) => (
-              <button key={h} onClick={() => setFenceHeight(h)} className={cn("flex-1 h-10 rounded-none border text-sm font-medium transition-colors", fenceHeight === h ? "border-brand-600 bg-brand-600 text-white" : "border-border bg-white text-gray-900 hover:bg-gray-50")}>
+              <button key={h} onClick={() => setFenceHeight(h)} className={cn("flex-1 h-10 rounded-sm border text-sm font-medium transition-colors", fenceHeight === h ? "border-brand-600 bg-brand-600 text-white" : "border-border bg-white text-gray-900 hover:bg-gray-50")}>
                 {h} ft
               </button>
             ))}
@@ -1302,7 +1302,7 @@ function FencingCalc() {
         <FieldGroup label="Post Spacing">
           <div className="flex gap-2">
             {([6, 8] as const).map((s) => (
-              <button key={s} onClick={() => setPostSpacing(s)} className={cn("flex-1 h-10 rounded-none border text-sm font-medium transition-colors", postSpacing === s ? "border-brand-600 bg-brand-600 text-white" : "border-border bg-white text-gray-900 hover:bg-gray-50")}>
+              <button key={s} onClick={() => setPostSpacing(s)} className={cn("flex-1 h-10 rounded-sm border text-sm font-medium transition-colors", postSpacing === s ? "border-brand-600 bg-brand-600 text-white" : "border-border bg-white text-gray-900 hover:bg-gray-50")}>
                 {s} ft OC
               </button>
             ))}
@@ -1365,7 +1365,7 @@ export default function WorkPage() {
             <input
               type="text"
               placeholder="Search jobs, locations, categories..."
-              className="h-10 rounded-none border border-gray-200 bg-white pl-10 pr-4 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 w-[320px]"
+              className="h-10 rounded-sm border border-gray-200 bg-white pl-10 pr-4 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 w-[320px]"
             />
           </div>
         </div>

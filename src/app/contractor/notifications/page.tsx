@@ -203,7 +203,7 @@ export default function NotificationsPage() {
           <div className="flex items-center gap-3">
             <h1 className="text-[22px] font-semibold text-gray-900 tracking-tight">Notifications</h1>
             {unreadCount > 0 && (
-              <span className="text-[13px] font-bold text-white bg-red-500 rounded-none px-2 py-0.5 tabular-nums">{unreadCount}</span>
+              <span className="text-[13px] font-bold text-white bg-red-500 rounded-sm px-2 py-0.5 tabular-nums">{unreadCount}</span>
             )}
           </div>
           {unreadCount > 0 && (
@@ -223,7 +223,7 @@ export default function NotificationsPage() {
                 key={f}
                 onClick={() => setFilter(f)}
                 className={cn(
-                  "text-[13px] font-medium px-3 py-1.5 rounded-none transition-colors",
+                  "text-[13px] font-medium px-3 py-1.5 rounded-sm transition-colors",
                   filter === f
                     ? "bg-gray-900 text-white"
                     : "bg-white text-gray-700 hover:bg-gray-100"
@@ -246,11 +246,11 @@ export default function NotificationsPage() {
                   href={notif.href}
                   onClick={() => markRead(notif.id)}
                   className={cn(
-                    "flex gap-4 rounded-none px-4 py-4 transition-all hover:bg-white",
+                    "flex gap-4 rounded-sm px-4 py-4 transition-all hover:bg-white",
                     !notif.read && "bg-white shadow-[0_1px_4px_rgba(0,0,0,0.04)]"
                   )}
                 >
-                  <div className={cn("w-10 h-10 rounded-none flex items-center justify-center flex-shrink-0", config.bg)}>
+                  <div className={cn("w-10 h-10 rounded-sm flex items-center justify-center flex-shrink-0", config.bg)}>
                     <Icon className="w-5 h-5" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -261,7 +261,7 @@ export default function NotificationsPage() {
                     <p className="text-[13px] text-gray-600 mt-0.5 line-clamp-1">{notif.body}</p>
                   </div>
                   {!notif.read && (
-                    <div className="w-2.5 h-2.5 rounded-none bg-brand-600 flex-shrink-0 mt-1.5" />
+                    <div className="w-2.5 h-2.5 rounded-sm bg-brand-600 flex-shrink-0 mt-1.5" />
                   )}
                 </Link>
               );

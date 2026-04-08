@@ -78,7 +78,7 @@ export default function HomeownerOnboarding() {
                       key={type.id}
                       onClick={() => setPropertyType(type.id)}
                       className={cn(
-                        "flex flex-col items-center gap-2 p-4 rounded-none border-2 transition-all",
+                        "flex flex-col items-center gap-2 p-4 rounded-sm border-2 transition-all",
                         selected
                           ? "border-brand-600 bg-brand-50"
                           : "border-gray-200 hover:border-gray-300 bg-white"
@@ -89,7 +89,7 @@ export default function HomeownerOnboarding() {
                         {type.label}
                       </span>
                       {selected && (
-                        <div className="w-4 h-4 rounded-none bg-brand-600 flex items-center justify-center">
+                        <div className="w-4 h-4 rounded-sm bg-brand-600 flex items-center justify-center">
                           <Check className="w-2.5 h-2.5 text-white" />
                         </div>
                       )}

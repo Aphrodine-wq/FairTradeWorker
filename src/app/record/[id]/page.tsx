@@ -85,7 +85,7 @@ export default function PublicRecordPage() {
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-none bg-brand-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-sm bg-brand-600 flex items-center justify-center">
               <span className="text-white text-sm font-bold">FT</span>
             </div>
             <span className="text-[15px] font-semibold text-gray-900">{BRAND.name}</span>
@@ -105,7 +105,7 @@ export default function PublicRecordPage() {
 
       <div className="max-w-3xl mx-auto px-6 py-8">
         {/* Certificate card */}
-        <div className="bg-white rounded-none overflow-hidden">
+        <div className="bg-white rounded-sm overflow-hidden">
           {/* Certificate header */}
           <div className="px-8 pt-8 pb-6 border-b border-gray-100">
             <div className="flex items-start justify-between">
@@ -116,7 +116,7 @@ export default function PublicRecordPage() {
                 </div>
                 <p className="text-[13px] text-gray-600">Verified Project Completion Certificate</p>
               </div>
-              <span className="text-[13px] font-mono text-gray-600 bg-gray-50 px-3 py-1.5 rounded-none">{record.publicId}</span>
+              <span className="text-[13px] font-mono text-gray-600 bg-gray-50 px-3 py-1.5 rounded-sm">{record.publicId}</span>
             </div>
           </div>
 
@@ -163,7 +163,7 @@ export default function PublicRecordPage() {
           <div className="px-8 py-6 border-b border-gray-100">
             <h3 className="text-[13px] font-semibold text-gray-900 uppercase tracking-wider mb-4">Performance Metrics</h3>
             <div className="grid grid-cols-3 gap-6">
-              <div className="text-center p-4 bg-gray-50 rounded-none">
+              <div className="text-center p-4 bg-gray-50 rounded-sm">
                 <DollarSign className="w-5 h-5 text-gray-600 mx-auto mb-2" />
                 <p className="text-[11px] text-gray-600 mb-1">Budget Accuracy</p>
                 <p className={cn(
@@ -176,7 +176,7 @@ export default function PublicRecordPage() {
                   {formatCurrency(record.finalCost)} of {formatCurrency(record.estimatedBudget)}
                 </div>
               </div>
-              <div className="text-center p-4 bg-gray-50 rounded-none">
+              <div className="text-center p-4 bg-gray-50 rounded-sm">
                 <Clock className="w-5 h-5 text-gray-600 mx-auto mb-2" />
                 <p className="text-[11px] text-gray-600 mb-1">Timeline</p>
                 <p className={cn(
@@ -189,7 +189,7 @@ export default function PublicRecordPage() {
                   {record.onTime ? "Completed on or before deadline" : `Completed ${formatDate(record.actualCompletionDate)}`}
                 </div>
               </div>
-              <div className="text-center p-4 bg-gray-50 rounded-none">
+              <div className="text-center p-4 bg-gray-50 rounded-sm">
                 <CheckCircle2 className="w-5 h-5 text-gray-600 mx-auto mb-2" />
                 <p className="text-[11px] text-gray-600 mb-1">Disputes</p>
                 <p className={cn(
@@ -215,7 +215,7 @@ export default function PublicRecordPage() {
           <div className="px-8 py-6 border-b border-gray-100">
             <h3 className="text-[13px] font-semibold text-gray-900 uppercase tracking-wider mb-4">Contractor</h3>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-none bg-brand-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 rounded-sm bg-brand-100 flex items-center justify-center flex-shrink-0">
                 <span className="text-brand-700 text-sm font-bold">
                   {record.contractorName.split(" ").map((n) => n[0]).join("")}
                 </span>

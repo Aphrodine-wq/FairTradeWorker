@@ -20,7 +20,7 @@ export default function HomeownerError({
       </p>
       <button
         onClick={() => reset()}
-        className="inline-flex items-center justify-center rounded-none bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 transition-colors"
+        className="inline-flex items-center justify-center rounded-sm bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 transition-colors"
       >
         Try again
       </button>

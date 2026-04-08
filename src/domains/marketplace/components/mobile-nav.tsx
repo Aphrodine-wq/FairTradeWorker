@@ -58,7 +58,7 @@ export function MobileNav() {
               key={link.href}
               href={link.href}
               onClick={() => setOpen(false)}
-              className={`block px-3 py-2.5 rounded-none text-sm transition-colors duration-150 ${
+              className={`block px-3 py-2.5 rounded-sm text-sm transition-colors duration-150 ${
                 link.accent
                   ? "font-medium text-brand-600 hover:bg-brand-50"
                   : "text-gray-800 hover:text-gray-900 hover:bg-gray-100"

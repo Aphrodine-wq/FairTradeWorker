@@ -271,7 +271,7 @@ function StepDot({
     <div className="flex flex-col items-center gap-1">
       <div
         className={cn(
-          "w-8 h-8 rounded-none flex items-center justify-center text-xs font-bold border-2 transition-colors duration-150",
+          "w-8 h-8 rounded-sm flex items-center justify-center text-xs font-bold border-2 transition-colors duration-150",
           active
             ? "border-brand-600 bg-brand-600 text-white"
             : completed
@@ -377,14 +377,14 @@ function RoleCard({
       type="button"
       onClick={onClick}
       className={cn(
-        "relative w-full text-left rounded-none border-2 p-5 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2",
+        "relative w-full text-left rounded-sm border-2 p-5 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2",
         selected
           ? "border-brand-600 bg-brand-50"
           : "border-border bg-white hover:border-gray-300 hover:bg-gray-50"
       )}
     >
       {selected && (
-        <span className="absolute top-3 right-3 w-4 h-4 rounded-none bg-brand-600 flex items-center justify-center">
+        <span className="absolute top-3 right-3 w-4 h-4 rounded-sm bg-brand-600 flex items-center justify-center">
           <svg
             className="w-2.5 h-2.5 text-white"
             fill="none"
@@ -472,7 +472,7 @@ function StepTwo({
         <button
           type="button"
           onClick={onBack}
-          className="flex items-center justify-center w-8 h-8 rounded-none border border-border text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
+          className="flex items-center justify-center w-8 h-8 rounded-sm border border-border text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
           aria-label="Go back"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -491,7 +491,7 @@ function StepTwo({
 
       <form onSubmit={onSubmit} className="space-y-4">
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-none">
+          <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-sm">
             {error}
           </div>
         )}
@@ -537,7 +537,7 @@ function StepTwo({
                   value={form.specialty}
                   onChange={update("specialty")}
                   required
-                  className="flex h-10 w-full rounded-none border border-border bg-white px-3 py-2 text-sm text-gray-900 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex h-10 w-full rounded-sm border border-border bg-white px-3 py-2 text-sm text-gray-900 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <option value="" disabled>
                     Select...

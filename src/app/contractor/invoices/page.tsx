@@ -486,14 +486,14 @@ export default function InvoicesPage() {
                 placeholder="Search invoices..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full h-9 rounded-none border border-gray-200 bg-white pl-9 pr-3 text-[13px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600"
+                className="w-full h-9 rounded-sm border border-gray-200 bg-white pl-9 pr-3 text-[13px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600"
               />
             </div>
             <div className="relative">
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value as typeof filter)}
-                className="appearance-none w-full h-9 rounded-none border border-gray-200 bg-white px-3 pr-8 text-[13px] font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 cursor-pointer"
+                className="appearance-none w-full h-9 rounded-sm border border-gray-200 bg-white px-3 pr-8 text-[13px] font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 cursor-pointer"
               >
                 <option value="all">All ({invoices.length})</option>
                 <option value="sent">Sent ({invoices.filter((inv) => inv.status === "sent").length})</option>
@@ -630,7 +630,7 @@ export default function InvoicesPage() {
               </div>
 
               {/* Paper document */}
-              <div className="bg-white rounded-none shadow-[0_4px_30px_-6px_rgba(0,0,0,0.15)] ring-1 ring-gray-200/80 overflow-hidden">
+              <div className="bg-white rounded-sm shadow-[0_4px_30px_-6px_rgba(0,0,0,0.15)] ring-1 ring-gray-200/80 overflow-hidden">
                 {/* Top accent */}
                 <div className="h-1.5 bg-brand-600" />
 
@@ -643,7 +643,7 @@ export default function InvoicesPage() {
                         alt="Marcus Johnson"
                         width={48}
                         height={48}
-                        className="w-12 h-12 rounded-none object-cover ring-2 ring-gray-100"
+                        className="w-12 h-12 rounded-sm object-cover ring-2 ring-gray-100"
                       />
                       <div>
                         <p className="text-[16px] font-bold text-gray-900 leading-tight">
@@ -727,7 +727,7 @@ export default function InvoicesPage() {
                   <table className="w-full mb-5">
                     <thead>
                       <tr className="bg-gray-50">
-                        <th className="text-left text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] px-3 py-2.5 rounded-none-lg">
+                        <th className="text-left text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] px-3 py-2.5 rounded-sm-lg">
                           Description
                         </th>
                         <th className="text-right text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] px-3 py-2.5 w-[45px]">
@@ -736,7 +736,7 @@ export default function InvoicesPage() {
                         <th className="text-right text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] px-3 py-2.5 w-[70px]">
                           Rate
                         </th>
-                        <th className="text-right text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] px-3 py-2.5 w-[80px] rounded-none-lg">
+                        <th className="text-right text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] px-3 py-2.5 w-[80px] rounded-sm-lg">
                           Amount
                         </th>
                       </tr>
@@ -783,7 +783,7 @@ export default function InvoicesPage() {
                           {formatCurrency(selected.platformFee)}
                         </span>
                       </div>
-                      <div className="flex justify-between py-2.5 px-3 bg-gray-900 rounded-none mt-1.5">
+                      <div className="flex justify-between py-2.5 px-3 bg-gray-900 rounded-sm mt-1.5">
                         <span className="text-[12px] font-bold text-white">
                           Total Due
                         </span>
@@ -795,7 +795,7 @@ export default function InvoicesPage() {
                   </div>
 
                   {/* Payment terms */}
-                  <div className="bg-gray-50 rounded-none px-4 py-3 mb-5">
+                  <div className="bg-gray-50 rounded-sm px-4 py-3 mb-5">
                     <p className="text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] mb-1">
                       Payment Terms
                     </p>
@@ -807,7 +807,7 @@ export default function InvoicesPage() {
 
                   {/* Notes */}
                   {selected.notes && (
-                    <div className="bg-gray-50 rounded-none px-4 py-3 mb-5">
+                    <div className="bg-gray-50 rounded-sm px-4 py-3 mb-5">
                       <p className="text-[8px] font-bold text-gray-600 uppercase tracking-[0.1em] mb-1">
                         Notes
                       </p>
@@ -818,7 +818,7 @@ export default function InvoicesPage() {
                   )}
 
                   {/* QuickBooks note */}
-                  <div className="bg-brand-50 rounded-none px-4 py-3 mb-5 border border-brand-100">
+                  <div className="bg-brand-50 rounded-sm px-4 py-3 mb-5 border border-brand-100">
                     <p className="text-[10px] text-brand-700 font-medium">
                       Payment processed via QuickBooks Online. Client will
                       receive a secure payment link by email.
@@ -893,7 +893,7 @@ export default function InvoicesPage() {
               <select
                 value={createProject}
                 onChange={(e) => handleProjectChange(e.target.value)}
-                className="w-full h-10 rounded-none border border-gray-200 bg-white px-3 text-[13px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600"
+                className="w-full h-10 rounded-sm border border-gray-200 bg-white px-3 text-[13px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600"
               >
                 <option value="">Select a project</option>
                 {PROJECTS_WITH_MILESTONES.map((p) => (
@@ -918,7 +918,7 @@ export default function InvoicesPage() {
                   <select
                     value={createMilestone}
                     onChange={(e) => handleMilestoneChange(e.target.value)}
-                    className="w-full h-10 rounded-none border border-gray-200 bg-white px-3 text-[13px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600"
+                    className="w-full h-10 rounded-sm border border-gray-200 bg-white px-3 text-[13px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600"
                   >
                     <option value="">Select a milestone</option>
                     {availableMilestones.map((m) => (
@@ -950,7 +950,7 @@ export default function InvoicesPage() {
                   </Button>
                 </div>
 
-                <div className="border border-gray-200 rounded-none overflow-hidden">
+                <div className="border border-gray-200 rounded-sm overflow-hidden">
                   <table className="w-full">
                     <thead>
                       <tr className="bg-gray-50 text-left">
@@ -1072,7 +1072,7 @@ export default function InvoicesPage() {
               <select
                 value={createPaymentTerms}
                 onChange={(e) => setCreatePaymentTerms(e.target.value)}
-                className="w-full h-10 rounded-none border border-gray-200 bg-white px-3 text-[13px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600"
+                className="w-full h-10 rounded-sm border border-gray-200 bg-white px-3 text-[13px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600"
               >
                 {PAYMENT_TERMS_OPTIONS.map((t) => (
                   <option key={t} value={t}>

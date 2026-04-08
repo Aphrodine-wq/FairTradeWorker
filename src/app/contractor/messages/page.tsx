@@ -356,7 +356,7 @@ function OnlineDot({ online }: { online: boolean }) {
   return (
     <span
       className={cn(
-        "absolute bottom-0 right-0 w-2.5 h-2.5 rounded-none border-2 border-white",
+        "absolute bottom-0 right-0 w-2.5 h-2.5 rounded-sm border-2 border-white",
         online ? "bg-emerald-700" : "bg-gray-300"
       )}
     />
@@ -385,7 +385,7 @@ function ConversationRow({
       <div className="flex items-start gap-3">
         {/* Avatar with online indicator */}
         <div className="relative flex-shrink-0">
-          <div className="w-9 h-9 rounded-none bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-800">
+          <div className="w-9 h-9 rounded-sm bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-800">
             {getInitials(conv.homeownerName)}
           </div>
           <OnlineDot online={conv.online} />
@@ -421,7 +421,7 @@ function ConversationRow({
               {conv.lastMessage}
             </p>
             {conv.unread && conv.unreadCount && conv.unreadCount > 0 && (
-              <span className="flex-shrink-0 min-w-[18px] h-[18px] rounded-none bg-brand-600 text-white text-[10px] font-bold flex items-center justify-center px-1">
+              <span className="flex-shrink-0 min-w-[18px] h-[18px] rounded-sm bg-brand-600 text-white text-[10px] font-bold flex items-center justify-center px-1">
                 {conv.unreadCount}
               </span>
             )}
@@ -460,10 +460,10 @@ function MessageBubble({ msg }: { msg: Message }) {
     >
       <div
         className={cn(
-          "px-4 py-2.5 rounded-none text-sm leading-relaxed",
+          "px-4 py-2.5 rounded-sm text-sm leading-relaxed",
           isContractor
-            ? "bg-brand-600 text-white rounded-none-sm"
-            : "bg-gray-100 text-gray-900 rounded-none-sm"
+            ? "bg-brand-600 text-white rounded-sm-sm"
+            : "bg-gray-100 text-gray-900 rounded-sm-sm"
         )}
       >
         {msg.text}
@@ -479,17 +479,17 @@ function MessageBubble({ msg }: { msg: Message }) {
 function TypingIndicator() {
   return (
     <div className="flex items-start self-start max-w-[70%]">
-      <div className="px-4 py-3 rounded-none rounded-none-sm bg-gray-100 flex items-center gap-1">
+      <div className="px-4 py-3 rounded-sm rounded-sm-sm bg-gray-100 flex items-center gap-1">
         <span
-          className="w-1.5 h-1.5 rounded-none bg-gray-400 animate-bounce"
+          className="w-1.5 h-1.5 rounded-sm bg-gray-400 animate-bounce"
           style={{ animationDelay: "0ms", animationDuration: "1s" }}
         />
         <span
-          className="w-1.5 h-1.5 rounded-none bg-gray-400 animate-bounce"
+          className="w-1.5 h-1.5 rounded-sm bg-gray-400 animate-bounce"
           style={{ animationDelay: "180ms", animationDuration: "1s" }}
         />
         <span
-          className="w-1.5 h-1.5 rounded-none bg-gray-400 animate-bounce"
+          className="w-1.5 h-1.5 rounded-sm bg-gray-400 animate-bounce"
           style={{ animationDelay: "360ms", animationDuration: "1s" }}
         />
       </div>
@@ -500,7 +500,7 @@ function TypingIndicator() {
 function EmptyState() {
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center px-8">
-      <div className="w-14 h-14 rounded-none bg-gray-100 flex items-center justify-center">
+      <div className="w-14 h-14 rounded-sm bg-gray-100 flex items-center justify-center">
         <MessageSquare className="w-7 h-7 text-gray-600" />
       </div>
       <div>
@@ -624,7 +624,7 @@ export default function ContractorMessagesPage() {
               <div className="px-6 py-4 border-b border-gray-200 flex items-center gap-3 flex-shrink-0">
                 {/* Avatar with online indicator */}
                 <div className="relative flex-shrink-0">
-                  <div className="w-9 h-9 rounded-none bg-brand-100 flex items-center justify-center text-sm font-semibold text-brand-700">
+                  <div className="w-9 h-9 rounded-sm bg-brand-100 flex items-center justify-center text-sm font-semibold text-brand-700">
                     {getInitials(active.homeownerName)}
                   </div>
                   <OnlineDot online={active.online} />
@@ -648,13 +648,13 @@ export default function ContractorMessagesPage() {
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <a
                     href="#"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-brand-700 border border-brand-200 rounded-none hover:bg-brand-50 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-brand-700 border border-brand-200 rounded-sm hover:bg-brand-50 transition-colors"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     View Project
                   </a>
                   <button
-                    className="w-8 h-8 flex items-center justify-center rounded-none border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                    className="w-8 h-8 flex items-center justify-center rounded-sm border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
                     aria-label="Call homeowner"
                   >
                     <Phone className="w-4 h-4" />
@@ -676,7 +676,7 @@ export default function ContractorMessagesPage() {
                   <button
                     key={reply}
                     onClick={() => handleQuickReply(reply)}
-                    className="text-xs px-3 py-1.5 rounded-none border border-gray-200 text-gray-800 hover:border-brand-400 hover:text-brand-700 hover:bg-brand-50 transition-colors whitespace-nowrap"
+                    className="text-xs px-3 py-1.5 rounded-sm border border-gray-200 text-gray-800 hover:border-brand-400 hover:text-brand-700 hover:bg-brand-50 transition-colors whitespace-nowrap"
                   >
                     {reply}
                   </button>
@@ -686,7 +686,7 @@ export default function ContractorMessagesPage() {
               {/* Input bar */}
               <div className="px-6 py-4 border-t border-gray-200 flex items-center gap-2 flex-shrink-0 mt-2">
                 <button
-                  className="w-9 h-9 flex items-center justify-center rounded-none text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-colors flex-shrink-0"
+                  className="w-9 h-9 flex items-center justify-center rounded-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-colors flex-shrink-0"
                   aria-label="Attach file"
                 >
                   <Paperclip className="w-4 h-4" />

@@ -8,6 +8,25 @@ export const metadata: Metadata = {
   title: "Escrow Payments: What Contractors Need to Know | FairTradeWorker",
   description:
     "Getting paid on time is one of the biggest problems in construction. Escrow doesn't just protect homeowners — it gives contractors leverage too.",
+  openGraph: {
+    title: "Escrow Payments: What Contractors Need to Know | FairTradeWorker",
+    description: "Escrow doesn't just protect homeowners — it gives contractors leverage too.",
+    type: "article",
+    publishedTime: "2026-02-28T00:00:00Z",
+    authors: ["FairTradeWorker"],
+  },
+  alternates: { canonical: "/blog/escrow-payments-guide" },
+};
+
+const blogPostSchema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: "Escrow Payments: What Contractors Need to Know",
+  description: "Getting paid on time is one of the biggest problems in construction. Escrow doesn't just protect homeowners — it gives contractors leverage too.",
+  datePublished: "2026-02-28",
+  author: { "@type": "Organization", name: "FairTradeWorker", url: "https://fairtradeworker.com" },
+  publisher: { "@type": "Organization", name: "FairTradeWorker", url: "https://fairtradeworker.com" },
+  mainEntityOfPage: "https://fairtradeworker.com/blog/escrow-payments-guide",
 };
 
 export default function EscrowPaymentsGuidePage() {
@@ -15,6 +34,7 @@ export default function EscrowPaymentsGuidePage() {
     <>
       <Navbar />
       <main className="bg-[#FAFAFA] min-h-screen">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostSchema) }} />
         <article className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
           <Link
             href="/blog"

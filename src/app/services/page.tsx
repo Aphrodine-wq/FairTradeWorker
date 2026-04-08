@@ -15,6 +15,9 @@ export const metadata: Metadata = {
     description:
       "Browse verified contractors by trade — HVAC, electricians, plumbers, roofers, painters, and more. No lead fees.",
   },
+  alternates: {
+    canonical: "/services",
+  },
 };
 
 // Unique states for location grouping

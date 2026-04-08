@@ -85,7 +85,7 @@ export function BidDialog({ job, trigger }: BidDialogProps) {
         {submitted ? (
           // ── Success State ──
           <div className="flex flex-col items-center text-center py-8 px-4">
-            <div className="w-16 h-16 rounded-none bg-brand-50 flex items-center justify-center mb-4">
+            <div className="w-16 h-16 rounded-sm bg-brand-50 flex items-center justify-center mb-4">
               <CheckCircle2 className="w-8 h-8 text-brand-600" />
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">
@@ -114,7 +114,7 @@ export function BidDialog({ job, trigger }: BidDialogProps) {
                 {job.title}
               </DialogDescription>
               {/* Budget reference */}
-              <div className="mt-3 inline-flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-none px-3 py-2 w-fit">
+              <div className="mt-3 inline-flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-sm px-3 py-2 w-fit">
                 <span className="text-xs text-gray-700 font-medium">
                   Homeowner budget:
                 </span>
@@ -158,7 +158,7 @@ export function BidDialog({ job, trigger }: BidDialogProps) {
                   onChange={(e) => setTimeline(e.target.value)}
                   required
                   className={cn(
-                    "w-full h-10 rounded-none border border-input bg-background px-3 py-2 text-sm",
+                    "w-full h-10 rounded-sm border border-input bg-background px-3 py-2 text-sm",
                     "focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-0",
                     "text-gray-900"
                   )}

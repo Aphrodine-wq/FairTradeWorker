@@ -82,7 +82,7 @@ function SubJobCarousel({ subJobs }: { subJobs: SubJob[] }) {
               <div>
                 <p className="text-[18px] font-bold text-gray-900 leading-tight">{sj.title}</p>
                 <p className="text-[13px] text-gray-500 mt-1 flex items-center gap-1.5">
-                  <span className={cn("w-2 h-2 rounded-none flex-shrink-0", catColor)} />
+                  <span className={cn("w-2 h-2 rounded-sm flex-shrink-0", catColor)} />
                   {sj.milestoneLabel} — {sj.projectTitle}
                 </p>
               </div>
@@ -120,7 +120,7 @@ function SubJobCarousel({ subJobs }: { subJobs: SubJob[] }) {
         {/* Dots */}
         <div className="flex justify-center gap-1 mt-2">
           {subJobs.map((_, i) => (
-            <button key={i} onClick={() => setActive(i)} className={cn("w-1.5 h-1.5 rounded-none transition-all", i === active ? "bg-brand-600 w-3" : "bg-gray-300")} />
+            <button key={i} onClick={() => setActive(i)} className={cn("w-1.5 h-1.5 rounded-sm transition-all", i === active ? "bg-brand-600 w-3" : "bg-gray-300")} />
           ))}
         </div>
       </div>
@@ -144,7 +144,7 @@ function TileHeader({ title, count, linkHref, linkLabel }: { title: string; coun
       <div className="flex items-center gap-2.5">
         <h2 className="text-[20px] font-bold text-gray-900">{title}</h2>
         {count !== undefined && (
-          <span className="text-[13px] font-semibold text-gray-600 bg-gray-100 rounded-none px-2 py-0.5 tabular-nums">{count}</span>
+          <span className="text-[13px] font-semibold text-gray-600 bg-gray-100 rounded-sm px-2 py-0.5 tabular-nums">{count}</span>
         )}
       </div>
       {linkHref && (
@@ -181,7 +181,7 @@ export default function SubContractorDashboardPage() {
         <div className="flex items-center justify-between">
           <h1 className="text-[24px] font-semibold text-gray-900 tracking-tight">{formatTodayDate()}</h1>
           <div className="flex items-center gap-3">
-            <Link href="/subcontractor/work" className="flex items-center gap-1.5 h-8 px-3 rounded-none bg-gray-900 text-white text-[12px] font-semibold hover:bg-gray-800 transition-colors">
+            <Link href="/subcontractor/work" className="flex items-center gap-1.5 h-8 px-3 rounded-sm bg-gray-900 text-white text-[12px] font-semibold hover:bg-gray-800 transition-colors">
               <Briefcase className="w-3.5 h-3.5" />
               Find Work
             </Link>

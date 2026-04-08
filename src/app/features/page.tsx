@@ -17,6 +17,13 @@ export const metadata: Metadata = {
   title: "Features",
   description:
     "Discover how FairTradeWorker helps homeowners find verified contractors and helps contractors grow their business with AI-powered tools.",
+  openGraph: {
+    title: "Features | FairTradeWorker",
+    description: "Discover how FairTradeWorker helps homeowners find verified contractors and helps contractors grow their business with AI-powered tools.",
+  },
+  alternates: {
+    canonical: "/features",
+  },
 };
 
 const TOP_FEATURES = [
@@ -74,8 +81,8 @@ export default function FeaturesPage() {
               {TOP_FEATURES.map((feature) => {
                 const Icon = feature.icon;
                 return (
-                  <div key={feature.title} className="bg-white rounded-none border border-border p-8 flex flex-col text-center">
-                    <div className="w-12 h-12 rounded-none bg-brand-50 flex items-center justify-center mx-auto mb-5">
+                  <div key={feature.title} className="bg-white rounded-sm border border-border p-8 flex flex-col text-center">
+                    <div className="w-12 h-12 rounded-sm bg-brand-50 flex items-center justify-center mx-auto mb-5">
                       <Icon className="w-5 h-5 text-brand-600" />
                     </div>
                     <h3 className="text-lg font-bold text-gray-900 mb-2">
@@ -87,7 +94,7 @@ export default function FeaturesPage() {
                     <ul className="space-y-2.5 text-left mx-auto">
                       {feature.points.map((d) => (
                         <li key={d} className="flex items-center gap-2.5 text-sm text-gray-800">
-                          <div className="w-5 h-5 rounded-none bg-brand-50 flex items-center justify-center shrink-0">
+                          <div className="w-5 h-5 rounded-sm bg-brand-50 flex items-center justify-center shrink-0">
                             <Check className="w-3 h-3 text-brand-600" strokeWidth={3} />
                           </div>
                           {d}
@@ -112,7 +119,7 @@ export default function FeaturesPage() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
-                <div className="w-12 h-12 rounded-none bg-brand-50 flex items-center justify-center mb-5">
+                <div className="w-12 h-12 rounded-sm bg-brand-50 flex items-center justify-center mb-5">
                   <BarChart3 className="w-5 h-5 text-brand-600" />
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight mb-3">
@@ -130,7 +137,7 @@ export default function FeaturesPage() {
                     "QuickBooks-ready report exports",
                   ].map((d) => (
                     <li key={d} className="flex items-center gap-2.5 text-sm text-gray-800">
-                      <div className="w-5 h-5 rounded-none bg-brand-50 flex items-center justify-center shrink-0">
+                      <div className="w-5 h-5 rounded-sm bg-brand-50 flex items-center justify-center shrink-0">
                         <Check className="w-3 h-3 text-brand-600" strokeWidth={3} />
                       </div>
                       {d}
@@ -146,7 +153,7 @@ export default function FeaturesPage() {
                   { label: "Response Time", value: "2.1 hr", sub: "faster than 90%" },
                   { label: "Revenue MTD", value: "$47,200", sub: "+23% vs last month" },
                 ].map((s) => (
-                  <div key={s.label} className="bg-[#FAFAFA] rounded-none border border-border p-5 text-center">
+                  <div key={s.label} className="bg-[#FAFAFA] rounded-sm border border-border p-5 text-center">
                     <p className="text-[11px] font-medium text-gray-600 uppercase tracking-wider mb-1">{s.label}</p>
                     <p className="text-2xl font-bold text-gray-900 tabular-nums">{s.value}</p>
                     <p className="text-xs text-gray-600 mt-1">{s.sub}</p>
@@ -177,8 +184,8 @@ export default function FeaturesPage() {
               ].map((feature) => {
                 const Icon = feature.icon;
                 return (
-                  <div key={feature.title} className="bg-white rounded-none border border-border p-8">
-                    <div className="w-12 h-12 rounded-none bg-brand-50 flex items-center justify-center mb-5">
+                  <div key={feature.title} className="bg-white rounded-sm border border-border p-8">
+                    <div className="w-12 h-12 rounded-sm bg-brand-50 flex items-center justify-center mb-5">
                       <Icon className="w-5 h-5 text-brand-600" />
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">
@@ -190,7 +197,7 @@ export default function FeaturesPage() {
                     <ul className="space-y-2.5">
                       {feature.points.map((d) => (
                         <li key={d} className="flex items-center gap-2.5 text-sm text-gray-800">
-                          <div className="w-5 h-5 rounded-none bg-brand-50 flex items-center justify-center shrink-0">
+                          <div className="w-5 h-5 rounded-sm bg-brand-50 flex items-center justify-center shrink-0">
                             <Check className="w-3 h-3 text-brand-600" strokeWidth={3} />
                           </div>
                           {d}
@@ -217,14 +224,14 @@ export default function FeaturesPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/signup"
-                className="inline-flex items-center gap-2 rounded-none bg-brand-600 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-700 transition-colors"
+                className="inline-flex items-center gap-2 rounded-sm bg-brand-600 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-700 transition-colors"
               >
                 Get Started Free
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 href="/pricing"
-                className="inline-flex items-center gap-2 rounded-none border border-border bg-white px-6 py-3 text-sm font-semibold text-gray-900 hover:bg-gray-50 transition-colors"
+                className="inline-flex items-center gap-2 rounded-sm border border-border bg-white px-6 py-3 text-sm font-semibold text-gray-900 hover:bg-gray-50 transition-colors"
               >
                 View Pricing
               </Link>

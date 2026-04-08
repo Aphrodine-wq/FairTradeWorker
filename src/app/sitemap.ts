@@ -10,6 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/pricing",
     "/features",
     "/how-it-works",
+    "/new-way",
     "/about",
     "/blog",
     "/careers",
@@ -104,10 +105,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   // Blog posts (static slugs)
   const blogSlugs = [
-    "fair-pricing-construction",
-    "ai-construction-estimating",
-    "mississippi-launch",
+    "roof-replacement-cost-mississippi",
+    "hvac-installation-cost-mississippi",
+    "how-much-kitchen-remodel-mississippi",
+    "fence-cost-mississippi",
+    "termite-damage-mississippi",
+    "hvac-maintenance-mississippi-summer",
+    "bathroom-remodel-cost-guide",
+    "hiring-contractor-checklist",
+    "killing-lead-fees",
+    "storm-damage-roof-mississippi",
+    "hunter-voice-ai",
+    "energy-efficient-home-mississippi",
     "escrow-payments-guide",
+    "first-time-homeowner-mississippi",
+    "mississippi-launch",
   ];
 
   const blogEntries: MetadataRoute.Sitemap = blogSlugs.map((slug) => ({

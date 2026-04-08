@@ -31,12 +31,12 @@ export function PricingSection() {
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             {/* Audience toggle */}
-            <div className="flex items-center gap-1 bg-gray-100 rounded-none p-1">
+            <div className="flex items-center gap-1 bg-gray-100 rounded-sm p-1">
               <button
                 type="button"
                 onClick={() => setAudience("contractor")}
                 className={cn(
-                  "px-4 py-1.5 text-sm font-medium rounded-none transition-colors",
+                  "px-4 py-1.5 text-sm font-medium rounded-sm transition-colors",
                   audience === "contractor"
                     ? "bg-white text-gray-900 shadow-sm"
                     : "text-gray-700 hover:text-gray-900"
@@ -48,7 +48,7 @@ export function PricingSection() {
                 type="button"
                 onClick={() => setAudience("homeowner")}
                 className={cn(
-                  "px-4 py-1.5 text-sm font-medium rounded-none transition-colors",
+                  "px-4 py-1.5 text-sm font-medium rounded-sm transition-colors",
                   audience === "homeowner"
                     ? "bg-white text-gray-900 shadow-sm"
                     : "text-gray-700 hover:text-gray-900"
@@ -72,13 +72,13 @@ export function PricingSection() {
                 type="button"
                 onClick={() => setYearly(!yearly)}
                 className={cn(
-                  "relative inline-flex h-6 w-11 items-center rounded-none transition-colors",
+                  "relative inline-flex h-6 w-11 items-center rounded-sm transition-colors",
                   yearly ? "bg-brand-600" : "bg-gray-200"
                 )}
               >
                 <span
                   className={cn(
-                    "inline-block h-4 w-4 transform rounded-none bg-white transition-transform",
+                    "inline-block h-4 w-4 transform rounded-sm bg-white transition-transform",
                     yearly ? "translate-x-6" : "translate-x-1"
                   )}
                 />
@@ -116,7 +116,7 @@ export function PricingSection() {
               <div
                 key={tier.name}
                 className={cn(
-                  "bg-white border rounded-none flex flex-col p-8",
+                  "bg-white border rounded-sm flex flex-col p-8",
                   tier.featured
                     ? "border-brand-600 border-t-4"
                     : "border-border"

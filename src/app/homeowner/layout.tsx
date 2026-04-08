@@ -39,7 +39,7 @@ function GlobalTopBar({ pathname }: { pathname: string }) {
       <Link
         href="/homeowner/messages"
         className={cn(
-          "relative w-8 h-8 rounded-none hover:bg-gray-100 flex items-center justify-center transition-colors",
+          "relative w-8 h-8 rounded-sm hover:bg-gray-100 flex items-center justify-center transition-colors",
           pathname === "/homeowner/messages" && "bg-gray-100"
         )}
       >
@@ -51,7 +51,7 @@ function GlobalTopBar({ pathname }: { pathname: string }) {
       <Link
         href="/homeowner/notifications"
         className={cn(
-          "relative w-8 h-8 rounded-none hover:bg-gray-100 flex items-center justify-center transition-colors",
+          "relative w-8 h-8 rounded-sm hover:bg-gray-100 flex items-center justify-center transition-colors",
           pathname === "/homeowner/notifications" && "bg-gray-100"
         )}
       >
@@ -88,7 +88,7 @@ export default function HomeownerLayout({
         topAction={
           <Link
             href="/homeowner/jobs"
-            className="flex items-center justify-center gap-2 w-full rounded-none bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold py-3 px-4 transition-colors"
+            className="flex items-center justify-center gap-2 w-full rounded-sm bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold py-3 px-4 transition-colors"
           >
             <Plus className="h-4 w-4" />
             Post a Job

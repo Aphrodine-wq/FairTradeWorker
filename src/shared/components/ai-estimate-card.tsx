@@ -96,7 +96,7 @@ export function AiEstimateCard({
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-none bg-brand-100 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-sm bg-brand-100 flex items-center justify-center">
               <Sparkles className="w-3.5 h-3.5 text-brand-600" />
             </div>
             <div>
@@ -142,7 +142,7 @@ export function AiEstimateCard({
 
         {/* Suggested bid for contractors */}
         {suggestedBid && variant === "contractor" && (
-          <div className="flex items-center gap-2 px-3 py-2 bg-emerald-950/10 border border-emerald-800/20 rounded-none">
+          <div className="flex items-center gap-2 px-3 py-2 bg-emerald-950/10 border border-emerald-800/20 rounded-sm">
             <TrendingUp className="w-4 h-4 text-emerald-950" />
             <span className="text-sm text-green-800">
               Suggested bid: <strong>{formatCurrency(suggestedBid)}</strong>

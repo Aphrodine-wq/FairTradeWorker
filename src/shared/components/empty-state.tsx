@@ -20,7 +20,7 @@ export function EmptyState({ icon: Icon, title, description, action }: EmptyStat
       {action && (
         <Link
           href={action.href}
-          className="mt-4 inline-flex items-center justify-center rounded-none bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 transition-colors"
+          className="mt-4 inline-flex items-center justify-center rounded-sm bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 transition-colors"
         >
           {action.label}
         </Link>

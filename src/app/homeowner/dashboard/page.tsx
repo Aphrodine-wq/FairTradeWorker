@@ -202,7 +202,7 @@ export default function HomeownerDashboardPage() {
               <button
                 key={c.label}
                 onClick={() => { reset(); setSelectedCategory(c.label); }}
-                className={`flex flex-col items-center gap-3 rounded-none border p-5 transition-colors ${
+                className={`flex flex-col items-center gap-3 rounded-sm border p-5 transition-colors ${
                   active ? `${c.border} ${c.bg}` : "border-border bg-white hover:border-gray-300"
                 }`}
               >
@@ -217,13 +217,13 @@ export default function HomeownerDashboardPage() {
       {/* ── Modal ─────────────────────────────────────────────────── */}
       {selectedCategory && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: "rgba(15,20,25,0.5)" }} onClick={reset}>
-          <div className="w-full max-w-3xl bg-white rounded-none shadow-2xl max-h-[88vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full max-w-3xl bg-white rounded-sm shadow-2xl max-h-[88vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
 
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-border flex-shrink-0">
               <div className="flex items-center gap-3">
                 {cat && (
-                  <div className={`flex h-8 w-8 items-center justify-center rounded-none ${cat.bg}`}>
+                  <div className={`flex h-8 w-8 items-center justify-center rounded-sm ${cat.bg}`}>
                     <cat.icon className={`h-4 w-4 ${cat.color}`} />
                   </div>
                 )}
@@ -233,11 +233,11 @@ export default function HomeownerDashboardPage() {
                 {!showSuccess && (
                   <div className="flex items-center gap-1">
                     {[1,2,3,4].map((s) => (
-                      <div key={s} className={`h-1 rounded-none transition-colors ${s <= step ? "w-7 bg-brand-600" : "w-4 bg-gray-200"}`} />
+                      <div key={s} className={`h-1 rounded-sm transition-colors ${s <= step ? "w-7 bg-brand-600" : "w-4 bg-gray-200"}`} />
                     ))}
                   </div>
                 )}
-                <button onClick={reset} className="w-7 h-7 rounded-none flex items-center justify-center text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-colors">
+                <button onClick={reset} className="w-7 h-7 rounded-sm flex items-center justify-center text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-colors">
                   <X className="h-4 w-4" />
                 </button>
               </div>
@@ -247,7 +247,7 @@ export default function HomeownerDashboardPage() {
             <div className="flex-1 overflow-y-auto px-6 py-5">
               {showSuccess ? (
                 <div className="py-10 text-center">
-                  <div className="w-14 h-14 rounded-none bg-brand-100 flex items-center justify-center mx-auto mb-4">
+                  <div className="w-14 h-14 rounded-sm bg-brand-100 flex items-center justify-center mx-auto mb-4">
                     <Check className="h-7 w-7 text-brand-600" />
                   </div>
                   <p className="text-lg font-bold text-gray-900 mb-1">Job posted</p>
@@ -263,7 +263,7 @@ export default function HomeownerDashboardPage() {
                     <input
                       type="text" value={title} onChange={(e) => setTitle(e.target.value)} autoFocus
                       placeholder="e.g., Replace hardwood floors in living room and hallway"
-                      className="w-full rounded-none border border-border px-4 py-3 text-sm text-gray-900 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600"
+                      className="w-full rounded-sm border border-border px-4 py-3 text-sm text-gray-900 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600"
                     />
                   </div>
                   <div>
@@ -273,7 +273,7 @@ export default function HomeownerDashboardPage() {
                     <textarea
                       value={description} onChange={(e) => setDescription(e.target.value)} rows={3}
                       placeholder={"What's the current state? Materials in mind? Specific requirements?"}
-                      className="w-full rounded-none border border-border px-4 py-3 text-sm text-gray-900 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600 resize-none leading-relaxed"
+                      className="w-full rounded-sm border border-border px-4 py-3 text-sm text-gray-900 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600 resize-none leading-relaxed"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
@@ -285,7 +285,7 @@ export default function HomeownerDashboardPage() {
                           const active = propertyType === pt.value;
                           return (
                             <button key={pt.value} onClick={() => setPropertyType(pt.value)}
-                              className={`flex items-center gap-2 p-2.5 rounded-none border-2 transition-colors ${sel(active)}`}>
+                              className={`flex items-center gap-2 p-2.5 rounded-sm border-2 transition-colors ${sel(active)}`}>
                               <PIcon className={`h-4 w-4 ${active ? "text-brand-600" : "text-gray-600"}`} />
                               <span className="text-xs font-medium">{pt.label}</span>
                             </button>
@@ -298,7 +298,7 @@ export default function HomeownerDashboardPage() {
                         <Camera className="inline h-3.5 w-3.5 mr-1 text-gray-600" />
                         Photos <span className="text-red-500">*</span>
                       </label>
-                      <div className="border-2 border-dashed border-gray-200 rounded-none p-4 hover:border-brand-300 hover:bg-brand-50/30 transition-colors cursor-pointer text-center h-[108px] flex flex-col items-center justify-center">
+                      <div className="border-2 border-dashed border-gray-200 rounded-sm p-4 hover:border-brand-300 hover:bg-brand-50/30 transition-colors cursor-pointer text-center h-[108px] flex flex-col items-center justify-center">
                         <Upload className="h-5 w-5 text-gray-300 mb-1" />
                         <p className="text-xs font-medium text-gray-700">Upload photos of the area</p>
                         <p className="text-[11px] text-gray-600 mt-0.5">Required. Up to 10 photos.</p>
@@ -312,7 +312,7 @@ export default function HomeownerDashboardPage() {
                       </label>
                       <input type="text" value={address} onChange={(e) => setAddress(e.target.value)}
                         placeholder="123 Main St, Oxford, MS"
-                        className="w-full rounded-none border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600" />
+                        className="w-full rounded-sm border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600" />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-gray-900 mb-1">
@@ -320,7 +320,7 @@ export default function HomeownerDashboardPage() {
                       </label>
                       <input type="text" value={sqft} onChange={(e) => setSqft(e.target.value)}
                         placeholder="2,200"
-                        className="w-full rounded-none border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600" />
+                        className="w-full rounded-sm border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600" />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-gray-900 mb-1">
@@ -328,7 +328,7 @@ export default function HomeownerDashboardPage() {
                       </label>
                       <input type="text" value={yearBuilt} onChange={(e) => setYearBuilt(e.target.value)}
                         placeholder="1998"
-                        className="w-full rounded-none border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600" />
+                        className="w-full rounded-sm border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600" />
                     </div>
                   </div>
                 </div>
@@ -340,7 +340,7 @@ export default function HomeownerDashboardPage() {
                     <div className="flex flex-wrap gap-2">
                       {AREAS.map((a) => (
                         <button key={a} onClick={() => toggleArea(a)}
-                          className={`px-3 py-1.5 rounded-none text-xs font-medium border transition-colors ${
+                          className={`px-3 py-1.5 rounded-sm text-xs font-medium border transition-colors ${
                             areas.includes(a) ? "bg-brand-600 text-white border-brand-600" : "bg-white text-gray-800 border-border hover:border-gray-300"
                           }`}>{a}</button>
                       ))}
@@ -350,14 +350,14 @@ export default function HomeownerDashboardPage() {
                     <label className="block text-sm font-medium text-gray-900 mb-1.5">Current condition</label>
                     <textarea value={condition} onChange={(e) => setCondition(e.target.value)} rows={3}
                       placeholder="Describe what's there now — existing materials, damage, anything a contractor should know before visiting..."
-                      className="w-full rounded-none border border-border px-4 py-3 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600 resize-none" />
+                      className="w-full rounded-sm border border-border px-4 py-3 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600 resize-none" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-900 mb-2">Material preference</label>
                     <div className="grid grid-cols-3 gap-2">
                       {["I know what I want", "I have some ideas", "Open to suggestions", "Budget-friendly", "Mid-range", "Premium / high-end"].map((opt) => (
                         <button key={opt} onClick={() => setMaterialPref(opt)}
-                          className={`p-2.5 rounded-none border-2 text-xs font-medium text-center transition-colors ${sel(materialPref === opt)}`}>{opt}</button>
+                          className={`p-2.5 rounded-sm border-2 text-xs font-medium text-center transition-colors ${sel(materialPref === opt)}`}>{opt}</button>
                       ))}
                     </div>
                   </div>
@@ -365,7 +365,7 @@ export default function HomeownerDashboardPage() {
                     <label className="block text-sm font-medium text-gray-900 mb-1.5">Anything else? <span className="text-gray-600 font-normal">(optional)</span></label>
                     <input type="text" value={notes} onChange={(e) => setNotes(e.target.value)}
                       placeholder="HOA rules, permit info, previous work done..."
-                      className="w-full rounded-none border border-border px-4 py-3 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600" />
+                      className="w-full rounded-sm border border-border px-4 py-3 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600" />
                   </div>
                 </div>
               ) : step === 3 ? (
@@ -383,7 +383,7 @@ export default function HomeownerDashboardPage() {
                         const OI = o.i; const active = timeline === o.v;
                         return (
                           <button key={o.v} onClick={() => setTimeline(o.v)}
-                            className={`flex items-center gap-3 p-3.5 rounded-none border-2 text-left transition-colors ${sel(active)}`}>
+                            className={`flex items-center gap-3 p-3.5 rounded-sm border-2 text-left transition-colors ${sel(active)}`}>
                             <OI className={`h-4 w-4 flex-shrink-0 ${active ? "text-brand-600" : "text-gray-600"}`} />
                             <div>
                               <span className={`text-sm font-medium block ${active ? "text-brand-700" : "text-gray-900"}`}>{o.l}</span>
@@ -403,7 +403,7 @@ export default function HomeownerDashboardPage() {
                         { v: "unsure", l: "Not sure yet" }, { v: "needestimate", l: "Need an estimate" },
                       ].map((o) => (
                         <button key={o.v} onClick={() => setBudget(o.v)}
-                          className={`p-2.5 rounded-none border-2 text-sm font-medium text-center transition-colors ${sel(budget === o.v)}`}>{o.l}</button>
+                          className={`p-2.5 rounded-sm border-2 text-sm font-medium text-center transition-colors ${sel(budget === o.v)}`}>{o.l}</button>
                       ))}
                     </div>
                   </div>
@@ -413,7 +413,7 @@ export default function HomeownerDashboardPage() {
                       <div className="flex gap-2">
                         {["3","5","7"].map((n) => (
                           <button key={n} onClick={() => setBidCount(n)}
-                            className={`flex-1 p-2.5 rounded-none border-2 text-sm font-semibold text-center transition-colors ${sel(bidCount === n)}`}>{n}</button>
+                            className={`flex-1 p-2.5 rounded-sm border-2 text-sm font-semibold text-center transition-colors ${sel(bidCount === n)}`}>{n}</button>
                         ))}
                       </div>
                     </div>
@@ -428,7 +428,7 @@ export default function HomeownerDashboardPage() {
                           const PI = o.i; const active = priority === o.v;
                           return (
                             <button key={o.v} onClick={() => setPriority(o.v)}
-                              className={`flex-1 flex flex-col items-center gap-1 p-2 rounded-none border-2 transition-colors ${sel(active)}`}>
+                              className={`flex-1 flex flex-col items-center gap-1 p-2 rounded-sm border-2 transition-colors ${sel(active)}`}>
                               <PI className={`h-3.5 w-3.5 ${active ? "text-brand-600" : "text-gray-600"}`} />
                               <span className="text-[11px] font-medium">{o.l}</span>
                             </button>
@@ -449,7 +449,7 @@ export default function HomeownerDashboardPage() {
                           const CI = o.i; const active = contact.includes(o.v);
                           return (
                             <button key={o.v} onClick={() => toggleContact(o.v)}
-                              className={`flex-1 flex items-center justify-center gap-1.5 p-2.5 rounded-none border-2 text-xs font-medium transition-colors ${sel(active)}`}>
+                              className={`flex-1 flex items-center justify-center gap-1.5 p-2.5 rounded-sm border-2 text-xs font-medium transition-colors ${sel(active)}`}>
                               <CI className="h-3.5 w-3.5" /> {o.l}
                             </button>
                           );
@@ -462,7 +462,7 @@ export default function HomeownerDashboardPage() {
                       </label>
                       <input type="text" value={access} onChange={(e) => setAccess(e.target.value)}
                         placeholder="Gate code, pets, best visit time..."
-                        className="w-full rounded-none border border-border px-3 py-2.5 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600" />
+                        className="w-full rounded-sm border border-border px-3 py-2.5 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600" />
                     </div>
                   </div>
                 </div>
@@ -470,11 +470,11 @@ export default function HomeownerDashboardPage() {
                 /* ── Step 4: Review ──────────────────────────── */
                 <div className="space-y-4">
                   <h3 className="text-base font-semibold text-gray-900">Review your job</h3>
-                  <div className="rounded-none bg-gray-50 divide-y divide-border">
+                  <div className="rounded-sm bg-gray-50 divide-y divide-border">
                     <div className="p-4">
                       <div className="flex items-start gap-3">
                         {cat && (
-                          <div className={`flex h-9 w-9 items-center justify-center rounded-none ${cat.bg} flex-shrink-0`}>
+                          <div className={`flex h-9 w-9 items-center justify-center rounded-sm ${cat.bg} flex-shrink-0`}>
                             <cat.icon className={`h-[18px] w-[18px] ${cat.color}`} />
                           </div>
                         )}
@@ -507,13 +507,13 @@ export default function HomeownerDashboardPage() {
                       </div>
                     )}
                   </div>
-                  <div className="flex items-center gap-3 p-3 rounded-none bg-brand-50 border border-brand-100">
+                  <div className="flex items-center gap-3 p-3 rounded-sm bg-brand-50 border border-brand-100">
                     <Shield className="h-4 w-4 text-brand-600 flex-shrink-0" />
                     <p className="text-xs text-brand-700">Only verified, licensed, and background-checked contractors can bid. Your info stays private until you accept.</p>
                   </div>
 
                   {/* FairScope */}
-                  <div className="rounded-none border border-border bg-white overflow-hidden">
+                  <div className="rounded-sm border border-border bg-white overflow-hidden">
                     <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-border">
                       <div className="flex items-center gap-2">
                         <Sparkles className="h-4 w-4 text-brand-600" />
@@ -533,7 +533,7 @@ export default function HomeownerDashboardPage() {
                               setScopeLoading(false);
                             }, 1500);
                           }}
-                          className="text-xs font-semibold text-brand-600 hover:text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-200 rounded-none px-3 py-1.5 transition-colors"
+                          className="text-xs font-semibold text-brand-600 hover:text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-200 rounded-sm px-3 py-1.5 transition-colors"
                         >
                           Generate Scope
                         </button>
@@ -542,7 +542,7 @@ export default function HomeownerDashboardPage() {
                     <div className="px-4 py-3">
                       {scopeLoading ? (
                         <div className="flex items-center gap-2 py-4 justify-center">
-                          <span className="w-4 h-4 border-2 border-brand-200 border-t-brand-600 rounded-none animate-spin" />
+                          <span className="w-4 h-4 border-2 border-brand-200 border-t-brand-600 rounded-sm animate-spin" />
                           <span className="text-sm text-gray-700">Generating detailed scope...</span>
                         </div>
                       ) : generatedScope ? (
@@ -550,7 +550,7 @@ export default function HomeownerDashboardPage() {
                           value={generatedScope}
                           onChange={(e) => setGeneratedScope(e.target.value)}
                           rows={8}
-                          className="w-full text-sm text-gray-900 leading-relaxed border border-border rounded-none px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600 resize-none"
+                          className="w-full text-sm text-gray-900 leading-relaxed border border-border rounded-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600 resize-none"
                         />
                       ) : (
                         <p className="text-sm text-gray-600 py-2">
@@ -628,7 +628,7 @@ export default function HomeownerDashboardPage() {
         {activeProjects.length === 0 && (
           <Card>
             <CardContent className="p-10 text-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-none bg-brand-50 mx-auto mb-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-sm bg-brand-50 mx-auto mb-4">
                 <FolderOpen className="h-7 w-7 text-brand-600" />
               </div>
               <p className="text-gray-900 font-semibold mb-1">No active projects yet</p>

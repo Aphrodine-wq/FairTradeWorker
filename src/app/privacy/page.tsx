@@ -6,6 +6,13 @@ export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
     "How FairTradeWorker collects, uses, and protects your personal information. Read our full privacy policy.",
+  openGraph: {
+    title: "Privacy Policy | FairTradeWorker",
+    description: "How FairTradeWorker collects, uses, and protects your personal information. Read our full privacy policy.",
+  },
+  alternates: {
+    canonical: "/privacy",
+  },
 };
 
 export default function PrivacyPage() {

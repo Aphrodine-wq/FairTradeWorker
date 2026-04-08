@@ -5,6 +5,13 @@ import { Testimonials } from "@marketplace/components/testimonials";
 export const metadata: Metadata = {
   title: "Testimonials",
   description: "See what homeowners and contractors are saying about FairTradeWorker.",
+  openGraph: {
+    title: "Testimonials | FairTradeWorker",
+    description: "See what homeowners and contractors are saying about FairTradeWorker.",
+  },
+  alternates: {
+    canonical: "/testimonials",
+  },
 };
 import { CTASection } from "@marketplace/components/cta-section";
 import { Footer } from "@marketplace/components/footer";

@@ -8,6 +8,26 @@ export const metadata: Metadata = {
   title: "Why We're Killing Lead Fees | FairTradeWorker",
   description:
     "Lead fees were supposed to connect contractors with homeowners. Instead, they became a tax on showing up. Here's why we built something different.",
+  openGraph: {
+    title: "Why We're Killing Lead Fees | FairTradeWorker",
+    description: "Lead fees were supposed to connect contractors with homeowners. Instead, they became a tax on showing up.",
+    type: "article",
+    publishedTime: "2026-03-15T00:00:00Z",
+    authors: ["FairTradeWorker"],
+  },
+  alternates: { canonical: "/blog/killing-lead-fees" },
+  other: { "article:author": "FairTradeWorker" },
+};
+
+const blogPostSchema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: "Why We're Killing Lead Fees",
+  description: "Lead fees were supposed to connect contractors with homeowners. Instead, they became a tax on showing up. Here's why we built something different.",
+  datePublished: "2026-03-15",
+  author: { "@type": "Organization", name: "FairTradeWorker", url: "https://fairtradeworker.com" },
+  publisher: { "@type": "Organization", name: "FairTradeWorker", url: "https://fairtradeworker.com" },
+  mainEntityOfPage: "https://fairtradeworker.com/blog/killing-lead-fees",
 };
 
 export default function KillingLeadFeesPage() {
@@ -15,6 +35,7 @@ export default function KillingLeadFeesPage() {
     <>
       <Navbar />
       <main className="bg-[#FAFAFA] min-h-screen">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostSchema) }} />
         <article className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
           <Link
             href="/blog"

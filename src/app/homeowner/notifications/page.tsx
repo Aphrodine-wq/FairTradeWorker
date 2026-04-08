@@ -230,7 +230,7 @@ export default function HomeownerNotificationsPage() {
               Notifications
             </h1>
             {unreadCount > 0 && (
-              <span className="text-[13px] font-bold text-white bg-red-500 rounded-none px-2 py-0.5 tabular-nums">
+              <span className="text-[13px] font-bold text-white bg-red-500 rounded-sm px-2 py-0.5 tabular-nums">
                 {unreadCount}
               </span>
             )}
@@ -257,7 +257,7 @@ export default function HomeownerNotificationsPage() {
                   key={f.key}
                   onClick={() => setFilter(f.key)}
                   className={cn(
-                    "text-[13px] font-medium px-3 py-1.5 rounded-none transition-colors flex items-center gap-1.5",
+                    "text-[13px] font-medium px-3 py-1.5 rounded-sm transition-colors flex items-center gap-1.5",
                     filter === f.key
                       ? "bg-gray-900 text-white"
                       : "bg-white text-gray-700 hover:bg-gray-100"
@@ -267,7 +267,7 @@ export default function HomeownerNotificationsPage() {
                   {count > 0 && (
                     <span
                       className={cn(
-                        "text-[11px] font-bold rounded-none px-1.5 py-0.5 tabular-nums leading-none",
+                        "text-[11px] font-bold rounded-sm px-1.5 py-0.5 tabular-nums leading-none",
                         filter === f.key
                           ? "bg-white/20 text-white"
                           : "bg-red-500 text-white"
@@ -300,14 +300,14 @@ export default function HomeownerNotificationsPage() {
                   href={notif.href}
                   onClick={() => markRead(notif.id)}
                   className={cn(
-                    "flex gap-4 rounded-none px-4 py-4 transition-all hover:bg-white",
+                    "flex gap-4 rounded-sm px-4 py-4 transition-all hover:bg-white",
                     !notif.read &&
                       "bg-white shadow-[0_1px_4px_rgba(0,0,0,0.04)]"
                   )}
                 >
                   <div
                     className={cn(
-                      "w-10 h-10 rounded-none flex items-center justify-center flex-shrink-0",
+                      "w-10 h-10 rounded-sm flex items-center justify-center flex-shrink-0",
                       config.bg
                     )}
                   >
@@ -332,7 +332,7 @@ export default function HomeownerNotificationsPage() {
                     </p>
                   </div>
                   {!notif.read && (
-                    <div className="w-2.5 h-2.5 rounded-none bg-brand-600 flex-shrink-0 mt-1.5" />
+                    <div className="w-2.5 h-2.5 rounded-sm bg-brand-600 flex-shrink-0 mt-1.5" />
                   )}
                 </Link>
               );

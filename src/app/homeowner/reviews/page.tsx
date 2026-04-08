@@ -294,7 +294,7 @@ export default function HomeownerFairRecordPage() {
           {/* Status bar */}
           <div className="flex items-center gap-5 mt-4">
             {needsReview.length > 0 && (
-              <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-none px-3 py-2">
+              <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-sm px-3 py-2">
                 <Clock className="w-4 h-4 text-amber-600" />
                 <span className="text-[13px] font-semibold text-amber-800">
                   {needsReview.length} {needsReview.length === 1 ? "job" : "jobs"} to review
@@ -302,7 +302,7 @@ export default function HomeownerFairRecordPage() {
               </div>
             )}
             {needsReview.length === 0 && (
-              <div className="flex items-center gap-2 bg-emerald-950/10 border border-emerald-800/20 rounded-none px-3 py-2">
+              <div className="flex items-center gap-2 bg-emerald-950/10 border border-emerald-800/20 rounded-sm px-3 py-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-950" />
                 <span className="text-[13px] font-semibold text-emerald-950">All caught up</span>
               </div>
@@ -326,19 +326,19 @@ export default function HomeownerFairRecordPage() {
 
           {/* ── How It Works (show when few reviews) ─────────────── */}
           {totalReviewed <= 2 && (
-            <div className="rounded-none bg-brand-50 border border-brand-200 px-5 py-4 mb-6">
+            <div className="rounded-sm bg-brand-50 border border-brand-200 px-5 py-4 mb-6">
               <p className="text-[13px] font-semibold text-brand-900 mb-2">How FairRecord works for homeowners</p>
               <div className="space-y-1.5">
                 <p className="text-[12px] text-brand-700 leading-relaxed flex items-start gap-2">
-                  <span className="w-5 h-5 rounded-none bg-brand-200 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold text-brand-800">1</span>
+                  <span className="w-5 h-5 rounded-sm bg-brand-200 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold text-brand-800">1</span>
                   Your contractor completes a milestone and submits for review through the escrow system.
                 </p>
                 <p className="text-[12px] text-brand-700 leading-relaxed flex items-start gap-2">
-                  <span className="w-5 h-5 rounded-none bg-brand-200 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold text-brand-800">2</span>
+                  <span className="w-5 h-5 rounded-sm bg-brand-200 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold text-brand-800">2</span>
                   Once all milestones are verified and paid, the job appears here for your final review.
                 </p>
                 <p className="text-[12px] text-brand-700 leading-relaxed flex items-start gap-2">
-                  <span className="w-5 h-5 rounded-none bg-brand-200 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold text-brand-800">3</span>
+                  <span className="w-5 h-5 rounded-sm bg-brand-200 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold text-brand-800">3</span>
                   You verify the work, rate the contractor, and a FairRecord is created on their public portfolio.
                 </p>
               </div>
@@ -378,7 +378,7 @@ export default function HomeownerFairRecordPage() {
               Jobs you&apos;ve reviewed. Each one created a FairRecord on the contractor&apos;s public portfolio.
             </p>
             {reviewed.length === 0 ? (
-              <div className="py-12 text-center bg-white rounded-none">
+              <div className="py-12 text-center bg-white rounded-sm">
                 <Award className="w-8 h-8 text-gray-200 mx-auto mb-3" />
                 <p className="text-[14px] font-medium text-gray-900 mb-1">No records yet</p>
                 <p className="text-[13px] text-gray-600">
@@ -420,13 +420,13 @@ function NeedsReviewCard({
   const budgetPct = Math.round((job.finalCost / job.estimatedBudget) * 100);
 
   return (
-    <div className="bg-white rounded-none overflow-hidden border border-amber-200">
+    <div className="bg-white rounded-sm overflow-hidden border border-amber-200">
       {/* Card header */}
       <button
         onClick={onToggle}
         className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-gray-50/50 transition-colors"
       >
-        <div className="w-10 h-10 rounded-none bg-amber-50 flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 rounded-sm bg-amber-50 flex items-center justify-center flex-shrink-0">
           <Clock className="w-5 h-5 text-amber-600" />
         </div>
         <div className="flex-1 min-w-0">
@@ -489,7 +489,7 @@ function NeedsReviewCard({
             <p className="text-[12px] font-medium text-gray-700 uppercase tracking-wider mb-3">
               Verification Checklist
             </p>
-            <div className="rounded-none border border-gray-200 divide-y divide-gray-200">
+            <div className="rounded-sm border border-gray-200 divide-y divide-gray-200">
               {VERIFICATION_ITEMS.map((item, i) => (
                 <label
                   key={i}
@@ -555,7 +555,7 @@ function NeedsReviewCard({
                       )
                     }
                     className={cn(
-                      "px-3 py-1.5 rounded-none text-[12px] font-medium border transition-colors",
+                      "px-3 py-1.5 rounded-sm text-[12px] font-medium border transition-colors",
                       tags.includes(tag)
                         ? "bg-brand-600 text-white border-brand-600"
                         : "bg-white text-gray-800 border-gray-200 hover:border-gray-300"
@@ -602,10 +602,10 @@ function ReviewedCard({ job }: { job: CompletedJob }) {
   const budgetPct = Math.round((job.finalCost / job.estimatedBudget) * 100);
 
   return (
-    <div className="bg-white rounded-none p-5">
+    <div className="bg-white rounded-sm p-5">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-none bg-brand-100 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-sm bg-brand-100 flex items-center justify-center flex-shrink-0">
             <Award className="w-5 h-5 text-brand-700" />
           </div>
           <div>
@@ -663,7 +663,7 @@ function ReviewedCard({ job }: { job: CompletedJob }) {
           {review.tags.map((tag) => (
             <span
               key={tag}
-              className="text-[11px] font-medium text-brand-700 bg-brand-50 px-2 py-0.5 rounded-none"
+              className="text-[11px] font-medium text-brand-700 bg-brand-50 px-2 py-0.5 rounded-sm"
             >
               {tag}
             </span>

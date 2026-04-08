@@ -56,9 +56,9 @@ function Toggle({ checked, onChange, label, description }: {
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
-        className={cn("relative flex-shrink-0 mt-0.5 w-10 h-[22px] rounded-none transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2", checked ? "bg-brand-600" : "bg-gray-200")}
+        className={cn("relative flex-shrink-0 mt-0.5 w-10 h-[22px] rounded-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2", checked ? "bg-brand-600" : "bg-gray-200")}
       >
-        <span className={cn("absolute top-0.5 left-0.5 w-[18px] h-[18px] rounded-none bg-white shadow transition-transform duration-200", checked ? "translate-x-[18px]" : "translate-x-0")} />
+        <span className={cn("absolute top-0.5 left-0.5 w-[18px] h-[18px] rounded-sm bg-white shadow transition-transform duration-200", checked ? "translate-x-[18px]" : "translate-x-0")} />
       </button>
     </div>
   );
@@ -68,17 +68,17 @@ type VerifyStatus = "verified" | "pending" | "expired";
 
 function VerifyBadge({ status }: { status: VerifyStatus }) {
   if (status === "verified") return (
-    <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-950 bg-emerald-950/10 border border-emerald-800/20 rounded-none px-2.5 py-0.5">
+    <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-950 bg-emerald-950/10 border border-emerald-800/20 rounded-sm px-2.5 py-0.5">
       <CheckCircle2 className="w-3.5 h-3.5" />Verified
     </span>
   );
   if (status === "pending") return (
-    <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-none px-2.5 py-0.5">
+    <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-sm px-2.5 py-0.5">
       <Clock className="w-3.5 h-3.5" />Pending
     </span>
   );
   return (
-    <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded-none px-2.5 py-0.5">
+    <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded-sm px-2.5 py-0.5">
       <XCircle className="w-3.5 h-3.5" />Expired
     </span>
   );
@@ -86,8 +86,8 @@ function VerifyBadge({ status }: { status: VerifyStatus }) {
 
 function UploadZone({ label, hint }: { label: string; hint: string }) {
   return (
-    <div className="border-2 border-dashed border-gray-200 rounded-none p-5 flex flex-col items-center justify-center gap-2 text-center hover:border-brand-400 hover:bg-brand-50/50 transition-colors cursor-pointer">
-      <div className="w-9 h-9 rounded-none bg-gray-100 flex items-center justify-center">
+    <div className="border-2 border-dashed border-gray-200 rounded-sm p-5 flex flex-col items-center justify-center gap-2 text-center hover:border-brand-400 hover:bg-brand-50/50 transition-colors cursor-pointer">
+      <div className="w-9 h-9 rounded-sm bg-gray-100 flex items-center justify-center">
         <Upload className="w-4 h-4 text-gray-600" />
       </div>
       <p className="text-sm font-medium text-gray-900">{label}</p>
@@ -137,7 +137,7 @@ function ProfileSection() {
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="w-16 h-16 rounded-none bg-brand-100 border-2 border-brand-200 flex items-center justify-center">
+        <div className="w-16 h-16 rounded-sm bg-brand-100 border-2 border-brand-200 flex items-center justify-center">
           <span className="text-brand-700 font-bold text-xl">{getInitials(name)}</span>
         </div>
         <div>
@@ -169,7 +169,7 @@ function ProfileSection() {
         </div>
         <div className="space-y-1.5">
           <label className="text-xs font-semibold text-gray-800 uppercase tracking-wide">Primary Specialty</label>
-          <select value={specialty} onChange={(e) => setSpecialty(e.target.value)} className="h-10 w-full rounded-none border border-border bg-white px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2">
+          <select value={specialty} onChange={(e) => setSpecialty(e.target.value)} className="h-10 w-full rounded-sm border border-border bg-white px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2">
             {JOB_CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
           </select>
         </div>
@@ -239,7 +239,7 @@ function ServiceAreaSection() {
         <label className="text-xs font-semibold text-gray-800 uppercase tracking-wide block mb-2">Cities You Serve</label>
         <div className="flex flex-wrap gap-2 mb-3">
           {areas.map((a) => (
-            <span key={a} className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-900 bg-gray-100 border border-border rounded-none px-3 py-1">
+            <span key={a} className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-900 bg-gray-100 border border-border rounded-sm px-3 py-1">
               {a}
               <button onClick={() => setAreas(areas.filter((x) => x !== a))} className="text-gray-600 hover:text-red-500 transition-colors">
                 <XCircle className="w-3.5 h-3.5" />
@@ -282,7 +282,7 @@ function JobPreferencesSection() {
         <label className="text-xs font-semibold text-gray-800 uppercase tracking-wide block mb-3">Job Categories</label>
         <div className="flex flex-wrap gap-2">
           {JOB_CATEGORIES.map((cat) => (
-            <button key={cat} onClick={() => toggleCat(cat)} className={cn("text-sm font-medium rounded-none px-3 py-1.5 border transition-colors", categories.includes(cat) ? "bg-brand-600 text-white border-brand-600" : "bg-white text-gray-800 border-border hover:border-gray-300")}>
+            <button key={cat} onClick={() => toggleCat(cat)} className={cn("text-sm font-medium rounded-sm px-3 py-1.5 border transition-colors", categories.includes(cat) ? "bg-brand-600 text-white border-brand-600" : "bg-white text-gray-800 border-border hover:border-gray-300")}>
               {cat}
             </button>
           ))}
@@ -341,11 +341,11 @@ function TeamSection() {
         <Button className="gap-2"><Users className="w-4 h-4" />Add Member</Button>
       </div>
 
-      <div className="bg-white border border-border rounded-none overflow-hidden">
+      <div className="bg-white border border-border rounded-sm overflow-hidden">
         {team.map((m, i) => (
           <div key={m.email} className={cn("flex items-center justify-between px-5 py-4", i < team.length - 1 && "border-b border-border")}>
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-none bg-brand-100 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-sm bg-brand-100 flex items-center justify-center">
                 <span className="text-brand-700 text-xs font-bold">{getInitials(m.name)}</span>
               </div>
               <div>
@@ -383,7 +383,7 @@ function AvailabilitySection() {
         <label className="text-xs font-semibold text-gray-800 uppercase tracking-wide block mb-3">Work Days</label>
         <div className="flex gap-2">
           {Object.entries(dayLabels).map(([key, label]) => (
-            <button key={key} onClick={() => setWorkDays({ ...workDays, [key]: !workDays[key as keyof typeof workDays] })} className={cn("w-12 h-10 rounded-none text-sm font-semibold border transition-colors", workDays[key as keyof typeof workDays] ? "bg-brand-600 text-white border-brand-600" : "bg-white text-gray-600 border-border hover:border-gray-300")}>
+            <button key={key} onClick={() => setWorkDays({ ...workDays, [key]: !workDays[key as keyof typeof workDays] })} className={cn("w-12 h-10 rounded-sm text-sm font-semibold border transition-colors", workDays[key as keyof typeof workDays] ? "bg-brand-600 text-white border-brand-600" : "bg-white text-gray-600 border-border hover:border-gray-300")}>
               {label}
             </button>
           ))}
@@ -502,7 +502,7 @@ function BillingSection() {
         <p className="text-sm text-gray-700 mt-1">Manage your subscription and payment method</p>
       </div>
 
-      <div className="flex items-center justify-between p-4 rounded-none bg-brand-50 border border-brand-100">
+      <div className="flex items-center justify-between p-4 rounded-sm bg-brand-50 border border-brand-100">
         <div>
           <div className="flex items-center gap-2">
             <p className="text-sm font-bold text-gray-900">Pro Plan</p>
@@ -514,15 +514,15 @@ function BillingSection() {
       </div>
 
       <div className="grid grid-cols-3 gap-3 text-sm">
-        <div className="p-3 rounded-none border border-border">
+        <div className="p-3 rounded-sm border border-border">
           <p className="text-xs text-gray-700">Estimates this month</p>
           <p className="font-bold text-gray-900 mt-0.5">23 / Unlimited</p>
         </div>
-        <div className="p-3 rounded-none border border-border">
+        <div className="p-3 rounded-sm border border-border">
           <p className="text-xs text-gray-700">Next billing</p>
           <p className="font-bold text-gray-900 mt-0.5">Apr 19, 2026</p>
         </div>
-        <div className="p-3 rounded-none border border-border">
+        <div className="p-3 rounded-sm border border-border">
           <p className="text-xs text-gray-700">YTD spend</p>
           <p className="font-bold text-gray-900 mt-0.5">$147</p>
         </div>
@@ -532,7 +532,7 @@ function BillingSection() {
 
       <div>
         <p className="text-sm font-semibold text-gray-900 mb-3">Payment Method</p>
-        <div className="flex items-center justify-between p-4 rounded-none bg-gray-50 border border-border">
+        <div className="flex items-center justify-between p-4 rounded-sm bg-gray-50 border border-border">
           <div>
             <p className="text-sm font-semibold text-gray-900">Chase Visa ending in 4821</p>
             <p className="text-xs text-gray-700 mt-0.5">Expires 08/28</p>
@@ -755,9 +755,9 @@ function IntegrationsSection() {
 
       <div className="space-y-3">
         {/* QuickBooks — real integration */}
-        <div className="flex items-center justify-between p-4 bg-white border border-border rounded-none">
+        <div className="flex items-center justify-between p-4 bg-white border border-border rounded-sm">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-none bg-emerald-950/10 flex items-center justify-center text-xs font-bold text-emerald-950">QB</div>
+            <div className="w-10 h-10 rounded-sm bg-emerald-950/10 flex items-center justify-center text-xs font-bold text-emerald-950">QB</div>
             <div>
               <p className="text-sm font-semibold text-gray-900">QuickBooks</p>
               <p className="text-xs text-gray-600">
@@ -792,9 +792,9 @@ function IntegrationsSection() {
 
         {/* Future integrations — still mock */}
         {futureIntegrations.map((int) => (
-          <div key={int.name} className="flex items-center justify-between p-4 bg-white border border-border rounded-none">
+          <div key={int.name} className="flex items-center justify-between p-4 bg-white border border-border rounded-sm">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-none bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-700">{int.icon}</div>
+              <div className="w-10 h-10 rounded-sm bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-700">{int.icon}</div>
               <div>
                 <p className="text-sm font-semibold text-gray-900">{int.name}</p>
                 <p className="text-xs text-gray-600">{int.desc}</p>
@@ -826,7 +826,7 @@ function AppearanceSection() {
         <label className="text-xs font-semibold text-gray-800 uppercase tracking-wide block mb-3">Layout Density</label>
         <div className="flex gap-3">
           {(["comfortable", "compact"] as const).map((d) => (
-            <button key={d} onClick={() => setDensity(d)} className={cn("flex-1 py-3 rounded-none border-2 text-sm font-semibold transition-colors capitalize", density === d ? "border-brand-600 bg-brand-50 text-brand-700" : "border-border bg-white text-gray-700 hover:border-gray-300")}>
+            <button key={d} onClick={() => setDensity(d)} className={cn("flex-1 py-3 rounded-sm border-2 text-sm font-semibold transition-colors capitalize", density === d ? "border-brand-600 bg-brand-50 text-brand-700" : "border-border bg-white text-gray-700 hover:border-gray-300")}>
               {d}
             </button>
           ))}
@@ -835,7 +835,7 @@ function AppearanceSection() {
 
       <div className="space-y-1.5">
         <label className="text-xs font-semibold text-gray-800 uppercase tracking-wide">Default Landing Page</label>
-        <select value={defaultTab} onChange={(e) => setDefaultTab(e.target.value)} className="h-10 w-full max-w-xs rounded-none border border-border bg-white px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2">
+        <select value={defaultTab} onChange={(e) => setDefaultTab(e.target.value)} className="h-10 w-full max-w-xs rounded-sm border border-border bg-white px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2">
           <option value="dashboard">Dashboard</option>
           <option value="work">Browse Jobs</option>
           <option value="estimates">Estimates</option>
@@ -918,7 +918,7 @@ function AccountSection() {
 
       <Separator />
 
-      <div className="rounded-none border border-red-200 bg-red-50 p-4 space-y-3">
+      <div className="rounded-sm border border-red-200 bg-red-50 p-4 space-y-3">
         <div className="flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 text-red-500" />
           <p className="text-sm font-semibold text-red-700">Danger Zone</p>
@@ -1080,7 +1080,7 @@ function SubModeSection() {
             <select
               value={specialty}
               onChange={(e) => setSpecialty(e.target.value)}
-              className="mt-2 w-full h-10 rounded-none border border-gray-200 px-3 text-[13px] text-gray-900 bg-white"
+              className="mt-2 w-full h-10 rounded-sm border border-gray-200 px-3 text-[13px] text-gray-900 bg-white"
             >
               <option value="">Select your trade...</option>
               <option>Plumbing</option>
@@ -1108,7 +1108,7 @@ function SubModeSection() {
               value={hourlyRate}
               onChange={(e) => setHourlyRate(e.target.value)}
               placeholder="85"
-              className="mt-2 h-10 rounded-none text-[13px]"
+              className="mt-2 h-10 rounded-sm text-[13px]"
             />
           </div>
 
@@ -1135,7 +1135,7 @@ function SubModeSection() {
 
           <button
             onClick={handleActivate}
-            className="w-full h-10 rounded-none bg-brand-600 text-white text-[14px] font-semibold hover:bg-brand-700 transition-colors flex items-center justify-center gap-2"
+            className="w-full h-10 rounded-sm bg-brand-600 text-white text-[14px] font-semibold hover:bg-brand-700 transition-colors flex items-center justify-center gap-2"
           >
             <Users className="w-4 h-4" />
             Activate SubContractor Mode
@@ -1209,7 +1209,7 @@ export default function SettingsPage() {
                 key={section.id}
                 onClick={() => setActive(section.id)}
                 className={cn(
-                  "w-full flex items-center gap-2 rounded-none px-2.5 py-2 text-[13px] font-medium transition-colors mb-0.5",
+                  "w-full flex items-center gap-2 rounded-sm px-2.5 py-2 text-[13px] font-medium transition-colors mb-0.5",
                   isActive
                     ? "bg-brand-600 text-white"
                     : "text-gray-800 hover:bg-gray-100 hover:text-gray-900"

@@ -188,7 +188,7 @@ export default function ContractorOnboarding() {
             <div
               key={s}
               className={cn(
-                "h-1.5 flex-1 rounded-none transition-colors",
+                "h-1.5 flex-1 rounded-sm transition-colors",
                 s <= step ? "bg-brand-600" : "bg-gray-200"
               )}
             />
@@ -214,7 +214,7 @@ export default function ContractorOnboarding() {
                   <select
                     value={specialty}
                     onChange={(e) => setSpecialty(e.target.value)}
-                    className="flex h-10 w-full rounded-none border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
+                    className="flex h-10 w-full rounded-sm border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
                   >
                     <option value="">Select specialty...</option>
                     {SPECIALTIES.map((s) => <option key={s} value={s}>{s}</option>)}
@@ -239,7 +239,7 @@ export default function ContractorOnboarding() {
                     placeholder="Tell homeowners what makes your work stand out..."
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
-                    className="flex w-full rounded-none border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
+                    className="flex w-full rounded-sm border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
                   />
                 </div>
               </div>
@@ -274,7 +274,7 @@ export default function ContractorOnboarding() {
                         type="button"
                         onClick={() => toggleSkill(skill)}
                         className={cn(
-                          "px-3 py-1.5 rounded-none text-xs font-medium border transition-colors",
+                          "px-3 py-1.5 rounded-sm text-xs font-medium border transition-colors",
                           selectedSkills.includes(skill)
                             ? "border-brand-600 bg-brand-50 text-brand-700"
                             : "border-gray-200 text-gray-700 hover:border-gray-300"
@@ -307,7 +307,7 @@ export default function ContractorOnboarding() {
                     <select
                       value={licenseState}
                       onChange={(e) => setLicenseState(e.target.value)}
-                      className="flex h-10 w-full rounded-none border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
+                      className="flex h-10 w-full rounded-sm border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
                     >
                       {US_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
                     </select>
