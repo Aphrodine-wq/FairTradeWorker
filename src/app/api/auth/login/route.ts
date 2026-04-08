@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@shared/lib/db";
-import { verifyPassword, createToken } from "@shared/lib/auth";
+import { verifyPassword, createToken, COOKIE_MAX_AGE } from "@shared/lib/auth";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: COOKIE_MAX_AGE,
     path: "/",
   });
 

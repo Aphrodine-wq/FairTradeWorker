@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@shared/lib/db";
-import jwt from "jsonwebtoken";
+
+const REALTIME_URL = process.env.NEXT_PUBLIC_REALTIME_URL || "http://localhost:4000";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -13,16 +13,15 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const user = await prisma.user.findUnique({ where: { email } });
-
-  if (user) {
-    const resetToken = jwt.sign(
-      { userId: user.id, type: "reset" },
-      process.env.JWT_SECRET!,
-      { expiresIn: "1h" }
-    );
-
-    // TODO: send reset email with token
+  try {
+    // Proxy to Spring Boot backend which handles token generation + email sending
+    await fetch(`${REALTIME_URL}/api/auth/forgot-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+  } catch {
+    // Swallow errors — never leak whether backend is up or email exists
   }
 
   // Always return success to avoid leaking whether the email exists

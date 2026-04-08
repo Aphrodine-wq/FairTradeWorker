@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@shared/lib/db";
-import { hashPassword } from "@shared/lib/auth";
-import jwt from "jsonwebtoken";
 
-interface ResetPayload {
-  userId: string;
-  type: string;
-}
+const REALTIME_URL = process.env.NEXT_PUBLIC_REALTIME_URL || "http://localhost:4000";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -26,29 +20,27 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let payload: ResetPayload;
   try {
-    payload = jwt.verify(token, process.env.JWT_SECRET!) as ResetPayload;
+    // Proxy to Spring Boot backend which verifies the reset token and updates password
+    const res = await fetch(`${REALTIME_URL}/api/auth/reset-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, password }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      return NextResponse.json(
+        { error: data.error || "Reset failed" },
+        { status: res.status }
+      );
+    }
+
+    return NextResponse.json({ message: "Password reset successfully" });
   } catch {
     return NextResponse.json(
-      { error: "Invalid or expired reset token" },
-      { status: 400 }
+      { error: "Unable to reset password. Please try again." },
+      { status: 500 }
     );
   }
-
-  if (payload.type !== "reset") {
-    return NextResponse.json(
-      { error: "Invalid token type" },
-      { status: 400 }
-    );
-  }
-
-  const passwordHash = await hashPassword(password);
-
-  await prisma.user.update({
-    where: { id: payload.userId },
-    data: { passwordHash },
-  });
-
-  return NextResponse.json({ message: "Password reset successfully" });
 }

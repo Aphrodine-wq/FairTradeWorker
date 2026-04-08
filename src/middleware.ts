@@ -1,17 +1,44 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { jwtVerify } from "jose";
 import { checkRateLimit } from "@shared/lib/rate-limit";
 
 /**
  * Next.js middleware for FairTradeWorker.
  *
+ * - JWT signature + expiry verification via `jose` (Edge-compatible)
  * - Rate-limits auth paths: /login, /signup, /forgot-password, /api/auth/* — 10 req/min per IP
  * - Security headers on all responses
- *
- * NOTE: This middleware does NOT run while `output: "export"` is set in
- * next.config.ts (static export). Once a server-side deployment is enabled
- * (dropping the export flag), this kicks in automatically.
  */
+
+// ---------------------------------------------------------------------------
+// JWT config (must match auth.ts and Spring Boot)
+// ---------------------------------------------------------------------------
+
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || "dev-secret-key-change-in-production"
+);
+
+// Known demo tokens — only these specific tokens bypass auth, not any "demo.*" prefix
+const DEMO_TOKENS = new Set([
+  "demo.contractor",
+  "demo.homeowner",
+  "demo.subcontractor",
+]);
+
+interface JwtPayload {
+  role: string;
+  exp?: number;
+}
+
+async function verifyJwt(token: string): Promise<JwtPayload | null> {
+  try {
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    return payload as unknown as JwtPayload;
+  } catch {
+    return null;
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Auth rate-limit config
@@ -42,10 +69,33 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
 }
 
 // ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function redirectToLogin(request: NextRequest, pathname: string, clearCookie = false): NextResponse {
+  const loginUrl = new URL("/login", request.url);
+  loginUrl.searchParams.set("redirect", pathname);
+  const resp = NextResponse.redirect(loginUrl);
+  if (clearCookie) resp.cookies.delete("ftw-token");
+  return addSecurityHeaders(resp);
+}
+
+function normalizeRole(role: string): string {
+  return String(role).toLowerCase().replace("_", "");
+}
+
+function getRoleFallback(rawRole: string, target: string): string {
+  if (target === "contractor") return rawRole === "subcontractor" ? "/subcontractor/dashboard" : "/homeowner/dashboard";
+  if (target === "homeowner") return rawRole === "subcontractor" ? "/subcontractor/dashboard" : "/contractor/dashboard";
+  if (target === "subcontractor") return rawRole === "contractor" ? "/contractor/dashboard" : "/homeowner/dashboard";
+  return "/login";
+}
+
+// ---------------------------------------------------------------------------
 // Middleware
 // ---------------------------------------------------------------------------
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Rate-limit auth endpoints: 10 requests per minute per IP
@@ -74,7 +124,6 @@ export function middleware(request: NextRequest) {
       return addSecurityHeaders(response);
     }
 
-    // Attach rate-limit info headers to successful auth requests
     const response = NextResponse.next();
     response.headers.set("X-RateLimit-Limit", String(AUTH_RATE_LIMIT));
     response.headers.set("X-RateLimit-Remaining", String(remaining));
@@ -86,44 +135,39 @@ export function middleware(request: NextRequest) {
   if (pathname.startsWith("/contractor") || pathname.startsWith("/homeowner") || pathname.startsWith("/subcontractor")) {
     const token = request.cookies.get("ftw-token")?.value;
     if (!token) {
-      const loginUrl = new URL("/login", request.url);
-      loginUrl.searchParams.set("redirect", pathname);
-      return addSecurityHeaders(NextResponse.redirect(loginUrl));
+      return redirectToLogin(request, pathname);
     }
 
-    // Skip role checking for demo tokens — they bypass auth entirely
-    if (token.startsWith("demo.")) {
-      const response = NextResponse.next();
-      return addSecurityHeaders(response);
+    // Only allow specific known demo tokens, not any arbitrary "demo.*" prefix
+    if (DEMO_TOKENS.has(token)) {
+      return addSecurityHeaders(NextResponse.next());
     }
 
-    // Check role from JWT payload (full verification in API routes)
-    // Backend sends lowercase enum names (e.g. "contractor", "sub_contractor")
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      const rawRole = String(payload.role).toLowerCase().replace("_", "");
-      if (pathname.startsWith("/contractor") && rawRole !== "contractor") {
-        const fallback = rawRole === "subcontractor" ? "/subcontractor/dashboard" : "/homeowner/dashboard";
+    // Verify JWT signature and expiry using jose (Edge-compatible)
+    const payload = await verifyJwt(token);
+    if (!payload) {
+      // Token is invalid or expired — clear it and redirect to login
+      return redirectToLogin(request, pathname, true);
+    }
+
+    // Role-based routing
+    const rawRole = normalizeRole(payload.role);
+    const roleChecks: [string, string][] = [
+      ["/contractor", "contractor"],
+      ["/homeowner", "homeowner"],
+      ["/subcontractor", "subcontractor"],
+    ];
+
+    for (const [prefix, expectedRole] of roleChecks) {
+      if (pathname.startsWith(prefix) && rawRole !== expectedRole) {
+        const fallback = getRoleFallback(rawRole, expectedRole);
         return addSecurityHeaders(NextResponse.redirect(new URL(fallback, request.url)));
       }
-      if (pathname.startsWith("/homeowner") && rawRole !== "homeowner") {
-        const fallback = rawRole === "subcontractor" ? "/subcontractor/dashboard" : "/contractor/dashboard";
-        return addSecurityHeaders(NextResponse.redirect(new URL(fallback, request.url)));
-      }
-      if (pathname.startsWith("/subcontractor") && rawRole !== "subcontractor") {
-        const fallback = rawRole === "contractor" ? "/contractor/dashboard" : "/homeowner/dashboard";
-        return addSecurityHeaders(NextResponse.redirect(new URL(fallback, request.url)));
-      }
-    } catch {
-      const resp = NextResponse.redirect(new URL("/login", request.url));
-      resp.cookies.delete("ftw-token");
-      return addSecurityHeaders(resp);
     }
   }
 
   // All other routes — pass through with security headers
-  const response = NextResponse.next();
-  return addSecurityHeaders(response);
+  return addSecurityHeaders(NextResponse.next());
 }
 
 export const config = {

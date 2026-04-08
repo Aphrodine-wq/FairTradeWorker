@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthUser, createToken } from "@shared/lib/auth";
+import { getAuthUser, createToken, COOKIE_MAX_AGE } from "@shared/lib/auth";
 import { prisma } from "@shared/lib/db";
 
 export async function POST(req: NextRequest) {
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: COOKIE_MAX_AGE,
       path: "/",
     });
 

@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-key-change-in-production";
 const TOKEN_EXPIRY = "24h";
+export const COOKIE_MAX_AGE = 60 * 60 * 24; // 24h — must match TOKEN_EXPIRY
 
 export interface TokenPayload {
   userId: string;
