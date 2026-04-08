@@ -104,17 +104,44 @@ export default function sitemap(): MetadataRoute.Sitemap {
       })),
     );
 
+  // Find work pages: /find-work, /find-work/[trade], /find-work/[trade]/[location]
+  const findWorkIndex: MetadataRoute.Sitemap = [
+    { url: `${baseUrl}/find-work`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/find-sub-work`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.85 },
+  ];
+
+  const findWorkTradeEntries: MetadataRoute.Sitemap = TRADES.map((trade) => ({
+    url: `${baseUrl}/find-work/${trade.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  }));
+
+  const findWorkLocationEntries: MetadataRoute.Sitemap = TRADES.flatMap((trade) =>
+    SERVICE_LOCATIONS.map((loc) => ({
+      url: `${baseUrl}/find-work/${trade.slug}/${loc.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.75,
+    })),
+  );
+
   // Blog posts (static slugs)
   const blogSlugs = [
+    "how-to-get-more-clients-contractor",
     "roof-replacement-cost-mississippi",
     "hvac-installation-cost-mississippi",
     "how-much-kitchen-remodel-mississippi",
     "fence-cost-mississippi",
+    "subcontractor-guide-mississippi",
     "termite-damage-mississippi",
     "hvac-maintenance-mississippi-summer",
     "bathroom-remodel-cost-guide",
+    "contractor-pricing-guide",
     "hiring-contractor-checklist",
+    "grow-construction-business-mississippi",
     "killing-lead-fees",
+    "escrow-payments-for-subs",
     "storm-damage-roof-mississippi",
     "hunter-voice-ai",
     "energy-efficient-home-mississippi",
@@ -139,6 +166,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...subServiceEntries,
     ...cityHubEntries,
     ...neighborhoodEntries,
+    ...findWorkIndex,
+    ...findWorkTradeEntries,
+    ...findWorkLocationEntries,
     ...blogEntries,
   ];
 }

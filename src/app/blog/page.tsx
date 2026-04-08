@@ -18,6 +18,14 @@ import { Separator } from "@shared/ui/separator";
 
 const POSTS = [
   {
+    title: "How to Get More Clients as a Contractor in Mississippi",
+    slug: "/blog/how-to-get-more-clients-contractor",
+    date: "Apr 6, 2026",
+    category: "Business",
+    excerpt:
+      "Why word of mouth alone doesn't scale, how lead-fee platforms eat your margins, and how FairTradeWorker's bid model works differently.",
+  },
+  {
     title: "Roof Replacement Cost in Mississippi: Complete 2026 Guide",
     slug: "/blog/roof-replacement-cost-mississippi",
     date: "Apr 5, 2026",
@@ -34,20 +42,28 @@ const POSTS = [
       "Central AC, heat pump, or mini-split? What each system costs in Mississippi and why SEER ratings matter more here than anywhere.",
   },
   {
-    title: "How Much Does a Kitchen Remodel Cost in Mississippi?",
-    slug: "/blog/how-much-kitchen-remodel-mississippi",
-    date: "Apr 1, 2026",
-    category: "Cost Guide",
-    excerpt:
-      "From a $10K refresh to a $50K gut renovation — real kitchen remodel costs for Mississippi homeowners and what drives the price.",
-  },
-  {
     title: "Termite Damage in Mississippi: What Every Homeowner Needs to Know",
     slug: "/blog/termite-damage-mississippi",
     date: "Apr 3, 2026",
     category: "Guides",
     excerpt:
       "Mississippi is #3 in the US for termite risk. Here's what to look for, what treatment costs, and why annual inspections are non-negotiable.",
+  },
+  {
+    title: "Subcontractor Survival Guide: Finding Steady Work in Mississippi",
+    slug: "/blog/subcontractor-guide-mississippi",
+    date: "Apr 2, 2026",
+    category: "Business",
+    excerpt:
+      "The sub's dilemma: feast or famine. How to diversify GC relationships, get paid on time, and build a reputation that keeps the pipeline full.",
+  },
+  {
+    title: "How Much Does a Kitchen Remodel Cost in Mississippi?",
+    slug: "/blog/how-much-kitchen-remodel-mississippi",
+    date: "Apr 1, 2026",
+    category: "Cost Guide",
+    excerpt:
+      "From a $10K refresh to a $50K gut renovation — real kitchen remodel costs for Mississippi homeowners and what drives the price.",
   },
   {
     title: "Mississippi Summer HVAC Guide: Keep Cool Without Going Broke",
@@ -66,12 +82,28 @@ const POSTS = [
       "Half bath refresh to master bath gut renovation. Real costs, what drives the price, and how to get fair bids in Mississippi.",
   },
   {
+    title: "How to Price Construction Jobs Without Losing Money (or Clients)",
+    slug: "/blog/contractor-pricing-guide",
+    date: "Mar 22, 2026",
+    category: "Business",
+    excerpt:
+      "Common pricing mistakes, real overhead math, markup vs margin, and how to stay competitive without racing to the bottom.",
+  },
+  {
     title: "How to Hire a Contractor in Mississippi (Without Getting Burned)",
     slug: "/blog/hiring-contractor-checklist",
     date: "Mar 20, 2026",
     category: "Guides",
     excerpt:
       "License check, insurance verification, written bids, escrow. The complete checklist for hiring a contractor in Mississippi.",
+  },
+  {
+    title: "Growing a Construction Business in Mississippi: What Actually Works",
+    slug: "/blog/grow-construction-business-mississippi",
+    date: "Mar 18, 2026",
+    category: "Business",
+    excerpt:
+      "Hiring, licensing, recurring revenue, online presence, and why the platform model beats the Craigslist/Facebook approach in Mississippi.",
   },
   {
     title: "Why We're Killing Lead Fees",
@@ -88,6 +120,14 @@ const POSTS = [
     category: "Seasonal",
     excerpt:
       "Storm season is March through May. What to do after damage, how to file claims, and how to avoid storm chaser scams.",
+  },
+  {
+    title: "Why Escrow Payments Are a Game Changer for Subcontractors",
+    slug: "/blog/escrow-payments-for-subs",
+    date: "Mar 10, 2026",
+    category: "Guides",
+    excerpt:
+      "How escrow payments solve the biggest problem in subcontracting: getting paid on time. Real math showing cash flow improvement.",
   },
   {
     title: "Voice AI: How Hunter Builds Estimates in 3 Minutes",
@@ -146,6 +186,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   News: "bg-amber-50 text-amber-700",
   "Cost Guide": "bg-emerald-50 text-emerald-700",
   Seasonal: "bg-orange-50 text-orange-700",
+  Business: "bg-violet-50 text-violet-700",
 };
 
 export default function BlogPage() {
