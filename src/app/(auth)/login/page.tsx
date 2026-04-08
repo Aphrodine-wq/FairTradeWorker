@@ -222,7 +222,7 @@ function LoginContent() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <Button type="button" variant="outline" size="lg" className="w-full font-medium">
                   <GoogleIcon className="w-4 h-4 mr-2 flex-shrink-0" />
                   Google
@@ -230,6 +230,16 @@ function LoginContent() {
                 <Button type="button" variant="outline" size="lg" className="w-full font-medium">
                   <AppleIcon className="w-4 h-4 mr-2 flex-shrink-0" />
                   Apple
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  className="w-full font-medium"
+                  onClick={() => { window.location.href = "/api/auth/quickbooks"; }}
+                >
+                  <QuickBooksIcon className="w-4 h-4 mr-2 flex-shrink-0" />
+                  QuickBooks
                 </Button>
               </div>
 
@@ -318,6 +328,18 @@ function AppleIcon({ className }: { className?: string }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={cn(className)} fill="currentColor" aria-hidden="true">
       <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.4c1.39.07 2.34.74 3.15.8 1.19-.24 2.33-.93 3.6-.84 1.53.12 2.68.72 3.43 1.9-3.15 1.88-2.4 5.98.82 7.14-.57 1.5-1.32 2.99-3 3.88zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+    </svg>
+  );
+}
+
+function QuickBooksIcon({ className }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={cn(className)} aria-hidden="true">
+      <circle cx="12" cy="12" r="11" fill="#2CA01C" />
+      <path
+        d="M7.5 8C6.12 8 5 9.12 5 10.5v3C5 14.88 6.12 16 7.5 16H9v-1.5H7.5c-.55 0-1-.45-1-1v-3c0-.55.45-1 1-1H9V8H7.5zm9 0H15v1.5h1.5c.55 0 1 .45 1 1v3c0 .55-.45 1-1 1H15V16h1.5c1.38 0 2.5-1.12 2.5-2.5v-3C19 9.12 17.88 8 16.5 8z"
+        fill="#fff"
+      />
     </svg>
   );
 }
