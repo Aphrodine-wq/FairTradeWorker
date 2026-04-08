@@ -3,5 +3,6 @@ Allow: /
 Disallow: /api/
 Disallow: /contractor/
 Disallow: /homeowner/
+Disallow: /subcontractor/
 
 Sitemap: https://fairtradeworker.com/sitemap.xml

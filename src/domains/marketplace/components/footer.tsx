@@ -7,8 +7,17 @@ const footerLinks = {
     { label: "How It Works", href: "/how-it-works" },
     { label: "Pricing", href: "/pricing" },
     { label: "FairPrice Estimator", href: "/fairprice" },
+    { label: "Find Contractors", href: "/services" },
     { label: "FAQ", href: "/faq" },
     { label: "Blog", href: "/blog" },
+  ],
+  "Popular Services": [
+    { label: "HVAC Contractors", href: "/services/hvac" },
+    { label: "Electricians", href: "/services/electricians" },
+    { label: "Plumbers", href: "/services/plumbers" },
+    { label: "Roofers", href: "/services/roofers" },
+    { label: "General Contractors", href: "/services/general-contractors" },
+    { label: "Remodeling", href: "/services/remodeling" },
   ],
   "For Contractors": [
     { label: "Find Work", href: "/signup?role=contractor" },
