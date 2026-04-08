@@ -123,7 +123,7 @@ export default function PostJobPage() {
         category: form.category,
         budget_min: form.budgetMin ? parseFloat(form.budgetMin) : 0,
         budget_max: form.budgetMax ? parseFloat(form.budgetMax) : 0,
-        location: form.location || "Texas",
+        location: form.location || "Mississippi",
       });
 
       // Request AI estimate in the background
@@ -334,7 +334,7 @@ function StepLocation({
           <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
           <Input
             className="pl-9"
-            placeholder="e.g. Austin, TX"
+            placeholder="e.g. Oxford, MS"
             value={form.location}
             onChange={(e) => set("location", e.target.value)}
           />
@@ -344,7 +344,7 @@ function StepLocation({
       <div className="space-y-1.5">
         <label className="text-sm font-medium text-gray-900">Full address (optional, shared after bid accepted)</label>
         <Input
-          placeholder="123 Main St, Austin, TX 78701"
+          placeholder="123 Main St, Oxford, MS 78701"
           value={form.fullAddress}
           onChange={(e) => set("fullAddress", e.target.value)}
         />

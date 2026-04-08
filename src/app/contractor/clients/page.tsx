@@ -74,7 +74,7 @@ interface Client {
 const CLIENTS: Client[] = [
   {
     id: "c1", name: "Michael Brown", email: "michael@brown.com", phone: "(512) 555-0147",
-    address: "4821 Ridgeline Dr", city: "Austin, TX", propertyType: "Single Family", source: "FairTradeWorker",
+    address: "4821 Ridgeline Dr", city: "Oxford, MS", propertyType: "Single Family", source: "FairTradeWorker",
     totalRevenue: 38500, totalPaid: 19250, outstanding: 19250, totalJobs: 1, activeJobs: 1,
     rating: 5, lastActivity: "2026-03-20", firstContact: "2026-02-28", status: "active",
     notes: "Prefers morning communication. Wants to discuss patio addition after kitchen is done. Very responsive — usually replies within an hour.",
@@ -94,7 +94,7 @@ const CLIENTS: Client[] = [
   },
   {
     id: "c2", name: "Sarah Williams", email: "sarah@williams.com", phone: "(210) 555-0293",
-    address: "7744 Stone Oak Pkwy", city: "San Antonio, TX", propertyType: "Single Family", source: "Referral",
+    address: "7744 Stone Oak Pkwy", city: "Hattiesburg, MS", propertyType: "Single Family", source: "Referral",
     totalRevenue: 15200, totalPaid: 7600, outstanding: 7600, totalJobs: 1, activeJobs: 1,
     rating: 5, lastActivity: "2026-03-19", firstContact: "2026-03-01", status: "active",
     notes: "Very detail-oriented. Wants photo updates every 2 days. Has a dog — keep gate closed. Mentioned master bedroom reno as a future project.",
@@ -114,7 +114,7 @@ const CLIENTS: Client[] = [
   },
   {
     id: "c3", name: "Robert Johnson", email: "robert@johnson.com", phone: "(512) 555-0831",
-    address: "1290 Pecan Creek Dr", city: "Austin, TX", propertyType: "Single Family", source: "FairTradeWorker",
+    address: "1290 Pecan Creek Dr", city: "Oxford, MS", propertyType: "Single Family", source: "FairTradeWorker",
     totalRevenue: 22000, totalPaid: 0, outstanding: 22000, totalJobs: 1, activeJobs: 1,
     rating: null, lastActivity: "2026-03-18", firstContact: "2026-03-05", status: "active",
     notes: "Invoice overdue 6 days — follow up. Wants composite decking, not wood. Said he'll pay after framing is done but framing finished last week.",
@@ -132,7 +132,7 @@ const CLIENTS: Client[] = [
   },
   {
     id: "c4", name: "Patricia Taylor", email: "patricia@taylor.com", phone: "(713) 555-0412",
-    address: "15230 Cypress Creek", city: "Houston, TX", propertyType: "Single Family", source: "Google",
+    address: "15230 Cypress Creek", city: "Jackson, MS", propertyType: "Single Family", source: "Google",
     totalRevenue: 13500, totalPaid: 0, outstanding: 13500, totalJobs: 1, activeJobs: 1,
     rating: null, lastActivity: "2026-03-16", firstContact: "2026-03-08", status: "active",
     notes: "Roof replacement. City inspection scheduled for March 27. She's out of town until the 25th — communicate via email only.",
@@ -150,7 +150,7 @@ const CLIENTS: Client[] = [
   },
   {
     id: "c5", name: "David Park", email: "david@park.com", phone: "(512) 555-0667",
-    address: "3401 Barton Springs Rd", city: "Austin, TX", propertyType: "Single Family", source: "FairTradeWorker",
+    address: "3401 Barton Springs Rd", city: "Oxford, MS", propertyType: "Single Family", source: "FairTradeWorker",
     totalRevenue: 0, totalPaid: 0, outstanding: 0, totalJobs: 0, activeJobs: 0,
     rating: null, lastActivity: "2026-03-17", firstContact: "2026-03-15", status: "lead",
     notes: "Sent estimate for garage conversion — $27,500. Waiting on response. Said he's getting 2 other bids.",
@@ -164,7 +164,7 @@ const CLIENTS: Client[] = [
   },
   {
     id: "c6", name: "Amanda Torres", email: "amanda@torres.com", phone: "(512) 555-0198",
-    address: "890 Lakeway Blvd", city: "Lakeway, TX", propertyType: "Single Family", source: "FairTradeWorker",
+    address: "890 Lakeway Blvd", city: "Water Valley, MS", propertyType: "Single Family", source: "FairTradeWorker",
     totalRevenue: 0, totalPaid: 0, outstanding: 0, totalJobs: 0, activeJobs: 0,
     rating: null, lastActivity: "2026-03-15", firstContact: "2026-03-12", status: "lead",
     notes: "Patio cover + outdoor kitchen. High budget — not price sensitive. Viewed estimate twice. Follow up this week.",
@@ -178,7 +178,7 @@ const CLIENTS: Client[] = [
   },
   {
     id: "c7", name: "Chris Martinez", email: "chris@martinez.com", phone: "(512) 555-0544",
-    address: "2100 Oak Hill Dr", city: "Round Rock, TX", propertyType: "Single Family", source: "Referral",
+    address: "2100 Oak Hill Dr", city: "Starkville, MS", propertyType: "Single Family", source: "Referral",
     totalRevenue: 0, totalPaid: 0, outstanding: 0, totalJobs: 0, activeJobs: 0,
     rating: null, lastActivity: "2026-03-09", firstContact: "2026-03-02", status: "past",
     notes: "Declined fence estimate ($6,750). Said budget was too high — may come back in summer. Referred by Kevin Nguyen.",
@@ -192,7 +192,7 @@ const CLIENTS: Client[] = [
   },
   {
     id: "c8", name: "Kevin Nguyen", email: "kevin@nguyen.com", phone: "(512) 555-0376",
-    address: "1845 Sam Bass Rd", city: "Round Rock, TX", propertyType: "Single Family", source: "FairTradeWorker",
+    address: "1845 Sam Bass Rd", city: "Starkville, MS", propertyType: "Single Family", source: "FairTradeWorker",
     totalRevenue: 0, totalPaid: 0, outstanding: 0, totalJobs: 0, activeJobs: 0,
     rating: null, lastActivity: "2026-03-20", firstContact: "2026-03-18", status: "lead",
     notes: "HVAC estimate walkthrough today at 3:30p. System is 18 years old, probably needs full replacement. Referred Chris Martinez to us.",
@@ -334,7 +334,7 @@ export default function ClientsPage() {
                     <label className="text-[12px] font-semibold text-gray-900 block mb-1.5">Address</label>
                     <div className="relative">
                       <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                      <input type="text" placeholder="1234 Main St, Austin, TX 78701" className="w-full h-10 rounded-sm border border-gray-200 bg-white pl-10 pr-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
+                      <input type="text" placeholder="1234 Main St, Oxford, MS 78701" className="w-full h-10 rounded-sm border border-gray-200 bg-white pl-10 pr-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
                     </div>
                   </div>
 

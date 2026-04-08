@@ -175,7 +175,7 @@ function SignupContent() {
               &ldquo;Landed three jobs in my first two weeks.&rdquo;
             </p>
             <p className="text-xs text-gray-600 mt-1">
-              David Ramirez, San Antonio TX
+              David Ramirez, Hattiesburg MS
             </p>
           </div>
         </div>
@@ -566,7 +566,7 @@ function StepTwo({
             <Field label="License number" optional>
               <Input
                 type="text"
-                placeholder="TX-123456 (optional)"
+                placeholder="MS-123456 (optional)"
                 value={form.licenseNumber}
                 onChange={update("licenseNumber")}
               />

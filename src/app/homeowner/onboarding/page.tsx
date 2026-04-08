@@ -22,7 +22,7 @@ export default function HomeownerOnboarding() {
   const [saving, setSaving] = useState(false);
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
-  const [state, setState] = useState("TX");
+  const [state, setState] = useState("MS");
   const [zip, setZip] = useState("");
   const [propertyType, setPropertyType] = useState("single_family");
 

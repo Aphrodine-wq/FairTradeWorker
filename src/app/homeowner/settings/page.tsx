@@ -73,7 +73,7 @@ function ProfileSection() {
   const [name, setName] = useState("Sarah Mitchell");
   const [email, setEmail] = useState("sarah.mitchell@gmail.com");
   const [phone, setPhone] = useState("(512) 555-0283");
-  const [address, setAddress] = useState("4821 Ridgeview Dr, Austin, TX 78731");
+  const [address, setAddress] = useState("215 South Lamar Blvd, Oxford, MS 38655");
   const { saved, onSave } = useSave();
 
   return (
@@ -120,8 +120,8 @@ function ProfileSection() {
 
 function PropertiesSection() {
   const properties = [
-    { id: 1, label: "Primary Residence", address: "4821 Ridgeview Dr, Austin, TX 78731", type: "Single Family", sqft: "2,450", yearBuilt: "2008" },
-    { id: 2, label: "Vacation Home", address: "119 Lakeshore Ln, Canyon Lake, TX 78133", type: "Cabin", sqft: "1,180", yearBuilt: "1994" },
+    { id: 1, label: "Primary Residence", address: "215 South Lamar Blvd, Oxford, MS 38655", type: "Single Family", sqft: "2,450", yearBuilt: "2008" },
+    { id: 2, label: "Vacation Home", address: "104 Sardis Lake Rd, Batesville, MS 38606", type: "Cabin", sqft: "1,180", yearBuilt: "1994" },
   ];
 
   return (
@@ -359,8 +359,8 @@ function SecuritySection() {
   const { saved, onSave } = useSave();
 
   const sessions = [
-    { id: 1, device: "MacBook Pro", location: "Austin, TX", lastActive: "Active now", icon: Monitor },
-    { id: 2, device: "iPhone 15", location: "Austin, TX", lastActive: "2 hours ago", icon: Smartphone },
+    { id: 1, device: "MacBook Pro", location: "Oxford, MS", lastActive: "Active now", icon: Monitor },
+    { id: 2, device: "iPhone 15", location: "Oxford, MS", lastActive: "2 hours ago", icon: Smartphone },
   ];
 
   return (

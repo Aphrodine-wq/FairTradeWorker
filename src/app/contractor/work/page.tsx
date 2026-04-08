@@ -708,10 +708,10 @@ const TEMPLATES = [
 ];
 
 const MOCK_CLIENTS = [
-  { name: "Michael Brown",   email: "michael.brown@email.com",   phone: "(512) 555-0121", address: "4821 Shoal Creek Blvd, Austin, TX 78756" },
-  { name: "Jennifer Wilson", email: "jennifer.wilson@email.com", phone: "(214) 555-0188", address: "7234 Lakewood Blvd, Dallas, TX 75214" },
-  { name: "David Anderson",  email: "david.anderson@email.com",  phone: "(210) 555-0143", address: "1102 Alamo Heights Dr, San Antonio, TX 78209" },
-  { name: "Patricia Taylor", email: "patricia.taylor@email.com", phone: "(713) 555-0167", address: "3318 Braeswood Blvd, Houston, TX 77025" },
+  { name: "Michael Brown",   email: "michael.brown@email.com",   phone: "(512) 555-0121", address: "4821 Shoal Creek Blvd, Oxford, MS 78756" },
+  { name: "Jennifer Wilson", email: "jennifer.wilson@email.com", phone: "(214) 555-0188", address: "7234 Lakewood Blvd, Tupelo, MS 75214" },
+  { name: "David Anderson",  email: "david.anderson@email.com",  phone: "(210) 555-0143", address: "1102 Alamo Heights Dr, Hattiesburg, MS 78209" },
+  { name: "Patricia Taylor", email: "patricia.taylor@email.com", phone: "(713) 555-0167", address: "3318 Braeswood Blvd, Jackson, MS 77025" },
 ];
 
 const DEFAULT_PAYMENT_TERMS = "Payment Schedule: 50% deposit due before work begins. 25% due at project midpoint. Remaining 25% due upon final walkthrough and client acceptance.";
@@ -903,7 +903,7 @@ function NewEstimateTab() {
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-gray-800">Property Address</label>
-                <Input placeholder="4821 Shoal Creek Blvd, Austin, TX 78756" value={clientAddress} onChange={(e) => setClientAddress(e.target.value)} />
+                <Input placeholder="4821 Shoal Creek Blvd, Oxford, MS 78756" value={clientAddress} onChange={(e) => setClientAddress(e.target.value)} />
               </div>
             </CardContent>
           </Card>

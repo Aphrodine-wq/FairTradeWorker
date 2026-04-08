@@ -2050,7 +2050,7 @@ function MilestonesTab({
           projectId={project.id}
           projectName={project.name}
           projectCategory="General Contracting"
-          projectLocation="Austin, TX"
+          projectLocation="Oxford, MS"
         />
       )}
     </div>

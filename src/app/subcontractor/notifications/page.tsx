@@ -36,7 +36,7 @@ const MOCK_NOTIFICATIONS: Notification[] = [
     id: "sn2",
     type: "sub_job_match",
     title: "New sub job match",
-    body: "A new Plumbing sub job in Austin, TX matches your skills and service area.",
+    body: "A new Plumbing sub job in Oxford, MS matches your skills and service area.",
     time: "5 hours ago",
     read: false,
   },

@@ -7,7 +7,7 @@ import { Footer } from "@marketplace/components/footer";
 export const metadata: Metadata = {
   title: "Mississippi Launch: Building Density Market by Market | FairTradeWorker",
   description:
-    "We're not going national on day one. Here's why we're building density in Mississippi and Texas first, and what that means for contractors in those markets.",
+    "We're not going national on day one. Here's why we're building density in Mississippi first, and what that means for contractors in this market.",
   openGraph: {
     title: "Mississippi Launch: Building Density Market by Market | FairTradeWorker",
     description: "We're building density in Mississippi first. Here's why and what it means for contractors.",
@@ -64,7 +64,7 @@ export default function MississippiLaunchPage() {
 
             <p className="text-gray-800 leading-relaxed mb-4">
               We&apos;re doing it differently. FairTradeWorker is launching in
-              North Mississippi first, expanding to Texas, and building density
+              North Mississippi first, expanding statewide, and building density
               one market at a time. Here&apos;s why.
             </p>
 
@@ -123,28 +123,15 @@ export default function MississippiLaunchPage() {
             </p>
 
             <h2 className="text-2xl font-semibold text-gray-900 mt-10 mb-4">
-              Texas Is Next
+              The Southeast Is Next
             </h2>
 
             <p className="text-gray-800 leading-relaxed mb-4">
-              Once Mississippi is dense and running, Texas is the next market.
-              The state has one of the highest rates of new residential
-              construction in the country, a large and active contractor base,
-              and a regulatory environment that lets us move fast. We&apos;re
-              targeting specific metros, not the whole state at once. Build
-              density in one city, prove the model, expand to the next.
-            </p>
-
-            <h2 className="text-2xl font-semibold text-gray-900 mt-10 mb-4">
-              The Southeast by Late 2026
-            </h2>
-
-            <p className="text-gray-800 leading-relaxed mb-4">
-              The roadmap after Texas is the broader Southeast. Alabama,
-              Tennessee, Louisiana, Georgia. Markets with strong construction
-              activity, growing populations, and contractors who are tired of
-              paying $60 per lead on platforms that don&apos;t care whether the
-              lead converts.
+              Once Mississippi is dense and running, we expand to neighboring
+              states. Alabama, Tennessee, Louisiana, Georgia. Markets with
+              strong construction activity, growing populations, and
+              contractors who are tired of paying $60 per lead on platforms
+              that don&apos;t care whether the lead converts.
             </p>
 
             <p className="text-gray-800 leading-relaxed mb-4">
@@ -157,8 +144,8 @@ export default function MississippiLaunchPage() {
             </p>
 
             <p className="text-gray-800 leading-relaxed mb-4">
-              If you&apos;re a contractor in Mississippi or Texas and you want
-              early access, sign up now. The best time to join a marketplace is
+              If you&apos;re a contractor in Mississippi and you want early
+              access, sign up now. The best time to join a marketplace is
               before it&apos;s crowded.
             </p>
           </div>

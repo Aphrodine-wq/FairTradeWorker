@@ -121,7 +121,7 @@ export default function ContractorReviewsPage() {
                 <ThumbsUp className="w-5 h-5 text-brand-600 mb-2" />
                 <p className="text-[12px] text-gray-600">Ranking</p>
                 <p className="text-[24px] font-bold text-gray-900 leading-tight">Top 5%</p>
-                <p className="text-[11px] text-gray-600 mt-0.5">Austin, TX contractors</p>
+                <p className="text-[11px] text-gray-600 mt-0.5">Oxford, MS contractors</p>
               </div>
             </div>
           </div>

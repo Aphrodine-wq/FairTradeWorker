@@ -12,7 +12,7 @@ const testimonials = [
       "I was spending $400 a month on leads that went nowhere. Switched to FairTradeWorker and landed three jobs in my first two weeks. The escrow system means I actually get paid on time.",
     name: "David Ramirez",
     company: "Ramirez Electric",
-    location: "San Antonio, TX",
+    location: "Hattiesburg, MS",
     role: "Electrician",
   },
   {
@@ -20,7 +20,7 @@ const testimonials = [
       "We needed our master bathroom redone and had no idea what it should cost. Posted on FairTradeWorker, got four bids within 48 hours, and every contractor was licensed and insured. The whole process felt transparent.",
     name: "Sarah Chen",
     company: null,
-    location: "Houston, TX",
+    location: "Jackson, MS",
     role: "Homeowner",
   },
   {
@@ -28,7 +28,7 @@ const testimonials = [
       "The AI estimator is a game changer. I used to spend an hour putting together a bid. Now I walk the site, talk through the scope, and Hunter has a full estimate ready before I'm back in the truck.",
     name: "Tommy Williams",
     company: "Williams Plumbing Co.",
-    location: "Dallas, TX",
+    location: "Tupelo, MS",
     role: "Plumber",
   },
   {
@@ -36,7 +36,7 @@ const testimonials = [
       "I've tried three different platforms. This is the only one where I feel like the contractors actually want to be there. The bids were detailed, communication was professional, and escrow gave me peace of mind.",
     name: "Angela Morrison",
     company: null,
-    location: "Round Rock, TX",
+    location: "Starkville, MS",
     role: "Homeowner",
   },
   {
@@ -44,7 +44,7 @@ const testimonials = [
       "My crew is on the Team plan and it changed how we operate. Everyone sees the same dashboard, assignments are clear, and I can track job costing without a spreadsheet. Should have had this years ago.",
     name: "Carlos Medina",
     company: "Medina Renovations",
-    location: "El Paso, TX",
+    location: "Biloxi, MS",
     role: "Remodeling Contractor",
   },
 ];

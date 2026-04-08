@@ -72,7 +72,7 @@ const MOCK_INVOICES: Invoice[] = [
     client: {
       name: "Michael Brown",
       email: "michael@brown.com",
-      address: "4821 Ridgeview Dr, Austin, TX 78731",
+      address: "4821 Ridgeview Dr, Oxford, MS 78731",
     },
     milestone: "Demo complete",
     milestoneNumber: 1,
@@ -100,7 +100,7 @@ const MOCK_INVOICES: Invoice[] = [
     client: {
       name: "Michael Brown",
       email: "michael@brown.com",
-      address: "4821 Ridgeview Dr, Austin, TX 78731",
+      address: "4821 Ridgeview Dr, Oxford, MS 78731",
     },
     milestone: "Rough-in",
     milestoneNumber: 2,
@@ -128,7 +128,7 @@ const MOCK_INVOICES: Invoice[] = [
     client: {
       name: "Michael Brown",
       email: "michael@brown.com",
-      address: "4821 Ridgeview Dr, Austin, TX 78731",
+      address: "4821 Ridgeview Dr, Oxford, MS 78731",
     },
     milestone: "Cabinet install",
     milestoneNumber: 3,
@@ -157,7 +157,7 @@ const MOCK_INVOICES: Invoice[] = [
     client: {
       name: "Sarah Williams",
       email: "sarah@williams.com",
-      address: "119 Lakeshore Ln, Canyon Lake, TX 78133",
+      address: "119 Lakeshore Ln, Sardis Lake, MS 38668",
     },
     milestone: "Demo complete",
     milestoneNumber: 1,
@@ -183,7 +183,7 @@ const MOCK_INVOICES: Invoice[] = [
     client: {
       name: "Robert Johnson",
       email: "robert@johnson.com",
-      address: "7700 MoPac Expy, Austin, TX 78749",
+      address: "7700 MoPac Expy, Oxford, MS 78749",
     },
     milestone: "Shingles",
     milestoneNumber: 3,
@@ -211,7 +211,7 @@ const MOCK_INVOICES: Invoice[] = [
 const PROJECTS_WITH_MILESTONES = [
   {
     name: "Kitchen Remodel",
-    client: { name: "Michael Brown", email: "michael@brown.com", address: "4821 Ridgeview Dr, Austin, TX 78731" },
+    client: { name: "Michael Brown", email: "michael@brown.com", address: "4821 Ridgeview Dr, Oxford, MS 78731" },
     milestones: [
       { name: "Demo complete", number: 1, total: 6, amount: 5000, invoiced: true },
       { name: "Rough-in", number: 2, total: 6, amount: 8500, invoiced: true },
@@ -223,7 +223,7 @@ const PROJECTS_WITH_MILESTONES = [
   },
   {
     name: "Bathroom Reno",
-    client: { name: "Sarah Williams", email: "sarah@williams.com", address: "119 Lakeshore Ln, Canyon Lake, TX 78133" },
+    client: { name: "Sarah Williams", email: "sarah@williams.com", address: "119 Lakeshore Ln, Sardis Lake, MS 38668" },
     milestones: [
       { name: "Demo complete", number: 1, total: 4, amount: 2500, invoiced: true },
       { name: "Plumbing & tile", number: 2, total: 4, amount: 3800, invoiced: false },
@@ -233,7 +233,7 @@ const PROJECTS_WITH_MILESTONES = [
   },
   {
     name: "Roof Replacement",
-    client: { name: "Robert Johnson", email: "robert@johnson.com", address: "7700 MoPac Expy, Austin, TX 78749" },
+    client: { name: "Robert Johnson", email: "robert@johnson.com", address: "7700 MoPac Expy, Oxford, MS 78749" },
     milestones: [
       { name: "Tear-off", number: 1, total: 4, amount: 3500, invoiced: false },
       { name: "Underlayment & flashing", number: 2, total: 4, amount: 2800, invoiced: false },
@@ -653,7 +653,7 @@ export default function InvoicesPage() {
                           Marcus Johnson — Owner
                         </p>
                         <p className="text-[10px] text-gray-600">
-                          TX License #R21445 — Fully Insured
+                          MS License #R21909 — Fully Insured
                         </p>
                       </div>
                     </div>
@@ -854,7 +854,7 @@ export default function InvoicesPage() {
                   <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                     <div className="text-[9px] text-gray-600">
                       <p>marcus@johnson.com — (512) 555-0100</p>
-                      <p>4200 South Congress Ave, Austin, TX 78745</p>
+                      <p>4200 South Congress Ave, Oxford, MS 78745</p>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <div className="w-4 h-4 rounded bg-brand-600 flex items-center justify-center">

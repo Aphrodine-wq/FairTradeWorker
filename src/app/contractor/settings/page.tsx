@@ -550,8 +550,8 @@ function BillingSection() {
 }
 
 function LicensesSection() {
-  const [licenseNumber, setLicenseNumber] = useState("GC-TX-2019-48821");
-  const [licenseState, setLicenseState] = useState("TX");
+  const [licenseNumber, setLicenseNumber] = useState("GC-MS-2019-48821");
+  const [licenseState, setLicenseState] = useState("MS");
   const [licenseExpiry, setLicenseExpiry] = useState("2027-06-30");
   const { saved, onSave } = useSave();
 
@@ -618,8 +618,8 @@ function InsuranceSection() {
   const [policyNumber, setPolicyNumber] = useState("SF-BOP-2024-99123");
   const [coverageAmount, setCoverageAmount] = useState("2000000");
   const [insuranceExpiry, setInsuranceExpiry] = useState("2026-12-31");
-  const [wcProvider, setWcProvider] = useState("Texas Mutual");
-  const [wcPolicy, setWcPolicy] = useState("WC-TX-2024-55781");
+  const [wcProvider, setWcProvider] = useState("Mississippi Mutual");
+  const [wcPolicy, setWcPolicy] = useState("WC-MS-2024-55781");
   const [wcExpiry, setWcExpiry] = useState("2026-12-31");
   const { saved, onSave } = useSave();
 
@@ -891,9 +891,9 @@ function AccountSection() {
         <p className="text-sm font-semibold text-gray-900 mb-3">Recent Login Activity</p>
         <div className="space-y-0 text-sm">
           {[
-            { device: "MacBook Pro — Chrome", location: "Austin, TX", time: "Today, 3:42 PM", current: true },
-            { device: "iPhone 15 — Safari", location: "Austin, TX", time: "Today, 8:15 AM", current: false },
-            { device: "MacBook Pro — Chrome", location: "Austin, TX", time: "Yesterday, 6:30 PM", current: false },
+            { device: "MacBook Pro — Chrome", location: "Oxford, MS", time: "Today, 3:42 PM", current: true },
+            { device: "iPhone 15 — Safari", location: "Oxford, MS", time: "Today, 8:15 AM", current: false },
+            { device: "MacBook Pro — Chrome", location: "Oxford, MS", time: "Yesterday, 6:30 PM", current: false },
           ].map((s, i) => (
             <div key={i} className="flex items-center justify-between py-2.5 border-b border-gray-100 last:border-0">
               <div>
