@@ -8,10 +8,10 @@ import { Button } from "@shared/ui/button";
 export const metadata: Metadata = {
   title: "A New Way to Do Home Projects",
   description:
-    "Stop calling around for quotes. Post your project, get real bids from verified contractors, and pick the best one. It's how home projects should work.",
+    "Stop calling around for quotes. Post your project, get real bids from verified contractors, and pick the best one. That's how home projects should work.",
   openGraph: {
     title: "A New Way to Do Home Projects | FairTradeWorker",
-    description: "Stop calling around for quotes. Post your project, get real bids from verified contractors, and pick the best one. It's how home projects should work.",
+    description: "Stop calling around for quotes. Post your project, get real bids from verified contractors, and pick the best one. That's how home projects should work.",
   },
   alternates: {
     canonical: "/new-way",
@@ -33,7 +33,7 @@ export default function NewWayPage() {
               Home projects should be fun, not stressful.
             </h1>
             <p className="mt-6 text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
-              You shouldn't have to call ten contractors to get two callbacks
+              You shouldn&apos;t have to call ten contractors to get two callbacks
               and one overpriced quote. We flipped the whole thing around.
             </p>
           </div>
@@ -105,7 +105,7 @@ export default function NewWayPage() {
                 </div>
                 <p className="text-gray-600 leading-relaxed pl-11">
                   "Need my kitchen cabinets repainted. 22 cabinets, white to
-                  navy. House is in Oxford off South Lamar." That's it. Add a
+                  navy. House is in Oxford off South Lamar." That&apos;s it. Add a
                   couple photos if you want. Takes two minutes on your phone.
                 </p>
               </div>
@@ -131,7 +131,7 @@ export default function NewWayPage() {
                 <p className="text-gray-600 leading-relaxed pl-11">
                   See every bid side by side. Check their reviews from past
                   jobs. Message them with questions. There's no pressure and no
-                  deadline — you hire when you're ready.
+                  deadline — you hire when you&apos;re ready.
                 </p>
               </div>
 
@@ -144,7 +144,7 @@ export default function NewWayPage() {
                   When you hire someone, your payment goes into escrow — not
                   the contractor's pocket. They do the work, you confirm it
                   looks good, then the money releases. If something's not right,
-                  you've got leverage. That's how it should work.
+                  you&apos;ve got leverage. That&apos;s how it should work.
                 </p>
               </div>
             </div>
@@ -160,7 +160,7 @@ export default function NewWayPage() {
             <p className="mt-4 text-lg text-gray-600 leading-relaxed">
               Most platforms charge contractors $30 to $80 per lead — and
               most of those leads never turn into jobs. That cost gets passed
-              to you in inflated bids. We don't do that.
+              to you in inflated bids. We don&apos;t do that.
             </p>
 
             <div className="mt-8 space-y-4">
@@ -202,16 +202,16 @@ export default function NewWayPage() {
                 <p className="mt-2 text-gray-600 leading-relaxed">
                   On lead-fee platforms, the contractor who pays the most gets
                   the most leads. Here, the contractor with the best bid and
-                  best track record wins. That's better for everyone.
+                  best track record wins. That&apos;s better for everyone.
                 </p>
               </div>
 
               <div>
                 <h3 className="text-lg font-bold text-gray-900">Prices are actually fair</h3>
                 <p className="mt-2 text-gray-600 leading-relaxed">
-                  When contractors don't pay $60 per lead, they don't need to
+                  When contractors don&apos;t pay $60 per lead, they don&apos;t need to
                   pad their bids to cover it. You get real pricing because the
-                  platform isn't taking a cut of every job.
+                  platform isn&apos;t taking a cut of every job.
                 </p>
               </div>
 
@@ -219,8 +219,8 @@ export default function NewWayPage() {
                 <h3 className="text-lg font-bold text-gray-900">Every review means something</h3>
                 <p className="mt-2 text-gray-600 leading-relaxed">
                   Reviews on FairTradeWorker are tied to completed,
-                  escrow-verified jobs. You can't fake them, you can't buy
-                  them, and you can't delete the bad ones. What you see is what
+                  escrow-verified jobs. You can&apos;t fake them, you can&apos;t buy
+                  them, and you can&apos;t delete the bad ones. What you see is what
                   you get.
                 </p>
               </div>
@@ -228,10 +228,10 @@ export default function NewWayPage() {
               <div>
                 <h3 className="text-lg font-bold text-gray-900">Mississippi first</h3>
                 <p className="mt-2 text-gray-600 leading-relaxed">
-                  We're not trying to be everywhere at once. We launched in
-                  Mississippi because it's home, and we're building density
+                  We&apos;re not trying to be everywhere at once. We launched in
+                  Mississippi because it&apos;s home, and we&apos;re building density
                   market by market. When you post a job in Oxford or Tupelo,
-                  you're getting local contractors who know the area — not a
+                  you&apos;re getting local contractors who know the area — not a
                   handyman three states away.
                 </p>
               </div>

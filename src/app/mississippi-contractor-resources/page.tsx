@@ -111,7 +111,7 @@ export default function MississippiContractorResourcesPage() {
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-2xl font-bold text-gray-900">Insurance Requirements</h2>
             <p className="mt-3 text-gray-600 leading-relaxed">
-              Mississippi doesn't mandate specific insurance amounts for all
+              Mississippi doesn&apos;t mandate specific insurance amounts for all
               contractors, but these are the industry-standard minimums that
               homeowners and GCs expect.
             </p>
@@ -299,7 +299,7 @@ export default function MississippiContractorResourcesPage() {
 
               <Link href="/blog/hiring-contractor-checklist" className="block p-5 border border-border rounded-sm hover:border-brand-600/30 transition-colors duration-150">
                 <h3 className="font-bold text-gray-900">Contractor Hiring Checklist</h3>
-                <p className="mt-1 text-sm text-gray-600">What homeowners look for when hiring. Know what you're being evaluated on.</p>
+                <p className="mt-1 text-sm text-gray-600">What homeowners look for when hiring. Know what you&apos;re being evaluated on.</p>
               </Link>
             </div>
           </div>

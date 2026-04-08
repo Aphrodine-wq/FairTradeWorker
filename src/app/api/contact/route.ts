@@ -18,12 +18,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Log for now — wire to email service later
-    console.log("=== CONTACT FORM SUBMISSION ===");
-    console.log(`From: ${name} <${email}>`);
-    console.log(`Subject: ${subject}`);
-    console.log(`Message: ${message}`);
-    console.log("===============================");
+    // TODO: wire to email service
 
     // If Spring Boot backend is available, forward there too
     const backendUrl = process.env.NEXT_PUBLIC_REALTIME_URL;

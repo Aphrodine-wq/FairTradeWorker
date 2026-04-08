@@ -22,8 +22,7 @@ export async function POST(req: NextRequest) {
       { expiresIn: "1h" }
     );
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    console.log("Password reset link:", `${baseUrl}/reset-password?token=${resetToken}`);
+    // TODO: send reset email with token
   }
 
   // Always return success to avoid leaking whether the email exists

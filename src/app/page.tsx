@@ -123,7 +123,7 @@ export default function HomePage() {
                 </h3>
                 <p className="text-sm text-gray-600 leading-relaxed">
                   Post your project, get bids from verified contractors,
-                  compare side by side, and hire when you're ready. Your money
+                  compare side by side, and hire when you&apos;re ready. Your money
                   sits in escrow until the work is done.
                 </p>
               </div>

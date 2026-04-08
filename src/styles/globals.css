@@ -46,7 +46,7 @@
     pointer-events: none;
     z-index: 0;
     opacity: 0.025;
-    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEWFhYWDg4N3d3dtbW17e3t1dXWBgYGHh4d5eXlzc3Oelieli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli eli AAAAAAAAkR");
+    background-image: none;
   }
 
   ::selection {

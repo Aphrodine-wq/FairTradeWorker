@@ -16,7 +16,7 @@ export function CTASection() {
             </h2>
             <p className="mt-4 text-base text-gray-300 leading-relaxed max-w-lg">
               3,200+ verified contractors. 12,800+ jobs completed. Zero lead
-              fees on every plan. Whether you're a contractor looking for work or
+              fees on every plan. Whether you&apos;re a contractor looking for work or
               a homeowner with a project, the platform is free to start and takes
               less than two minutes to set up.
             </p>

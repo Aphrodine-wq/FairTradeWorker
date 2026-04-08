@@ -235,7 +235,6 @@ export default function BlogPage() {
             ))}
           </div>
 
-          <p className="mt-14 text-sm text-gray-600">More coming soon.</p>
 
         </div>
       </main>
