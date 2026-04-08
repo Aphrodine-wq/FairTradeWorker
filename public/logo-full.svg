@@ -1,0 +1,9 @@
+<svg viewBox="0 0 240 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Logo mark -->
+  <rect width="36" height="36" rx="8" y="2" fill="#C41E3A"/>
+  <rect x="10" y="9" width="4.5" height="20" rx="1.5" fill="white"/>
+  <rect x="10" y="9" width="17" height="4.5" rx="1.5" fill="white"/>
+  <rect x="10" y="16.5" width="12.5" height="4" rx="1.5" fill="white"/>
+  <!-- Text -->
+  <text x="44" y="27" fill="#111318" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif" font-size="22" font-weight="700" letter-spacing="-0.02em">FairTradeWorker</text>
+</svg>

@@ -25,6 +25,7 @@ const footerLinks = {
     { label: "Voice AI (Hunter)", href: "/pricing" },
     { label: "Escrow Payments", href: "/faq" },
     { label: "Contractor Plans", href: "/pricing" },
+    { label: "MS Contractor Resources", href: "/mississippi-contractor-resources" },
   ],
   "For Homeowners": [
     { label: "Post a Job", href: "/signup?role=homeowner" },

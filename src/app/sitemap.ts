@@ -11,6 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/features",
     "/how-it-works",
     "/new-way",
+    "/mississippi-contractor-resources",
     "/about",
     "/blog",
     "/careers",
