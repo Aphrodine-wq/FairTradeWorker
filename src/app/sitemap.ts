@@ -58,6 +58,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
   );
 
+  // Sub-service index pages: /services/[trade]/[subservice]
+  const subServiceIndexEntries: MetadataRoute.Sitemap = TRADES.flatMap((trade) =>
+    trade.subServices.map((sub) => ({
+      url: `${baseUrl}/services/${trade.slug}/${sub.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    })),
+  );
+
   // Sub-service + location pages: /services/[trade]/[subservice]/[location]
   const subServiceEntries: MetadataRoute.Sitemap = TRADES.flatMap((trade) =>
     trade.subServices.flatMap((sub) =>
@@ -90,6 +100,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...servicesIndex,
     ...tradeEntries,
     ...tradeLocationEntries,
+    ...subServiceIndexEntries,
     ...subServiceEntries,
     ...blogEntries,
   ];

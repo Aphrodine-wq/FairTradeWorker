@@ -163,7 +163,7 @@ export default async function TradePage({ params }: Props) {
               {trade.subServices.map((sub) => (
                 <Link
                   key={sub.slug}
-                  href={`/services/${trade.slug}/${sub.slug}/oxford-ms`}
+                  href={`/services/${trade.slug}/${sub.slug}`}
                   className="group bg-white border border-[#E5E1DB] p-5 hover:border-[#C41E3A]/30 transition-colors duration-150"
                 >
                   <h3 className="text-lg font-semibold text-[#111318] group-hover:text-[#C41E3A] transition-colors duration-150">
