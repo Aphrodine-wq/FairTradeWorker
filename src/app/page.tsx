@@ -88,10 +88,16 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="mt-10">
+            <div className="mt-10 flex flex-col sm:flex-row gap-3">
               <Button variant="outline" asChild>
                 <Link href="/features" className="inline-flex items-center gap-2">
                   See all features
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link href="/fairprice" className="inline-flex items-center gap-2">
+                  Get a free estimate
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </Button>

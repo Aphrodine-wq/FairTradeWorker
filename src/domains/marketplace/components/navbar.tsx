@@ -17,7 +17,7 @@ export function Navbar() {
             <Link href="/features" className="text-sm text-gray-800 hover:text-gray-900 transition-colors duration-150">Features</Link>
             <Link href="/how-it-works" className="text-sm text-gray-800 hover:text-gray-900 transition-colors duration-150">How It Works</Link>
             <Link href="/pricing" className="text-sm text-gray-800 hover:text-gray-900 transition-colors duration-150">Pricing</Link>
-            <Link href="/fairprice" className="text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors duration-150">FairPrice</Link>
+            <Link href="/fairprice" className="text-base font-semibold text-brand-600 hover:text-brand-700 transition-colors duration-150">FairPrice</Link>
             <Link href="/about" className="text-sm text-gray-800 hover:text-gray-900 transition-colors duration-150">About</Link>
             <Link href="/faq" className="text-sm text-gray-800 hover:text-gray-900 transition-colors duration-150">FAQ</Link>
           </nav>
