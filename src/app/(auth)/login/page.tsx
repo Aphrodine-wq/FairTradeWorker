@@ -49,70 +49,70 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] flex">
+    <div className="min-h-screen bg-white flex">
       {/* Left panel — value prop */}
-      <div className="hidden lg:flex lg:w-[45%] bg-dark flex-col justify-between p-12">
+      <div className="hidden lg:flex lg:w-[45%] bg-[#F7F8FA] border-r border-gray-200 flex-col justify-between p-12">
         <div>
           <Link href="/" className="inline-flex items-center gap-2.5">
             <BrandMark className="w-8 h-8" />
-            <span className="text-xl font-bold text-white">FairTradeWorker</span>
+            <span className="text-xl font-bold text-gray-900">FairTradeWorker</span>
           </Link>
         </div>
 
         <div className="space-y-12">
-          <h2 className="text-3xl font-bold text-white leading-tight">
+          <h2 className="text-3xl font-bold text-gray-900 leading-tight">
             Built for
             <br />
-            <span className="text-brand-500">the trades.</span>
+            <span className="text-brand-600">the trades.</span>
           </h2>
 
           <div className="space-y-6">
             <div className="flex items-center gap-3">
-              <DollarSign className="w-5 h-5 text-brand-500 flex-shrink-0" />
-              <p className="text-sm text-gray-300">$0 lead fees. Flat subscription.</p>
+              <DollarSign className="w-5 h-5 text-brand-600 flex-shrink-0" />
+              <p className="text-sm text-gray-600">$0 lead fees. Flat subscription.</p>
             </div>
             <div className="flex items-center gap-3">
-              <Shield className="w-5 h-5 text-brand-500 flex-shrink-0" />
-              <p className="text-sm text-gray-300">Escrow on every job.</p>
+              <Shield className="w-5 h-5 text-brand-600 flex-shrink-0" />
+              <p className="text-sm text-gray-600">Escrow on every job.</p>
             </div>
             <div className="flex items-center gap-3">
-              <Mic className="w-5 h-5 text-brand-500 flex-shrink-0" />
-              <p className="text-sm text-gray-300">AI estimates in 3 minutes.</p>
+              <Mic className="w-5 h-5 text-brand-600 flex-shrink-0" />
+              <p className="text-sm text-gray-600">AI estimates in 3 minutes.</p>
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <p className="text-2xl font-bold text-white tabular-nums">12,800+</p>
-              <p className="text-xs text-gray-600">Jobs</p>
+              <p className="text-2xl font-bold text-gray-900 tabular-nums">12,800+</p>
+              <p className="text-xs text-gray-500">Jobs</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-white tabular-nums">3,200+</p>
-              <p className="text-xs text-gray-600">Contractors</p>
+              <p className="text-2xl font-bold text-gray-900 tabular-nums">3,200+</p>
+              <p className="text-xs text-gray-500">Contractors</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-white tabular-nums">98%</p>
-              <p className="text-xs text-gray-600">Satisfaction</p>
+              <p className="text-2xl font-bold text-gray-900 tabular-nums">98%</p>
+              <p className="text-xs text-gray-500">Satisfaction</p>
             </div>
           </div>
 
           <div className="border-l-2 border-brand-600 pl-4">
-            <p className="text-sm text-gray-300 italic">
+            <p className="text-sm text-gray-600 italic">
               &ldquo;I&apos;ve grown my business 40% since joining.&rdquo;
             </p>
-            <p className="text-xs text-gray-600 mt-1">
+            <p className="text-xs text-gray-500 mt-1">
               Marcus Johnson, Oxford MS
             </p>
           </div>
         </div>
 
-        <p className="text-xs text-gray-700">
+        <p className="text-xs text-gray-400">
           &copy; {new Date().getFullYear()} FairTradeWorker
         </p>
       </div>
 
       {/* Right panel — form */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 bg-white">
         <div className="w-full max-w-[420px]">
           {/* Mobile brand */}
           <div className="flex justify-center mb-8 lg:hidden">
@@ -222,7 +222,16 @@ function LoginContent() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
+              <button
+                type="button"
+                onClick={() => { window.location.href = "/api/auth/quickbooks"; }}
+                className="w-full flex items-center justify-center gap-2.5 h-11 rounded-md bg-[#2CA01C] hover:bg-[#249117] text-white text-sm font-semibold transition-colors"
+              >
+                <QuickBooksIcon className="w-5 h-5" />
+                Sign in with QuickBooks
+              </button>
+
+              <div className="grid grid-cols-2 gap-3 mt-3">
                 <Button type="button" variant="outline" size="lg" className="w-full font-medium">
                   <GoogleIcon className="w-4 h-4 mr-2 flex-shrink-0" />
                   Google
@@ -230,16 +239,6 @@ function LoginContent() {
                 <Button type="button" variant="outline" size="lg" className="w-full font-medium">
                   <AppleIcon className="w-4 h-4 mr-2 flex-shrink-0" />
                   Apple
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="lg"
-                  className="w-full font-medium"
-                  onClick={() => { window.location.href = "/api/auth/quickbooks"; }}
-                >
-                  <QuickBooksIcon className="w-4 h-4 mr-2 flex-shrink-0" />
-                  QuickBooks
                 </Button>
               </div>
 
@@ -334,11 +333,11 @@ function AppleIcon({ className }: { className?: string }) {
 
 function QuickBooksIcon({ className }: { className?: string }) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={cn(className)} aria-hidden="true">
-      <circle cx="12" cy="12" r="11" fill="#2CA01C" />
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" className={cn(className)} aria-hidden="true">
+      <circle cx="20" cy="20" r="20" fill="#fff" />
       <path
-        d="M7.5 8C6.12 8 5 9.12 5 10.5v3C5 14.88 6.12 16 7.5 16H9v-1.5H7.5c-.55 0-1-.45-1-1v-3c0-.55.45-1 1-1H9V8H7.5zm9 0H15v1.5h1.5c.55 0 1 .45 1 1v3c0 .55-.45 1-1 1H15V16h1.5c1.38 0 2.5-1.12 2.5-2.5v-3C19 9.12 17.88 8 16.5 8z"
-        fill="#fff"
+        d="M13.2 12C11.43 12 10 13.43 10 15.2v9.6c0 1.77 1.43 3.2 3.2 3.2h2.4v-2.4h-2.4c-.44 0-.8-.36-.8-.8v-9.6c0-.44.36-.8.8-.8h2.4V12h-2.4zm13.6 0h-2.4v2.4h2.4c.44 0 .8.36.8.8v9.6c0 .44-.36.8-.8.8h-2.4V28h2.4c1.77 0 3.2-1.43 3.2-3.2v-9.6c0-1.77-1.43-3.2-3.2-3.2z"
+        fill="#2CA01C"
       />
     </svg>
   );
