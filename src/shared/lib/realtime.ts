@@ -201,6 +201,11 @@ export const api = {
   },
 
   // Chat (authenticated)
+  async listConversations(): Promise<any[]> {
+    const data = await apiFetch<{ conversations: any[] }>("/api/chat/conversations");
+    return data.conversations;
+  },
+
   async listMessages(conversationId: string): Promise<RealtimeMessage[]> {
     const data = await apiFetch<{ messages: RealtimeMessage[] }>(
       `/api/chat/${conversationId}`

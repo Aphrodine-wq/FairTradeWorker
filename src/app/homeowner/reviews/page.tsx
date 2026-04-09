@@ -22,6 +22,7 @@ import { Textarea } from "@shared/ui/textarea";
 import { cn, formatCurrency, formatDate } from "@shared/lib/utils";
 import { toast } from "sonner";
 import { usePageTitle } from "@shared/hooks/use-page-title";
+import { api } from "@shared/lib/realtime";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -254,12 +255,30 @@ export default function HomeownerFairRecordPage() {
       ? reviewed.reduce((sum, j) => sum + (j.review?.rating ?? 0), 0) / totalReviewed
       : 0;
 
-  function submitReview(
+  async function submitReview(
     jobId: string,
     rating: number,
     text: string,
     tags: string[]
   ) {
+    const job = jobs.find((j) => j.id === jobId);
+    let fairRecordId = `FR-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+
+    // Post to real API
+    try {
+      const result = await api.createReview({
+        rating,
+        comment: text,
+        reviewed_id: job?.contractorId ?? "",
+        job_id: jobId,
+      });
+      if (result?.fair_record_id) {
+        fairRecordId = result.fair_record_id;
+      }
+    } catch {
+      // API failed — still update UI optimistically
+    }
+
     setJobs((prev) =>
       prev.map((j) =>
         j.id === jobId
@@ -271,7 +290,7 @@ export default function HomeownerFairRecordPage() {
                 text,
                 tags,
                 submittedAt: new Date().toISOString(),
-                fairRecordId: `FR-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
+                fairRecordId,
               },
             }
           : j

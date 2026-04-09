@@ -119,9 +119,9 @@ export default function HomeownerDashboardPage() {
   const [notificationCount, setNotificationCount] = useState(0);
 
   useEffect(() => {
-    fetchNotifications().then((notifs) => {
-      if (notifs.length > 0) {
-        setNotificationCount(notifs.filter((n: any) => !n.read).length);
+    fetchNotifications().then(({ data }) => {
+      if (data.length > 0) {
+        setNotificationCount(data.filter((n: any) => !n.read).length);
       }
     });
   }, []);

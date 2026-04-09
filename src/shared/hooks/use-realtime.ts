@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   realtimeClient,
   api,
@@ -136,10 +136,13 @@ export function useRealtimeBids(jobId: string | null) {
 
 /**
  * Live chat — messages appear in real-time via WebSocket.
+ * Typing indicators come through the STOMP presence channel.
  */
 export function useRealtimeChat(conversationId: string | null) {
   const [messages, setMessages] = useState<RealtimeMessage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [typingUsers, setTypingUsers] = useState<string[]>([]);
+  const typingTimeoutRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   useEffect(() => {
     if (!conversationId || !getAuthToken()) return;
@@ -153,10 +156,40 @@ export function useRealtimeChat(conversationId: string | null) {
       },
       onNewMessage: (msg) => {
         setMessages((prev) => [...prev, msg]);
+        // Clear typing indicator for this sender
+        const senderName = typeof msg.sender === "string" ? msg.sender : msg.sender?.name;
+        if (senderName) {
+          setTypingUsers((prev) => prev.filter((u) => u !== senderName));
+        }
+      },
+      onPresence: (data: any) => {
+        if (data?.typing !== undefined && data?.user) {
+          const userName = data.user.name || data.user;
+          if (data.typing) {
+            setTypingUsers((prev) => prev.includes(userName) ? prev : [...prev, userName]);
+            // Auto-clear after 4s
+            const existing = typingTimeoutRef.current.get(userName);
+            if (existing) clearTimeout(existing);
+            typingTimeoutRef.current.set(
+              userName,
+              setTimeout(() => {
+                setTypingUsers((prev) => prev.filter((u) => u !== userName));
+                typingTimeoutRef.current.delete(userName);
+              }, 4000)
+            );
+          } else {
+            setTypingUsers((prev) => prev.filter((u) => u !== userName));
+          }
+        }
       },
     });
 
-    return leave;
+    return () => {
+      leave();
+      typingTimeoutRef.current.forEach((t) => clearTimeout(t));
+      typingTimeoutRef.current.clear();
+      setTypingUsers([]);
+    };
   }, [conversationId]);
 
   const sendMessage = useCallback(
@@ -175,5 +208,70 @@ export function useRealtimeChat(conversationId: string | null) {
     [conversationId]
   );
 
-  return { messages, loading, sendMessage, sendTyping };
+  return { messages, loading, sendMessage, sendTyping, typingUsers };
+}
+
+/**
+ * Real-time notifications — subscribes to user notification channel.
+ * Also fetches initial notification list via REST.
+ */
+export function useRealtimeNotifications() {
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    // Fetch initial list via REST
+    api.listNotifications()
+      .then((notifs) => {
+        setNotifications(notifs);
+        setUnreadCount(notifs.filter((n: any) => !n.read).length);
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
+
+    // Subscribe to real-time notifications if authenticated
+    const token = getAuthToken();
+    if (!token) return;
+
+    realtimeClient.connect();
+
+    // Decode user ID from JWT for subscription
+    let userId = "me";
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      userId = payload.sub || payload.id || "me";
+    } catch {
+      // Use "me" as fallback
+    }
+
+    const leave = realtimeClient.joinNotifications(userId, {
+      onNotification: (payload: any) => {
+        setNotifications((prev) => [payload, ...prev]);
+        if (!payload.read) {
+          setUnreadCount((prev) => prev + 1);
+        }
+      },
+    });
+
+    return leave;
+  }, []);
+
+  const markRead = useCallback(async (id: string) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+    );
+    setUnreadCount((prev) => Math.max(0, prev - 1));
+    api.markNotificationRead(id).catch(() => {});
+  }, []);
+
+  const markAllRead = useCallback(async () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    setUnreadCount(0);
+    api.markAllNotificationsRead().catch(() => {});
+  }, []);
+
+  return { notifications, loading, unreadCount, markRead, markAllRead };
 }

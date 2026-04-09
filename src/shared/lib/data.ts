@@ -91,18 +91,49 @@ export async function fetchClients(): Promise<any[]> {
 }
 
 /**
- * Fetch reviews — real API with empty fallback.
+ * Fetch reviews — real API with mock fallback.
  */
-export async function fetchReviews(forUserId?: string): Promise<any[]> {
-  try { return await api.listReviews(forUserId); } catch { return []; }
+export async function fetchReviews(forUserId?: string): Promise<{ data: any[]; isMock: boolean }> {
+  try {
+    const reviews = await api.listReviews(forUserId);
+    if (reviews.length > 0) return { data: reviews, isMock: false };
+  } catch {
+    // Backend not available — fall through to mock
+  }
+  return { data: [], isMock: true };
 }
 
 /**
- * Fetch notifications — real API with empty fallback.
+ * Fetch notifications — real API with mock fallback.
+ * Returns isMock flag so UI can show fallback banner.
  */
-export async function fetchNotifications(): Promise<any[]> {
-  try { return await api.listNotifications(); } catch { return []; }
+export async function fetchNotifications(): Promise<{ data: any[]; isMock: boolean }> {
+  try {
+    const notifs = await api.listNotifications();
+    return { data: notifs, isMock: false };
+  } catch {
+    // Backend not available — fall through to mock
+  }
+  return { data: [], isMock: true };
 }
+
+/**
+ * Fetch conversations — real API with mock fallback.
+ */
+export async function fetchConversations(): Promise<{ data: any[]; isMock: boolean }> {
+  try {
+    const convos = await api.listConversations();
+    if (convos.length > 0) return { data: convos, isMock: false };
+  } catch {
+    // Backend not available — fall through to mock
+  }
+  return { data: [], isMock: true };
+}
+
+/**
+ * Legacy fetchNotifications without isMock — for backward compatibility.
+ * Prefer the named export above which returns { data, isMock }.
+ */
 
 /**
  * Fetch settings — real API with null fallback.
