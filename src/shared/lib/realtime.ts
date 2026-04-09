@@ -176,7 +176,7 @@ export const api = {
   }): Promise<RealtimeJob> {
     const data = await apiFetch<{ job: RealtimeJob }>("/api/jobs", {
       method: "POST",
-      body: JSON.stringify({ job }),
+      body: JSON.stringify(job),
     });
     return data.job;
   },
@@ -187,7 +187,7 @@ export const api = {
   ): Promise<RealtimeBid> {
     const data = await apiFetch<{ bid: RealtimeBid }>(`/api/jobs/${jobId}/bids`, {
       method: "POST",
-      body: JSON.stringify({ bid }),
+      body: JSON.stringify(bid),
     });
     return data.bid;
   },
@@ -219,7 +219,7 @@ export const api = {
   ): Promise<RealtimeMessage> {
     const data = await apiFetch<{ message: RealtimeMessage }>(
       `/api/chat/${conversationId}`,
-      { method: "POST", body: JSON.stringify({ message }) }
+      { method: "POST", body: JSON.stringify(message) }
     );
     return data.message;
   },
@@ -318,7 +318,7 @@ export const api = {
   async updateSettings(settings: Record<string, any>): Promise<any> {
     const data = await apiFetch<{ settings: any }>("/api/settings", {
       method: "PUT",
-      body: JSON.stringify({ settings }),
+      body: JSON.stringify(settings),
     });
     return data.settings;
   },
@@ -327,7 +327,7 @@ export const api = {
   async createReview(attrs: { rating: number; comment: string; reviewed_id: string; job_id?: string }): Promise<any> {
     const data = await apiFetch<{ review: any }>("/api/reviews", {
       method: "POST",
-      body: JSON.stringify({ review: attrs }),
+      body: JSON.stringify(attrs),
     });
     return data.review;
   },
@@ -367,7 +367,7 @@ export const api = {
   }): Promise<any> {
     const data = await apiFetch<{ sub_job: any }>("/api/sub-jobs", {
       method: "POST",
-      body: JSON.stringify({ sub_job: subJob }),
+      body: JSON.stringify(subJob),
     });
     return data.sub_job;
   },
@@ -378,7 +378,7 @@ export const api = {
   ): Promise<any> {
     const data = await apiFetch<{ bid: any }>(`/api/sub-jobs/${subJobId}/bids`, {
       method: "POST",
-      body: JSON.stringify({ bid }),
+      body: JSON.stringify(bid),
     });
     return data.bid;
   },
@@ -425,7 +425,7 @@ export const api = {
   async submitVerificationStep(step: string, data: Record<string, unknown>): Promise<any> {
     return apiFetch(`/api/contractor/verification/${step}`, {
       method: "POST",
-      body: JSON.stringify({ data }),
+      body: JSON.stringify(data),
     });
   },
 };
