@@ -5,8 +5,11 @@ import { Search, SlidersHorizontal, X, ChevronDown, LayoutGrid, List } from "luc
 import { Input } from "@shared/ui/input";
 import { Button } from "@shared/ui/button";
 import { Badge } from "@shared/ui/badge";
+import { Textarea } from "@shared/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@shared/ui/dialog";
 import { mockSubJobs, type SubJob, type SubPaymentPath } from "@shared/lib/mock-data";
 import { fetchSubJobs } from "@shared/lib/data";
+import { api } from "@shared/lib/realtime";
 import { SubJobCard } from "@subcontractor/components/sub-job-card";
 import { AppHeader } from "@shared/components/app-header";
 import { cn } from "@shared/lib/utils";
@@ -44,6 +47,10 @@ export default function BrowseSubJobsPage() {
   const [selectedUrgency, setSelectedUrgency] = useState<string | null>(null);
   const [selectedPaymentPath, setSelectedPaymentPath] = useState<SubPaymentPath | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
+  const [bidDialogJob, setBidDialogJob] = useState<SubJob | null>(null);
+  const [bidAmount, setBidAmount] = useState("");
+  const [bidTimeline, setBidTimeline] = useState("");
+  const [bidMessage, setBidMessage] = useState("");
 
   useEffect(() => {
     fetchSubJobs().then(setSubJobs);
@@ -113,6 +120,29 @@ export default function BrowseSubJobsPage() {
   }
 
   const hasFilters = search || selectedCategories.length > 0 || selectedSkills.length > 0 || selectedUrgency || selectedPaymentPath;
+
+  async function submitBid() {
+    if (!bidDialogJob) return;
+    const amount = Number(bidAmount);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      toast.error("Enter a valid bid amount");
+      return;
+    }
+    try {
+      await api.placeSubBid(bidDialogJob.id, {
+        amount,
+        timeline: bidTimeline || undefined,
+        message: bidMessage || undefined,
+      });
+      toast.success("Bid submitted");
+      setBidDialogJob(null);
+      setBidAmount("");
+      setBidTimeline("");
+      setBidMessage("");
+    } catch {
+      toast.error("Could not submit bid");
+    }
+  }
 
   return (
     <div className="flex h-full">
@@ -286,7 +316,12 @@ export default function BrowseSubJobsPage() {
                 <SubJobCard
                   key={sj.id}
                   subJob={sj}
-                  onBid={(sj) => toast.success(`Bid dialog for "${sj.title}" — coming soon`)}
+                  onBid={(sj) => {
+                    setBidDialogJob(sj);
+                    setBidAmount(String(sj.budgetMin));
+                    setBidTimeline("");
+                    setBidMessage("");
+                  }}
                 />
               ))}
             </div>
@@ -303,6 +338,40 @@ export default function BrowseSubJobsPage() {
           )}
         </div>
       </div>
+
+      <Dialog
+        open={Boolean(bidDialogJob)}
+        onOpenChange={(open) => {
+          if (!open) setBidDialogJob(null);
+        }}
+      >
+        <DialogContent className="max-w-[520px]">
+          <DialogHeader>
+            <DialogTitle>Place Sub-Bid</DialogTitle>
+          </DialogHeader>
+          {bidDialogJob && (
+            <div className="space-y-4">
+              <p className="text-sm text-gray-700">{bidDialogJob.title}</p>
+              <div>
+                <label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Amount</label>
+                <Input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Timeline</label>
+                <Input value={bidTimeline} onChange={(e) => setBidTimeline(e.target.value)} placeholder="e.g., 5 days" />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Message</label>
+                <Textarea value={bidMessage} onChange={(e) => setBidMessage(e.target.value)} rows={4} placeholder="Briefly explain your approach and availability." />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setBidDialogJob(null)}>Cancel</Button>
+                <Button onClick={submitBid}>Submit Bid</Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

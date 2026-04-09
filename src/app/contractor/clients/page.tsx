@@ -27,7 +27,8 @@ import {
   DialogTrigger,
 } from "@shared/ui/dialog";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
-import { fetchClients } from "@shared/lib/data";
+import { fetchClients, createClient, updateClient, removeClient } from "@shared/lib/data";
+import { toast } from "sonner";
 import { usePageTitle } from "@shared/hooks/use-page-title";
 
 // ─── Mock Data ───────────────────────────────────────────────────────────────
@@ -219,6 +220,15 @@ export default function ClientsPage() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "active" | "lead" | "past">("all");
   const [selectedId, setSelectedId] = useState<string>("c1");
+  const [addClientOpen, setAddClientOpen] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [clientEmail, setClientEmail] = useState("");
+  const [clientPhone, setClientPhone] = useState("");
+  const [clientAddress, setClientAddress] = useState("");
+  const [clientStatus, setClientStatus] = useState<"lead" | "active" | "past">("lead");
+  const [clientNotes, setClientNotes] = useState("");
+  const [savingNotes, setSavingNotes] = useState(false);
 
   useEffect(() => {
     fetchClients().then((apiClients) => {
@@ -251,6 +261,65 @@ export default function ClientsPage() {
     });
   }, []);
 
+  function resetCreateForm() {
+    setFirstName("");
+    setLastName("");
+    setClientEmail("");
+    setClientPhone("");
+    setClientAddress("");
+    setClientStatus("lead");
+    setClientNotes("");
+  }
+
+  async function handleCreateClient() {
+    const name = `${firstName} ${lastName}`.trim();
+    if (!name) {
+      toast.error("Please enter a client name");
+      return;
+    }
+    const created = await createClient({
+      name,
+      email: clientEmail || undefined,
+      phone: clientPhone || undefined,
+      address: clientAddress || undefined,
+      notes: clientNotes || undefined,
+    });
+    if (!created) {
+      toast.error("Could not create client");
+      return;
+    }
+    const now = new Date().toISOString();
+    const next: Client = {
+      id: created.id,
+      name: created.name || name,
+      email: created.email || "",
+      phone: created.phone || "",
+      address: created.address || "",
+      city: "",
+      propertyType: "",
+      source: "FairTradeWorker",
+      totalRevenue: 0,
+      totalPaid: 0,
+      outstanding: 0,
+      totalJobs: 0,
+      activeJobs: 0,
+      rating: null,
+      lastActivity: now,
+      firstContact: now,
+      status: clientStatus,
+      notes: created.notes || clientNotes || "",
+      tags: [],
+      jobs: [],
+      invoices: [],
+      communications: [],
+    };
+    setClients((prev) => [next, ...prev]);
+    setSelectedId(next.id);
+    setAddClientOpen(false);
+    resetCreateForm();
+    toast.success("Client created");
+  }
+
   const filtered = clients
     .filter((c) => filter === "all" || c.status === filter)
     .filter((c) =>
@@ -264,13 +333,43 @@ export default function ClientsPage() {
   const activeCount = clients.filter((c) => c.status === "active").length;
   const leadCount = clients.filter((c) => c.status === "lead").length;
 
+  async function handleSaveSelectedNotes() {
+    if (!selected) return;
+    setSavingNotes(true);
+    const updated = await updateClient(selected.id, { notes: selected.notes });
+    setSavingNotes(false);
+    if (updated) toast.success("Client notes saved");
+    else toast.error("Could not save notes to backend");
+  }
+
+  async function handleDeleteSelectedClient() {
+    if (!selected) return;
+    const ok = await removeClient(selected.id);
+    if (!ok) {
+      toast.error("Could not delete client");
+      return;
+    }
+    setClients((prev) => {
+      const nextList = prev.filter((c) => c.id !== selected.id);
+      if (nextList[0]) setSelectedId(nextList[0].id);
+      return nextList;
+    });
+    toast.success("Client deleted");
+  }
+
   return (
     <div className="flex flex-col min-h-full bg-surface">
       {/* Header */}
       <div className="px-6 pt-5 pb-4 bg-white shadow-[0_4px_16px_-2px_rgba(0,0,0,0.1)] relative z-10">
         <div className="flex items-center justify-between">
           <h1 className="text-[22px] font-semibold text-gray-900 tracking-tight">Clients</h1>
-          <Dialog>
+          <Dialog
+            open={addClientOpen}
+            onOpenChange={(open) => {
+              setAddClientOpen(open);
+              if (!open) resetCreateForm();
+            }}
+          >
             <DialogTrigger asChild>
               <Button className="gap-2 shadow-sm">
                 <Plus className="w-4 h-4" />
@@ -304,11 +403,11 @@ export default function ClientsPage() {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="text-[12px] font-semibold text-gray-900 block mb-1.5">First Name</label>
-                      <input type="text" placeholder="John" className="w-full h-10 rounded-sm border border-gray-200 bg-white px-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
+                      <input value={firstName} onChange={(e) => setFirstName(e.target.value)} type="text" placeholder="John" className="w-full h-10 rounded-sm border border-gray-200 bg-white px-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
                     </div>
                     <div>
                       <label className="text-[12px] font-semibold text-gray-900 block mb-1.5">Last Name</label>
-                      <input type="text" placeholder="Smith" className="w-full h-10 rounded-sm border border-gray-200 bg-white px-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
+                      <input value={lastName} onChange={(e) => setLastName(e.target.value)} type="text" placeholder="Smith" className="w-full h-10 rounded-sm border border-gray-200 bg-white px-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
                     </div>
                   </div>
 
@@ -317,7 +416,7 @@ export default function ClientsPage() {
                     <label className="text-[12px] font-semibold text-gray-900 block mb-1.5">Email</label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                      <input type="email" placeholder="john@example.com" className="w-full h-10 rounded-sm border border-gray-200 bg-white pl-10 pr-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
+                      <input value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} type="email" placeholder="john@example.com" className="w-full h-10 rounded-sm border border-gray-200 bg-white pl-10 pr-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
                     </div>
                   </div>
 
@@ -325,7 +424,7 @@ export default function ClientsPage() {
                     <label className="text-[12px] font-semibold text-gray-900 block mb-1.5">Phone</label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                      <input type="tel" placeholder="(512) 555-0000" className="w-full h-10 rounded-sm border border-gray-200 bg-white pl-10 pr-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
+                      <input value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} type="tel" placeholder="(512) 555-0000" className="w-full h-10 rounded-sm border border-gray-200 bg-white pl-10 pr-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
                     </div>
                   </div>
 
@@ -334,14 +433,14 @@ export default function ClientsPage() {
                     <label className="text-[12px] font-semibold text-gray-900 block mb-1.5">Address</label>
                     <div className="relative">
                       <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                      <input type="text" placeholder="1234 Main St, Oxford, MS 78701" className="w-full h-10 rounded-sm border border-gray-200 bg-white pl-10 pr-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
+                      <input value={clientAddress} onChange={(e) => setClientAddress(e.target.value)} type="text" placeholder="1234 Main St, Oxford, MS 78701" className="w-full h-10 rounded-sm border border-gray-200 bg-white pl-10 pr-3 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow" />
                     </div>
                   </div>
 
                   {/* Status */}
                   <div>
                     <label className="text-[12px] font-semibold text-gray-900 block mb-1.5">Status</label>
-                    <select className="w-full h-10 rounded-sm border border-gray-200 bg-white px-3 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow appearance-none">
+                    <select value={clientStatus} onChange={(e) => setClientStatus(e.target.value as "lead" | "active" | "past")} className="w-full h-10 rounded-sm border border-gray-200 bg-white px-3 text-[14px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow appearance-none">
                       <option value="lead">Lead</option>
                       <option value="active">Active</option>
                       <option value="past">Past</option>
@@ -351,7 +450,7 @@ export default function ClientsPage() {
                   {/* Notes */}
                   <div>
                     <label className="text-[12px] font-semibold text-gray-900 block mb-1.5">Notes</label>
-                    <textarea rows={3} placeholder="Any details about this client..." className="w-full rounded-sm border border-gray-200 bg-white px-3 py-2.5 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow resize-none" />
+                    <textarea value={clientNotes} onChange={(e) => setClientNotes(e.target.value)} rows={3} placeholder="Any details about this client..." className="w-full rounded-sm border border-gray-200 bg-white px-3 py-2.5 text-[14px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-shadow resize-none" />
                   </div>
                 </div>
 
@@ -360,7 +459,7 @@ export default function ClientsPage() {
                   <DialogTrigger asChild>
                     <Button variant="outline">Cancel</Button>
                   </DialogTrigger>
-                  <Button className="gap-2 min-w-[120px]">
+                  <Button className="gap-2 min-w-[120px]" onClick={handleCreateClient}>
                     <Plus className="w-4 h-4" />
                     Add Client
                   </Button>
@@ -554,7 +653,15 @@ export default function ClientsPage() {
                   {/* Notes */}
                   <div className="mb-5 pb-5 border-b border-gray-100">
                     <p className="text-[13px] font-bold text-gray-900 mb-2">Notes</p>
-                    <p className="text-[13px] text-gray-700 leading-relaxed">{selected.notes}</p>
+                    <textarea
+                      value={selected.notes}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setClients((prev) => prev.map((c) => (c.id === selected.id ? { ...c, notes: value } : c)));
+                      }}
+                      rows={3}
+                      className="w-full rounded-sm border border-gray-200 bg-white px-3 py-2 text-[13px] text-gray-700 leading-relaxed focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent"
+                    />
                   </div>
 
                   {/* Job history */}
@@ -620,7 +727,7 @@ export default function ClientsPage() {
                   )}
 
                   {/* Actions */}
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <Button variant="outline" className="flex-1 gap-2 text-[13px]">
                       <MessageSquare className="w-4 h-4" />
                       Message
@@ -632,6 +739,13 @@ export default function ClientsPage() {
                     <Button variant="outline" className="flex-1 gap-2 text-[13px]">
                       <DollarSign className="w-4 h-4" />
                       Invoice
+                    </Button>
+                    <Button variant="outline" className="gap-2 text-[13px]" onClick={handleSaveSelectedNotes} disabled={savingNotes}>
+                      {savingNotes ? "Saving..." : "Save Notes"}
+                    </Button>
+                    <Button variant="destructive" className="gap-2 text-[13px]" onClick={handleDeleteSelectedClient}>
+                      <X className="w-4 h-4" />
+                      Delete
                     </Button>
                   </div>
                 </div>

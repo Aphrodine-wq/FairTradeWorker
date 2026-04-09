@@ -25,6 +25,7 @@ import { Input } from "@shared/ui/input";
 import { Badge } from "@shared/ui/badge";
 import { cn } from "@shared/lib/utils";
 import { JOB_CATEGORIES } from "@shared/lib/constants";
+import { api } from "@shared/lib/realtime";
 
 const PROJECT_SIZES = [
   { label: "Small — under $5K", value: "small", multiplier: 1 },
@@ -125,6 +126,46 @@ function generateEstimate(category: string, zip: string, size: string): Estimate
   };
 }
 
+function mapFairPriceResponse(
+  response: any,
+  category: string,
+  zip: string,
+  size: string
+): EstimateResult | null {
+  const payload = response?.fair_price || response?.estimate || response;
+  if (!payload) return null;
+  const low = Number(payload.low ?? payload.low_estimate ?? payload.min_price);
+  const high = Number(payload.high ?? payload.high_estimate ?? payload.max_price);
+  if (!Number.isFinite(low) || !Number.isFinite(high)) return null;
+  const tips = Array.isArray(payload.tips) ? payload.tips : [];
+  const midpoint = (low + high) / 2;
+  const materialsPct = Number(payload.materials_pct ?? 35);
+  const laborPct = Number(payload.labor_pct ?? 50);
+  const overheadPct = Math.max(0, 100 - materialsPct - laborPct);
+  return {
+    low,
+    high,
+    materials: Math.round((midpoint * materialsPct) / 100),
+    labor: Math.round((midpoint * laborPct) / 100),
+    overhead: Math.round((midpoint * overheadPct) / 100),
+    materialsPct,
+    laborPct,
+    overheadPct,
+    confidence: "medium",
+    category,
+    zip,
+    size: PROJECT_SIZES.find((s) => s.value === size)?.label ?? size,
+    sizeValue: size,
+    regionLabel: payload.region_label || "Local market",
+    regionMultiplier: Number(payload.region_multiplier ?? 1),
+    nationalLow: Number(payload.national_low ?? low),
+    nationalHigh: Number(payload.national_high ?? high),
+    timelineMin: Number(payload.timeline_min ?? 1),
+    timelineMax: Number(payload.timeline_max ?? 2),
+    tips,
+  };
+}
+
 function formatUSD(n: number): string {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
 }
@@ -138,14 +179,19 @@ export default function FairPricePage() {
 
   const canSubmit = category && zip.length === 5 && size;
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!canSubmit) return;
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const response = await api.getFairPrice({ category, zip, size });
+      const mapped = mapFairPriceResponse(response, category, zip, size);
+      setResult(mapped || generateEstimate(category, zip, size));
+    } catch {
       setResult(generateEstimate(category, zip, size));
+    } finally {
       setLoading(false);
-    }, 1200);
+    }
   }
 
   function handleReset() {

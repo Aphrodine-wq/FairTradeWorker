@@ -48,8 +48,10 @@ import { cn, formatCurrency, formatDate, getInitials } from "@shared/lib/utils";
 import { mockContractors, mockJobs, type Job } from "@shared/lib/mock-data";
 import { fetchJobs } from "@shared/lib/data";
 import { useRealtimeJobs } from "@shared/hooks/use-realtime";
+import { api } from "@shared/lib/realtime";
 import type { LucideIcon } from "lucide-react";
 import { usePageTitle } from "@shared/hooks/use-page-title";
+import { toast } from "sonner";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -803,7 +805,25 @@ export default function JobsPage() {
   const [activeBid, setActiveBid] = useState<Bid | null>(null);
   const [compareJobId, setCompareJobId] = useState<string | null>(null);
 
-  const handleAccept = (bidId: string) => setBidStatuses((prev) => ({ ...prev, [bidId]: "accepted" }));
+  const handleAccept = async (bidId: string) => {
+    const bid = MOCK_BIDS.find((b) => b.id === bidId);
+    if (!bid) return;
+    try {
+      await api.acceptBid(bid.jobId, bidId);
+      await api.transitionJob(bid.jobId, "in_progress");
+      setBidStatuses((prev) => {
+        const next = { ...prev, [bidId]: "accepted" as BidStatus };
+        MOCK_BIDS.filter((b) => b.jobId === bid.jobId && b.id !== bidId).forEach((b) => {
+          next[b.id] = "declined";
+        });
+        return next;
+      });
+      setJobs((prev) => prev.map((j) => (j.id === bid.jobId ? { ...j, status: "in_progress" } : j)));
+      toast.success("Bid accepted and job moved to in progress");
+    } catch {
+      toast.error("Could not accept bid");
+    }
+  };
   const handleDecline = (bidId: string) => setBidStatuses((prev) => ({ ...prev, [bidId]: "declined" }));
 
   const filteredJobs = useMemo(

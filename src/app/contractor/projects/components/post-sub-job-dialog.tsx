@@ -32,6 +32,21 @@ interface PostSubJobDialogProps {
   projectName: string;
   projectCategory: string;
   projectLocation: string;
+  onSubmit?: (payload: {
+    project_id: string;
+    milestone_label: string;
+    milestone_index: number;
+    title: string;
+    description: string;
+    category?: string;
+    skills?: string[];
+    location?: string;
+    budget_min?: number;
+    budget_max?: number;
+    payment_path?: "contractor_escrow" | "passthrough_escrow";
+    disclosed_to_owner?: boolean;
+    deadline?: string;
+  }) => Promise<boolean>;
 }
 
 export function PostSubJobDialog({
@@ -44,6 +59,7 @@ export function PostSubJobDialog({
   projectName,
   projectCategory,
   projectLocation,
+  onSubmit,
 }: PostSubJobDialogProps) {
   const [description, setDescription] = useState("");
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
@@ -59,7 +75,7 @@ export function PostSubJobDialog({
     );
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!description.trim()) {
       toast.error("Add a description for the sub job");
       return;
@@ -69,6 +85,23 @@ export function PostSubJobDialog({
       return;
     }
 
+    const payload = {
+      project_id: projectId,
+      milestone_label: milestoneLabel,
+      milestone_index: milestoneIndex,
+      title: `${milestoneLabel} - ${projectName}`,
+      description: description.trim(),
+      category: projectCategory,
+      skills: selectedSkills,
+      location: projectLocation,
+      budget_min: Number(budgetMin) || undefined,
+      budget_max: Number(budgetMax) || undefined,
+      payment_path: paymentPath,
+      disclosed_to_owner: disclosed,
+      deadline: deadline || undefined,
+    };
+    const ok = onSubmit ? await onSubmit(payload) : true;
+    if (!ok) return;
     toast.success(`Sub job posted for "${milestoneLabel}"`);
     onOpenChange(false);
 

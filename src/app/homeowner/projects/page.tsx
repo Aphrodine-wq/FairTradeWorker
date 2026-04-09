@@ -704,7 +704,30 @@ export default function HomeownerProjectsPage() {
   useEffect(() => {
     fetchProjects().then((apiProjects) => {
       if (apiProjects.length > 0) {
-        // API projects supplement inline mock data when shape matches
+        const normalizeMoney = (value: unknown, fallback: number) =>
+          typeof value === "number" ? (value > 100000 ? value / 100 : value) : fallback;
+        setProjects((prev) =>
+          prev.map((p) => {
+            const apiProject = apiProjects.find((ap: any) => ap.id === p.id);
+            if (!apiProject) return p;
+            const mappedStatus =
+              apiProject.status === "in_progress"
+                ? "in-progress"
+                : apiProject.status === "completed"
+                  ? "completed"
+                  : p.status;
+            const budget = normalizeMoney(apiProject.budget, p.budget);
+            const spent = normalizeMoney(apiProject.spent, p.spent);
+            return {
+              ...p,
+              title: apiProject.name || p.title,
+              status: mappedStatus,
+              budget,
+              spent,
+              progress: budget > 0 ? Math.max(0, Math.min(100, Math.round((spent / budget) * 100))) : p.progress,
+            };
+          })
+        );
       }
     });
   }, []);

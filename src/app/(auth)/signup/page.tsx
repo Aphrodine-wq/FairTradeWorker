@@ -105,7 +105,7 @@ function SignupContent() {
         email: form.email,
         password: form.password,
         name: form.name,
-        role: role as "homeowner" | "contractor",
+        role: role as "homeowner" | "contractor" | "subcontractor",
       });
       identify(user.id, {
         email: user.email,

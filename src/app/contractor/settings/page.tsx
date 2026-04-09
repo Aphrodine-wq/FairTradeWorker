@@ -33,6 +33,7 @@ import { mockContractors } from "@shared/lib/mock-data";
 import { JOB_CATEGORIES } from "@shared/lib/constants";
 import { getInitials, cn } from "@shared/lib/utils";
 import { fetchSettings, saveSettings } from "@shared/lib/data";
+import { api } from "@shared/lib/realtime";
 import { toast } from "sonner";
 import { usePageTitle } from "@shared/hooks/use-page-title";
 
@@ -935,7 +936,41 @@ function SecuritySection() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [twoFactor, setTwoFactor] = useState(true);
+  const [updatingPassword, setUpdatingPassword] = useState(false);
   const { saved, onSave } = useSave();
+
+  async function handleUpdatePassword() {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast.error("Please fill all password fields");
+      return;
+    }
+    if (newPassword.length < 8) {
+      toast.error("New password must be at least 8 characters");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error("New password and confirm password do not match");
+      return;
+    }
+    setUpdatingPassword(true);
+    try {
+      await api.changePassword(currentPassword, newPassword);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      onSave();
+      toast.success("Password updated");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to update password";
+      if (message.includes("404")) {
+        toast.error("Change password endpoint is not available on backend yet");
+      } else {
+        toast.error(message);
+      }
+    } finally {
+      setUpdatingPassword(false);
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -961,8 +996,8 @@ function SecuritySection() {
               <Input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
             </div>
           </div>
-          <Button onClick={onSave} className="gap-2" variant={saved ? "secondary" : "default"}>
-            <Lock className="w-4 h-4" />{saved ? "Updated!" : "Update Password"}
+          <Button onClick={handleUpdatePassword} disabled={updatingPassword} className="gap-2" variant={saved ? "secondary" : "default"}>
+            <Lock className="w-4 h-4" />{updatingPassword ? "Updating..." : saved ? "Updated!" : "Update Password"}
           </Button>
         </div>
       </div>

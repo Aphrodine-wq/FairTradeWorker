@@ -29,7 +29,7 @@ import {
 } from "@shared/ui/dialog";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
 import { toast } from "sonner";
-import { fetchInvoices } from "@shared/lib/data";
+import { fetchInvoices, createInvoice, updateInvoice } from "@shared/lib/data";
 import { usePageTitle } from "@shared/hooks/use-page-title";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -398,7 +398,7 @@ export default function InvoicesPage() {
     setCreateLineItems((prev) => prev.filter((_, i) => i !== index));
   }
 
-  function handleCreateInvoice() {
+  async function handleCreateInvoice() {
     if (!createProject || !createMilestone || createLineItems.length === 0) {
       toast.error("Select a project, milestone, and add at least one line item");
       return;
@@ -413,9 +413,18 @@ export default function InvoicesPage() {
     const total = subtotal + platformFee;
     const nextNumber = invoices.length + 1;
 
+    const created = await createInvoice({
+      invoice_number: `INV-${String(nextNumber).padStart(3, "0")}`,
+      amount: Math.round(total * 100),
+      notes: createNotes || undefined,
+      due_date: new Date(Date.now() + 14 * 86400000).toISOString().split("T")[0],
+      project_id: undefined,
+      client_id: undefined,
+    });
+
     const newInvoice: Invoice = {
-      id: `inv-${nextNumber}`,
-      invoiceNumber: `INV-${String(nextNumber).padStart(3, "0")}`,
+      id: created?.id || `inv-${nextNumber}`,
+      invoiceNumber: created?.invoice_number || `INV-${String(nextNumber).padStart(3, "0")}`,
       project: createProject,
       client: proj.client,
       milestone: createMilestone,
@@ -435,21 +444,29 @@ export default function InvoicesPage() {
     setInvoices((prev) => [newInvoice, ...prev]);
     setSelectedId(newInvoice.id);
     setCreateOpen(false);
-    toast.success(`Invoice ${newInvoice.invoiceNumber} created as draft`);
+    if (created) {
+      toast.success(`Invoice ${newInvoice.invoiceNumber} created`);
+    } else {
+      toast.error("Invoice API unavailable. Saved locally only");
+    }
   }
 
-  function handleSendInvoice(id: string) {
+  async function handleSendInvoice(id: string) {
+    const updated = await updateInvoice(id, { status: "sent" });
     setInvoices((prev) =>
       prev.map((inv) => (inv.id === id ? { ...inv, status: "sent" as InvoiceStatus } : inv))
     );
-    toast.success("Invoice sent to client");
+    if (updated) toast.success("Invoice sent to client");
+    else toast.error("Could not update invoice status in backend");
   }
 
-  function handleMarkPaid(id: string) {
+  async function handleMarkPaid(id: string) {
+    const updated = await updateInvoice(id, { status: "paid" });
     setInvoices((prev) =>
       prev.map((inv) => (inv.id === id ? { ...inv, status: "paid" as InvoiceStatus } : inv))
     );
-    toast.success("Invoice marked as paid");
+    if (updated) toast.success("Invoice marked as paid");
+    else toast.error("Could not update invoice status in backend");
   }
 
   function handleDownloadPdf() {

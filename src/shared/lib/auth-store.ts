@@ -225,7 +225,7 @@ export const authStore = {
         email: attrs.email,
         password: attrs.password,
         name: attrs.name,
-        role: attrs.role as "homeowner" | "contractor",
+        role: attrs.role as "homeowner" | "contractor" | "subcontractor",
         location: undefined,
       });
       // Spring Boot register may not return a token — login after registration
@@ -350,7 +350,32 @@ export const authStore = {
       if (typeof window !== "undefined") {
         window.location.href = "/login?expired=true";
       }
+      return;
     }
+    api.me()
+      .then((result) => {
+        const apiUser = result.user as Record<string, unknown>;
+        const role = normalizeRole(String(apiUser.role));
+        const apiRoles = apiUser.roles as string[] | undefined;
+        const roles = apiRoles
+          ? apiRoles.map((r) => normalizeRole(r))
+          : _state.user?.roles || [role];
+        _state = {
+          ..._state,
+          user: {
+            id: String(apiUser.id),
+            email: String(apiUser.email),
+            name: String(apiUser.name),
+            role,
+            roles,
+          },
+        };
+        save(_state);
+        notify();
+      })
+      .catch(() => {
+        // Non-fatal: keep local auth state until token expires.
+      });
   },
 };
 

@@ -8,6 +8,8 @@ import {
   type RealtimeJob,
   type RealtimeBid,
   type RealtimeMessage,
+  type RealtimeSubJob,
+  type RealtimeSubBid,
 } from "@shared/lib/realtime";
 
 /**
@@ -176,4 +178,85 @@ export function useRealtimeChat(conversationId: string | null) {
   );
 
   return { messages, loading, sendMessage, sendTyping };
+}
+
+/**
+ * Live sub-job feed.
+ */
+export function useRealtimeSubJobs() {
+  const [subJobs, setSubJobs] = useState<RealtimeSubJob[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [connected, setConnected] = useState(false);
+
+  useEffect(() => {
+    api.listSubJobs({ status: "open", limit: 50 }).then((list) => {
+      setSubJobs(list);
+      setLoading(false);
+    });
+
+    if (!getAuthToken()) return;
+    realtimeClient.connect();
+    const leave = realtimeClient.joinSubJobFeed({
+      onSubJobsList: (list) => {
+        setSubJobs(list);
+        setConnected(true);
+      },
+      onSubJobPosted: (job) => setSubJobs((prev) => [job, ...prev]),
+      onSubJobUpdated: (updated) =>
+        setSubJobs((prev) => prev.map((j) => (j.id === updated.id ? updated : j))),
+    });
+    return leave;
+  }, []);
+
+  return { subJobs, loading, connected };
+}
+
+/**
+ * Live sub-bids on one sub-job.
+ */
+export function useRealtimeSubJobBids(subJobId: string | null) {
+  const [subJob, setSubJob] = useState<RealtimeSubJob | null>(null);
+  const [bids, setBids] = useState<RealtimeSubBid[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!subJobId) return;
+    api.getSubJob(subJobId).then((data) => {
+      setSubJob(data.subJob);
+      setBids(data.bids);
+      setLoading(false);
+    });
+
+    if (!getAuthToken()) return;
+    realtimeClient.connect();
+    const leave = realtimeClient.joinSubJob(subJobId, {
+      onSubJobDetails: (data) => {
+        setSubJob(data.sub_job);
+        setBids(data.bids || []);
+        setLoading(false);
+      },
+      onSubBidPlaced: (bid) => setBids((prev) => [...prev, bid]),
+      onSubBidAccepted: (accepted) =>
+        setBids((prev) => prev.map((b) => (b.id === accepted.id ? accepted : b))),
+    });
+    return leave;
+  }, [subJobId]);
+
+  const placeBid = useCallback(
+    async (attrs: { amount: number; message?: string; timeline?: string }) => {
+      if (!subJobId) return;
+      return api.placeSubBid(subJobId, attrs);
+    },
+    [subJobId]
+  );
+
+  const acceptBid = useCallback(
+    async (bidId: string) => {
+      if (!subJobId) return;
+      return api.acceptSubBid(subJobId, bidId);
+    },
+    [subJobId]
+  );
+
+  return { subJob, bids, loading, placeBid, acceptBid };
 }

@@ -45,6 +45,11 @@ interface Bid {
   createdAt: string;
 }
 
+function normalizeBidAmount(amount: number): number {
+  // Support either cents or dollars from backend payloads.
+  return amount > 100000 ? amount / 100 : amount;
+}
+
 function generateMockBids(): Bid[] {
   const jobs = mockJobs.filter((j) => j.status === "open").slice(0, 3);
   const bids: Bid[] = [];
@@ -95,7 +100,7 @@ export default function BidsPage() {
           name: b.contractor?.name || "Contractor",
           rating: b.contractor?.rating || 4.5,
         },
-        amount: (b.amount || 0) / 100,
+        amount: normalizeBidAmount(b.amount || 0),
         message: b.message,
         timeline: b.timeline,
         status: b.status as Bid["status"],
@@ -109,7 +114,7 @@ export default function BidsPage() {
             id: b.id,
             jobId: activeJob,
             contractor: mockContractors.find((c) => c.id === b.contractor?.id) || mockContractors[0],
-            amount: (b.amount || 0) / 100,
+            amount: normalizeBidAmount(b.amount || 0),
             message: b.message,
             timeline: b.timeline,
             status: b.status as Bid["status"],
@@ -126,7 +131,10 @@ export default function BidsPage() {
   const handleAccept = async (bidId: string) => {
     setAcceptingBid(bidId);
     try {
-      if (activeJob) await api.acceptBid(activeJob, bidId);
+      if (activeJob) {
+        await api.acceptBid(activeJob, bidId);
+        await api.transitionJob(activeJob, "in_progress");
+      }
       toast.success("Bid accepted");
     } catch {
       // API not available — mock delay

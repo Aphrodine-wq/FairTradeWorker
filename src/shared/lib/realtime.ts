@@ -19,7 +19,7 @@ const WS_URL = `${API_BASE}/ws`;
 export interface RealtimeUser {
   id: string;
   name: string;
-  role: "homeowner" | "contractor";
+  role: "homeowner" | "contractor" | "subcontractor";
   location: string;
   rating: number | null;
 }
@@ -68,11 +68,46 @@ export interface AuthResponse {
   };
 }
 
+export interface RealtimeSubJob {
+  id: string;
+  project_id: string;
+  milestone_label: string;
+  milestone_index: number;
+  title: string;
+  description?: string;
+  category?: string;
+  skills?: string[];
+  location?: string;
+  budget_min?: number;
+  budget_max?: number;
+  payment_path?: "contractor_escrow" | "passthrough_escrow";
+  disclosed_to_owner?: boolean;
+  status: "open" | "in_progress" | "completed" | "cancelled";
+  deadline?: string;
+  bid_count?: number;
+  posted_at?: string;
+  contractor?: RealtimeUser & { company?: string };
+  project?: { title?: string };
+}
+
+export interface RealtimeSubBid {
+  id: string;
+  sub_job_id: string;
+  amount: number;
+  message?: string;
+  timeline?: string;
+  status: "pending" | "accepted" | "declined" | "withdrawn";
+  placed_at?: string;
+  subcontractor?: RealtimeUser & { company?: string };
+}
+
 // --- Event callbacks ---
 
 type JobCallback = (job: RealtimeJob) => void;
 type BidCallback = (bid: RealtimeBid) => void;
 type MessageCallback = (message: RealtimeMessage) => void;
+type SubJobCallback = (job: RealtimeSubJob) => void;
+type SubBidCallback = (bid: RealtimeSubBid) => void;
 
 // --- Token management ---
 
@@ -97,13 +132,18 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
     headers["Authorization"] = `Bearer ${_authToken}`;
   }
 
+  const optionHeaders = (options?.headers || {}) as Record<string, string>;
+  const mergedHeaders = { ...headers, ...optionHeaders };
+  const allow401Passthrough = Boolean(mergedHeaders["X-Allow-401"]);
+  delete mergedHeaders["X-Allow-401"];
+
   const res = await fetch(`${API_BASE}${path}`, {
-    headers,
     ...options,
+    headers: mergedHeaders,
   });
 
   if (!res.ok) {
-    if (res.status === 401 && typeof window !== "undefined") {
+    if (res.status === 401 && typeof window !== "undefined" && !allow401Passthrough) {
       // Session expired — clear auth and redirect
       setAuthToken(null);
       localStorage.removeItem("ftw-auth");
@@ -111,13 +151,42 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
       throw new Error("Session expired");
     }
     const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || `API error: ${res.status}`);
+    throw new Error(body.error || body.message || `API error: ${res.status}`);
   }
 
   return res.json();
 }
 
+function toQuery(params: Record<string, string | number | undefined>) {
+  const qp = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== "") qp.set(key, String(value));
+  });
+  const query = qp.toString();
+  return query ? `?${query}` : "";
+}
+
+function unwrapList<T>(data: unknown, key: string): T[] {
+  if (Array.isArray(data)) return data as T[];
+  if (data && typeof data === "object" && Array.isArray((data as Record<string, unknown>)[key])) {
+    return (data as Record<string, T[]>)[key];
+  }
+  return [];
+}
+
+function unwrapOne<T>(data: unknown, key: string): T {
+  if (data && typeof data === "object" && key in (data as Record<string, unknown>)) {
+    return (data as Record<string, T>)[key];
+  }
+  return data as T;
+}
+
 export const api = {
+  // Health
+  async health(): Promise<any> {
+    return apiFetch("/api/health", { headers: { "X-Allow-401": "1" } });
+  },
+
   // Auth
   async login(email: string, password: string): Promise<AuthResponse> {
     const data = await apiFetch<AuthResponse>("/api/auth/login", {
@@ -149,16 +218,35 @@ export const api = {
   },
 
   async switchRole(role: string): Promise<AuthResponse> {
-    return apiFetch("/api/auth/switch-role", {
+    const data = await apiFetch<AuthResponse>("/api/auth/switch-role", {
       method: "POST",
       body: JSON.stringify({ role: role.toUpperCase() }),
+    });
+    setAuthToken(data.token);
+    return data;
+  },
+
+  async changePassword(currentPassword: string, newPassword: string): Promise<any> {
+    return apiFetch("/api/auth/change-password", {
+      method: "POST",
+      body: JSON.stringify({
+        current_password: currentPassword,
+        new_password: newPassword,
+      }),
     });
   },
 
   // Jobs (public — no auth required for listing)
-  async listJobs(): Promise<RealtimeJob[]> {
-    const data = await apiFetch<{ jobs: RealtimeJob[] }>("/api/jobs");
-    return data.jobs;
+  async listJobs(params?: {
+    status?: string;
+    category?: string;
+    limit?: number;
+  }): Promise<RealtimeJob[]> {
+    const data = await apiFetch<{ jobs: RealtimeJob[] } | RealtimeJob[]>(
+      `/api/jobs${toQuery(params || {})}`,
+      { headers: { "X-Allow-401": "1" } }
+    );
+    return unwrapList<RealtimeJob>(data, "jobs");
   },
 
   async getJob(id: string): Promise<{ job: RealtimeJob; bids: RealtimeBid[] }> {
@@ -200,6 +288,17 @@ export const api = {
     return data.bid;
   },
 
+  async transitionJob(jobId: string, status: string): Promise<RealtimeJob> {
+    const data = await apiFetch<{ job: RealtimeJob } | RealtimeJob>(
+      `/api/jobs/${jobId}/transition`,
+      {
+        method: "POST",
+        body: JSON.stringify({ status }),
+      }
+    );
+    return unwrapOne<RealtimeJob>(data, "job");
+  },
+
   // Chat (authenticated)
   async listMessages(conversationId: string): Promise<RealtimeMessage[]> {
     const data = await apiFetch<{ messages: RealtimeMessage[] }>(
@@ -221,43 +320,123 @@ export const api = {
 
   // Estimates
   async listEstimates(): Promise<any[]> {
-    const data = await apiFetch<{ estimates: any[] }>("/api/estimates");
-    return data.estimates;
+    const data = await apiFetch<{ estimates: any[] } | any[]>("/api/estimates");
+    return unwrapList<any>(data, "estimates");
   },
   async getEstimate(id: string): Promise<any> {
-    const data = await apiFetch<{ estimate: any }>(`/api/estimates/${id}`);
-    return data.estimate;
+    const data = await apiFetch<{ estimate: any } | any>(`/api/estimates/${id}`);
+    return unwrapOne<any>(data, "estimate");
+  },
+  async createEstimate(estimate: Record<string, unknown>): Promise<any> {
+    const data = await apiFetch<{ estimate: any } | any>("/api/estimates", {
+      method: "POST",
+      body: JSON.stringify({ estimate }),
+    });
+    return unwrapOne<any>(data, "estimate");
+  },
+  async updateEstimate(id: string, estimate: Record<string, unknown>): Promise<any> {
+    const data = await apiFetch<{ estimate: any } | any>(`/api/estimates/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ estimate }),
+    });
+    return unwrapOne<any>(data, "estimate");
+  },
+  async deleteEstimate(id: string): Promise<void> {
+    await apiFetch(`/api/estimates/${id}`, { method: "DELETE" });
   },
 
   // Invoices
   async listInvoices(): Promise<any[]> {
-    const data = await apiFetch<{ invoices: any[] }>("/api/invoices");
-    return data.invoices;
+    const data = await apiFetch<{ invoices: any[] } | any[]>("/api/invoices");
+    return unwrapList<any>(data, "invoices");
+  },
+  async getInvoice(id: string): Promise<any> {
+    const data = await apiFetch<{ invoice: any } | any>(`/api/invoices/${id}`);
+    return unwrapOne<any>(data, "invoice");
+  },
+  async createInvoice(invoice: Record<string, unknown>): Promise<any> {
+    const data = await apiFetch<{ invoice: any } | any>("/api/invoices", {
+      method: "POST",
+      body: JSON.stringify({ invoice }),
+    });
+    return unwrapOne<any>(data, "invoice");
+  },
+  async updateInvoice(id: string, invoice: Record<string, unknown>): Promise<any> {
+    const data = await apiFetch<{ invoice: any } | any>(`/api/invoices/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ invoice }),
+    });
+    return unwrapOne<any>(data, "invoice");
   },
 
   // Projects
-  async listProjects(): Promise<any[]> {
-    const data = await apiFetch<{ projects: any[] }>("/api/projects");
-    return data.projects;
+  async listProjects(params?: { status?: string }): Promise<any[]> {
+    const data = await apiFetch<{ projects: any[] } | any[]>(
+      `/api/projects${toQuery(params || {})}`
+    );
+    return unwrapList<any>(data, "projects");
+  },
+  async getProject(id: string): Promise<any> {
+    const data = await apiFetch<{ project: any } | any>(`/api/projects/${id}`);
+    return unwrapOne<any>(data, "project");
+  },
+  async createProject(project: Record<string, unknown>): Promise<any> {
+    const data = await apiFetch<{ project: any } | any>("/api/projects", {
+      method: "POST",
+      body: JSON.stringify({ project }),
+    });
+    return unwrapOne<any>(data, "project");
+  },
+  async updateProject(id: string, project: Record<string, unknown>): Promise<any> {
+    const data = await apiFetch<{ project: any } | any>(`/api/projects/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ project }),
+    });
+    return unwrapOne<any>(data, "project");
   },
 
   // Clients
   async listClients(): Promise<any[]> {
-    const data = await apiFetch<{ clients: any[] }>("/api/clients");
-    return data.clients;
+    const data = await apiFetch<{ clients: any[] } | any[]>("/api/clients");
+    return unwrapList<any>(data, "clients");
+  },
+  async getClient(id: string): Promise<any> {
+    const data = await apiFetch<{ client: any } | any>(`/api/clients/${id}`);
+    return unwrapOne<any>(data, "client");
+  },
+  async createClient(client: Record<string, unknown>): Promise<any> {
+    const data = await apiFetch<{ client: any } | any>("/api/clients", {
+      method: "POST",
+      body: JSON.stringify({ client }),
+    });
+    return unwrapOne<any>(data, "client");
+  },
+  async updateClient(id: string, client: Record<string, unknown>): Promise<any> {
+    const data = await apiFetch<{ client: any } | any>(`/api/clients/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ client }),
+    });
+    return unwrapOne<any>(data, "client");
+  },
+  async deleteClient(id: string): Promise<void> {
+    await apiFetch(`/api/clients/${id}`, { method: "DELETE" });
   },
 
   // Reviews
   async listReviews(forUserId?: string): Promise<any[]> {
     const params = forUserId ? `?for=${forUserId}` : "";
-    const data = await apiFetch<{ reviews: any[] }>(`/api/reviews${params}`);
-    return data.reviews;
+    const data = await apiFetch<{ reviews: any[] } | any[]>(`/api/reviews${params}`);
+    return unwrapList<any>(data, "reviews");
+  },
+  async getReview(id: string): Promise<any> {
+    const data = await apiFetch<{ review: any } | any>(`/api/reviews/${id}`);
+    return unwrapOne<any>(data, "review");
   },
 
   // Notifications
   async listNotifications(): Promise<any[]> {
-    const data = await apiFetch<{ notifications: any[] }>("/api/notifications");
-    return data.notifications;
+    const data = await apiFetch<{ notifications: any[] } | any[]>("/api/notifications");
+    return unwrapList<any>(data, "notifications");
   },
   async markNotificationRead(id: string): Promise<any> {
     return apiFetch(`/api/notifications/${id}/read`, { method: "POST" });
@@ -271,6 +450,27 @@ export const api = {
     return apiFetch("/api/ai/estimate", {
       method: "POST",
       body: JSON.stringify({ description }),
+    });
+  },
+  async getFairPrice(params: { category: string; zip: string; size: string }): Promise<any> {
+    return apiFetch(`/api/ai/fair-price${toQuery(params)}`, {
+      headers: { "X-Allow-401": "1" },
+    });
+  },
+  async getAIStats(): Promise<any> {
+    return apiFetch("/api/ai/stats", {
+      headers: { "X-Allow-401": "1" },
+    });
+  },
+  async getFairScope(attrs: {
+    category: string;
+    title?: string;
+    areas?: string[];
+    materials?: string[];
+  }): Promise<any> {
+    return apiFetch("/api/ai/fair-scope", {
+      method: "POST",
+      body: JSON.stringify(attrs),
     });
   },
 
@@ -345,6 +545,14 @@ export const api = {
     return data.record;
   },
 
+  async getRecordCertificate(publicId: string): Promise<string> {
+    const res = await fetch(`${API_BASE}/api/records/${publicId}/certificate`, {
+      headers: _authToken ? { Authorization: `Bearer ${_authToken}` } : {},
+    });
+    if (!res.ok) throw new Error(`Certificate fetch failed: ${res.status}`);
+    return res.text();
+  },
+
   async getProjectRecord(projectId: string): Promise<any> {
     const data = await apiFetch<{ record: any }>(`/api/projects/${projectId}/record`);
     return data.record;
@@ -366,6 +574,62 @@ export const api = {
     return apiFetch(`/api/contractor/verification/${step}`, {
       method: "POST",
       body: JSON.stringify({ data }),
+    });
+  },
+
+  // Sub-jobs
+  async listSubJobs(params?: { status?: string; limit?: number }): Promise<RealtimeSubJob[]> {
+    const data = await apiFetch<{ sub_jobs: RealtimeSubJob[] } | RealtimeSubJob[]>(
+      `/api/sub-jobs${toQuery(params || {})}`,
+      { headers: { "X-Allow-401": "1" } }
+    );
+    return unwrapList<RealtimeSubJob>(data, "sub_jobs");
+  },
+  async getSubJob(id: string): Promise<{ subJob: RealtimeSubJob; bids: RealtimeSubBid[] }> {
+    const data = await apiFetch<any>(`/api/sub-jobs/${id}`, {
+      headers: { "X-Allow-401": "1" },
+    });
+    return {
+      subJob: (data.sub_job || data.subJob || data) as RealtimeSubJob,
+      bids: (data.bids || []) as RealtimeSubBid[],
+    };
+  },
+  async createSubJob(payload: Record<string, unknown>): Promise<RealtimeSubJob> {
+    const data = await apiFetch<{ sub_job: RealtimeSubJob } | RealtimeSubJob>("/api/sub-jobs", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    return unwrapOne<RealtimeSubJob>(data, "sub_job");
+  },
+  async placeSubBid(subJobId: string, bid: { amount: number; message?: string; timeline?: string }): Promise<RealtimeSubBid> {
+    const data = await apiFetch<{ bid: RealtimeSubBid } | RealtimeSubBid>(`/api/sub-jobs/${subJobId}/bids`, {
+      method: "POST",
+      body: JSON.stringify(bid),
+    });
+    return unwrapOne<RealtimeSubBid>(data, "bid");
+  },
+  async acceptSubBid(subJobId: string, bidId: string): Promise<RealtimeSubBid> {
+    const data = await apiFetch<{ bid: RealtimeSubBid } | RealtimeSubBid>(
+      `/api/sub-jobs/${subJobId}/bids/${bidId}/accept`,
+      { method: "POST" }
+    );
+    return unwrapOne<RealtimeSubBid>(data, "bid");
+  },
+  async listMySubJobPosts(): Promise<RealtimeSubJob[]> {
+    const data = await apiFetch<{ sub_jobs: RealtimeSubJob[] } | RealtimeSubJob[]>("/api/sub-jobs/my-posts");
+    return unwrapList<RealtimeSubJob>(data, "sub_jobs");
+  },
+
+  async registerPushToken(token: string, platform: string): Promise<any> {
+    return apiFetch("/api/push/register", {
+      method: "POST",
+      body: JSON.stringify({ token, platform }),
+    });
+  },
+  async unregisterPushToken(token: string): Promise<any> {
+    return apiFetch("/api/push/unregister", {
+      method: "DELETE",
+      body: JSON.stringify({ token }),
     });
   },
 };
@@ -557,6 +821,50 @@ class RealtimeClient {
     });
   }
 
+  // Subscribe to live sub-job feed
+  joinSubJobFeed(callbacks: {
+    onSubJobsList?: (jobs: RealtimeSubJob[]) => void;
+    onSubJobPosted?: SubJobCallback;
+    onSubJobUpdated?: SubJobCallback;
+  }): () => void {
+    return this.subscribe("/topic/sub-jobs.feed", (msg) => {
+      switch (msg.event) {
+        case "sub-jobs:list":
+          callbacks.onSubJobsList?.(msg.data.sub_jobs || msg.data.jobs || []);
+          break;
+        case "sub-job:posted":
+          callbacks.onSubJobPosted?.(msg.data);
+          break;
+        case "sub-job:updated":
+          callbacks.onSubJobUpdated?.(msg.data);
+          break;
+      }
+    });
+  }
+
+  joinSubJob(
+    subJobId: string,
+    callbacks: {
+      onSubJobDetails?: (data: { sub_job: RealtimeSubJob; bids: RealtimeSubBid[] }) => void;
+      onSubBidPlaced?: SubBidCallback;
+      onSubBidAccepted?: SubBidCallback;
+    }
+  ): () => void {
+    return this.subscribe(`/topic/sub-job.${subJobId}`, (msg) => {
+      switch (msg.event) {
+        case "sub-job:details":
+          callbacks.onSubJobDetails?.(msg.data);
+          break;
+        case "sub-bid:placed":
+          callbacks.onSubBidPlaced?.(msg.data);
+          break;
+        case "sub-bid:accepted":
+          callbacks.onSubBidAccepted?.(msg.data);
+          break;
+      }
+    });
+  }
+
   // Send a message through the chat channel
   sendViaChannel(conversationId: string, attrs: { body: string }) {
     this.client?.publish({
@@ -584,6 +892,13 @@ class RealtimeClient {
     });
   }
 
+  acceptBidViaChannel(jobId: string, bidId: string) {
+    this.client?.publish({
+      destination: `/app/job.${jobId}.accept`,
+      body: JSON.stringify({ bid_id: bidId }),
+    });
+  }
+
   // Post a job through the feed channel
   postJobViaChannel(attrs: {
     title: string;
@@ -595,6 +910,20 @@ class RealtimeClient {
   }) {
     this.client?.publish({
       destination: "/app/jobs.feed.post",
+      body: JSON.stringify(attrs),
+    });
+  }
+
+  postSubJobViaChannel(attrs: Record<string, unknown>) {
+    this.client?.publish({
+      destination: "/app/sub-jobs.feed.post",
+      body: JSON.stringify(attrs),
+    });
+  }
+
+  placeSubBidViaChannel(subJobId: string, attrs: { amount: number; message?: string; timeline?: string }) {
+    this.client?.publish({
+      destination: `/app/sub-job.${subJobId}.bid`,
       body: JSON.stringify(attrs),
     });
   }

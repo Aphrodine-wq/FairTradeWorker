@@ -57,7 +57,8 @@ import {
   DialogTrigger,
 } from "@shared/ui/dialog";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
-import { fetchProjects } from "@shared/lib/data";
+import { fetchProjects, updateProject as persistProject } from "@shared/lib/data";
+import { api } from "@shared/lib/realtime";
 import { toast } from "sonner";
 import { usePageTitle } from "@shared/hooks/use-page-title";
 import { PostSubJobDialog } from "./components/post-sub-job-dialog";
@@ -65,6 +66,9 @@ import { PostSubJobDialog } from "./components/post-sub-job-dialog";
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
 type MilestoneStatus = "paid" | "approved" | "submitted" | "in_progress" | "pending";
+
+/** UI lifecycle for sidebar / API sync (distinct from milestone or job API enums). */
+type ProjectListStatus = "active" | "complete";
 
 interface Milestone {
   label: string;
@@ -82,6 +86,8 @@ const PROJECTS = [
     client: "Michael Brown",
     description: "Full gut and rebuild — demo, plumbing, electrical, cabinets, countertops, tile, flooring.",
     contractValue: 38500,
+    spent: 0,
+    status: "active" as ProjectListStatus,
     startDate: "2026-03-10",
     estimatedEnd: "2026-04-25",
     progress: 52,
@@ -104,6 +110,8 @@ const PROJECTS = [
     client: "Sarah Williams",
     description: "Strip to studs, re-plumb, waterproof, tile, new vanity and fixtures.",
     contractValue: 15200,
+    spent: 0,
+    status: "active" as ProjectListStatus,
     startDate: "2026-03-14",
     estimatedEnd: "2026-04-05",
     progress: 35,
@@ -125,6 +133,8 @@ const PROJECTS = [
     client: "Robert Johnson",
     description: "New 400 sqft composite deck — footings, framing, boards, railing, stairs.",
     contractValue: 22000,
+    spent: 0,
+    status: "active" as ProjectListStatus,
     startDate: "2026-03-13",
     estimatedEnd: "2026-04-10",
     progress: 40,
@@ -146,6 +156,8 @@ const PROJECTS = [
     client: "Patricia Taylor",
     description: "30-square tear-off and re-roof — GAF Timberline HDZ, new flashings, ridge vent.",
     contractValue: 13500,
+    spent: 0,
+    status: "active" as ProjectListStatus,
     startDate: "2026-03-15",
     estimatedEnd: "2026-03-22",
     progress: 80,
@@ -2051,6 +2063,15 @@ function MilestonesTab({
           projectName={project.name}
           projectCategory="General Contracting"
           projectLocation="Oxford, MS"
+          onSubmit={async (payload) => {
+            try {
+              await api.createSubJob(payload);
+              return true;
+            } catch {
+              toast.error("Could not post sub job");
+              return false;
+            }
+          }}
         />
       )}
     </div>
@@ -2246,8 +2267,31 @@ export default function ProjectsPage() {
   useEffect(() => {
     fetchProjects().then((apiProjects) => {
       if (apiProjects.length > 0) {
-        // API projects supplement the inline mock data when available
-        // For now, keep inline data since API shape differs from page needs
+        const normalizeMoney = (value: unknown, fallback: number) =>
+          typeof value === "number" ? (value > 100000 ? value / 100 : value) : fallback;
+        setProjects((prev) =>
+          prev.map((p) => {
+            const apiProject = apiProjects.find((ap: any) => ap.id === p.id);
+            if (!apiProject) return p;
+            const mappedStatus =
+              apiProject.status === "in_progress"
+                ? "active"
+                : apiProject.status === "completed"
+                  ? "complete"
+                  : p.status;
+            const budget = normalizeMoney(apiProject.budget, p.contractValue);
+            const spent = normalizeMoney(apiProject.spent, p.spent);
+            return {
+              ...p,
+              name: apiProject.name || p.name,
+              description: apiProject.description || p.description,
+              status: mappedStatus,
+              contractValue: budget,
+              spent,
+              progress: budget > 0 ? Math.max(0, Math.min(100, Math.round((spent / budget) * 100))) : p.progress,
+            };
+          })
+        );
       }
     });
   }, []);
@@ -2260,7 +2304,16 @@ export default function ProjectsPage() {
     switch (activeSection) {
       case "overview": return <OverviewTab project={project} />;
       case "milestones": return <MilestonesTab project={project} initialExpandIndex={initialMilestoneIndex} onUpdate={(ms: Milestone[]) => {
-        setProjects((prev) => prev.map((p) => p.id === selectedProjectId ? { ...p, milestones: ms as typeof p.milestones, progress: ms.length > 0 ? Math.round(ms.filter((m) => m.done).length / ms.length * 100) : 0 } : p));
+        const progress = ms.length > 0 ? Math.round(ms.filter((m) => m.done).length / ms.length * 100) : 0;
+        const status = progress >= 100 ? "completed" : "in_progress";
+        const spent = ms
+          .filter((m) => m.status === "paid" || m.status === "approved")
+          .reduce((sum, m) => sum + m.amount, 0);
+        setProjects((prev) => prev.map((p) => p.id === selectedProjectId ? { ...p, milestones: ms as typeof p.milestones, progress } : p));
+        void persistProject(selectedProjectId, {
+          spent: Math.round(spent * 100),
+          status,
+        });
       }} />;
       case "daily-log": return <DailyLogTab projectId={selectedProjectId} />;
       case "schedule": return <MilestoneScheduleTab project={project} />;
