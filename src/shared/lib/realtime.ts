@@ -335,6 +335,61 @@ export const api = {
     return data.review;
   },
 
+  // Sub Jobs
+  async listSubJobs(): Promise<any[]> {
+    const data = await apiFetch<{ sub_jobs: any[] }>("/api/sub-jobs");
+    return data.sub_jobs;
+  },
+
+  async getSubJob(id: string): Promise<{ sub_job: any; bids: any[] }> {
+    return apiFetch(`/api/sub-jobs/${id}`);
+  },
+
+  async postSubJob(subJob: {
+    project_id: string;
+    milestone_label: string;
+    milestone_index: number;
+    title: string;
+    description: string;
+    category: string;
+    skills: string[];
+    location: string;
+    budget_min: number;
+    budget_max: number;
+    payment_path: string;
+    disclosed_to_owner: boolean;
+    deadline: string;
+  }): Promise<any> {
+    const data = await apiFetch<{ sub_job: any }>("/api/sub-jobs", {
+      method: "POST",
+      body: JSON.stringify({ sub_job: subJob }),
+    });
+    return data.sub_job;
+  },
+
+  async placeSubBid(
+    subJobId: string,
+    bid: { amount: number; message: string; timeline: string }
+  ): Promise<any> {
+    const data = await apiFetch<{ bid: any }>(`/api/sub-jobs/${subJobId}/bids`, {
+      method: "POST",
+      body: JSON.stringify({ bid }),
+    });
+    return data.bid;
+  },
+
+  async getSubContractorStats(): Promise<any> {
+    return apiFetch("/api/sub-contractors/stats");
+  },
+
+  async updateSubJobStatus(subJobId: string, status: string): Promise<any> {
+    const data = await apiFetch<{ sub_job: any }>(`/api/sub-jobs/${subJobId}/status`, {
+      method: "PUT",
+      body: JSON.stringify({ status }),
+    });
+    return data.sub_job;
+  },
+
   // FairRecords
   async listFairRecords(contractorId: string): Promise<{ records: any[]; stats: any }> {
     return apiFetch(`/api/contractors/${contractorId}/records`);

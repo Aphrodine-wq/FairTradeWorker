@@ -165,23 +165,145 @@ export async function fetchPublicRecord(publicId: string): Promise<FairRecord | 
   return mockFairRecords.find((r) => r.publicId === publicId) || null;
 }
 
+// Convert a snake_case sub job from the API to the camelCase SubJob shape pages expect
+function toSubJob(raw: any): SubJob {
+  return {
+    id: raw.id,
+    contractorId: raw.contractor_id ?? raw.contractorId ?? "",
+    contractorName: raw.contractor_name ?? raw.contractorName ?? "",
+    contractorCompany: raw.contractor_company ?? raw.contractorCompany ?? "",
+    contractorRating: raw.contractor_rating ?? raw.contractorRating ?? 0,
+    projectId: raw.project_id ?? raw.projectId ?? "",
+    projectTitle: raw.project_title ?? raw.projectTitle ?? "",
+    milestoneLabel: raw.milestone_label ?? raw.milestoneLabel ?? "",
+    milestoneIndex: raw.milestone_index ?? raw.milestoneIndex ?? 0,
+    title: raw.title,
+    description: raw.description ?? "",
+    category: raw.category ?? "",
+    skills: raw.skills ?? [],
+    location: raw.location ?? "",
+    budgetMin: raw.budget_min ?? raw.budgetMin ?? 0,
+    budgetMax: raw.budget_max ?? raw.budgetMax ?? 0,
+    paymentPath: raw.payment_path ?? raw.paymentPath ?? "contractor_escrow",
+    disclosedToOwner: raw.disclosed_to_owner ?? raw.disclosedToOwner ?? false,
+    status: raw.status ?? "open",
+    deadline: raw.deadline ?? "",
+    bidsCount: raw.bids_count ?? raw.bid_count ?? raw.bidsCount ?? 0,
+    postedDate: raw.posted_date ?? raw.posted_at ?? raw.postedDate ?? "",
+    urgency: raw.urgency ?? "medium",
+  };
+}
+
+function toSubBid(raw: any): SubBid {
+  return {
+    id: raw.id,
+    subJobId: raw.sub_job_id ?? raw.subJobId ?? "",
+    subContractorId: raw.sub_contractor_id ?? raw.subContractorId ?? "",
+    subContractorName: raw.sub_contractor_name ?? raw.subContractorName ?? "",
+    subContractorCompany: raw.sub_contractor_company ?? raw.subContractorCompany ?? "",
+    subContractorRating: raw.sub_contractor_rating ?? raw.subContractorRating ?? 0,
+    amount: raw.amount ?? 0,
+    message: raw.message ?? "",
+    timeline: raw.timeline ?? "",
+    status: raw.status ?? "pending",
+    createdDate: raw.created_date ?? raw.created_at ?? raw.createdDate ?? "",
+  };
+}
+
 /**
- * Fetch sub jobs — mock data for now.
+ * Fetch sub jobs — real API if backend is reachable, mock data otherwise.
  */
 export async function fetchSubJobs(): Promise<SubJob[]> {
+  try {
+    const rawSubJobs = await api.listSubJobs();
+    if (rawSubJobs.length > 0) {
+      return rawSubJobs.map(toSubJob);
+    }
+  } catch {
+    // Backend not available — fall through to mock
+  }
   return mockSubJobs;
 }
 
 /**
- * Fetch bids for a specific sub job — mock data for now.
+ * Fetch bids for a specific sub job — real API with mock fallback.
  */
 export async function fetchSubBids(subJobId: string): Promise<SubBid[]> {
+  try {
+    const { bids } = await api.getSubJob(subJobId);
+    if (bids && bids.length > 0) {
+      return bids.map(toSubBid);
+    }
+  } catch {
+    // Backend not available — fall through to mock
+  }
   return mockSubBids.filter((b) => b.subJobId === subJobId);
 }
 
 /**
- * Fetch sub contractor dashboard stats — mock data for now.
+ * Fetch sub contractor dashboard stats — real API with mock fallback.
  */
 export async function fetchSubContractorStats() {
+  try {
+    const stats = await api.getSubContractorStats();
+    if (stats) return stats;
+  } catch {
+    // Backend not available — fall through to mock
+  }
   return subContractorDashboardStats;
+}
+
+/**
+ * Post a sub job — calls real API.
+ */
+export async function postSubJob(params: {
+  projectId: string;
+  milestoneLabel: string;
+  milestoneIndex: number;
+  title: string;
+  description: string;
+  category: string;
+  skills: string[];
+  location: string;
+  budgetMin: number;
+  budgetMax: number;
+  paymentPath: string;
+  disclosedToOwner: boolean;
+  deadline: string;
+}): Promise<SubJob> {
+  const raw = await api.postSubJob({
+    project_id: params.projectId,
+    milestone_label: params.milestoneLabel,
+    milestone_index: params.milestoneIndex,
+    title: params.title,
+    description: params.description,
+    category: params.category,
+    skills: params.skills,
+    location: params.location,
+    budget_min: params.budgetMin,
+    budget_max: params.budgetMax,
+    payment_path: params.paymentPath,
+    disclosed_to_owner: params.disclosedToOwner,
+    deadline: params.deadline,
+  });
+  return toSubJob(raw);
+}
+
+/**
+ * Place a bid on a sub job — calls real API.
+ */
+export async function placeSubBid(
+  subJobId: string,
+  bid: { amount: number; message: string; timeline: string }
+): Promise<SubBid> {
+  const raw = await api.placeSubBid(subJobId, bid);
+  return toSubBid(raw);
+}
+
+/**
+ * Update a sub job's status — calls real API.
+ */
+export async function updateSubJobStatus(subJobId: string, status: string): Promise<SubJob> {
+  const raw = await api.updateSubJobStatus(subJobId, status);
+  return toSubJob(raw);
 }

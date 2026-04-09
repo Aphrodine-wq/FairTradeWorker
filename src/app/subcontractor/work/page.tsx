@@ -5,11 +5,12 @@ import { Search, SlidersHorizontal, X, ChevronDown, LayoutGrid, List } from "luc
 import { Input } from "@shared/ui/input";
 import { Button } from "@shared/ui/button";
 import { Badge } from "@shared/ui/badge";
-import { mockSubJobs, type SubJob, type SubPaymentPath } from "@shared/lib/mock-data";
+import { type SubJob, type SubPaymentPath } from "@shared/lib/mock-data";
 import { fetchSubJobs } from "@shared/lib/data";
 import { SubJobCard } from "@subcontractor/components/sub-job-card";
 import { AppHeader } from "@shared/components/app-header";
 import { cn } from "@shared/lib/utils";
+import { placeSubBid } from "@shared/lib/data";
 import { usePageTitle } from "@shared/hooks/use-page-title";
 import { toast } from "sonner";
 
@@ -35,7 +36,7 @@ const SKILL_FILTERS = [
 
 export default function BrowseSubJobsPage() {
   usePageTitle("Browse Sub Jobs");
-  const [subJobs, setSubJobs] = useState<SubJob[]>(mockSubJobs);
+  const [subJobs, setSubJobs] = useState<SubJob[]>([]);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortOption>("newest");
   const [showFilters, setShowFilters] = useState(true);
@@ -286,7 +287,20 @@ export default function BrowseSubJobsPage() {
                 <SubJobCard
                   key={sj.id}
                   subJob={sj}
-                  onBid={(sj) => toast.success(`Bid dialog for "${sj.title}" — coming soon`)}
+                  onBid={async (subJob) => {
+                    try {
+                      await placeSubBid(subJob.id, {
+                        amount: subJob.budgetMin,
+                        message: "Interested in this job. Ready to start.",
+                        timeline: "Per milestone schedule",
+                      });
+                      toast.success(`Bid placed on "${subJob.title}"`);
+                      // Refresh list to reflect updated bid count
+                      fetchSubJobs().then(setSubJobs);
+                    } catch (err: any) {
+                      toast.error(err.message || "Failed to place bid");
+                    }
+                  }}
                 />
               ))}
             </div>

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { CheckCircle2, Circle, Clock, MapPin, DollarSign, Users, ArrowRight } from "lucide-react";
 import { Badge } from "@shared/ui/badge";
-import { mockSubJobs, type SubJob } from "@shared/lib/mock-data";
+import { type SubJob } from "@shared/lib/mock-data";
 import { fetchSubJobs } from "@shared/lib/data";
 import { formatCurrency, cn } from "@shared/lib/utils";
 import { usePageTitle } from "@shared/hooks/use-page-title";
@@ -20,7 +20,7 @@ const STATUS_CONFIG: Record<string, { label: string; style: string }> = {
 
 export default function MySubJobsPage() {
   usePageTitle("My Sub Jobs");
-  const [subJobs, setSubJobs] = useState<SubJob[]>(mockSubJobs);
+  const [subJobs, setSubJobs] = useState<SubJob[]>([]);
   const [tab, setTab] = useState<TabFilter>("active");
 
   useEffect(() => {

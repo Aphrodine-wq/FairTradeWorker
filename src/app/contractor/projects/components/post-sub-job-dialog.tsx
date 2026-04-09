@@ -12,6 +12,7 @@ import { Input } from "@shared/ui/input";
 import { Textarea } from "@shared/ui/textarea";
 import { Button } from "@shared/ui/button";
 import { cn, formatCurrency } from "@shared/lib/utils";
+import { postSubJob } from "@shared/lib/data";
 import { toast } from "sonner";
 
 const SKILL_OPTIONS = [
@@ -59,7 +60,9 @@ export function PostSubJobDialog({
     );
   }
 
-  function handleSubmit() {
+  const [submitting, setSubmitting] = useState(false);
+
+  async function handleSubmit() {
     if (!description.trim()) {
       toast.error("Add a description for the sub job");
       return;
@@ -69,17 +72,39 @@ export function PostSubJobDialog({
       return;
     }
 
-    toast.success(`Sub job posted for "${milestoneLabel}"`);
-    onOpenChange(false);
+    setSubmitting(true);
+    try {
+      await postSubJob({
+        projectId,
+        milestoneLabel,
+        milestoneIndex,
+        title: `${milestoneLabel} — ${projectCategory}`,
+        description,
+        category: projectCategory,
+        skills: selectedSkills,
+        location: projectLocation,
+        budgetMin: Number(budgetMin),
+        budgetMax: Number(budgetMax),
+        paymentPath,
+        disclosedToOwner: disclosed,
+        deadline,
+      });
+      toast.success(`Sub job posted for "${milestoneLabel}"`);
+      onOpenChange(false);
 
-    // Reset form
-    setDescription("");
-    setSelectedSkills([]);
-    setBudgetMin(Math.round(milestoneAmount * 0.6).toString());
-    setBudgetMax(Math.round(milestoneAmount * 0.9).toString());
-    setPaymentPath("contractor_escrow");
-    setDisclosed(false);
-    setDeadline("");
+      // Reset form
+      setDescription("");
+      setSelectedSkills([]);
+      setBudgetMin(Math.round(milestoneAmount * 0.6).toString());
+      setBudgetMax(Math.round(milestoneAmount * 0.9).toString());
+      setPaymentPath("contractor_escrow");
+      setDisclosed(false);
+      setDeadline("");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to post sub job");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -261,10 +286,11 @@ export function PostSubJobDialog({
           </Button>
           <Button
             onClick={handleSubmit}
+            disabled={submitting}
             className="h-9 rounded-sm bg-brand-600 hover:bg-brand-700 text-white text-[13px] font-semibold"
           >
             <Send className="w-3.5 h-3.5 mr-1.5" />
-            Post Sub Job
+            {submitting ? "Posting..." : "Post Sub Job"}
           </Button>
         </div>
       </DialogContent>
