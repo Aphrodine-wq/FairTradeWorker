@@ -132,7 +132,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Route protection for authenticated areas
-  if (pathname.startsWith("/contractor") || pathname.startsWith("/homeowner") || pathname.startsWith("/subcontractor")) {
+  if (pathname.startsWith("/contractor") || pathname.startsWith("/homeowner") || pathname.startsWith("/subcontractor") || pathname.startsWith("/admin")) {
     const token = request.cookies.get("ftw-token")?.value;
     if (!token) {
       return redirectToLogin(request, pathname);
@@ -157,6 +157,11 @@ export async function middleware(request: NextRequest) {
       ["/homeowner", "homeowner"],
       ["/subcontractor", "subcontractor"],
     ];
+
+    // Admin routes require admin role
+    if (pathname.startsWith("/admin") && rawRole !== "admin") {
+      return addSecurityHeaders(NextResponse.redirect(new URL("/login", request.url)));
+    }
 
     for (const [prefix, expectedRole] of roleChecks) {
       if (pathname.startsWith(prefix) && rawRole !== expectedRole) {
