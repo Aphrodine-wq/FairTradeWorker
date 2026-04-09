@@ -227,6 +227,36 @@ export default function ContactPage() {
                   directly — we respond same day on business days.
                 </p>
               </div>
+
+              <Separator />
+
+              <div>
+                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-4">
+                  Common Questions
+                </h3>
+                <ul className="space-y-3 text-sm text-gray-700">
+                  <li>
+                    <strong className="text-gray-900">Are you licensed?</strong>{" "}
+                    FairTradeWorker is a Mississippi-based technology company. All contractors on
+                    our platform carry their own licenses and insurance, which we verify.
+                  </li>
+                  <li>
+                    <strong className="text-gray-900">How do payments work?</strong>{" "}
+                    Payments flow through QuickBooks with milestone-based escrow.
+                    Homeowners pay per milestone. Contractors get paid when work is approved.
+                  </li>
+                  <li>
+                    <strong className="text-gray-900">What areas do you serve?</strong>{" "}
+                    We&apos;re launching across Mississippi — Oxford, Tupelo, Hattiesburg,
+                    Jackson, Southaven, and 200+ cities. Expanding to neighboring states in 2027.
+                  </li>
+                  <li>
+                    <strong className="text-gray-900">Is it free for homeowners?</strong>{" "}
+                    Yes. Posting a job and receiving bids is completely free. A small service fee
+                    applies only when you hire and pay through the platform.
+                  </li>
+                </ul>
+              </div>
             </div>
 
           </div>

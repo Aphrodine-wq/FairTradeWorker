@@ -22,10 +22,14 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { city } = await params;
   const loc = getLocationBySlug(city);
-  if (!loc?.profile) return {};
+  if (!loc) return {};
 
-  const title = `Contractors in ${loc.city}, ${loc.stateAbbr} — All Trades, Verified Pros`;
-  const description = `Find verified contractors in ${loc.city}, Mississippi for HVAC, electrical, plumbing, roofing, painting, and more. Compare bids by neighborhood. No lead fees. Free to post.`;
+  const title = loc.profile
+    ? `Contractors in ${loc.city}, ${loc.stateAbbr} — All Trades, Verified Pros`
+    : `Contractors in ${loc.city}, ${loc.stateAbbr} | FairTradeWorker`;
+  const description = loc.profile
+    ? `Find verified contractors in ${loc.city}, Mississippi for HVAC, electrical, plumbing, roofing, painting, and more. Compare bids by neighborhood. No lead fees. Free to post.`
+    : `Find verified contractors in ${loc.city}, ${loc.stateAbbr}. Compare bids, read reviews, and hire with confidence on FairTradeWorker.`;
 
   return {
     title,

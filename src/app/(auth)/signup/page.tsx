@@ -478,9 +478,9 @@ function StepTwo({
           <ChevronLeft className="w-4 h-4" />
         </button>
         <div>
-          <h1 className="text-xl font-bold text-gray-900 tracking-tight">
+          <h2 className="text-xl font-bold text-gray-900 tracking-tight">
             {isContractor ? "Contractor details" : "Your details"}
-          </h1>
+          </h2>
           <p className="text-sm text-gray-700">
             {isContractor
               ? "Tell us about your business"
