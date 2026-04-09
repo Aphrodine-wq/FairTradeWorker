@@ -37,20 +37,6 @@ const DOCS = [
     href: "/docs/FairTradeWorker_Media_Kit.pdf",
     audience: "Press & Partners",
   },
-  {
-    title: "Investor Overview",
-    description:
-      "Market opportunity, business model, traction, and competitive advantages.",
-    href: "/docs/FairTradeWorker_Pitch_Deck.pdf",
-    audience: "Investors",
-  },
-  {
-    title: "SEO & Site Health Report",
-    description:
-      "Full-site analysis of 10,238 pages. Technical SEO health, architecture breakdown, and growth opportunities.",
-    href: "/docs/FairTradeWorker_SEO_Site_Report.pdf",
-    audience: "Internal",
-  },
 ] as const;
 
 export default function ResourcesPage() {
