@@ -3,7 +3,7 @@ import { getAuthUser } from "@shared/lib/auth";
 import { prisma } from "@shared/lib/db";
 import { revokeToken } from "@shared/lib/quickbooks";
 
-export async function POST(req: NextRequest) {
+export async function DELETE(req: NextRequest) {
   const user = getAuthUser(req);
   if (!user || user.role !== "CONTRACTOR") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

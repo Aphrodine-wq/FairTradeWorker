@@ -28,6 +28,7 @@ import { Input } from "@shared/ui/input";
 import { Textarea } from "@shared/ui/textarea";
 import { Badge } from "@shared/ui/badge";
 import { Card, CardContent } from "@shared/ui/card";
+import { useQuickBooks } from "@shared/hooks/use-quickbooks";
 import { Separator } from "@shared/ui/separator";
 import { mockContractors } from "@shared/lib/mock-data";
 import { JOB_CATEGORIES } from "@shared/lib/constants";
@@ -685,60 +686,25 @@ function InsuranceSection() {
 }
 
 function IntegrationsSection() {
-  const [qbStatus, setQbStatus] = useState<{
-    connected: boolean;
-    companyName?: string;
-    connectedAt?: string;
-  }>({ connected: false });
-  const [qbLoading, setQbLoading] = useState(true);
-  const [qbConnecting, setQbConnecting] = useState(false);
-  const [qbDisconnecting, setQbDisconnecting] = useState(false);
+  const {
+    status: qbStatus,
+    loading: qbLoading,
+    connecting: qbConnecting,
+    disconnecting: qbDisconnecting,
+    connect: connectQuickBooks,
+    disconnect: disconnectQuickBooks,
+  } = useQuickBooks();
 
   // Check for OAuth redirect result
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const qbResult = params.get("qb");
     if (qbResult === "connected") {
-      // Clean up URL
       const url = new URL(window.location.href);
       url.searchParams.delete("qb");
       window.history.replaceState({}, "", url.pathname + url.search);
     }
   }, []);
-
-  // Fetch QuickBooks connection status
-  useEffect(() => {
-    fetch("/api/integrations/quickbooks/status")
-      .then((res) => res.json())
-      .then((data) => setQbStatus(data))
-      .catch(() => setQbStatus({ connected: false }))
-      .finally(() => setQbLoading(false));
-  }, []);
-
-  async function connectQuickBooks() {
-    setQbConnecting(true);
-    try {
-      const res = await fetch("/api/integrations/quickbooks/connect");
-      const data = await res.json();
-      if (data.authUrl) {
-        window.location.href = data.authUrl;
-      }
-    } catch {
-      setQbConnecting(false);
-    }
-  }
-
-  async function disconnectQuickBooks() {
-    setQbDisconnecting(true);
-    try {
-      await fetch("/api/integrations/quickbooks/disconnect", { method: "POST" });
-      setQbStatus({ connected: false });
-    } catch {
-      // Silently fail — user can retry
-    } finally {
-      setQbDisconnecting(false);
-    }
-  }
 
   const futureIntegrations = [
     { name: "Google Calendar", desc: "Sync project schedule", icon: "GC" },

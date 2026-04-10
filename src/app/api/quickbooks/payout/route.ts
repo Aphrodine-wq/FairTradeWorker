@@ -16,7 +16,7 @@ const safeDiv = (a: number, b: number): number => (b !== 0 ? a / b : 0);
 const safeCents = (value: number): number => safeDiv(Math.round(value * 100), 100);
 
 /**
- * POST /api/integrations/quickbooks/payout
+ * POST /api/quickbooks/payout
  *
  * Creates a contractor payout for an accepted bid.
  * Flow:
@@ -224,7 +224,7 @@ export async function POST(req: NextRequest) {
 }
 
 /**
- * GET /api/integrations/quickbooks/payout?bidId=xxx
+ * GET /api/quickbooks/payout?bidId=xxx
  *
  * Get payout status for a specific bid.
  */

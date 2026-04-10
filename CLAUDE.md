@@ -45,7 +45,7 @@ src/app/api/          # Next.js API routes
   contractor/         # Profile, licenses, insurance, estimates, estimate PDFs
   homeowner/          # Property management
   contact/            # Contact form submission
-  integrations/       # QuickBooks OAuth2, invoices, estimates, payouts, receipts, webhooks
+  quickbooks/         # QuickBooks OAuth2, invoices, estimates, payouts, receipts, webhooks
   seed/               # Database seed endpoint (POST, requires x-seed-secret header)
 
 src/domains/          # Domain-specific components
@@ -132,7 +132,7 @@ Middleware redirects unauthenticated users from `/contractor/*`, `/subcontractor
 - **Contractor**: `GET/PUT /api/contractor/profile`, `GET/POST /api/contractor/licenses`, `GET/POST /api/contractor/insurance`, `GET/POST /api/contractor/estimates`, `GET/DELETE /api/contractor/estimates/[id]`, `GET /api/contractor/estimates/[id]/pdf`
 - **Homeowner**: `GET/PUT /api/homeowner/property`
 - **Contact**: `POST /api/contact`
-- **QuickBooks**: 9 routes under `/api/integrations/quickbooks/` (connect, callback, disconnect, status, create-invoice, sync-estimate, payout, receipt, webhook)
+- **QuickBooks**: 9 routes under `/api/quickbooks/` (connect, callback, disconnect, status, create-invoice, sync-estimate, payout, receipt, webhook)
 - **Seed**: `POST /api/seed` (requires `x-seed-secret` header matching `JWT_SECRET`, populates demo data)
 
 All database routes use `prisma` from `src/shared/lib/db.ts`. Auth-required routes call `getAuthUser(req)`.

@@ -4,7 +4,7 @@ import { prisma } from "@shared/lib/db";
 import { getQBInvoice } from "@shared/lib/quickbooks";
 
 /**
- * POST /api/integrations/quickbooks/receipt
+ * POST /api/quickbooks/receipt
  *
  * Generates a homeowner receipt after payment is confirmed.
  * Pulls data from our Invoice + QB Invoice, computes the full charge
@@ -209,7 +209,7 @@ export async function POST(req: NextRequest) {
 }
 
 /**
- * GET /api/integrations/quickbooks/receipt?bidId=xxx
+ * GET /api/quickbooks/receipt?bidId=xxx
  *
  * Fetch an existing receipt for a bid.
  */
