@@ -181,7 +181,7 @@ export function useContractorEstimates() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/contractor/estimates", {
+      const res = await fetch("/api/estimates", {
         headers: authHeaders(),
       });
       const data = await res.json();
@@ -196,7 +196,7 @@ export function useContractorEstimates() {
 
   const remove = useCallback(async (id: string) => {
     try {
-      const res = await fetch(`/api/contractor/estimates/${id}`, {
+      const res = await fetch(`/api/estimates/${id}`, {
         method: "DELETE",
         headers: authHeaders(),
       });
@@ -227,7 +227,7 @@ export function useGenerateEstimate() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/contractor/estimates", {
+      const res = await fetch("/api/estimates", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
