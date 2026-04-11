@@ -9,6 +9,7 @@ import { Input } from "@shared/ui/input";
 import { Textarea } from "@shared/ui/textarea";
 import { Separator } from "@shared/ui/separator";
 import { Mail, Phone, Clock, MapPin } from "lucide-react";
+import { submitContactForm } from "@shared/lib/ftw-svc-gaps";
 
 const SUBJECTS = [
   "General",
@@ -31,16 +32,12 @@ export default function ContactPage() {
     e.preventDefault();
     setSending(true);
     try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, subject, message }),
-      });
-      if (!res.ok) throw new Error("Failed to send");
+      await submitContactForm({ name, email, subject, message });
       setSubmitted(true);
       toast.success("Message sent");
-    } catch {
-      toast.error("Failed to send message. Please try again.");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to send message. Please try again.";
+      toast.error(message);
     } finally {
       setSending(false);
     }

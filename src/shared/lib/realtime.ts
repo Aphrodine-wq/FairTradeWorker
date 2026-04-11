@@ -10,7 +10,9 @@
  */
 import { Client, IMessage, StompSubscription } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
+import { changePassword as changePasswordGap } from "./ftw-svc-gaps";
 
+// FairTradeWorker talks to ftw-svc through this base URL.
 const API_BASE = process.env.NEXT_PUBLIC_REALTIME_URL || "http://localhost:4000";
 const WS_URL = `${API_BASE}/ws`;
 
@@ -227,13 +229,7 @@ export const api = {
   },
 
   async changePassword(currentPassword: string, newPassword: string): Promise<any> {
-    return apiFetch("/api/auth/change-password", {
-      method: "POST",
-      body: JSON.stringify({
-        current_password: currentPassword,
-        new_password: newPassword,
-      }),
-    });
+    return changePasswordGap(currentPassword, newPassword);
   },
 
   // Jobs (public — no auth required for listing)

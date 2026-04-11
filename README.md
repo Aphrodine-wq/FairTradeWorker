@@ -210,9 +210,9 @@ docs/                            # Business intelligence + research
 | GET/PUT | `/api/contractor/profile` | Contractor profile management |
 | GET/POST | `/api/contractor/licenses` | License management |
 | GET/POST | `/api/contractor/insurance` | Insurance cert management |
-| GET/POST | `/api/contractor/estimates` | List or generate standalone estimates |
-| GET/DELETE | `/api/contractor/estimates/[id]` | Single estimate detail or delete |
-| GET | `/api/contractor/estimates/[id]/pdf` | Download or regenerate estimate PDF |
+| GET/POST | `/api/estimates` | List or generate standalone estimates |
+| GET/DELETE | `/api/estimates/[id]` | Single estimate detail or delete |
+| GET | `/api/estimates/[id]/pdf` | Download or regenerate estimate PDF |
 
 ### Homeowner
 

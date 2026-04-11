@@ -9,6 +9,7 @@ import { Button } from "@shared/ui/button";
 import { Card, CardContent } from "@shared/ui/card";
 import { Input } from "@shared/ui/input";
 import { BrandMark } from "@shared/components/brand-mark";
+import { resetPassword } from "@shared/lib/ftw-svc-gaps";
 
 export default function ResetPasswordPage() {
   return (
@@ -76,17 +77,7 @@ function ResetPasswordContent() {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/reset-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, password }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Reset failed");
-      }
-
+      await resetPassword(token, password);
       toast.success("Password reset successfully");
       router.push("/login");
     } catch (err) {

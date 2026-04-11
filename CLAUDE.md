@@ -129,7 +129,7 @@ Middleware redirects unauthenticated users from `/contractor/*`, `/subcontractor
 - **Auth**: `POST /api/auth/signup`, `POST /api/auth/login`, `POST /api/auth/forgot-password`, `POST /api/auth/reset-password`, `POST /api/auth/switch-role`, `POST /api/auth/sync-token`
 - **Jobs**: `GET/POST /api/jobs`, `GET /api/jobs/[id]`, `POST /api/jobs/[id]/bids`, `POST /api/jobs/[id]/estimate`
 - **Bids**: `POST /api/bids/[id]/accept` (also creates QB invoice + queues contractor payout)
-- **Contractor**: `GET/PUT /api/contractor/profile`, `GET/POST /api/contractor/licenses`, `GET/POST /api/contractor/insurance`, `GET/POST /api/contractor/estimates`, `GET/DELETE /api/contractor/estimates/[id]`, `GET /api/contractor/estimates/[id]/pdf`
+- **Contractor**: `GET/PUT /api/contractor/profile`, `GET/POST /api/contractor/licenses`, `GET/POST /api/contractor/insurance`, `GET/POST /api/estimates`, `GET/DELETE /api/estimates/[id]`, `GET /api/estimates/[id]/pdf`
 - **Homeowner**: `GET/PUT /api/homeowner/property`
 - **Contact**: `POST /api/contact`
 - **QuickBooks**: 9 routes under `/api/integrations/quickbooks/` (connect, callback, disconnect, status, create-invoice, sync-estimate, payout, receipt, webhook)
@@ -168,11 +168,11 @@ Backend calls the ConstructionAI FastAPI service at `CONSTRUCTIONAI_API_URL` (de
 
 **Contractor standalone estimates:**
 
-- `GET /api/contractor/estimates` -- list saved estimates
-- `POST /api/contractor/estimates` -- generate standalone estimate (not tied to a job). Body: `{ projectType, description, location, sqft?, quality?, clientName?, propertyType?, yearBuilt? }`
-- `GET /api/contractor/estimates/[id]` -- single estimate detail
-- `DELETE /api/contractor/estimates/[id]` -- remove saved estimate
-- `GET /api/contractor/estimates/[id]/pdf` -- download/regenerate PDF
+- `GET /api/estimates` -- list saved estimates
+- `POST /api/estimates` -- generate standalone estimate (not tied to a job). Body: `{ projectType, description, location, sqft?, quality?, clientName?, propertyType?, yearBuilt? }`
+- `GET /api/estimates/[id]` -- single estimate detail
+- `DELETE /api/estimates/[id]` -- remove saved estimate
+- `GET /api/estimates/[id]/pdf` -- download/regenerate PDF
 
 **Prisma models:** `AiEstimate` (job-linked, full v4 fields), `SavedEstimate` (contractor's standalone estimates).
 

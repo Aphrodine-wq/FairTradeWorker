@@ -23,7 +23,7 @@ export function useRealtimeJobs() {
 
   useEffect(() => {
     if (!getAuthToken()) {
-      // Fall back to REST if not authenticated
+      // Use the ftw-svc REST feed until the user has an auth token for websockets
       api.listJobs().then((list) => {
         setJobs(list);
         setLoading(false);

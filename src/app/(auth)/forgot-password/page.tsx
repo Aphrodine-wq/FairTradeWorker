@@ -8,6 +8,7 @@ import { Button } from "@shared/ui/button";
 import { Card, CardContent } from "@shared/ui/card";
 import { BrandMark } from "@shared/components/brand-mark";
 import { Input } from "@shared/ui/input";
+import { requestPasswordReset } from "@shared/lib/ftw-svc-gaps";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -18,15 +19,12 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await fetch("/api/auth/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
+      await requestPasswordReset(email);
       setSubmitted(true);
       toast.success("Check your email for a reset link.");
-    } catch {
-      toast.error("Something went wrong. Please try again.");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Something went wrong. Please try again.";
+      toast.error(message);
     } finally {
       setLoading(false);
     }

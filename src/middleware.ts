@@ -7,7 +7,7 @@ import { checkRateLimit } from "@shared/lib/rate-limit";
  * Next.js middleware for FairTradeWorker.
  *
  * - JWT signature + expiry verification via `jose` (Edge-compatible)
- * - Rate-limits auth paths: /login, /signup, /forgot-password, /api/auth/* — 10 req/min per IP
+ * - Rate-limits public auth pages: /login, /signup, /forgot-password, /reset-password — 10 req/min per IP
  * - Security headers on all responses
  */
 
@@ -44,7 +44,7 @@ async function verifyJwt(token: string): Promise<JwtPayload | null> {
 // Auth rate-limit config
 // ---------------------------------------------------------------------------
 
-const AUTH_RATE_LIMIT_PATHS = ["/login", "/signup", "/forgot-password", "/api/auth"];
+const AUTH_RATE_LIMIT_PATHS = ["/login", "/signup", "/forgot-password", "/reset-password"];
 const AUTH_RATE_LIMIT = 10; // requests
 const AUTH_RATE_WINDOW = 60_000; // 1 minute
 

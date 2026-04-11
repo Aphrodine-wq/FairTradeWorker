@@ -7,8 +7,8 @@ import { Button } from "@shared/ui/button";
 import { Card, CardContent } from "@shared/ui/card";
 import { Input } from "@shared/ui/input";
 import { cn } from "@shared/lib/utils";
-import { authStore } from "@shared/lib/auth-store";
 import { usePageTitle } from "@shared/hooks/use-page-title";
+import { saveHomeownerProperty } from "@shared/lib/ftw-svc-gaps";
 
 const PROPERTY_TYPES = [
   { id: "single_family", label: "Single Family Home", icon: Home },
@@ -30,21 +30,14 @@ export default function HomeownerOnboarding() {
 
   const handleComplete = async () => {
     setSaving(true);
-    const token = authStore.getToken();
-    const headers: Record<string, string> = { "Content-Type": "application/json" };
-    if (token) headers["Authorization"] = `Bearer ${token}`;
 
     try {
-      await fetch("/api/homeowner/property", {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          address,
-          city,
-          state,
-          zip,
-          propertyType,
-        }),
+      await saveHomeownerProperty({
+        address,
+        city,
+        state,
+        zip,
+        propertyType,
       });
     } catch {
       // Best-effort — continue even if API isn't available

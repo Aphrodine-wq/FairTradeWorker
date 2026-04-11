@@ -1,9 +1,17 @@
 /**
- * Data layer — tries real Elixir API first, falls back to mock data.
- * Pages import from here instead of mock-data directly.
+ * Data layer — prefers ftw-svc and only returns mock fixtures when explicitly
+ * enabled through DEV_USE_MOCK_DATA / NEXT_PUBLIC_DEV_USE_MOCK_DATA.
  */
 import { api, type RealtimeJob, type RealtimeBid, type RealtimeSubJob, type RealtimeSubBid } from "./realtime";
 import { mockJobs, mockEstimates, mockFairRecords, mockSubJobs, mockSubBids, subContractorDashboardStats, type Job, type Estimate, type FairRecord, type SubJob, type SubBid } from "./mock-data";
+
+const USE_MOCK_DATA =
+  process.env.DEV_USE_MOCK_DATA === "true" ||
+  process.env.NEXT_PUBLIC_DEV_USE_MOCK_DATA === "true";
+
+function warnFtWSvcFailure(scope: string, error: unknown) {
+  console.warn(`[ftw-svc] ${scope} failed`, error);
+}
 
 // Convert a RealtimeJob from the API to the mock Job shape pages expect
 function toJob(rj: RealtimeJob): Job {
@@ -28,7 +36,7 @@ function toJob(rj: RealtimeJob): Job {
 }
 
 /**
- * Fetch jobs — real API if backend is reachable, mock data otherwise.
+ * Fetch jobs from ftw-svc.
  */
 export async function fetchJobs(filters?: {
   status?: string;
@@ -37,13 +45,14 @@ export async function fetchJobs(filters?: {
 }): Promise<Job[]> {
   try {
     const realtimeJobs = await api.listJobs(filters);
-    if (realtimeJobs.length > 0) {
-      return realtimeJobs.map(toJob);
+    return realtimeJobs.map(toJob);
+  } catch (error) {
+    warnFtWSvcFailure("fetchJobs", error);
+    if (USE_MOCK_DATA) {
+      return mockJobs;
     }
-  } catch {
-    // Backend not available — fall through to mock
+    return [];
   }
-  return mockJobs;
 }
 
 /**
@@ -53,113 +62,114 @@ export async function fetchBidsForJob(jobId: string): Promise<RealtimeBid[]> {
   try {
     const { bids } = await api.getJob(jobId);
     return bids;
-  } catch {
+  } catch (error) {
+    warnFtWSvcFailure(`fetchBidsForJob(${jobId})`, error);
     return [];
   }
 }
 
 /**
- * Fetch estimates — real API with mock fallback.
+ * Fetch estimates from ftw-svc.
  */
 export async function fetchEstimates(): Promise<Estimate[]> {
   try {
-    const apiEstimates = await api.listEstimates();
-    if (apiEstimates.length > 0) {
-      return apiEstimates;
+    return await api.listEstimates();
+  } catch (error) {
+    warnFtWSvcFailure("fetchEstimates", error);
+    if (USE_MOCK_DATA) {
+      return mockEstimates;
     }
-  } catch {
-    // Backend not available — fall through to mock
+    return [];
   }
-  return mockEstimates;
 }
 
 /**
- * Fetch invoices — real API with empty fallback.
+ * Fetch invoices from ftw-svc.
  */
 export async function fetchInvoices(): Promise<any[]> {
-  try { return await api.listInvoices(); } catch { return []; }
+  try { return await api.listInvoices(); } catch (error) { warnFtWSvcFailure("fetchInvoices", error); return []; }
 }
 export async function fetchInvoice(id: string): Promise<any | null> {
-  try { return await api.getInvoice(id); } catch { return null; }
+  try { return await api.getInvoice(id); } catch (error) { warnFtWSvcFailure(`fetchInvoice(${id})`, error); return null; }
 }
 export async function createInvoice(payload: Record<string, unknown>): Promise<any | null> {
-  try { return await api.createInvoice(payload); } catch { return null; }
+  try { return await api.createInvoice(payload); } catch (error) { warnFtWSvcFailure("createInvoice", error); return null; }
 }
 export async function updateInvoice(id: string, payload: Record<string, unknown>): Promise<any | null> {
-  try { return await api.updateInvoice(id, payload); } catch { return null; }
+  try { return await api.updateInvoice(id, payload); } catch (error) { warnFtWSvcFailure(`updateInvoice(${id})`, error); return null; }
 }
 
 /**
- * Fetch projects — real API with empty fallback.
+ * Fetch projects from ftw-svc.
  */
 export async function fetchProjects(): Promise<any[]> {
-  try { return await api.listProjects(); } catch { return []; }
+  try { return await api.listProjects(); } catch (error) { warnFtWSvcFailure("fetchProjects", error); return []; }
 }
 export async function fetchProject(id: string): Promise<any | null> {
-  try { return await api.getProject(id); } catch { return null; }
+  try { return await api.getProject(id); } catch (error) { warnFtWSvcFailure(`fetchProject(${id})`, error); return null; }
 }
 export async function createProject(payload: Record<string, unknown>): Promise<any | null> {
-  try { return await api.createProject(payload); } catch { return null; }
+  try { return await api.createProject(payload); } catch (error) { warnFtWSvcFailure("createProject", error); return null; }
 }
 export async function updateProject(id: string, payload: Record<string, unknown>): Promise<any | null> {
-  try { return await api.updateProject(id, payload); } catch { return null; }
+  try { return await api.updateProject(id, payload); } catch (error) { warnFtWSvcFailure(`updateProject(${id})`, error); return null; }
 }
 
 /**
- * Fetch clients — real API with empty fallback.
+ * Fetch clients from ftw-svc.
  */
 export async function fetchClients(): Promise<any[]> {
-  try { return await api.listClients(); } catch { return []; }
+  try { return await api.listClients(); } catch (error) { warnFtWSvcFailure("fetchClients", error); return []; }
 }
 export async function fetchClient(id: string): Promise<any | null> {
-  try { return await api.getClient(id); } catch { return null; }
+  try { return await api.getClient(id); } catch (error) { warnFtWSvcFailure(`fetchClient(${id})`, error); return null; }
 }
 export async function createClient(payload: Record<string, unknown>): Promise<any | null> {
-  try { return await api.createClient(payload); } catch { return null; }
+  try { return await api.createClient(payload); } catch (error) { warnFtWSvcFailure("createClient", error); return null; }
 }
 export async function updateClient(id: string, payload: Record<string, unknown>): Promise<any | null> {
-  try { return await api.updateClient(id, payload); } catch { return null; }
+  try { return await api.updateClient(id, payload); } catch (error) { warnFtWSvcFailure(`updateClient(${id})`, error); return null; }
 }
 export async function removeClient(id: string): Promise<boolean> {
-  try { await api.deleteClient(id); return true; } catch { return false; }
+  try { await api.deleteClient(id); return true; } catch (error) { warnFtWSvcFailure(`removeClient(${id})`, error); return false; }
 }
 
 /**
- * Fetch reviews — real API with empty fallback.
+ * Fetch reviews from ftw-svc.
  */
 export async function fetchReviews(forUserId?: string): Promise<any[]> {
-  try { return await api.listReviews(forUserId); } catch { return []; }
+  try { return await api.listReviews(forUserId); } catch (error) { warnFtWSvcFailure("fetchReviews", error); return []; }
 }
 export async function fetchReview(id: string): Promise<any | null> {
-  try { return await api.getReview(id); } catch { return null; }
+  try { return await api.getReview(id); } catch (error) { warnFtWSvcFailure(`fetchReview(${id})`, error); return null; }
 }
 
 /**
- * Fetch notifications — real API with empty fallback.
+ * Fetch notifications from ftw-svc.
  */
 export async function fetchNotifications(): Promise<any[]> {
-  try { return await api.listNotifications(); } catch { return []; }
+  try { return await api.listNotifications(); } catch (error) { warnFtWSvcFailure("fetchNotifications", error); return []; }
 }
 
 /**
- * Fetch settings — real API with null fallback.
+ * Fetch settings from ftw-svc.
  */
 export async function fetchSettings(): Promise<any> {
-  try { return await api.getSettings(); } catch { return null; }
+  try { return await api.getSettings(); } catch (error) { warnFtWSvcFailure("fetchSettings", error); return null; }
 }
 
 /**
- * Save settings — real API with null fallback.
+ * Save settings to ftw-svc.
  */
 export async function saveSettings(settings: Record<string, any>): Promise<any> {
-  try { return await api.updateSettings(settings); } catch { return null; }
+  try { return await api.updateSettings(settings); } catch (error) { warnFtWSvcFailure("saveSettings", error); return null; }
 }
 
 /**
- * Fetch verification status — real API with default fallback.
+ * Fetch verification status from ftw-svc.
  */
 export async function fetchVerificationStatus(): Promise<any> {
-  try { return await api.getVerificationStatus(); } catch { return null; }
+  try { return await api.getVerificationStatus(); } catch (error) { warnFtWSvcFailure("fetchVerificationStatus", error); return null; }
 }
 
 /**
@@ -170,81 +180,125 @@ export async function submitVerification(step: string, data: Record<string, any>
 }
 
 /**
- * Fetch FairRecords for a contractor — real API with mock fallback.
+ * Fetch FairRecords for a contractor.
  */
 export async function fetchFairRecords(contractorId?: string): Promise<{ records: FairRecord[]; stats: any }> {
-  try {
-    const data = await api.listFairRecords(contractorId || "me");
-    if (data.records.length > 0) return data;
-  } catch {
-    // Backend not available — fall through to mock
+  if (!contractorId) {
+    warnFtWSvcFailure("fetchFairRecords", new Error("ftw-svc requires a contractorId for /api/contractors/{contractorId}/records"));
+    if (USE_MOCK_DATA) {
+      return {
+        records: mockFairRecords,
+        stats: {
+          total: mockFairRecords.length,
+          avg_budget_accuracy: 96.8,
+          on_time_rate: 80.0,
+          avg_rating: 4.9,
+        },
+      };
+    }
+    return {
+      records: [],
+      stats: {
+        total: 0,
+        avg_budget_accuracy: 0,
+        on_time_rate: 0,
+        avg_rating: 0,
+      },
+    };
   }
-  return {
-    records: mockFairRecords,
-    stats: {
-      total: mockFairRecords.length,
-      avg_budget_accuracy: 96.8,
-      on_time_rate: 80.0,
-      avg_rating: 4.9,
-    },
-  };
+
+  try {
+    return await api.listFairRecords(contractorId);
+  } catch (error) {
+    warnFtWSvcFailure(`fetchFairRecords(${contractorId})`, error);
+    if (USE_MOCK_DATA) {
+      return {
+        records: mockFairRecords,
+        stats: {
+          total: mockFairRecords.length,
+          avg_budget_accuracy: 96.8,
+          on_time_rate: 80.0,
+          avg_rating: 4.9,
+        },
+      };
+    }
+    return {
+      records: [],
+      stats: {
+        total: 0,
+        avg_budget_accuracy: 0,
+        on_time_rate: 0,
+        avg_rating: 0,
+      },
+    };
+  }
 }
 
 /**
- * Fetch a single FairRecord by public ID — real API with mock fallback.
+ * Fetch a single FairRecord by public ID.
  */
 export async function fetchPublicRecord(publicId: string): Promise<FairRecord | null> {
   try {
     return await api.getPublicRecord(publicId);
-  } catch {
-    // Fall through to mock
+  } catch (error) {
+    warnFtWSvcFailure(`fetchPublicRecord(${publicId})`, error);
+    if (USE_MOCK_DATA) {
+      return mockFairRecords.find((r) => r.publicId === publicId) || null;
+    }
+    return null;
   }
-  return mockFairRecords.find((r) => r.publicId === publicId) || null;
 }
 
 /**
- * Fetch sub jobs — mock data for now.
+ * Fetch sub-jobs from ftw-svc.
  */
 export async function fetchSubJobs(): Promise<SubJob[]> {
   try {
     const subJobs = await api.listSubJobs({ status: "open", limit: 50 });
-    if (subJobs.length > 0) {
-      return subJobs.map(toSubJob);
+    return subJobs.map(toSubJob);
+  } catch (error) {
+    warnFtWSvcFailure("fetchSubJobs", error);
+    if (USE_MOCK_DATA) {
+      return mockSubJobs;
     }
-  } catch {
-    // fall through
+    return [];
   }
-  return mockSubJobs;
 }
 
 /**
- * Fetch bids for a specific sub job — mock data for now.
+ * Fetch bids for a specific sub-job from ftw-svc.
  */
 export async function fetchSubBids(subJobId: string): Promise<SubBid[]> {
   try {
     const { bids } = await api.getSubJob(subJobId);
-    if (bids.length > 0) return bids.map(toSubBid);
-  } catch {
-    // fall through
+    return bids.map(toSubBid);
+  } catch (error) {
+    warnFtWSvcFailure(`fetchSubBids(${subJobId})`, error);
+    if (USE_MOCK_DATA) {
+      return mockSubBids.filter((b) => b.subJobId === subJobId);
+    }
+    return [];
   }
-  return mockSubBids.filter((b) => b.subJobId === subJobId);
 }
 
 /**
  * Fetch sub contractor dashboard stats — mock data for now.
  */
 export async function fetchSubContractorStats() {
+  if (!USE_MOCK_DATA) {
+    warnFtWSvcFailure("fetchSubContractorStats", new Error("TODO(ftw-svc): add a subcontractor dashboard stats endpoint"));
+  }
   return subContractorDashboardStats;
 }
 
 export async function createEstimate(payload: Record<string, unknown>): Promise<any | null> {
-  try { return await api.createEstimate(payload); } catch { return null; }
+  try { return await api.createEstimate(payload); } catch (error) { warnFtWSvcFailure("createEstimate", error); return null; }
 }
 export async function updateEstimate(id: string, payload: Record<string, unknown>): Promise<any | null> {
-  try { return await api.updateEstimate(id, payload); } catch { return null; }
+  try { return await api.updateEstimate(id, payload); } catch (error) { warnFtWSvcFailure(`updateEstimate(${id})`, error); return null; }
 }
 export async function removeEstimate(id: string): Promise<boolean> {
-  try { await api.deleteEstimate(id); return true; } catch { return false; }
+  try { await api.deleteEstimate(id); return true; } catch (error) { warnFtWSvcFailure(`removeEstimate(${id})`, error); return false; }
 }
 
 function toSubJob(sj: RealtimeSubJob): SubJob {

@@ -1,7 +1,6 @@
 /**
- * Auth store — tries Spring Boot backend first (via realtime.ts),
- * falls back to Next.js API routes. Syncs JWT to httpOnly cookie
- * for middleware route protection.
+ * Auth store — uses ftw-svc for all auth operations and mirrors the JWT into
+ * a browser cookie so Next middleware can enforce protected routes.
  */
 import { api, setAuthToken } from "./realtime";
 
@@ -27,6 +26,8 @@ function normalizeRole(role: string): UserRoleClient {
 
 const STORAGE_KEY = "ftw-auth";
 const SESSION_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutes
+const AUTH_COOKIE_KEY = "ftw-token";
+const AUTH_COOKIE_MAX_AGE = 60 * 60 * 24; // 24 hours, aligned with the current JWT lifetime
 
 function load(): AuthState {
   if (typeof window === "undefined") return { token: null, user: null };
@@ -48,30 +49,15 @@ function save(state: AuthState) {
   }
 }
 
-/** Sync JWT to httpOnly cookie so Next.js middleware can read it */
-async function syncTokenCookie(token: string) {
-  try {
-    await fetch("/api/auth/sync-token", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token }),
-    });
-  } catch {
-    // Non-critical — middleware cookie sync failed, but auth still works via localStorage
-  }
-}
+function syncTokenCookie(token: string | null) {
+  if (typeof document === "undefined") return;
 
-/** Clear the httpOnly cookie on logout */
-async function clearTokenCookie() {
-  try {
-    await fetch("/api/auth/sync-token", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: "" }),
-    });
-  } catch {
-    // Non-critical
-  }
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  const cookieValue = token ? encodeURIComponent(token) : "";
+  const maxAge = token ? AUTH_COOKIE_MAX_AGE : 0;
+
+  document.cookie =
+    `${AUTH_COOKIE_KEY}=${cookieValue}; Path=/; SameSite=Lax; Max-Age=${maxAge}${secure}`;
 }
 
 /** Decode JWT payload (no verification — just reads claims) */
@@ -91,15 +77,17 @@ function isTokenExpired(token: string): boolean {
   return payload.exp * 1000 < Date.now() + 60_000;
 }
 
-async function authFetch<T>(path: string, body: Record<string, unknown>): Promise<T> {
-  const res = await fetch(path, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || `Auth error: ${res.status}`);
-  return data;
+function toAuthUser(rawUser: Record<string, unknown>, fallbackRoles?: UserRoleClient[]): AuthUser {
+  const role = normalizeRole(String(rawUser.role));
+  const rawRoles = rawUser.roles as string[] | undefined;
+
+  return {
+    id: String(rawUser.id),
+    email: String(rawUser.email),
+    name: String(rawUser.name),
+    role,
+    roles: rawRoles ? rawRoles.map((r) => normalizeRole(r)) : fallbackRoles || [role],
+  };
 }
 
 let _state = load();
@@ -163,53 +151,17 @@ export const authStore = {
     _state = { token: null, user: null };
     save(_state);
     setAuthToken(null);
+    syncTokenCookie(null);
 
-    try {
-      // Try Spring Boot backend first
-      const result = await api.login(email, password);
-      const apiUser = result.user as Record<string, unknown>;
-      const role = normalizeRole(String(apiUser.role));
-      const apiRoles = apiUser.roles as string[] | undefined;
-      const roles = apiRoles
-        ? apiRoles.map((r) => normalizeRole(r))
-        : [role];
-      const user: AuthUser = {
-        id: String(apiUser.id),
-        email: String(apiUser.email),
-        name: String(apiUser.name),
-        role,
-        roles,
-      };
-      _state = { token: result.token, user };
-      save(_state);
-      setAuthToken(result.token);
-      await syncTokenCookie(result.token);
-      startSessionCheck();
-      notify();
-      return user;
-    } catch {
-      // Fall back to Next.js Prisma route (dev/offline)
-      const { token, user: rawUser } = await authFetch<{ token: string; user: Record<string, unknown> }>(
-        "/api/auth/login",
-        { email, password }
-      );
-      const rawRole = normalizeRole(String(rawUser.role));
-      const rawRoles = rawUser.roles as string[] | undefined;
-      const user: AuthUser = {
-        id: String(rawUser.id),
-        email: String(rawUser.email),
-        name: String(rawUser.name),
-        role: rawRole,
-        roles: rawRoles ? rawRoles.map((r) => normalizeRole(r)) : [rawRole],
-      };
-      _state = { token, user };
-      save(_state);
-      setAuthToken(token);
-      await syncTokenCookie(token);
-      startSessionCheck();
-      notify();
-      return user;
-    }
+    const result = await api.login(email, password);
+    const user = toAuthUser(result.user as Record<string, unknown>);
+    _state = { token: result.token, user };
+    save(_state);
+    setAuthToken(result.token);
+    syncTokenCookie(result.token);
+    startSessionCheck();
+    notify();
+    return user;
   },
 
   async register(attrs: {
@@ -219,118 +171,38 @@ export const authStore = {
     role: UserRoleClient;
     phone?: string;
   }): Promise<AuthUser> {
-    try {
-      // Try Spring Boot backend first
-      const result = await api.register({
-        email: attrs.email,
-        password: attrs.password,
-        name: attrs.name,
-        role: attrs.role as "homeowner" | "contractor" | "subcontractor",
-        location: undefined,
-      });
-      // Spring Boot register may not return a token — login after registration
-      const loginResult = await api.login(attrs.email, attrs.password);
-      const apiUser = loginResult.user as Record<string, unknown>;
-      const role = normalizeRole(String(apiUser.role));
-      const apiRoles = apiUser.roles as string[] | undefined;
-      const roles = apiRoles
-        ? apiRoles.map((r) => normalizeRole(r))
-        : [role];
-      const user: AuthUser = {
-        id: String(apiUser.id),
-        email: String(apiUser.email),
-        name: String(apiUser.name),
-        role,
-        roles,
-      };
-      _state = { token: loginResult.token, user };
-      save(_state);
-      setAuthToken(loginResult.token);
-      await syncTokenCookie(loginResult.token);
-      startSessionCheck();
-      notify();
-      return user;
-    } catch {
-      // Fall back to Next.js Prisma route
-      const { token, user: rawUser } = await authFetch<{ token: string; user: Record<string, unknown> }>(
-        "/api/auth/signup",
-        { ...attrs, role: attrs.role.toUpperCase() }
-      );
-      const rawRole = normalizeRole(String(rawUser.role));
-      const rawRoles = rawUser.roles as string[] | undefined;
-      const user: AuthUser = {
-        id: String(rawUser.id),
-        email: String(rawUser.email),
-        name: String(rawUser.name),
-        role: rawRole,
-        roles: rawRoles ? rawRoles.map((r) => normalizeRole(r)) : [rawRole],
-      };
-      _state = { token, user };
-      save(_state);
-      setAuthToken(token);
-      await syncTokenCookie(token);
-      startSessionCheck();
-      notify();
-      return user;
-    }
+    await api.register({
+      email: attrs.email,
+      password: attrs.password,
+      name: attrs.name,
+      role: attrs.role as "homeowner" | "contractor" | "subcontractor",
+      location: undefined,
+    });
+
+    const loginResult = await api.login(attrs.email, attrs.password);
+    const user = toAuthUser(loginResult.user as Record<string, unknown>);
+    _state = { token: loginResult.token, user };
+    save(_state);
+    setAuthToken(loginResult.token);
+    syncTokenCookie(loginResult.token);
+    startSessionCheck();
+    notify();
+    return user;
   },
 
   async switchRole(targetRole: UserRoleClient): Promise<AuthUser> {
     if (!_state.user || !_state.user.roles.includes(targetRole)) {
       throw new Error(`Cannot switch to role: ${targetRole}`);
     }
-    try {
-      // Try Spring Boot backend first
-      const result = await api.switchRole(targetRole);
-      const apiUser = result.user as Record<string, unknown>;
-      const role = normalizeRole(String(apiUser.role));
-      const apiRoles = apiUser.roles as string[] | undefined;
-      const roles = apiRoles
-        ? apiRoles.map((r) => normalizeRole(r))
-        : _state.user.roles;
-      const user: AuthUser = {
-        id: String(apiUser.id),
-        email: String(apiUser.email),
-        name: String(apiUser.name || _state.user.name),
-        role,
-        roles,
-      };
-      _state = { token: result.token, user };
-      save(_state);
-      setAuthToken(result.token);
-      await syncTokenCookie(result.token);
-      notify();
-      return user;
-    } catch {
-      try {
-        // Fall back to Next.js Prisma route
-        const { token, user: rawUser } = await authFetch<{ token: string; user: Record<string, unknown> }>(
-          "/api/auth/switch-role",
-          { role: targetRole.toUpperCase() }
-        );
-        const rawRoles = rawUser.roles as string[] | undefined;
-        const user: AuthUser = {
-          id: String(rawUser.id),
-          email: String(rawUser.email),
-          name: String(rawUser.name),
-          role: normalizeRole(String(rawUser.role)),
-          roles: rawRoles ? rawRoles.map((r) => normalizeRole(r)) : _state.user!.roles,
-        };
-        _state = { token, user };
-        save(_state);
-        setAuthToken(token);
-        await syncTokenCookie(token);
-        notify();
-        return user;
-      } catch {
-        // Optimistic local switch if both APIs unavailable
-        const user: AuthUser = { ..._state.user!, role: targetRole };
-        _state = { ..._state, user };
-        save(_state);
-        notify();
-        return user;
-      }
-    }
+
+    const result = await api.switchRole(targetRole);
+    const user = toAuthUser(result.user as Record<string, unknown>, _state.user.roles);
+    _state = { token: result.token, user };
+    save(_state);
+    setAuthToken(result.token);
+    syncTokenCookie(result.token);
+    notify();
+    return user;
   },
 
   logout() {
@@ -338,7 +210,7 @@ export const authStore = {
     save(_state);
     setAuthToken(null);
     stopSessionCheck();
-    clearTokenCookie();
+    syncTokenCookie(null);
     notify();
   },
 
@@ -354,21 +226,9 @@ export const authStore = {
     }
     api.me()
       .then((result) => {
-        const apiUser = result.user as Record<string, unknown>;
-        const role = normalizeRole(String(apiUser.role));
-        const apiRoles = apiUser.roles as string[] | undefined;
-        const roles = apiRoles
-          ? apiRoles.map((r) => normalizeRole(r))
-          : _state.user?.roles || [role];
         _state = {
           ..._state,
-          user: {
-            id: String(apiUser.id),
-            email: String(apiUser.email),
-            name: String(apiUser.name),
-            role,
-            roles,
-          },
+          user: toAuthUser(result.user as Record<string, unknown>, _state.user?.roles),
         };
         save(_state);
         notify();

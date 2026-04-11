@@ -34,6 +34,11 @@ import { JOB_CATEGORIES } from "@shared/lib/constants";
 import { getInitials, cn } from "@shared/lib/utils";
 import { fetchSettings, saveSettings } from "@shared/lib/data";
 import { api } from "@shared/lib/realtime";
+import {
+  disconnectQuickBooks as disconnectQuickBooksGap,
+  getQuickBooksSupportState,
+  startQuickBooksConnect as startQuickBooksConnectGap,
+} from "@shared/lib/ftw-svc-gaps";
 import { toast } from "sonner";
 import { usePageTitle } from "@shared/hooks/use-page-title";
 
@@ -686,12 +691,13 @@ function InsuranceSection() {
 }
 
 function IntegrationsSection() {
+  const qbSupport = getQuickBooksSupportState();
   const [qbStatus, setQbStatus] = useState<{
     connected: boolean;
     companyName?: string;
     connectedAt?: string;
   }>({ connected: false });
-  const [qbLoading, setQbLoading] = useState(true);
+  const [qbLoading, setQbLoading] = useState(false);
   const [qbConnecting, setQbConnecting] = useState(false);
   const [qbDisconnecting, setQbDisconnecting] = useState(false);
 
@@ -707,24 +713,14 @@ function IntegrationsSection() {
     }
   }, []);
 
-  // Fetch QuickBooks connection status
-  useEffect(() => {
-    fetch("/api/integrations/quickbooks/status")
-      .then((res) => res.json())
-      .then((data) => setQbStatus(data))
-      .catch(() => setQbStatus({ connected: false }))
-      .finally(() => setQbLoading(false));
-  }, []);
-
   async function connectQuickBooks() {
     setQbConnecting(true);
     try {
-      const res = await fetch("/api/integrations/quickbooks/connect");
-      const data = await res.json();
-      if (data.authUrl) {
-        window.location.href = data.authUrl;
-      }
-    } catch {
+      await startQuickBooksConnectGap();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : qbSupport.description;
+      toast.error(message);
+    } finally {
       setQbConnecting(false);
     }
   }
@@ -732,10 +728,11 @@ function IntegrationsSection() {
   async function disconnectQuickBooks() {
     setQbDisconnecting(true);
     try {
-      await fetch("/api/integrations/quickbooks/disconnect", { method: "POST" });
+      await disconnectQuickBooksGap();
       setQbStatus({ connected: false });
-    } catch {
-      // Silently fail — user can retry
+    } catch (error) {
+      const message = error instanceof Error ? error.message : qbSupport.description;
+      toast.error(message);
     } finally {
       setQbDisconnecting(false);
     }
@@ -755,7 +752,7 @@ function IntegrationsSection() {
       </div>
 
       <div className="space-y-3">
-        {/* QuickBooks — real integration */}
+        {/* QuickBooks — pending ftw-svc support */}
         <div className="flex items-center justify-between p-4 bg-white border border-border rounded-sm">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-sm bg-emerald-950/10 flex items-center justify-center text-xs font-bold text-emerald-950">QB</div>
@@ -766,7 +763,7 @@ function IntegrationsSection() {
                   ? "Checking connection..."
                   : qbStatus.connected
                     ? `Connected to ${qbStatus.companyName || "QuickBooks"}`
-                    : "Sync estimates and invoices"}
+                    : qbSupport.description}
               </p>
             </div>
           </div>
@@ -786,9 +783,13 @@ function IntegrationsSection() {
             </div>
           ) : (
             <Button size="sm" onClick={connectQuickBooks} disabled={qbConnecting}>
-              {qbConnecting ? "Connecting..." : "Connect"}
+              {qbConnecting ? "Opening..." : "View TODO"}
             </Button>
           )}
+        </div>
+        <div className="rounded-sm border border-amber-200 bg-amber-50 p-3">
+          <p className="text-xs font-medium text-amber-900">{qbSupport.title}</p>
+          <p className="mt-1 text-xs text-amber-800">{qbSupport.todo}</p>
         </div>
 
         {/* Future integrations — still mock */}

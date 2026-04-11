@@ -12,6 +12,7 @@ import { cn } from "@shared/lib/utils";
 import { authStore } from "@shared/lib/auth-store";
 import { track, identify } from "@shared/lib/analytics";
 import { BrandMark } from "@shared/components/brand-mark";
+import { startQuickBooksSignIn } from "@shared/lib/ftw-svc-gaps";
 
 export default function LoginPage() {
   return (
@@ -224,7 +225,14 @@ function LoginContent() {
 
               <button
                 type="button"
-                onClick={() => { window.location.href = "/api/auth/quickbooks"; }}
+                onClick={async () => {
+                  try {
+                    await startQuickBooksSignIn();
+                  } catch (error) {
+                    const message = error instanceof Error ? error.message : "QuickBooks sign-in is not available yet.";
+                    toast.error(message);
+                  }
+                }}
                 className="w-full flex items-center justify-center gap-2.5 h-11 rounded-md bg-[#2CA01C] hover:bg-[#249117] text-white text-sm font-semibold transition-colors"
               >
                 <QuickBooksIcon className="w-5 h-5" />
