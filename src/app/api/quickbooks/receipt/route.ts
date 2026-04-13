@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { randomBytes } from "crypto";
 import { getAuthUser } from "@shared/lib/auth";
 import { prisma } from "@shared/lib/db";
 import { getQBInvoice } from "@shared/lib/quickbooks";
@@ -151,7 +152,7 @@ export async function POST(req: NextRequest) {
     // Generate a receipt number: FTW-YYMMDD-XXXX
     const now = new Date();
     const datePart = now.toISOString().slice(2, 10).replace(/-/g, "");
-    const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const randomPart = randomBytes(3).toString("hex").toUpperCase();
     const receiptNumber = `FTW-${datePart}-${randomPart}`;
 
     const contractorName = bid.contractor?.company || bid.contractor?.user?.name || "Unknown Contractor";

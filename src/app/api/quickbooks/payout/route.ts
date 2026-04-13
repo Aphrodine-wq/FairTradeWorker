@@ -124,17 +124,40 @@ export async function POST(req: NextRequest) {
     const netAmount = safeCents(grossAmount - platformFee);
 
     // Create queued payout record before calling QB
-    const payout = await prisma.payout.create({
-      data: {
-        bidId: bid.id,
-        contractorId: bid.contractorId,
-        grossAmount,
-        platformFee,
-        netAmount,
-        feePercent: PLATFORM_FEE_PERCENT,
-        status: "processing",
-      },
-    });
+    let payout;
+    try {
+      payout = await prisma.payout.create({
+        data: {
+          bidId: bid.id,
+          contractorId: bid.contractorId,
+          grossAmount,
+          platformFee,
+          netAmount,
+          feePercent: PLATFORM_FEE_PERCENT,
+          status: "processing",
+        },
+      });
+    } catch (createErr: unknown) {
+      // Handle unique constraint violation (race condition / duplicate request)
+      if (
+        typeof createErr === "object" &&
+        createErr !== null &&
+        "code" in createErr &&
+        (createErr as { code: string }).code === "P2002"
+      ) {
+        const existingPayout = await prisma.payout.findUnique({
+          where: { bidId: bid.id },
+        });
+        if (existingPayout) {
+          return NextResponse.json({
+            error: "Payout already exists for this bid",
+            payoutId: existingPayout.id,
+            status: existingPayout.status,
+          }, { status: 409 });
+        }
+      }
+      throw createErr;
+    }
 
     try {
       // Step 1: Create a Bill in QB (represents what we owe the contractor)
@@ -244,7 +267,13 @@ export async function GET(req: NextRequest) {
     include: {
       bid: {
         include: {
-          job: { select: { title: true, homeownerId: true } },
+          job: {
+            select: {
+              title: true,
+              homeownerId: true,
+              homeowner: { select: { userId: true } },
+            },
+          },
           contractor: { select: { userId: true } },
         },
       },
@@ -259,7 +288,7 @@ export async function GET(req: NextRequest) {
   const isContractor =
     user.role === "CONTRACTOR" && payout.bid?.contractor?.userId === user.userId;
   const isHomeowner =
-    user.role === "HOMEOWNER";
+    user.role === "HOMEOWNER" && payout.bid?.job?.homeowner?.userId === user.userId;
 
   if (!isContractor && !isHomeowner) {
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });

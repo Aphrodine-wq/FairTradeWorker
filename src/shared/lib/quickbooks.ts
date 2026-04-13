@@ -213,7 +213,7 @@ export async function findOrCreateCustomer(
   customer: { name: string; email?: string; phone?: string; address?: string }
 ): Promise<QBCustomer> {
   // Search for existing customer by name
-  const query = `SELECT * FROM Customer WHERE DisplayName = '${customer.name.replace(/'/g, "\\'")}'`;
+  const query = `SELECT * FROM Customer WHERE DisplayName = '${customer.name.replace(/'/g, "''")}'`;
   const searchResult = await qbFetch(contractorId, `query?query=${encodeURIComponent(query)}`);
 
   if (searchResult.QueryResponse?.Customer?.length > 0) {
@@ -373,7 +373,7 @@ export async function findOrCreateVendor(
   contractorId: string,
   vendor: { name: string; email?: string; phone?: string }
 ): Promise<QBVendor> {
-  const query = `SELECT * FROM Vendor WHERE DisplayName = '${vendor.name.replace(/'/g, "\\'")}'`;
+  const query = `SELECT * FROM Vendor WHERE DisplayName = '${vendor.name.replace(/'/g, "''")}'`;
   const searchResult = await qbFetch(contractorId, `query?query=${encodeURIComponent(query)}`);
 
   if (searchResult.QueryResponse?.Vendor?.length > 0) {
@@ -501,11 +501,15 @@ export function verifyWebhookSignature(payload: string, signature: string): bool
   const webhookVerifier = process.env.QB_WEBHOOK_VERIFIER_TOKEN;
   if (!webhookVerifier) return false;
 
-  const crypto = require("crypto");
-  const hash = crypto
-    .createHmac("sha256", webhookVerifier)
+  const { createHmac, timingSafeEqual } = require("crypto");
+  const hash = createHmac("sha256", webhookVerifier)
     .update(payload)
     .digest("base64");
 
-  return hash === signature;
+  const hashBuf = Buffer.from(hash, "utf8");
+  const sigBuf = Buffer.from(signature, "utf8");
+
+  if (hashBuf.length !== sigBuf.length) return false;
+
+  return timingSafeEqual(hashBuf, sigBuf);
 }

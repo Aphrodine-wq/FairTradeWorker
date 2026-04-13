@@ -37,9 +37,20 @@ export async function POST(req: NextRequest) {
     // Fetch the accepted bid to get amount
     const bid = await prisma.bid.findUnique({
       where: { id: bidId, contractorId: contractor.id },
+      include: { invoice: true },
     });
     if (!bid) {
       return NextResponse.json({ error: "Bid not found" }, { status: 404 });
+    }
+
+    // Return existing invoice if one already exists for this bid
+    if (bid.invoice) {
+      return NextResponse.json({
+        created: false,
+        qbInvoiceId: bid.invoice.qbInvoiceId,
+        invoiceId: bid.invoice.id,
+        message: "Invoice already exists for this bid",
+      });
     }
 
     const lineDescription = milestone
