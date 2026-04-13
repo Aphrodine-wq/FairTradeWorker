@@ -10,11 +10,6 @@ import {
   CheckCircle2,
   Circle,
   AlertTriangle,
-  Sun,
-  Cloud,
-  CloudRain,
-  Snowflake,
-  Wind,
   TrendingUp,
   TrendingDown,
   Plus,
@@ -61,10 +56,11 @@ import { fetchProjects } from "@shared/lib/data";
 import { toast } from "sonner";
 import { usePageTitle } from "@shared/hooks/use-page-title";
 import { PostSubJobDialog } from "./components/post-sub-job-dialog";
+import { CreateProjectDialog } from "./components/create-project-dialog";
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
-type MilestoneStatus = "paid" | "approved" | "submitted" | "in_progress" | "pending";
+type MilestoneStatus = "paid" | "complete" | "in_progress" | "pending" | "delayed";
 
 interface Milestone {
   label: string;
@@ -88,7 +84,7 @@ const PROJECTS = [
     milestones: [
       { label: "Demo complete", done: true, amount: 5000, status: "paid" as MilestoneStatus, completedDate: "2026-03-14", note: "Full gut demo finished — all debris hauled same day. Subfloor in good shape." },
       { label: "Rough-in (plumb/elec)", done: true, amount: 8500, status: "paid" as MilestoneStatus, completedDate: "2026-03-19", note: "Found old galvanized pipe behind wall — replaced with PEX. Added to CO-002." },
-      { label: "Cabinet install", done: true, amount: 7000, status: "approved" as MilestoneStatus, completedDate: "2026-03-24", note: "All 8 upper boxes set and leveled. Crown molding prepped for next phase." },
+      { label: "Cabinet install", done: true, amount: 7000, status: "complete" as MilestoneStatus, completedDate: "2026-03-24", note: "All 8 upper boxes set and leveled. Crown molding prepped for next phase." },
       { label: "Countertops", done: false, amount: 6500, status: "in_progress" as MilestoneStatus },
       { label: "Tile & flooring", done: false, amount: 7500, status: "pending" as MilestoneStatus },
       { label: "Final walkthrough", done: false, amount: 4000, status: "pending" as MilestoneStatus },
@@ -109,7 +105,7 @@ const PROJECTS = [
     progress: 35,
     milestones: [
       { label: "Demo complete", done: true, amount: 2500, status: "paid" as MilestoneStatus, completedDate: "2026-03-17", note: "Bathroom stripped to studs. No mold found behind tile." },
-      { label: "Plumbing rough-in", done: true, amount: 3500, status: "approved" as MilestoneStatus, completedDate: "2026-03-21", note: "Moved shower drain 6 inches per CO-003. All copper replaced with PEX." },
+      { label: "Plumbing rough-in", done: true, amount: 3500, status: "complete" as MilestoneStatus, completedDate: "2026-03-21", note: "Moved shower drain 6 inches per CO-003. All copper replaced with PEX." },
       { label: "Tile & waterproofing", done: false, amount: 4200, status: "in_progress" as MilestoneStatus },
       { label: "Vanity & fixtures", done: false, amount: 3000, status: "pending" as MilestoneStatus },
       { label: "Final walkthrough", done: false, amount: 2000, status: "pending" as MilestoneStatus },
@@ -130,7 +126,7 @@ const PROJECTS = [
     progress: 40,
     milestones: [
       { label: "Footings & posts", done: true, amount: 4500, status: "paid" as MilestoneStatus, completedDate: "2026-03-16", note: "8 footings poured — 12\" sonotubes, 24\" depth. Inspector signed off." },
-      { label: "Framing", done: true, amount: 6000, status: "submitted" as MilestoneStatus, completedDate: "2026-03-22", note: "All joists and ledger board secured. Lag bolts torqued to spec." },
+      { label: "Framing", done: true, amount: 6000, status: "complete" as MilestoneStatus, completedDate: "2026-03-22", note: "All joists and ledger board secured. Lag bolts torqued to spec." },
       { label: "Decking boards", done: false, amount: 5500, status: "in_progress" as MilestoneStatus },
       { label: "Railing & stairs", done: false, amount: 4000, status: "pending" as MilestoneStatus },
       { label: "Final walkthrough", done: false, amount: 2000, status: "pending" as MilestoneStatus },
@@ -152,7 +148,7 @@ const PROJECTS = [
     milestones: [
       { label: "Tear-off complete", done: true, amount: 3000, status: "paid" as MilestoneStatus, completedDate: "2026-03-16", note: "Full tear-off to decking. Found 4 sheets compromised OSB — see CO-004." },
       { label: "OSB & underlayment", done: true, amount: 3500, status: "paid" as MilestoneStatus, completedDate: "2026-03-17", note: "Replaced bad OSB, ice & water shield at eaves and valleys." },
-      { label: "Shingles", done: true, amount: 4000, status: "approved" as MilestoneStatus, completedDate: "2026-03-19", note: "GAF Timberline HDZ installed — all 30 squares. Ridge vent prepped." },
+      { label: "Shingles", done: true, amount: 4000, status: "complete" as MilestoneStatus, completedDate: "2026-03-19", note: "GAF Timberline HDZ installed — all 30 squares. Ridge vent prepped." },
       { label: "Flashings & ridge", done: false, amount: 2000, status: "in_progress" as MilestoneStatus },
       { label: "Final inspection", done: false, amount: 1000, status: "pending" as MilestoneStatus },
     ] satisfies Milestone[],
@@ -193,97 +189,6 @@ const ALL_COS: Record<string, ChangeOrder[]> = {
     { id: "CO-004", description: "Replace 4 sheets OSB", amount: 680, status: "Pending", date: "2026-03-15", labor: 280, materials: 400, reason: "Found compromised OSB during tear-off not visible during inspection." },
   ],
 };
-
-// ─── Daily Log data ───────────────────────────────────────────────────────────
-
-const WEATHER_OPTIONS = [
-  { label: "Clear", icon: Sun },
-  { label: "Cloudy", icon: Cloud },
-  { label: "Rain", icon: CloudRain },
-  { label: "Snow", icon: Snowflake },
-  { label: "Wind", icon: Wind },
-];
-
-const CREW_NAMES = ["Marcus", "Tony", "David", "Alex", "Maria"];
-
-const WEEK_DAYS = [
-  { short: "Mon", date: "2026-03-17", num: "17" },
-  { short: "Tue", date: "2026-03-18", num: "18" },
-  { short: "Wed", date: "2026-03-19", num: "19" },
-  { short: "Thu", date: "2026-03-20", num: "20" },
-  { short: "Fri", date: "2026-03-21", num: "21" },
-];
-
-interface LogEntry {
-  id: string;
-  date: string;
-  weather: string;
-  temp: string;
-  crew: string[];
-  hours: string;
-  workPerformed: string;
-  materialsDelivered: string;
-  issues: string;
-  safetyIncidents: string;
-  milestone: string;
-}
-
-const MOCK_LOGS: LogEntry[] = [
-  { id: "log-1", date: "2026-03-18", weather: "Clear", temp: "72", crew: ["Marcus", "Tony", "David"], hours: "9", workPerformed: "Completed upper cabinet installation on north wall. Set and leveled all 8 boxes. Started crown molding prep cuts.", materialsDelivered: "Crown molding — 3 bundles (16 LF each).", issues: "Soffit framing was 1/2\" out of square — had to shim two cabinet runs.", safetyIncidents: "", milestone: "Cabinet install" },
-  { id: "log-2", date: "2026-03-17", weather: "Cloudy", temp: "65", crew: ["Marcus", "Tony", "David", "Alex"], hours: "10", workPerformed: "Demo complete on lower cabinets. Subfloor inspection revealed no rot. Started upper cabinet run layout.", materialsDelivered: "Upper cabinet boxes staged in dining room.", issues: "Found old galvanized pipe — added to scope (CO-002).", safetyIncidents: "", milestone: "Rough-in (plumb/elec)" },
-];
-
-// ─── Schedule data ────────────────────────────────────────────────────────────
-
-const CREW = ["Marcus Johnson", "Tony Rivera", "David Park", "Alex Torres", "Maria Castillo"];
-const DAYS = ["Mon 3/17", "Tue 3/18", "Wed 3/19", "Thu 3/20", "Fri 3/21"];
-
-const PROJECT_COLORS: Record<string, string> = {
-  "Kitchen Remodel - Full Gut": "bg-blue-50 border-blue-200 text-blue-800",
-  "Bathroom Reno":              "bg-purple-50 border-purple-200 text-purple-800",
-  "Deck Build":                 "bg-teal-50 border-teal-200 text-teal-800",
-  "Roof Replacement":           "bg-orange-50 border-orange-200 text-orange-800",
-};
-
-interface Assignment { project: string; time: string; }
-
-const SCHEDULE: (Assignment | null)[][] = [
-  [
-    { project: "Kitchen Remodel - Full Gut", time: "7a–4p" },
-    { project: "Kitchen Remodel - Full Gut", time: "7a–4p" },
-    { project: "Kitchen Remodel - Full Gut", time: "7a–4p" },
-    { project: "Roof Replacement", time: "7a–3p" },
-    { project: "Roof Replacement", time: "7a–2p" },
-  ],
-  [
-    { project: "Bathroom Reno", time: "8a–4p" },
-    { project: "Bathroom Reno", time: "8a–4p" },
-    { project: "Kitchen Remodel - Full Gut", time: "7a–4p" },
-    { project: "Kitchen Remodel - Full Gut", time: "7a–4p" },
-    null,
-  ],
-  [
-    { project: "Roof Replacement", time: "7a–3p" },
-    { project: "Roof Replacement", time: "7a–3p" },
-    { project: "Roof Replacement", time: "7a–3p" },
-    { project: "Deck Build", time: "8a–5p" },
-    { project: "Deck Build", time: "8a–5p" },
-  ],
-  [
-    { project: "Deck Build", time: "8a–5p" },
-    { project: "Deck Build", time: "8a–5p" },
-    { project: "Deck Build", time: "8a–5p" },
-    null,
-    null,
-  ],
-  [
-    null,
-    null,
-    null,
-    null,
-    null,
-  ],
-];
 
 // ─── Punch List data ──────────────────────────────────────────────────────────
 
@@ -347,13 +252,6 @@ function StatusBadge({ status }: { status: COStatus }) {
   if (status === "Approved") return <Badge variant="success" className="gap-1"><CheckCircle2 className="w-3 h-3" />Approved</Badge>;
   if (status === "Pending") return <Badge variant="warning" className="gap-1"><Clock className="w-3 h-3" />Pending</Badge>;
   return <Badge variant="danger" className="gap-1"><AlertTriangle className="w-3 h-3" />Declined</Badge>;
-}
-
-function WeatherIcon({ weather }: { weather: string }) {
-  const opt = WEATHER_OPTIONS.find((w) => w.label === weather);
-  if (!opt) return null;
-  const Icon = opt.icon;
-  return <Icon className="w-3.5 h-3.5" />;
 }
 
 function VarianceCell({ estimated, actual }: { estimated: number; actual: number }) {
@@ -536,812 +434,11 @@ function OverviewTab({ project }: { project: typeof PROJECTS[0] }) {
   );
 }
 
-function DailyLogTab({ projectId }: { projectId: string }) {
-  const [selectedDate, setSelectedDate] = useState("2026-03-19");
-  const [weather, setWeather] = useState("Clear");
-  const [temp, setTemp] = useState("");
-  const [crew, setCrew] = useState<string[]>([]);
-  const [hours, setHours] = useState("");
-  const [workPerformed, setWorkPerformed] = useState("");
-  const [materialsDelivered, setMaterialsDelivered] = useState("");
-  const [issues, setIssues] = useState("");
-  const [safetyIncidents, setSafetyIncidents] = useState("");
-  const [saved, setSaved] = useState(false);
-  const [expanded, setExpanded] = useState<string | null>(null);
 
-  function toggleCrew(name: string) {
-    setCrew((prev) => prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]);
-  }
 
-  function handleSave() {
-    if (!workPerformed) return;
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
-  }
 
-  return (
-    <div className="space-y-5">
-      {/* Week pills */}
-      <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-gray-700 mr-1">Week of Mar 17:</span>
-        {WEEK_DAYS.map((d) => (
-          <button key={d.date} onClick={() => setSelectedDate(d.date)} className={cn("flex flex-col items-center px-3 py-2 rounded-sm border text-sm font-medium transition-colors", selectedDate === d.date ? "bg-brand-600 text-white border-brand-600" : "bg-white text-gray-900 border-border hover:bg-gray-50")}>
-            <span className="text-xs">{d.short}</span>
-            <span className="font-bold">{d.num}</span>
-          </button>
-        ))}
-      </div>
 
-      <div className="grid grid-cols-[1fr_300px] gap-5">
-        {/* Entry form */}
-        <div className="bg-white border border-border rounded-sm p-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-gray-900">Log Entry — {formatDate(selectedDate)}</h3>
-            {saved && <span className="flex items-center gap-1.5 text-xs text-brand-600 font-medium"><CheckCircle2 className="w-3.5 h-3.5" />Saved</span>}
-          </div>
-          <Separator />
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium text-gray-900">Hours Worked</label>
-              <Input type="number" placeholder="8" value={hours} onChange={(e) => setHours(e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium text-gray-900">Temperature (°F)</label>
-              <Input type="number" placeholder="72" value={temp} onChange={(e) => setTemp(e.target.value)} />
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-gray-900">Weather</label>
-            <div className="flex gap-1.5 flex-wrap">
-              {WEATHER_OPTIONS.map((w) => {
-                const Icon = w.icon;
-                return (
-                  <button key={w.label} onClick={() => setWeather(w.label)} className={cn("flex items-center gap-1.5 px-3 py-1.5 rounded-sm border text-xs font-medium transition-colors", weather === w.label ? "bg-brand-600 text-white border-brand-600" : "bg-white text-gray-800 border-border hover:bg-gray-50")}>
-                    <Icon className="w-3.5 h-3.5" />{w.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-gray-900">Crew on Site</label>
-            <div className="flex flex-wrap gap-2">
-              {CREW_NAMES.map((name) => (
-                <button key={name} onClick={() => toggleCrew(name)} className={cn("px-3 py-1.5 rounded-sm border text-sm font-medium transition-colors", crew.includes(name) ? "bg-brand-600 text-white border-brand-600" : "bg-white text-gray-800 border-border hover:bg-gray-50")}>
-                  {name}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-gray-900">Work Performed</label>
-            <Textarea placeholder="Describe all work completed today..." rows={3} value={workPerformed} onChange={(e) => setWorkPerformed(e.target.value)} />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium text-gray-900">Materials Delivered</label>
-              <Textarea placeholder="Materials received..." rows={2} value={materialsDelivered} onChange={(e) => setMaterialsDelivered(e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium text-gray-900">Issues / Delays</label>
-              <Textarea placeholder="Problems or delays..." rows={2} value={issues} onChange={(e) => setIssues(e.target.value)} />
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-gray-900 flex items-center gap-2">
-              Safety Incidents <span className="text-xs text-gray-600 font-normal">(optional)</span>
-            </label>
-            <Textarea className={cn(safetyIncidents && "border-red-300")} placeholder="Document any incidents, near-misses, or first aid..." rows={2} value={safetyIncidents} onChange={(e) => setSafetyIncidents(e.target.value)} />
-            {safetyIncidents && <p className="text-xs text-red-600 flex items-center gap-1"><AlertTriangle className="w-3 h-3" />Safety incidents are flagged in the log</p>}
-          </div>
-
-          <div className="border-2 border-dashed border-gray-200 rounded-sm p-4 text-center hover:border-brand-300 transition-colors cursor-pointer">
-            <Upload className="w-5 h-5 text-gray-300 mx-auto mb-1" />
-            <p className="text-xs text-gray-600">Drop photos or click to upload</p>
-          </div>
-
-          <Button className="w-full" disabled={!workPerformed} onClick={handleSave}>Save Log Entry</Button>
-        </div>
-
-        {/* Recent entries */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-gray-900">Recent Entries</h3>
-          {MOCK_LOGS.map((log) => (
-            <div key={log.id} className="bg-white border border-border rounded-sm overflow-hidden">
-              <button className="w-full text-left px-4 py-3.5 hover:bg-gray-50 transition-colors" onClick={() => setExpanded(expanded === log.id ? null : log.id)}>
-                {log.milestone && (
-                  <span className="inline-block text-[10px] font-semibold text-brand-700 bg-brand-50 border border-brand-200 rounded px-1.5 py-0.5 mb-1.5">{log.milestone}</span>
-                )}
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-semibold text-gray-900">{formatDate(log.date)}</span>
-                  <span className="flex items-center gap-1 text-xs text-gray-700">
-                    <WeatherIcon weather={log.weather} />{log.weather} / {log.temp}°F
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 text-xs text-gray-700">
-                  <span className="flex items-center gap-1"><Users className="w-3 h-3" />{log.crew.join(", ")}</span>
-                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{log.hours} hrs</span>
-                </div>
-                {expanded !== log.id && <p className="text-xs text-gray-800 mt-1.5 truncate">{log.workPerformed}</p>}
-              </button>
-              {expanded === log.id && (
-                <div className="px-4 pb-4 space-y-2.5 border-t border-border pt-3">
-                  <div><p className="text-xs font-semibold text-gray-700 uppercase mb-1">Work Performed</p><p className="text-xs text-gray-900 leading-relaxed">{log.workPerformed}</p></div>
-                  {log.materialsDelivered && <div><p className="text-xs font-semibold text-gray-700 uppercase mb-1">Materials</p><p className="text-xs text-gray-900">{log.materialsDelivered}</p></div>}
-                  {log.issues && <div><p className="text-xs font-semibold text-gray-700 uppercase mb-1">Issues</p><p className="text-xs text-gray-900">{log.issues}</p></div>}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-const DAILY_DETAILS: Record<string, { weather: string; high: number; deliveries: string[]; notes: string }> = {
-  "Mon 3/17": { weather: "Clear", high: 78, deliveries: ["Cabinet boxes — Kitchen Remodel"], notes: "Marcus covering both Kitchen + Roof crew lead" },
-  "Tue 3/18": { weather: "Clear", high: 82, deliveries: [], notes: "" },
-  "Wed 3/19": { weather: "Partly Cloudy", high: 75, deliveries: ["Quartz countertop slab — Kitchen Remodel", "Composite decking — Deck Build"], notes: "City inspector scheduled 1pm for Kitchen rough-in" },
-  "Thu 3/20": { weather: "Rain", high: 68, deliveries: ["Shingle pallets — Roof Replacement"], notes: "Rain expected — move roofing crew to interior prep if needed" },
-  "Fri 3/21": { weather: "Clear", high: 80, deliveries: [], notes: "Half day — Maria off" },
-};
-
-const WEATHER_ICONS: Record<string, string> = {
-  "Clear": "text-amber-500",
-  "Partly Cloudy": "text-gray-600",
-  "Rain": "text-blue-500",
-  "Overcast": "text-gray-700",
-};
-
-// ─── Calendar View ───────────────────────────────────────────────────────────
-
-interface CalEvent {
-  label: string;
-  type: "work" | "inspection" | "delivery" | "meeting" | "milestone";
-  time: string;
-  endTime?: string;
-  crew?: string[];
-  location?: string;
-  notes?: string;
-  project?: string;
-}
-
-const CALENDAR_EVENTS: Record<string, CalEvent[]> = {
-  "2026-03-10": [
-    { label: "Kitchen demo start", type: "work", time: "7:00a", endTime: "4:00p", crew: ["Marcus", "Tony", "David"], location: "4821 Ridgeline Dr, Austin", project: "Kitchen Remodel" },
-  ],
-  "2026-03-11": [
-    { label: "Kitchen demo day 2", type: "work", time: "7:00a", endTime: "4:00p", crew: ["Marcus", "Tony"], project: "Kitchen Remodel" },
-  ],
-  "2026-03-12": [
-    { label: "Plumbing rough-in", type: "work", time: "7:00a", endTime: "3:00p", crew: ["Marcus", "David"], project: "Kitchen Remodel" },
-    { label: "Permit pickup — Deck", type: "meeting", time: "10:00a", notes: "City of Austin permits office", project: "Deck Build" },
-  ],
-  "2026-03-13": [
-    { label: "Deck footings pour", type: "work", time: "8:00a", endTime: "2:00p", crew: ["Tony", "Alex"], location: "1290 Pecan Creek Dr, Austin", project: "Deck Build" },
-    { label: "Electrical rough-in", type: "work", time: "7:00a", endTime: "4:00p", crew: ["Marcus", "David"], project: "Kitchen Remodel" },
-  ],
-  "2026-03-14": [
-    { label: "Bathroom demo", type: "work", time: "7:00a", endTime: "3:00p", crew: ["Marcus", "Tony"], location: "7744 Stone Oak Pkwy, SA", project: "Bathroom Renovation" },
-    { label: "Deck framing", type: "work", time: "7:00a", endTime: "4:00p", crew: ["Alex", "David"], project: "Deck Build" },
-  ],
-  "2026-03-15": [
-    { label: "Roof tear-off", type: "work", time: "6:30a", endTime: "5:00p", crew: ["David", "Alex", "Tony"], location: "15230 Cypress Creek, Houston", project: "Roof Replacement" },
-    { label: "Demo complete", type: "milestone", time: "—", notes: "Kitchen Remodel — demo phase signed off", project: "Kitchen Remodel" },
-  ],
-  "2026-03-17": [
-    { label: "Cabinet delivery", type: "delivery", time: "10:00a", endTime: "11:00a", notes: "ABC Supply — 42 boxes, check for damage before signing", project: "Kitchen Remodel" },
-    { label: "Electrical inspection", type: "inspection", time: "2:00p", endTime: "3:00p", location: "4821 Ridgeline Dr, Austin", notes: "City inspector — have permits and rough-in photos ready", project: "Kitchen Remodel" },
-    { label: "Shingle delivery", type: "delivery", time: "8:00a", notes: "30 squares GAF Timberline HDZ", project: "Roof Replacement" },
-  ],
-  "2026-03-18": [
-    { label: "Cabinet install", type: "work", time: "7:00a", endTime: "5:00p", crew: ["Marcus", "Tony"], project: "Kitchen Remodel" },
-    { label: "Bathroom plumbing rough-in", type: "work", time: "7:00a", endTime: "3:00p", crew: ["David"], project: "Bathroom Renovation" },
-    { label: "Roof shingles day 1", type: "work", time: "6:30a", endTime: "5:00p", crew: ["Alex"], project: "Roof Replacement" },
-  ],
-  "2026-03-19": [
-    { label: "Tile delivery", type: "delivery", time: "9:00a", endTime: "10:00a", notes: "Subway white matte — 30 boxes + shower niche pieces", project: "Bathroom Renovation" },
-    { label: "Cabinet install day 2", type: "work", time: "7:00a", endTime: "4:00p", crew: ["Marcus", "Tony"], project: "Kitchen Remodel" },
-    { label: "Deck board delivery", type: "delivery", time: "11:00a", notes: "Composite — verify color match", project: "Deck Build" },
-  ],
-  "2026-03-20": [
-    { label: "Framing inspection", type: "inspection", time: "1:00p", endTime: "2:00p", location: "4821 Ridgeline Dr, Austin", notes: "Bring permit docs, insurance cert, and ladder", project: "Kitchen Remodel" },
-    { label: "Client meeting — Brown", type: "meeting", time: "3:30p", endTime: "4:30p", location: "4821 Ridgeline Dr, Austin", notes: "Review cabinet install, discuss countertop template date", project: "Kitchen Remodel" },
-    { label: "HVAC estimate walkthrough", type: "meeting", time: "5:00p", endTime: "6:00p", location: "1845 Sam Bass Rd, Round Rock", notes: "Kevin Nguyen — measure ductwork, check attic access" },
-  ],
-  "2026-03-21": [
-    { label: "Deck boards install", type: "work", time: "7:00a", endTime: "5:00p", crew: ["Tony", "Alex"], project: "Deck Build" },
-    { label: "Bathroom tile start", type: "work", time: "7:00a", endTime: "4:00p", crew: ["Marcus"], project: "Bathroom Renovation" },
-  ],
-  "2026-03-22": [
-    { label: "Roof replacement complete", type: "milestone", time: "—", notes: "All shingles, flashing, and ridge done. Ready for final inspection.", project: "Roof Replacement" },
-  ],
-  "2026-03-24": [
-    { label: "Countertop template", type: "work", time: "9:00a", endTime: "11:00a", notes: "Fabricator on-site to template quartz", project: "Kitchen Remodel" },
-    { label: "Deck railing materials", type: "delivery", time: "8:00a", notes: "60 LF aluminum railing system", project: "Deck Build" },
-  ],
-  "2026-03-25": [
-    { label: "Tile install — shower", type: "work", time: "7:00a", endTime: "5:00p", crew: ["Marcus", "Tony"], project: "Bathroom Renovation" },
-    { label: "Deck railing install", type: "work", time: "7:00a", endTime: "4:00p", crew: ["Alex", "David"], project: "Deck Build" },
-  ],
-  "2026-03-26": [
-    { label: "Tile grout + cleanup", type: "work", time: "7:00a", endTime: "2:00p", crew: ["Marcus"], project: "Bathroom Renovation" },
-    { label: "Plumbing inspection", type: "inspection", time: "10:00a", location: "7744 Stone Oak Pkwy, SA", project: "Bathroom Renovation" },
-  ],
-  "2026-03-27": [
-    { label: "Final roof inspection", type: "inspection", time: "10:00a", endTime: "11:00a", location: "15230 Cypress Creek, Houston", notes: "City inspector — have all permits and warranty docs", project: "Roof Replacement" },
-    { label: "Vanity + fixtures install", type: "work", time: "7:00a", endTime: "3:00p", crew: ["Marcus", "David"], project: "Bathroom Renovation" },
-  ],
-  "2026-03-28": [
-    { label: "Deck stairs + finish", type: "work", time: "7:00a", endTime: "4:00p", crew: ["Tony", "Alex"], project: "Deck Build" },
-    { label: "Kitchen flooring start", type: "work", time: "7:00a", endTime: "5:00p", crew: ["Marcus", "David"], project: "Kitchen Remodel" },
-  ],
-  "2026-03-31": [
-    { label: "Countertop install", type: "delivery", time: "8:00a", endTime: "12:00p", notes: "Fabricator installing quartz — keep kitchen clear", project: "Kitchen Remodel" },
-    { label: "Deck walkthrough", type: "meeting", time: "2:00p", endTime: "3:00p", location: "1290 Pecan Creek Dr, Austin", notes: "Final walkthrough with Robert Johnson", project: "Deck Build" },
-  ],
-};
-
-const EVENT_COLORS: Record<string, string> = {
-  work: "bg-brand-600",
-  inspection: "bg-amber-500",
-  delivery: "bg-blue-500",
-  meeting: "bg-violet-500",
-  milestone: "bg-gray-900",
-};
-
-const EVENT_TEXT_COLORS: Record<string, string> = {
-  work: "text-brand-600",
-  inspection: "text-amber-600",
-  delivery: "text-blue-600",
-  meeting: "text-violet-600",
-  milestone: "text-gray-900",
-};
-
-function CalendarView({ project }: { project: typeof PROJECTS[0] }) {
-  const [month, setMonth] = useState(2);
-  const [year, setYear] = useState(2026);
-  const [selectedDate, setSelectedDate] = useState<string | null>("2026-03-20");
-  const [view, setView] = useState<"month" | "week">("month");
-
-  const monthName = new Date(year, month).toLocaleString("en-US", { month: "long", year: "numeric" });
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const today = "2026-03-20";
-
-  const prevMonth = () => { if (month === 0) { setMonth(11); setYear(year - 1); } else setMonth(month - 1); };
-  const nextMonth = () => { if (month === 11) { setMonth(0); setYear(year + 1); } else setMonth(month + 1); };
-
-  const days: (number | null)[] = [];
-  for (let i = 0; i < firstDay; i++) days.push(null);
-  for (let d = 1; d <= daysInMonth; d++) days.push(d);
-
-  const selectedEvents = selectedDate ? CALENDAR_EVENTS[selectedDate] || [] : [];
-
-  // Week view — get 7 days around selected date
-  const getWeekDays = () => {
-    const d = selectedDate ? new Date(selectedDate + "T12:00:00") : new Date("2026-03-20T12:00:00");
-    const dayOfWeek = d.getDay();
-    const start = new Date(d);
-    start.setDate(d.getDate() - dayOfWeek);
-    return Array.from({ length: 7 }, (_, i) => {
-      const date = new Date(start);
-      date.setDate(start.getDate() + i);
-      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-    });
-  };
-
-  // Stats
-  const allMonthEvents = Object.entries(CALENDAR_EVENTS)
-    .filter(([d]) => d.startsWith(`${year}-${String(month + 1).padStart(2, "0")}`))
-    .flatMap(([, evts]) => evts);
-  const workDays = new Set(Object.entries(CALENDAR_EVENTS)
-    .filter(([d]) => d.startsWith(`${year}-${String(month + 1).padStart(2, "0")}`))
-    .filter(([, evts]) => evts.some((e) => e.type === "work"))
-    .map(([d]) => d)).size;
-  const inspectionCount = allMonthEvents.filter((e) => e.type === "inspection").length;
-  const deliveryCount = allMonthEvents.filter((e) => e.type === "delivery").length;
-
-  return (
-    <div>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center gap-4">
-          <h2 className="text-[22px] font-bold text-gray-900">{monthName}</h2>
-          <div className="flex gap-1">
-            <button onClick={prevMonth} className="w-8 h-8 rounded-sm hover:bg-gray-100 flex items-center justify-center transition-colors">
-              <ChevronLeft className="w-4 h-4 text-gray-700" />
-            </button>
-            <button onClick={nextMonth} className="w-8 h-8 rounded-sm hover:bg-gray-100 flex items-center justify-center transition-colors">
-              <ChevronRight className="w-4 h-4 text-gray-700" />
-            </button>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          {/* Month stats */}
-          <div className="flex items-center gap-4 mr-4 text-[13px]">
-            <span className="text-gray-600">{workDays} work days</span>
-            <span className="text-gray-600">{inspectionCount} inspections</span>
-            <span className="text-gray-600">{deliveryCount} deliveries</span>
-          </div>
-          {/* View toggle */}
-          <div className="flex rounded-sm ring-1 ring-gray-200 overflow-hidden">
-            <button onClick={() => setView("month")} className={cn("px-3 py-1.5 text-[13px] font-medium transition-colors", view === "month" ? "bg-gray-900 text-white" : "bg-white text-gray-700 hover:bg-gray-50")}>Month</button>
-            <button onClick={() => setView("week")} className={cn("px-3 py-1.5 text-[13px] font-medium transition-colors", view === "week" ? "bg-gray-900 text-white" : "bg-white text-gray-700 hover:bg-gray-50")}>Week</button>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex gap-5">
-        {/* Calendar */}
-        <div className="flex-1">
-          {view === "month" ? (
-            <>
-              <div className="grid grid-cols-7 gap-px bg-gray-200 rounded-sm overflow-hidden">
-                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-                  <div key={d} className="bg-gray-50 px-2 py-2 text-center text-[11px] font-bold text-gray-600">{d}</div>
-                ))}
-                {days.map((day, i) => {
-                  if (day === null) return <div key={`empty-${i}`} className="bg-white min-h-[90px]" />;
-                  const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-                  const events = CALENDAR_EVENTS[dateStr] || [];
-                  const isToday = dateStr === today;
-                  const isSelected = dateStr === selectedDate;
-                  const isProjectRange = dateStr >= project.startDate && dateStr <= project.estimatedEnd;
-                  const isWeekend = (firstDay + day - 1) % 7 === 0 || (firstDay + day - 1) % 7 === 6;
-
-                  return (
-                    <button
-                      key={dateStr}
-                      onClick={() => setSelectedDate(dateStr)}
-                      className={cn(
-                        "bg-white min-h-[90px] px-1.5 pt-1.5 pb-1 text-left hover:bg-gray-50 transition-colors relative",
-                        isSelected && "ring-2 ring-gray-900 ring-inset z-10",
-                        isProjectRange && !isSelected && "bg-brand-50/20",
-                        isWeekend && !isSelected && !isProjectRange && "bg-gray-50/50"
-                      )}
-                    >
-                      <span className={cn(
-                        "text-[13px] tabular-nums inline-flex items-center justify-center w-6 h-6 rounded-sm",
-                        isToday ? "bg-gray-900 text-white font-bold" : isWeekend ? "text-gray-600 font-medium" : "text-gray-900 font-medium"
-                      )}>
-                        {day}
-                      </span>
-                      <div className="mt-0.5 space-y-0.5">
-                        {events.slice(0, 3).map((ev, j) => (
-                          <div key={j} className={cn("text-[8px] font-medium truncate rounded px-1 py-0.5", `${EVENT_COLORS[ev.type]}/10`, EVENT_TEXT_COLORS[ev.type])}>
-                            {ev.label}
-                          </div>
-                        ))}
-                        {events.length > 3 && (
-                          <span className="text-[8px] text-gray-600 px-1">+{events.length - 3} more</span>
-                        )}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Legend */}
-              <div className="flex items-center gap-5 mt-3">
-                {Object.entries(EVENT_COLORS).map(([type, color]) => (
-                  <div key={type} className="flex items-center gap-1.5">
-                    <span className={cn("w-2 h-2 rounded-sm", color)} />
-                    <span className="text-[11px] text-gray-600 capitalize">{type}</span>
-                  </div>
-                ))}
-                <div className="flex items-center gap-1.5 ml-auto">
-                  <span className="w-4 h-2 rounded bg-brand-50/40" />
-                  <span className="text-[11px] text-gray-600">Project range</span>
-                </div>
-              </div>
-            </>
-          ) : (
-            /* Week view */
-            <div className="space-y-0">
-              {getWeekDays().map((dateStr) => {
-                const d = new Date(dateStr + "T12:00:00");
-                const dayName = d.toLocaleDateString("en-US", { weekday: "short" });
-                const dayNum = d.getDate();
-                const events = CALENDAR_EVENTS[dateStr] || [];
-                const isToday = dateStr === today;
-                const isSelected = dateStr === selectedDate;
-
-                return (
-                  <button
-                    key={dateStr}
-                    onClick={() => setSelectedDate(dateStr)}
-                    className={cn(
-                      "w-full flex gap-4 px-4 py-3 text-left border-b border-gray-100 last:border-0 transition-colors",
-                      isSelected ? "bg-gray-50" : "hover:bg-gray-50/50"
-                    )}
-                  >
-                    <div className="w-12 flex-shrink-0 text-center pt-0.5">
-                      <p className="text-[11px] text-gray-600 font-medium">{dayName}</p>
-                      <p className={cn(
-                        "text-[20px] font-bold tabular-nums leading-tight",
-                        isToday ? "text-brand-600" : "text-gray-900"
-                      )}>{dayNum}</p>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      {events.length > 0 ? (
-                        <div className="space-y-1.5">
-                          {events.map((ev, j) => (
-                            <div key={j} className="flex items-center gap-2">
-                              <span className={cn("w-2 h-2 rounded-sm flex-shrink-0", EVENT_COLORS[ev.type])} />
-                              <span className="text-[13px] font-medium text-gray-900 truncate">{ev.label}</span>
-                              <span className="text-[12px] text-gray-600 flex-shrink-0">{ev.time}{ev.endTime ? `–${ev.endTime}` : ""}</span>
-                              {ev.crew && <span className="text-[11px] text-gray-600 flex-shrink-0">{ev.crew.join(", ")}</span>}
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-[13px] text-gray-300 pt-1">No events</p>
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Day detail panel */}
-        <div className="w-[300px] flex-shrink-0">
-          <div className="sticky top-0">
-            <h3 className="text-[18px] font-bold text-gray-900 mb-1">
-              {selectedDate ? new Date(selectedDate + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" }) : "Select a day"}
-            </h3>
-            {selectedDate && (
-              <p className="text-[13px] text-gray-600 mb-4">{selectedEvents.length} event{selectedEvents.length !== 1 ? "s" : ""} scheduled</p>
-            )}
-
-            {selectedEvents.length > 0 ? (
-              <div className="space-y-4">
-                {selectedEvents.map((ev, i) => (
-                  <div key={i} className="bg-white rounded-sm p-4 ring-1 ring-gray-200/80">
-                    <div className="flex items-start gap-3 mb-2">
-                      <span className={cn("w-3 h-3 rounded-sm flex-shrink-0 mt-1", EVENT_COLORS[ev.type])} />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[15px] font-bold text-gray-900">{ev.label}</p>
-                        <p className="text-[12px] text-gray-600 capitalize">{ev.type}{ev.project ? ` — ${ev.project}` : ""}</p>
-                      </div>
-                    </div>
-                    <div className="ml-6 space-y-1.5">
-                      {ev.time !== "—" && (
-                        <div className="flex items-center gap-2">
-                          <Clock className="w-3.5 h-3.5 text-gray-300" />
-                          <span className="text-[13px] text-gray-800">{ev.time}{ev.endTime ? ` — ${ev.endTime}` : ""}</span>
-                        </div>
-                      )}
-                      {ev.location && (
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-3.5 h-3.5 text-gray-300" />
-                          <span className="text-[13px] text-gray-800">{ev.location}</span>
-                        </div>
-                      )}
-                      {ev.crew && (
-                        <div className="flex items-center gap-2">
-                          <Users className="w-3.5 h-3.5 text-gray-300" />
-                          <span className="text-[13px] text-gray-800">{ev.crew.join(", ")}</span>
-                        </div>
-                      )}
-                      {ev.notes && (
-                        <p className="text-[12px] text-gray-600 leading-relaxed mt-1">{ev.notes}</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="bg-white rounded-sm p-6 ring-1 ring-gray-200/80 text-center">
-                <p className="text-[14px] text-gray-600">No events scheduled</p>
-                <p className="text-[12px] text-gray-300 mt-1">Click a day to see details</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ScheduleTab() {
-  const [schedule, setSchedule] = useState<(Assignment | null)[][]>(
-    SCHEDULE.map((row) => [...row])
-  );
-  const [selectedDay, setSelectedDay] = useState<string | null>(null);
-  const [addingEntry, setAddingEntry] = useState(false);
-  const [editingCell, setEditingCell] = useState<{ row: number; col: number } | null>(null);
-  const [newProject, setNewProject] = useState("");
-  const [newCrew, setNewCrew] = useState("");
-  const [newTime, setNewTime] = useState("");
-  const [editProject, setEditProject] = useState("");
-  const [editTime, setEditTime] = useState("");
-
-  const clearCell = (ri: number, di: number) => {
-    setSchedule((prev) => prev.map((row, r) => r === ri ? row.map((cell, d) => d === di ? null : cell) : row));
-  };
-
-  const saveEdit = () => {
-    if (!editingCell || !editProject) return;
-    setSchedule((prev) =>
-      prev.map((row, r) =>
-        r === editingCell.row
-          ? row.map((cell, d) => d === editingCell.col ? { project: editProject, time: editTime || "7a–4p" } : cell)
-          : row
-      )
-    );
-    setEditingCell(null);
-    setEditProject("");
-    setEditTime("");
-  };
-
-  const startEdit = (ri: number, di: number, assignment: Assignment | null) => {
-    setEditingCell({ row: ri, col: di });
-    setEditProject(assignment?.project || "");
-    setEditTime(assignment?.time || "7a–4p");
-  };
-
-  // Crew hours summary
-  const crewHours = CREW.map((member, ri) => {
-    const assigned = schedule[ri].filter((a) => a !== null).length;
-    return { name: member, daysAssigned: assigned, hoursEst: assigned * 8 };
-  });
-
-  // Conflict detection — same crew member on 2 projects same day
-  const conflicts: { crew: string; day: string; projects: string[] }[] = [];
-  // (In real app this would check for actual overlaps — mock has 1 assignment per cell so no conflicts currently)
-
-  const detail = selectedDay ? DAILY_DETAILS[selectedDay] : null;
-
-  return (
-    <div className="space-y-5">
-      {/* Header row */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button className="w-8 h-8 flex items-center justify-center rounded-sm border border-border bg-white hover:bg-gray-50 transition-colors">
-            <ChevronLeft className="w-4 h-4 text-gray-800" />
-          </button>
-          <span className="text-sm font-semibold text-gray-900">This Week — Mon Mar 17 – Fri Mar 21, 2026</span>
-          <button className="w-8 h-8 flex items-center justify-center rounded-sm border border-border bg-white hover:bg-gray-50 transition-colors">
-            <ChevronRight className="w-4 h-4 text-gray-800" />
-          </button>
-        </div>
-        <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setAddingEntry(true)}>
-          <Plus className="w-3.5 h-3.5" />Add Entry
-        </Button>
-      </div>
-
-      {/* Add entry form */}
-      {addingEntry && (
-        <div className="bg-white border border-border rounded-sm p-4">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-semibold text-gray-900">New Schedule Entry</p>
-            <button onClick={() => setAddingEntry(false)} className="text-gray-600 hover:text-gray-800"><AlertCircle className="w-4 h-4" /></button>
-          </div>
-          <div className="grid grid-cols-4 gap-3">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-gray-800">Project</label>
-              <select value={newProject} onChange={(e) => setNewProject(e.target.value)} className="h-9 w-full rounded-sm border border-border bg-white px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600">
-                <option value="">Select...</option>
-                {Object.keys(PROJECT_COLORS).map((p) => <option key={p} value={p}>{p}</option>)}
-              </select>
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-gray-800">Crew Member</label>
-              <select value={newCrew} onChange={(e) => setNewCrew(e.target.value)} className="h-9 w-full rounded-sm border border-border bg-white px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600">
-                <option value="">Select...</option>
-                {CREW.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-gray-800">Day</label>
-              <select className="h-9 w-full rounded-sm border border-border bg-white px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600">
-                <option value="">Select...</option>
-                {DAYS.map((d) => <option key={d} value={d}>{d}</option>)}
-              </select>
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-gray-800">Time</label>
-              <div className="flex items-center gap-2">
-                <Input value={newTime} onChange={(e) => setNewTime(e.target.value)} placeholder="7a–4p" className="h-9 text-sm" />
-                <Button size="sm">Add</Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Project legend */}
-      <div className="flex flex-wrap gap-2">
-        {Object.entries(PROJECT_COLORS).map(([p, cls]) => (
-          <div key={p} className={cn("px-2.5 py-1 rounded-sm border text-xs font-medium", cls)}>{p}</div>
-        ))}
-      </div>
-
-      {/* Weekly grid */}
-      <div className="bg-white border border-border rounded-sm overflow-hidden">
-        <div className="grid grid-cols-[180px_repeat(5,1fr)] border-b border-border bg-gray-50">
-          <div className="px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wide">Crew Member</div>
-          {DAYS.map((d) => {
-            const dd = DAILY_DETAILS[d];
-            return (
-              <button
-                key={d}
-                onClick={() => setSelectedDay(selectedDay === d ? null : d)}
-                className={cn(
-                  "px-3 py-3 text-left border-l border-border transition-colors",
-                  selectedDay === d ? "bg-brand-50" : "hover:bg-gray-100"
-                )}
-              >
-                <p className="text-xs font-semibold text-gray-900">{d}</p>
-                {dd && (
-                  <div className="flex items-center gap-1.5 mt-1">
-                    <span className={cn("text-[10px] font-medium", WEATHER_ICONS[dd.weather] || "text-gray-600")}>{dd.weather}</span>
-                    <span className="text-[10px] text-gray-600">{dd.high}°F</span>
-                  </div>
-                )}
-              </button>
-            );
-          })}
-        </div>
-        {CREW.map((member, ri) => (
-          <div key={member} className={cn("grid grid-cols-[180px_repeat(5,1fr)] items-stretch", ri < CREW.length - 1 && "border-b border-border")}>
-            <div className="px-4 py-3 flex items-center gap-2 border-r border-border">
-              <div className="w-7 h-7 rounded-sm bg-gray-100 border border-gray-200 flex items-center justify-center flex-shrink-0">
-                <User className="w-3.5 h-3.5 text-gray-700" />
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-900 leading-tight">{member.split(" ")[0]}</p>
-                <p className="text-[11px] text-gray-600">{member.split(" ")[1]}</p>
-              </div>
-            </div>
-            {schedule[ri].map((assignment, di) => {
-              const colorClass = assignment ? (PROJECT_COLORS[assignment.project] ?? "bg-gray-50 border-gray-200 text-gray-900") : "";
-              const isSelected = selectedDay === DAYS[di];
-              const isEditing = editingCell?.row === ri && editingCell?.col === di;
-              return (
-                <div key={di} className={cn("px-2 py-2.5", di > 0 && "border-l border-border", isSelected && "bg-brand-50/50")}>
-                  {isEditing ? (
-                    <div className="h-14 flex flex-col gap-1 justify-center">
-                      <select value={editProject} onChange={(e) => setEditProject(e.target.value)} className="h-6 text-[11px] rounded border border-border bg-white px-1 focus:outline-none focus:ring-1 focus:ring-brand-600">
-                        <option value="">None</option>
-                        {Object.keys(PROJECT_COLORS).map((p) => <option key={p} value={p}>{p}</option>)}
-                      </select>
-                      <div className="flex gap-1">
-                        <input value={editTime} onChange={(e) => setEditTime(e.target.value)} className="h-5 flex-1 text-[10px] rounded border border-border px-1 focus:outline-none focus:ring-1 focus:ring-brand-600" />
-                        <button onClick={saveEdit} className="text-brand-600 hover:text-brand-700"><CheckCircle2 className="w-3.5 h-3.5" /></button>
-                        <button onClick={() => setEditingCell(null)} className="text-gray-600 hover:text-gray-800"><X className="w-3.5 h-3.5" /></button>
-                      </div>
-                    </div>
-                  ) : assignment ? (
-                    <div className={cn("group relative h-14 flex flex-col justify-center px-2.5 rounded-sm border text-xs cursor-pointer", colorClass)} onClick={() => startEdit(ri, di, assignment)}>
-                      <p className="font-semibold leading-tight truncate">{assignment.project}</p>
-                      <p className="text-[11px] opacity-70 mt-0.5">{assignment.time}</p>
-                      <button onClick={(e) => { e.stopPropagation(); clearCell(ri, di); }} className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity text-gray-600 hover:text-red-500" title="Remove">
-                        <X className="w-3 h-3" />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="h-14 flex items-center justify-center rounded-sm border border-dashed border-gray-200 cursor-pointer hover:border-brand-300 hover:bg-brand-50/30 transition-colors" onClick={() => startEdit(ri, di, null)}>
-                      <span className="text-xs text-gray-300">Available</span>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        ))}
-      </div>
-
-      {/* Day detail panel */}
-      {selectedDay && detail && (
-        <div className="bg-white border border-border rounded-sm p-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-gray-900">{selectedDay} — Day Details</h3>
-            <button onClick={() => setSelectedDay(null)} className="text-xs text-gray-600 hover:text-gray-800">Close</button>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <p className="text-[10px] text-gray-600 font-bold uppercase tracking-wide mb-1">Weather</p>
-              <p className={cn("text-sm font-semibold", WEATHER_ICONS[detail.weather] || "text-gray-900")}>{detail.weather}, {detail.high}°F</p>
-              {detail.weather === "Rain" && (
-                <p className="text-[11px] text-red-500 mt-1 font-medium">Outdoor work may be affected</p>
-              )}
-            </div>
-            <div>
-              <p className="text-[10px] text-gray-600 font-bold uppercase tracking-wide mb-1">Crew on Site</p>
-              <div className="flex flex-wrap gap-1">
-                {CREW.map((member, ri) => {
-                  const dayIdx = DAYS.indexOf(selectedDay);
-                  const assigned = dayIdx >= 0 && schedule[ri][dayIdx] !== null;
-                  if (!assigned) return null;
-                  return (
-                    <span key={member} className="text-xs font-medium text-gray-900 bg-gray-100 px-2 py-0.5 rounded-sm">
-                      {member.split(" ")[0]}
-                    </span>
-                  );
-                })}
-              </div>
-            </div>
-            <div>
-              <p className="text-[10px] text-gray-600 font-bold uppercase tracking-wide mb-1">Active Projects</p>
-              <div className="flex flex-wrap gap-1">
-                {(() => {
-                  const dayIdx = DAYS.indexOf(selectedDay);
-                  const projects = new Set<string>();
-                  schedule.forEach((row) => { if (dayIdx >= 0 && row[dayIdx]) projects.add(row[dayIdx]!.project); });
-                  return Array.from(projects).map((p) => {
-                    const cls = PROJECT_COLORS[p] || "bg-gray-50 border-gray-200 text-gray-900";
-                    return <span key={p} className={cn("text-xs font-medium px-2 py-0.5 rounded border", cls)}>{p}</span>;
-                  });
-                })()}
-              </div>
-            </div>
-          </div>
-
-          {/* Deliveries */}
-          {detail.deliveries.length > 0 && (
-            <div>
-              <p className="text-[10px] text-gray-600 font-bold uppercase tracking-wide mb-2">Material Deliveries</p>
-              <div className="space-y-1.5">
-                {detail.deliveries.map((d, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm text-gray-900">
-                    <div className="w-1.5 h-1.5 rounded-sm bg-brand-500 flex-shrink-0" />
-                    {d}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Notes */}
-          {detail.notes && (
-            <div>
-              <p className="text-[10px] text-gray-600 font-bold uppercase tracking-wide mb-1">Notes</p>
-              <p className="text-sm text-gray-800">{detail.notes}</p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Crew hours summary */}
-      <div className="bg-white border border-border rounded-sm overflow-hidden">
-        <div className="px-5 py-3 border-b border-border">
-          <p className="text-[11px] font-bold text-gray-600 uppercase tracking-wide">Crew Hours This Week</p>
-        </div>
-        <div className="divide-y divide-border">
-          {crewHours.map((ch) => (
-            <div key={ch.name} className="flex items-center justify-between px-5 py-3">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-sm bg-gray-100 flex items-center justify-center">
-                  <User className="w-3 h-3 text-gray-700" />
-                </div>
-                <span className="text-sm font-medium text-gray-900">{ch.name}</span>
-              </div>
-              <div className="flex items-center gap-4">
-                <span className="text-xs text-gray-600">{ch.daysAssigned} of 5 days</span>
-                <div className="w-20 h-1.5 bg-gray-100 rounded-sm overflow-hidden">
-                  <div className="h-full bg-brand-600 rounded-sm" style={{ width: `${(ch.daysAssigned / 5) * 100}%` }} />
-                </div>
-                <span className="text-sm font-bold text-gray-900 tabular-nums w-12 text-right">{ch.hoursEst}h</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
+/* CalendarView and ScheduleTab removed — schedule routes to MilestoneScheduleTab */
 
 function ChangeOrdersTab({ projectId }: { projectId: string }) {
   const cos = ALL_COS[projectId] ?? [];
@@ -1662,37 +759,87 @@ function PunchListTab({ projectId }: { projectId: string }) {
 }
 
 // Recent expenses per project (mock)
-const ALL_EXPENSES: Record<string, { date: string; description: string; amount: number }[]> = {
+const EXPENSE_CATEGORIES = ["Labor", "Materials", "Equipment", "Subcontractor", "Permits", "Overhead", "Other"] as const;
+type ExpenseCategory = (typeof EXPENSE_CATEGORIES)[number];
+
+const CATEGORY_BADGE_STYLE: Record<ExpenseCategory, string> = {
+  Labor: "bg-blue-50 text-blue-700 border-blue-200",
+  Materials: "bg-amber-50 text-amber-700 border-amber-200",
+  Equipment: "bg-purple-50 text-purple-700 border-purple-200",
+  Subcontractor: "bg-teal-50 text-teal-700 border-teal-200",
+  Permits: "bg-gray-50 text-gray-700 border-gray-200",
+  Overhead: "bg-red-50 text-red-700 border-red-200",
+  Other: "bg-gray-50 text-gray-600 border-gray-200",
+};
+
+interface Expense {
+  date: string;
+  description: string;
+  amount: number;
+  category: ExpenseCategory;
+  milestone?: string;
+  vendor?: string;
+}
+
+const ALL_EXPENSES: Record<string, Expense[]> = {
   j1: [
-    { date: "Mar 24", description: "Quartz countertop slab deposit", amount: 2800 },
-    { date: "Mar 22", description: "Tile — porcelain 12x24 (14 boxes)", amount: 1260 },
-    { date: "Mar 20", description: "Plumber — rough-in labor", amount: 1400 },
-    { date: "Mar 18", description: "Cabinet hardware — pulls + hinges", amount: 340 },
-    { date: "Mar 15", description: "Dumpster rental — 20yd", amount: 480 },
+    { date: "Mar 24", description: "Quartz countertop slab deposit", amount: 2800, category: "Materials", milestone: "Countertops", vendor: "ABC Stone" },
+    { date: "Mar 22", description: "Tile — porcelain 12x24 (14 boxes)", amount: 1260, category: "Materials", milestone: "Tile & flooring" },
+    { date: "Mar 20", description: "Plumber — rough-in labor", amount: 1400, category: "Subcontractor", milestone: "Rough-in (plumb/elec)" },
+    { date: "Mar 18", description: "Cabinet hardware — pulls + hinges", amount: 340, category: "Materials", milestone: "Cabinet install" },
+    { date: "Mar 15", description: "Dumpster rental — 20yd", amount: 480, category: "Equipment", milestone: "Demo complete" },
   ],
   j2: [
-    { date: "Mar 23", description: "Schluter membrane + accessories", amount: 620 },
-    { date: "Mar 21", description: "Vanity — 48in double sink", amount: 1350 },
-    { date: "Mar 19", description: "Tile — subway 3x6 white (22 boxes)", amount: 440 },
+    { date: "Mar 23", description: "Schluter membrane + accessories", amount: 620, category: "Materials", milestone: "Tile & waterproofing" },
+    { date: "Mar 21", description: "Vanity — 48in double sink", amount: 1350, category: "Materials", milestone: "Vanity & fixtures" },
+    { date: "Mar 19", description: "Tile — subway 3x6 white (22 boxes)", amount: 440, category: "Materials", milestone: "Tile & waterproofing" },
   ],
   j3: [
-    { date: "Mar 24", description: "Composite decking — Trex Enhance", amount: 3200 },
-    { date: "Mar 22", description: "Post brackets + concrete", amount: 480 },
-    { date: "Mar 20", description: "Permit fee — deck construction", amount: 250 },
+    { date: "Mar 24", description: "Composite decking — Trex Enhance", amount: 3200, category: "Materials", milestone: "Decking boards" },
+    { date: "Mar 22", description: "Post brackets + concrete", amount: 480, category: "Materials", milestone: "Footings & posts" },
+    { date: "Mar 20", description: "Permit fee — deck construction", amount: 250, category: "Permits" },
   ],
   j4: [
-    { date: "Mar 23", description: "Architectural shingles — 28 squares", amount: 4200 },
-    { date: "Mar 21", description: "Ice & water shield + underlayment", amount: 860 },
-    { date: "Mar 19", description: "Ridge vent + pipe boots", amount: 320 },
+    { date: "Mar 23", description: "Architectural shingles — 28 squares", amount: 4200, category: "Materials", milestone: "Shingles" },
+    { date: "Mar 21", description: "Ice & water shield + underlayment", amount: 860, category: "Materials", milestone: "OSB & underlayment" },
+    { date: "Mar 19", description: "Ridge vent + pipe boots", amount: 320, category: "Materials", milestone: "Flashings & ridge" },
   ],
 };
 
-function JobCostingTab({ projectId, project }: { projectId: string; project: typeof PROJECTS[0] }) {
+function CostsTab({ projectId, project }: { projectId: string; project: typeof PROJECTS[0] }) {
   const categories = ALL_COSTING[projectId] ?? [];
-  const expenses = ALL_EXPENSES[projectId] ?? [];
+  const [expenses, setExpenses] = useState<Expense[]>(ALL_EXPENSES[projectId] ?? []);
+  const [showAddExpense, setShowAddExpense] = useState(false);
+  const [expDesc, setExpDesc] = useState("");
+  const [expAmount, setExpAmount] = useState("");
+  const [expCategory, setExpCategory] = useState<ExpenseCategory>("Materials");
+  const [expMilestone, setExpMilestone] = useState("");
+  const [expVendor, setExpVendor] = useState("");
+
   const totalEstimated = categories.reduce((s, c) => s + c.estimated, 0);
   const totalActual = categories.reduce((s, c) => s + c.actual, 0);
   const remaining = totalEstimated - totalActual;
+  const milestones = project.milestones as Milestone[];
+
+  function handleAddExpense() {
+    if (!expDesc.trim() || !expAmount) return;
+    const newExp: Expense = {
+      date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      description: expDesc.trim(),
+      amount: parseFloat(expAmount) || 0,
+      category: expCategory,
+      milestone: expMilestone || undefined,
+      vendor: expVendor.trim() || undefined,
+    };
+    setExpenses((prev) => [newExp, ...prev]);
+    setExpDesc("");
+    setExpAmount("");
+    setExpCategory("Materials");
+    setExpMilestone("");
+    setExpVendor("");
+    setShowAddExpense(false);
+    toast.success("Expense added");
+  }
 
   return (
     <div className="space-y-6 max-w-[800px]">
@@ -1748,22 +895,84 @@ function JobCostingTab({ projectId, project }: { projectId: string; project: typ
       </div>
 
       {/* Recent expenses */}
-      {expenses.length > 0 && (
-        <div className="bg-white rounded-sm border border-border p-5">
-          <p className="text-[13px] font-bold text-gray-900 uppercase tracking-wider mb-4">Recent Expenses</p>
-          <div className="space-y-0">
-            {expenses.map((exp, i) => (
-              <div key={i} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
-                <div className="flex items-center gap-3 min-w-0 flex-1">
-                  <span className="text-[13px] text-gray-600 tabular-nums w-[52px] flex-shrink-0">{exp.date}</span>
-                  <span className="text-[14px] text-gray-900 truncate">{exp.description}</span>
-                </div>
-                <span className="text-[14px] font-semibold text-gray-900 tabular-nums flex-shrink-0 ml-4">{formatCurrency(exp.amount)}</span>
-              </div>
-            ))}
-          </div>
+      <div className="bg-white rounded-sm border border-border p-5">
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-[13px] font-bold text-gray-900 uppercase tracking-wider">Recent Expenses</p>
+          <Button size="sm" variant="outline" className="gap-1.5 h-8 text-[12px]" onClick={() => setShowAddExpense(true)}>
+            <Plus className="w-3.5 h-3.5" />
+            Add Expense
+          </Button>
         </div>
-      )}
+
+        {/* Add Expense Dialog */}
+        <Dialog open={showAddExpense} onOpenChange={setShowAddExpense}>
+          <DialogContent className="max-w-md">
+            <DialogHeader><DialogTitle>Add Expense</DialogTitle></DialogHeader>
+            <div className="space-y-4 mt-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-900">Description</label>
+                <Input value={expDesc} onChange={(e) => setExpDesc(e.target.value)} placeholder="e.g. Tile — porcelain 12x24" autoFocus />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-900">Amount ($)</label>
+                <Input type="number" value={expAmount} onChange={(e) => setExpAmount(e.target.value)} placeholder="0.00" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-900">Category</label>
+                <select
+                  value={expCategory}
+                  onChange={(e) => setExpCategory(e.target.value as ExpenseCategory)}
+                  className="w-full h-9 rounded-sm border border-border bg-white px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600"
+                >
+                  {EXPENSE_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-900">Milestone</label>
+                <select
+                  value={expMilestone}
+                  onChange={(e) => setExpMilestone(e.target.value)}
+                  className="w-full h-9 rounded-sm border border-border bg-white px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600"
+                >
+                  <option value="">None</option>
+                  {milestones.map((m) => <option key={m.label} value={m.label}>{m.label}</option>)}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-900">
+                  Vendor <span className="text-xs text-gray-600 font-normal">(optional)</span>
+                </label>
+                <Input value={expVendor} onChange={(e) => setExpVendor(e.target.value)} placeholder="e.g. ABC Supply" />
+              </div>
+              <Button className="w-full" disabled={!expDesc.trim() || !expAmount} onClick={handleAddExpense}>
+                Add Expense
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <div className="space-y-0">
+          {expenses.map((exp, i) => (
+            <div key={i} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <span className="text-[13px] text-gray-600 tabular-nums w-[52px] flex-shrink-0">{exp.date}</span>
+                <div className="min-w-0 flex-1">
+                  <span className="text-[14px] text-gray-900 truncate block">{exp.description}</span>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded border", CATEGORY_BADGE_STYLE[exp.category])}>{exp.category}</span>
+                    {exp.milestone && <span className="text-[11px] text-gray-600">{exp.milestone}</span>}
+                    {exp.vendor && <span className="text-[11px] text-gray-600">/ {exp.vendor}</span>}
+                  </div>
+                </div>
+              </div>
+              <span className="text-[14px] font-semibold text-gray-900 tabular-nums flex-shrink-0 ml-4">{formatCurrency(exp.amount)}</span>
+            </div>
+          ))}
+          {expenses.length === 0 && (
+            <p className="text-[13px] text-gray-600 text-center py-6">No expenses recorded yet.</p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -1772,10 +981,10 @@ function JobCostingTab({ projectId, project }: { projectId: string; project: typ
 
 const STATUS_CONFIG: Record<MilestoneStatus, { label: string; color: string; bg: string }> = {
   paid:        { label: "Paid",        color: "text-emerald-950",  bg: "bg-emerald-950/10 border-emerald-800/30" },
-  approved:    { label: "Approved",    color: "text-blue-700",   bg: "bg-blue-100 border-blue-300" },
-  submitted:   { label: "Submitted",   color: "text-amber-700",  bg: "bg-amber-50 border-amber-200" },
-  in_progress: { label: "In Progress", color: "text-brand-700",  bg: "bg-brand-50 border-brand-200" },
-  pending:     { label: "Pending",     color: "text-gray-700",   bg: "bg-gray-50 border-gray-200" },
+  complete:    { label: "Complete",    color: "text-blue-700",     bg: "bg-blue-100 border-blue-300" },
+  in_progress: { label: "In Progress", color: "text-brand-700",   bg: "bg-brand-50 border-brand-200" },
+  pending:     { label: "Pending",     color: "text-gray-700",    bg: "bg-gray-50 border-gray-200" },
+  delayed:     { label: "Delayed",     color: "text-red-700",     bg: "bg-red-50 border-red-200" },
 };
 
 function MilestonesTab({
@@ -1797,12 +1006,12 @@ function MilestonesTab({
 
   const totalAmount = milestones.reduce((s, m) => s + m.amount, 0);
   const paidAmount = milestones.filter((m) => m.status === "paid").reduce((s, m) => s + m.amount, 0);
-  const approvedAmount = milestones.filter((m) => m.status === "approved").reduce((s, m) => s + m.amount, 0);
-  const releasedAmount = paidAmount + approvedAmount;
+  const completeAmount = milestones.filter((m) => m.status === "complete").reduce((s, m) => s + m.amount, 0);
+  const releasedAmount = paidAmount + completeAmount;
   const pct = totalAmount > 0 ? Math.round((releasedAmount / totalAmount) * 100) : 0;
 
   function submitMilestone(index: number) {
-    const updated = milestones.map((m, i) => i === index ? { ...m, done: true, status: "submitted" as MilestoneStatus, completedDate: new Date().toISOString().split("T")[0], note: submitNote || undefined } : m);
+    const updated = milestones.map((m, i) => i === index ? { ...m, done: true, status: "complete" as MilestoneStatus, completedDate: new Date().toISOString().split("T")[0], note: submitNote || undefined } : m);
     onUpdate(updated);
     setExpandedIndex(null);
     setSubmitNote("");
@@ -1852,11 +1061,11 @@ function MilestonesTab({
         </div>
         <div className="h-2 bg-gray-100 rounded-sm overflow-hidden flex">
           {paidAmount > 0 && <div className="bg-emerald-600 transition-all duration-500" style={{ width: `${(paidAmount / totalAmount) * 100}%` }} />}
-          {approvedAmount > 0 && <div className="bg-blue-600 transition-all duration-500" style={{ width: `${(approvedAmount / totalAmount) * 100}%` }} />}
+          {completeAmount > 0 && <div className="bg-blue-600 transition-all duration-500" style={{ width: `${(completeAmount / totalAmount) * 100}%` }} />}
         </div>
         <div className="flex items-center gap-4 mt-2">
           <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-sm bg-emerald-600" /><span className="text-[11px] text-gray-600">Paid</span></div>
-          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-sm bg-blue-600" /><span className="text-[11px] text-gray-600">Approved</span></div>
+          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-sm bg-blue-600" /><span className="text-[11px] text-gray-600">Complete</span></div>
           <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-sm bg-gray-200" /><span className="text-[11px] text-gray-600">Remaining</span></div>
         </div>
       </div>
@@ -1872,7 +1081,7 @@ function MilestonesTab({
               key={`${m.label}-${i}`}
               className={cn(
                 "group rounded-sm border bg-white transition-all",
-                m.status === "in_progress" ? "border-brand-200 shadow-sm" : m.status === "submitted" ? "border-amber-200" : "border-border"
+                m.status === "in_progress" ? "border-brand-200 shadow-sm" : "border-border"
               )}
             >
               {/* Row */}
@@ -1882,12 +1091,12 @@ function MilestonesTab({
               >
                 <div className={cn(
                   "w-7 h-7 rounded-sm flex items-center justify-center shrink-0",
-                  m.status === "paid" || m.status === "approved" ? "bg-emerald-950/10" : m.status === "submitted" ? "bg-amber-50" : m.status === "in_progress" ? "bg-brand-50" : "bg-gray-50"
+                  m.status === "paid" || m.status === "complete" ? "bg-emerald-950/10" : m.status === "in_progress" ? "bg-brand-50" : m.status === "delayed" ? "bg-red-50" : "bg-gray-50"
                 )}>
-                  {(m.status === "paid" || m.status === "approved") && <Check className="w-4 h-4 text-emerald-950" strokeWidth={2.5} />}
-                  {m.status === "submitted" && <Clock className="w-4 h-4 text-amber-600" />}
+                  {(m.status === "paid" || m.status === "complete") && <Check className="w-4 h-4 text-emerald-950" strokeWidth={2.5} />}
                   {m.status === "in_progress" && <div className="w-2.5 h-2.5 rounded-sm bg-brand-600 animate-pulse" />}
                   {m.status === "pending" && <Circle className="w-4 h-4 text-gray-300" />}
+                  {m.status === "delayed" && <AlertTriangle className="w-4 h-4 text-red-600" />}
                 </div>
 
                 <div className="flex-1 min-w-0">
@@ -1937,7 +1146,7 @@ function MilestonesTab({
                   <div className="mt-4 mb-4">
                     <p className="text-[12px] font-semibold text-gray-900 uppercase tracking-wider mb-2">Photos</p>
                     <div className="grid grid-cols-4 gap-2">
-                      {(m.status === "paid" || m.status === "approved" || m.status === "submitted") ? (
+                      {(m.status === "paid" || m.status === "complete") ? (
                         <>
                           {[1, 2, 3].map((n) => (
                             <div key={n} className="aspect-square rounded-sm bg-gray-100 border border-border flex items-center justify-center">
@@ -1957,7 +1166,7 @@ function MilestonesTab({
                   </div>
 
                   {/* Note */}
-                  {(m.status === "paid" || m.status === "approved" || m.status === "submitted") && m.note && (
+                  {(m.status === "paid" || m.status === "complete") && m.note && (
                     <div className="mb-4 p-3 bg-gray-50 rounded-sm">
                       <p className="text-[12px] font-semibold text-gray-900 uppercase tracking-wider mb-1">Contractor note</p>
                       <p className="text-[13px] text-gray-800">{m.note}</p>
@@ -1987,11 +1196,11 @@ function MilestonesTab({
                     </div>
                   )}
 
-                  {/* Waiting message for submitted */}
-                  {m.status === "submitted" && (
-                    <div className="flex items-center gap-2 p-3 bg-amber-50 rounded-sm border border-amber-100">
-                      <Clock className="w-4 h-4 text-amber-600 shrink-0" />
-                      <p className="text-[13px] text-amber-700">Waiting for {project.client} to review and approve this milestone.</p>
+                  {/* Complete confirmation */}
+                  {m.status === "complete" && (
+                    <div className="flex items-center gap-2 p-3 bg-blue-100 rounded-sm border border-blue-300">
+                      <Check className="w-4 h-4 text-blue-700 shrink-0" />
+                      <p className="text-[13px] text-blue-700">Milestone complete. Payment processing.</p>
                     </div>
                   )}
 
@@ -2003,13 +1212,6 @@ function MilestonesTab({
                     </div>
                   )}
 
-                  {/* Approved message */}
-                  {m.status === "approved" && (
-                    <div className="flex items-center gap-2 p-3 bg-blue-100 rounded-sm border border-blue-300">
-                      <Check className="w-4 h-4 text-blue-700 shrink-0" />
-                      <p className="text-[13px] text-blue-700">Approved by {project.client}. Payment processing.</p>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
@@ -2086,8 +1288,7 @@ function MilestoneScheduleTab({ project }: { project: typeof PROJECTS[0] }) {
               <div className="flex flex-col items-center w-10 shrink-0">
                 <div className={cn(
                   "w-3 h-3 rounded-sm border-2 shrink-0 mt-1.5",
-                  m.status === "paid" || m.status === "approved" ? "bg-emerald-600 border-emerald-600"
-                    : m.status === "submitted" ? "bg-amber-400 border-amber-400"
+                  m.status === "paid" || m.status === "complete" ? "bg-emerald-600 border-emerald-600"
                     : m.status === "in_progress" ? "bg-brand-600 border-brand-600"
                     : "bg-white border-gray-300"
                 )} />
@@ -2225,9 +1426,8 @@ function DocumentsTab() {
 const PROJECT_NAV = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "milestones", label: "Milestones", icon: CheckCircle2 },
-  { id: "daily-log", label: "Daily Log", icon: FileText },
   { id: "schedule", label: "Schedule", icon: Calendar },
-  { id: "job-costing", label: "Job Costing", icon: TrendingUp },
+  { id: "costs", label: "Costs", icon: DollarSign },
   { id: "documents", label: "Documents", icon: FileText },
 ];
 
@@ -2242,6 +1442,7 @@ export default function ProjectsPage() {
   const [selectedProjectId, setSelectedProjectId] = useState(paramProject || "j1");
   const [activeSection, setActiveSection] = useState(paramTab || "overview");
   const [initialMilestoneIndex] = useState(paramMilestone ? parseInt(paramMilestone) : null);
+  const [createProjectOpen, setCreateProjectOpen] = useState(false);
 
   useEffect(() => {
     fetchProjects().then((apiProjects) => {
@@ -2262,11 +1463,10 @@ export default function ProjectsPage() {
       case "milestones": return <MilestonesTab project={project} initialExpandIndex={initialMilestoneIndex} onUpdate={(ms: Milestone[]) => {
         setProjects((prev) => prev.map((p) => p.id === selectedProjectId ? { ...p, milestones: ms as typeof p.milestones, progress: ms.length > 0 ? Math.round(ms.filter((m) => m.done).length / ms.length * 100) : 0 } : p));
       }} />;
-      case "daily-log": return <DailyLogTab projectId={selectedProjectId} />;
       case "schedule": return <MilestoneScheduleTab project={project} />;
       case "change-orders": return <ChangeOrdersTab projectId={selectedProjectId} />;
       case "punch-list": return <PunchListTab projectId={selectedProjectId} />;
-      case "job-costing": return <JobCostingTab projectId={selectedProjectId} project={project} />;
+      case "costs": return <CostsTab projectId={selectedProjectId} project={project} />;
       case "documents": return <DocumentsTab />;
       default: return <OverviewTab project={project} />;
     }
@@ -2278,12 +1478,18 @@ export default function ProjectsPage() {
       <div className="px-6 pt-5 pb-4 bg-white shadow-[0_4px_16px_-2px_rgba(0,0,0,0.1)] relative z-10">
         <div className="flex items-center justify-between">
           <h1 className="text-[22px] font-semibold text-gray-900 tracking-tight">Projects</h1>
-          <Link href="/contractor/messages">
-            <Button variant="outline" size="sm" className="gap-2">
-              <MessageSquare className="w-3.5 h-3.5" />
-              Message {project.client.split(" ")[0]}
+          <div className="flex items-center gap-2">
+            <Button size="sm" className="gap-2" onClick={() => setCreateProjectOpen(true)}>
+              <Plus className="w-3.5 h-3.5" />
+              New Project
             </Button>
-          </Link>
+            <Link href="/contractor/messages">
+              <Button variant="outline" size="sm" className="gap-2">
+                <MessageSquare className="w-3.5 h-3.5" />
+                Message {project.client.split(" ")[0]}
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -2370,6 +1576,17 @@ export default function ProjectsPage() {
           </div>
         </div>
       </div>
+
+      <CreateProjectDialog
+        open={createProjectOpen}
+        onOpenChange={setCreateProjectOpen}
+        onCreated={(newProject) => {
+          setProjects((prev) => [...prev, newProject]);
+          setSelectedProjectId(newProject.id);
+          setActiveSection("overview");
+          toast.success("Project created");
+        }}
+      />
     </div>
   );
 }

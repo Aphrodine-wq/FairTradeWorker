@@ -96,69 +96,65 @@ describe("QuickBooks integration", () => {
 // ── Payout fee calculations ──────────────────────────────────────
 // These mirror the logic in the payout route to ensure correctness.
 
-describe("Payout fee calculations", () => {
+describe("Payout fee calculations (Int cents)", () => {
   const PLATFORM_FEE_PERCENT = 5.0;
   const HOMEOWNER_SERVICE_FEE_PERCENT = 3.0;
-  const safeDiv = (a: number, b: number): number => (b !== 0 ? a / b : 0);
-  const safeCents = (value: number): number => safeDiv(Math.round(value * 100), 100);
+  const roundCents = (value: number): number => Math.round(value);
 
-  it("calculates 5% platform fee correctly on a $10,000 bid", () => {
-    const gross = 10000;
-    const fee = safeCents(gross * safeDiv(PLATFORM_FEE_PERCENT, 100));
-    const net = safeCents(gross - fee);
+  it("calculates 5% platform fee correctly on a $10,000 bid (1000000 cents)", () => {
+    const gross = 1000000; // $10,000 in cents
+    const fee = roundCents(gross * PLATFORM_FEE_PERCENT / 100);
+    const net = gross - fee;
 
-    expect(fee).toBe(500);
-    expect(net).toBe(9500);
+    expect(fee).toBe(50000);   // $500
+    expect(net).toBe(950000);  // $9,500
   });
 
   it("calculates 3% homeowner service fee correctly", () => {
-    const bidAmount = 5000;
-    const homeownerFee = safeCents(bidAmount * safeDiv(HOMEOWNER_SERVICE_FEE_PERCENT, 100));
-    const totalCharge = safeCents(bidAmount + homeownerFee);
+    const bidAmount = 500000; // $5,000 in cents
+    const homeownerFee = roundCents(bidAmount * HOMEOWNER_SERVICE_FEE_PERCENT / 100);
+    const totalCharge = bidAmount + homeownerFee;
 
-    expect(homeownerFee).toBe(150);
-    expect(totalCharge).toBe(5150);
+    expect(homeownerFee).toBe(15000);  // $150
+    expect(totalCharge).toBe(515000);  // $5,150
   });
 
-  it("handles zero amounts without division by zero", () => {
-    expect(safeDiv(0, 0)).toBe(0);
-    expect(safeCents(0)).toBe(0);
+  it("handles zero amounts", () => {
+    expect(roundCents(0)).toBe(0);
   });
 
   it("rounds fractional cents correctly", () => {
-    // $1,234.567 -> should round to $1,234.57
-    expect(safeCents(1234.567)).toBe(1234.57);
-    // $99.994 -> $99.99
-    expect(safeCents(99.994)).toBe(99.99);
-    // $99.995 -> $100.00
-    expect(safeCents(99.995)).toBe(100);
+    // 5% of 333 cents = 16.65 -> rounds to 17 cents
+    expect(roundCents(333 * PLATFORM_FEE_PERCENT / 100)).toBe(17);
+    // 3% of 999 cents = 29.97 -> rounds to 30 cents
+    expect(roundCents(999 * HOMEOWNER_SERVICE_FEE_PERCENT / 100)).toBe(30);
   });
 
   it("calculates combined platform revenue correctly", () => {
-    // On a $10,000 bid:
-    // - Homeowner pays: $10,000 + $300 (3% service fee) = $10,300
-    // - Platform keeps: $500 (5% contractor fee) + $300 (3% homeowner fee) = $800
-    // - Contractor gets: $10,000 - $500 = $9,500
-    const bid = 10000;
-    const homeownerFee = safeCents(bid * safeDiv(HOMEOWNER_SERVICE_FEE_PERCENT, 100));
-    const platformFee = safeCents(bid * safeDiv(PLATFORM_FEE_PERCENT, 100));
-    const contractorNet = safeCents(bid - platformFee);
-    const totalRevenue = safeCents(homeownerFee + platformFee);
+    // On a $10,000 bid (1000000 cents):
+    // - Homeowner pays: 1000000 + 30000 (3% service fee) = 1030000 cents ($10,300)
+    // - Platform keeps: 50000 (5% contractor fee) + 30000 (3% homeowner fee) = 80000 cents ($800)
+    // - Contractor gets: 1000000 - 50000 = 950000 cents ($9,500)
+    const bid = 1000000;
+    const homeownerFee = roundCents(bid * HOMEOWNER_SERVICE_FEE_PERCENT / 100);
+    const platformFee = roundCents(bid * PLATFORM_FEE_PERCENT / 100);
+    const contractorNet = bid - platformFee;
+    const totalRevenue = homeownerFee + platformFee;
 
-    expect(homeownerFee).toBe(300);
-    expect(platformFee).toBe(500);
-    expect(contractorNet).toBe(9500);
-    expect(totalRevenue).toBe(800);
+    expect(homeownerFee).toBe(30000);
+    expect(platformFee).toBe(50000);
+    expect(contractorNet).toBe(950000);
+    expect(totalRevenue).toBe(80000);
   });
 
-  it("handles small bid amounts", () => {
-    const bid = 50;
-    const homeownerFee = safeCents(bid * safeDiv(HOMEOWNER_SERVICE_FEE_PERCENT, 100));
-    const platformFee = safeCents(bid * safeDiv(PLATFORM_FEE_PERCENT, 100));
-    const contractorNet = safeCents(bid - platformFee);
+  it("handles small bid amounts in cents", () => {
+    const bid = 5000; // $50 in cents
+    const homeownerFee = roundCents(bid * HOMEOWNER_SERVICE_FEE_PERCENT / 100);
+    const platformFee = roundCents(bid * PLATFORM_FEE_PERCENT / 100);
+    const contractorNet = bid - platformFee;
 
-    expect(homeownerFee).toBe(1.5);
-    expect(platformFee).toBe(2.5);
-    expect(contractorNet).toBe(47.5);
+    expect(homeownerFee).toBe(150);  // $1.50
+    expect(platformFee).toBe(250);   // $2.50
+    expect(contractorNet).toBe(4750); // $47.50
   });
 });

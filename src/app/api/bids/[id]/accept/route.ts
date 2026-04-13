@@ -9,11 +9,8 @@ import { createQBInvoice, sendQBInvoice } from "@shared/lib/quickbooks";
  */
 const HOMEOWNER_SERVICE_FEE_PERCENT = 3.0;
 
-/** Safe division — returns 0 when divisor is 0 to prevent division-by-zero in money calculations. */
-const safeDiv = (a: number, b: number): number => (b !== 0 ? a / b : 0);
-
-/** Round to 2 decimal places safely. */
-const safeCents = (value: number): number => safeDiv(Math.round(value * 100), 100);
+/** Round a fractional cent value to the nearest whole cent. */
+const roundCents = (value: number): number => Math.round(value);
 
 // POST /api/bids/[id]/accept — homeowner accepts a bid
 export async function POST(
@@ -80,10 +77,10 @@ export async function POST(
 
   if (bid.contractor.qbConnection) {
     try {
-      // Calculate what the homeowner will be charged
+      // Calculate what the homeowner will be charged (all values in cents)
       const bidAmount = bid.amount;
-      const homeownerFee = safeCents(bidAmount * safeDiv(HOMEOWNER_SERVICE_FEE_PERCENT, 100));
-      const totalCharge = safeCents(bidAmount + homeownerFee);
+      const homeownerFee = roundCents(bidAmount * HOMEOWNER_SERVICE_FEE_PERCENT / 100);
+      const totalCharge = bidAmount + homeownerFee;
 
       // Due in 3 days from acceptance
       const dueDate = new Date();
@@ -94,6 +91,7 @@ export async function POST(
       const homeownerEmail = bid.job?.homeowner?.user?.email ?? "";
 
       // Create QB invoice for the homeowner with bid amount + service fee
+      // QB API expects dollar amounts, so convert cents to dollars
       const qbInvoice = await createQBInvoice({
         contractorId: bid.contractorId,
         customerName: homeownerName,
@@ -102,12 +100,12 @@ export async function POST(
           {
             description: `${bid.job.title} — ${bid.contractor?.company || bid.contractor?.user?.name || "Contractor"}`,
             quantity: 1,
-            unitPrice: bidAmount,
+            unitPrice: bidAmount / 100,
           },
           {
             description: "FairTradeWorker Service Fee",
             quantity: 1,
-            unitPrice: homeownerFee,
+            unitPrice: homeownerFee / 100,
           },
         ],
         dueDate: dueDateStr,
@@ -132,9 +130,10 @@ export async function POST(
       invoiceCreated = true;
 
       // Queue the contractor payout (will be executed when invoice is paid)
+      // All values in cents
       const platformFeePercent = 5.0;
-      const platformFee = safeCents(bidAmount * safeDiv(platformFeePercent, 100));
-      const netPayout = safeCents(bidAmount - platformFee);
+      const platformFee = roundCents(bidAmount * platformFeePercent / 100);
+      const netPayout = bidAmount - platformFee;
 
       await prisma.payout.create({
         data: {
@@ -156,7 +155,7 @@ export async function POST(
           userId: bid.contractor.userId,
           type: "bid_accepted",
           title: "Bid Accepted",
-          body: `Your $${bidAmount.toFixed(2)} bid on "${bid.job.title}" was accepted. Payout of $${netPayout.toFixed(2)} will process when payment is received.`,
+          body: `Your $${(bidAmount / 100).toFixed(2)} bid on "${bid.job.title}" was accepted. Payout of $${(netPayout / 100).toFixed(2)} will process when payment is received.`,
           data: {
             bidId: bid.id,
             jobId: bid.jobId,

@@ -18,11 +18,8 @@ import { getQBInvoice } from "@shared/lib/quickbooks";
  */
 const HOMEOWNER_SERVICE_FEE_PERCENT = 3.0;
 
-/** Safe division — returns 0 when divisor is 0 to prevent division-by-zero in money calculations. */
-const safeDiv = (a: number, b: number): number => (b !== 0 ? a / b : 0);
-
-/** Round to 2 decimal places safely. */
-const safeCents = (value: number): number => safeDiv(Math.round(value * 100), 100);
+/** Round a fractional cent value to the nearest whole cent. */
+const roundCents = (value: number): number => Math.round(value);
 
 export async function POST(req: NextRequest) {
   const user = getAuthUser(req);
@@ -144,10 +141,10 @@ export async function POST(req: NextRequest) {
       ];
     }
 
-    // Calculate receipt amounts
+    // Calculate receipt amounts (all values in cents)
     const grossAmount = bid.amount;
-    const homeownerFee = safeCents(grossAmount * safeDiv(HOMEOWNER_SERVICE_FEE_PERCENT, 100));
-    const totalCharged = safeCents(grossAmount + homeownerFee);
+    const homeownerFee = roundCents(grossAmount * HOMEOWNER_SERVICE_FEE_PERCENT / 100);
+    const totalCharged = grossAmount + homeownerFee;
 
     // Generate a receipt number: FTW-YYMMDD-XXXX
     const now = new Date();

@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "QuickBooks not connected" }, { status: 400 });
     }
 
+    // QB API expects dollar amounts, so convert cents to dollars
     const qbEstimate = await syncEstimateToQB({
       contractorId: contractor.id,
       customerName,
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
       lineItems: lineItems.map((li: { description: string; quantity: number; unitPrice: number }) => ({
         description: li.description,
         quantity: li.quantity,
-        unitPrice: li.unitPrice,
+        unitPrice: li.unitPrice / 100,
       })),
       expirationDate,
       memo: title ? `FTW Estimate: ${title}` : undefined,

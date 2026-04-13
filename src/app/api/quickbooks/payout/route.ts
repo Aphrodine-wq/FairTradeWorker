@@ -9,11 +9,8 @@ import { createQBBill, payQBBill } from "@shared/lib/quickbooks";
  */
 const PLATFORM_FEE_PERCENT = 5.0;
 
-/** Safe division — returns 0 when divisor is 0 to prevent division-by-zero in money calculations. */
-const safeDiv = (a: number, b: number): number => (b !== 0 ? a / b : 0);
-
-/** Round to 2 decimal places safely. */
-const safeCents = (value: number): number => safeDiv(Math.round(value * 100), 100);
+/** Round a fractional cent value to the nearest whole cent. */
+const roundCents = (value: number): number => Math.round(value);
 
 /**
  * POST /api/quickbooks/payout
@@ -118,10 +115,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Calculate payout amounts
+    // Calculate payout amounts (all values in cents)
     const grossAmount = bid.amount;
-    const platformFee = safeCents(grossAmount * safeDiv(PLATFORM_FEE_PERCENT, 100));
-    const netAmount = safeCents(grossAmount - platformFee);
+    const platformFee = roundCents(grossAmount * PLATFORM_FEE_PERCENT / 100);
+    const netAmount = grossAmount - platformFee;
 
     // Create queued payout record before calling QB
     let payout;
@@ -161,15 +158,16 @@ export async function POST(req: NextRequest) {
 
     try {
       // Step 1: Create a Bill in QB (represents what we owe the contractor)
+      // QB API expects dollar amounts, so convert cents to dollars
       const vendorName = bid.contractor?.company || bid.contractor?.user?.name || "Unknown Contractor";
       const { bill, vendorId } = await createQBBill({
         contractorId: bid.contractorId,
         vendorName,
         vendorEmail: bid.contractor?.user?.email ?? "",
-        amount: netAmount,
+        amount: netAmount / 100,
         description: `FTW Payout — ${bid.job.title} (Bid #${bid.id.slice(-8)})`,
         dueDate: new Date().toISOString().split("T")[0],
-        memo: `Platform fee: $${platformFee.toFixed(2)} (${PLATFORM_FEE_PERCENT}%) | Gross: $${grossAmount.toFixed(2)}`,
+        memo: `Platform fee: $${(platformFee / 100).toFixed(2)} (${PLATFORM_FEE_PERCENT}%) | Gross: $${(grossAmount / 100).toFixed(2)}`,
       });
 
       // Update payout with QB bill info
@@ -183,11 +181,12 @@ export async function POST(req: NextRequest) {
       });
 
       // Step 2: Pay the Bill (execute the transfer to contractor)
+      // QB API expects dollar amounts, so convert cents to dollars
       const billPayment = await payQBBill({
         contractorId: bid.contractorId,
         billId: bill.Id,
         vendorId: vendorId!,
-        amount: netAmount,
+        amount: netAmount / 100,
       });
 
       // Mark payout as completed
@@ -206,7 +205,7 @@ export async function POST(req: NextRequest) {
           userId: bid.contractor.userId,
           type: "payout_completed",
           title: "Payout Received",
-          body: `$${netAmount.toFixed(2)} payout for "${bid.job.title}" has been processed.`,
+          body: `$${(netAmount / 100).toFixed(2)} payout for "${bid.job.title}" has been processed.`,
           data: {
             bidId: bid.id,
             payoutId: payout.id,

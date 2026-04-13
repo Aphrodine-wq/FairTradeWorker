@@ -57,6 +57,7 @@ export async function POST(req: NextRequest) {
       ? `Milestone: ${milestone} — ${description || ""}`
       : description || "Project payment";
 
+    // QB API expects dollar amounts, so convert cents to dollars
     const qbInvoice = await createQBInvoice({
       contractorId: contractor.id,
       customerName,
@@ -65,7 +66,7 @@ export async function POST(req: NextRequest) {
         {
           description: lineDescription,
           quantity: 1,
-          unitPrice: bid.amount, // bid.amount is already in dollars (Float)
+          unitPrice: bid.amount / 100, // bid.amount is in cents
         },
       ],
       dueDate,

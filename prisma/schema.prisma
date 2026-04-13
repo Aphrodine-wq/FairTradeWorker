@@ -60,7 +60,7 @@ model Contractor {
   location         String?
   serviceRadius    Int?     @default(50)
   yearsExperience  Int?
-  hourlyRate       Float?
+  hourlyRate       Int?      // cents
   verified         Boolean  @default(false)
   licensed         Boolean  @default(false)
   insured          Boolean  @default(false)
@@ -115,7 +115,7 @@ model SubContractor {
   location         String?
   serviceRadius    Int?     @default(50)
   yearsExperience  Int?
-  hourlyRate       Float?
+  hourlyRate       Int?      // cents
   verified         Boolean  @default(false)
   licensed         Boolean  @default(false)
   insured          Boolean  @default(false)
@@ -143,8 +143,8 @@ model SubJob {
   category         String
   skills           String[]
   location         String
-  budgetMin        Float
-  budgetMax        Float
+  budgetMin        Int       // cents
+  budgetMax        Int       // cents
   paymentPath      SubPaymentPath
   disclosedToOwner Boolean        @default(false)
   status           SubJobStatus   @default(OPEN)
@@ -166,7 +166,7 @@ model SubBid {
   subJob          SubJob        @relation(fields: [subJobId], references: [id], onDelete: Cascade)
   subContractorId String
   subContractor   SubContractor @relation(fields: [subContractorId], references: [id], onDelete: Cascade)
-  amount          Float
+  amount          Int           // cents
   message         String?
   timeline        String?
   status          BidStatus     @default(PENDING)
@@ -183,9 +183,9 @@ model SubPayout {
   subJobId        String         @unique
   subJob          SubJob         @relation(fields: [subJobId], references: [id], onDelete: Cascade)
   subContractorId String
-  grossAmount     Float
-  platformFee     Float
-  netAmount       Float
+  grossAmount     Int            // cents
+  platformFee     Int            // cents
+  netAmount       Int            // cents
   feePercent      Float          @default(5.0)
   paymentPath     SubPaymentPath
   status          String         @default("queued")
@@ -218,7 +218,7 @@ model InsuranceCert {
   provider       String
   policyNumber   String
   coverageType   String
-  coverageAmount Float?
+  coverageAmount Int?      // cents
   expirationDate DateTime
   fileUrl        String?
   verified       Boolean   @default(false)
@@ -258,8 +258,8 @@ model Job {
   detailedScope      String?
   category           String
   subcategory        String?
-  budgetMin          Float?
-  budgetMax          Float?
+  budgetMin          Int?      // cents
+  budgetMax          Int?      // cents
   location           String
   fullAddress        String?
   status             JobStatus    @default(OPEN)
@@ -316,7 +316,7 @@ model Bid {
   job          Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
   contractorId String
   contractor   Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
-  amount       Float
+  amount       Int       // cents
   message      String?
   timeline     String?
   status       BidStatus @default(PENDING)
@@ -339,22 +339,22 @@ model AiEstimate {
   jobId           String   @unique
   job             Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
   estimateNumber  String   @unique
-  estimateMin     Float
-  estimateMax     Float
-  estimateMid     Float
+  estimateMin     Int      // cents
+  estimateMax     Int      // cents
+  estimateMid     Int      // cents
   confidence      Float
   breakdown       Json?
   lineItems       Json?
   materials       Json?
   laborHours      Float?
-  laborCost       Float?
-  materialCost    Float?
-  equipmentCost   Float?
-  subtotal        Float?
+  laborCost       Int?     // cents
+  materialCost    Int?     // cents
+  equipmentCost   Int?     // cents
+  subtotal        Int?     // cents
   overheadPercent Float?   @default(0.12)
   profitPercent   Float?   @default(0.15)
   contingencyPct  Float?   @default(0.08)
-  total           Float?
+  total           Int?     // cents
   exclusions      String[]
   notes           String[]
   timelineWeeks   Int?
@@ -465,7 +465,7 @@ model Invoice {
   bidId          String   @unique
   bid            Bid      @relation(fields: [bidId], references: [id], onDelete: Cascade)
   qbInvoiceId    String?
-  amount         Float
+  amount         Int      // cents
   status         String   @default("draft")
   paidAt         DateTime?
   createdAt      DateTime @default(now())
@@ -480,9 +480,9 @@ model Payout {
   bid             Bid      @relation(fields: [bidId], references: [id], onDelete: Cascade)
   contractorId    String
   contractor      Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
-  grossAmount     Float
-  platformFee     Float
-  netAmount       Float
+  grossAmount     Int      // cents
+  platformFee     Int      // cents
+  netAmount       Int      // cents
   feePercent      Float    @default(5.0)
   qbVendorId      String?
   qbBillId        String?
@@ -504,9 +504,9 @@ model Receipt {
   homeownerId    String
   homeowner      Homeowner @relation(fields: [homeownerId], references: [id], onDelete: Cascade)
   receiptNumber  String   @unique
-  grossAmount    Float
-  platformFee    Float
-  totalCharged   Float
+  grossAmount    Int      // cents
+  platformFee    Int      // cents
+  totalCharged   Int      // cents
   jobTitle       String
   contractorName String
   homeownerName  String
