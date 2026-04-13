@@ -1,22 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   ChevronDown,
-  CalendarDays,
   DollarSign,
   Users,
   Clock,
   CheckCircle2,
   Circle,
   AlertTriangle,
-  TrendingUp,
-  TrendingDown,
   Plus,
-  ChevronLeft,
-  ChevronRight,
-  User,
-  AlertCircle,
   Upload,
   CheckSquare,
   MessageSquare,
@@ -26,24 +19,19 @@ import {
   LayoutDashboard,
   FileText,
   Calendar,
-  Wrench,
-  ClipboardList,
-  Pencil,
-  MapPin,
   Check,
   ArrowRight,
   Download,
+  Cloud,
 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { AppHeader } from "@shared/components/app-header";
 import { Button } from "@shared/ui/button";
 import { Badge } from "@shared/ui/badge";
 import { Input } from "@shared/ui/input";
 import { Textarea } from "@shared/ui/textarea";
 import { Progress } from "@shared/ui/progress";
 import { Separator } from "@shared/ui/separator";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@shared/ui/tabs";
 import {
   Dialog,
   DialogContent,
