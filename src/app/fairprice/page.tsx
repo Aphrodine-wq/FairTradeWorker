@@ -157,9 +157,11 @@ export default function FairPricePage() {
 
         // Parse AI response into our EstimateResult shape
         const base = BASE_ESTIMATES[category] ?? BASE_ESTIMATES["General Contracting"];
-        const low = Math.round(ai.estimate_min ?? ai.min ?? 0);
-        const high = Math.round(ai.estimate_max ?? ai.max ?? 0);
-        const mid = (low + high) / 2;
+        // Derive range from total (±15%) if min/max not provided
+        const total = ai.total ?? ai.subtotal ?? 0;
+        const low = Math.round(ai.estimate_min ?? ai.min ?? total * 0.85);
+        const high = Math.round(ai.estimate_max ?? ai.max ?? total * 1.15);
+        const mid = (low + high) / 2 || total;
         const materialCost = ai.material_cost ?? Math.round(mid * (base.materials));
         const laborCost = ai.labor_cost ?? Math.round(mid * (base.labor));
         const overhead = mid - materialCost - laborCost;

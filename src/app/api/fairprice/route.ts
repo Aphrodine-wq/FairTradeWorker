@@ -84,14 +84,15 @@ export async function POST(req: NextRequest) {
       headers: { "Content-Type": "application/json" },
       signal: controller.signal,
       body: JSON.stringify({
-        project_type: safeCategory,
-        description:
-          safeDescription ||
-          `${size} ${safeCategory.toLowerCase()} project in ${zip}`,
-        sqft: sizeToSqft[size] || 800,
-        location: zip,
-        quality: "mid-range",
-        format: "full",
+        project: {
+          type: safeCategory,
+          description:
+            safeDescription ||
+            `${size} ${safeCategory.toLowerCase()} project in ${zip}`,
+          sqft: sizeToSqft[size] || 800,
+          location: zip,
+          quality: "mid-range",
+        },
       }),
     });
 
