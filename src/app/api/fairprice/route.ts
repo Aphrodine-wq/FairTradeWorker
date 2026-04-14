@@ -68,12 +68,14 @@ export async function POST(req: NextRequest) {
       ? description.replace(/[^\w\s\-.,!?()'/&$#%@+:;]/g, "").slice(0, MAX_DESCRIPTION_LEN)
       : undefined;
 
-  const sizeToSqft: Record<string, number> = {
-    small: 200,
-    medium: 800,
-    large: 2000,
-    major: 5000,
+  const sizeBudgets: Record<string, { sqft: number; budget: string; label: string }> = {
+    small: { sqft: 150, budget: "$2,000-$5,000", label: "small" },
+    medium: { sqft: 400, budget: "$5,000-$15,000", label: "medium" },
+    large: { sqft: 1200, budget: "$15,000-$50,000", label: "large" },
+    major: { sqft: 3000, budget: "$50,000+", label: "major" },
   };
+
+  const sizeInfo = sizeBudgets[size] || sizeBudgets.medium;
 
   try {
     const controller = new AbortController();
@@ -88,8 +90,8 @@ export async function POST(req: NextRequest) {
           type: safeCategory,
           description:
             safeDescription ||
-            `${size} ${safeCategory.toLowerCase()} project in ${zip}`,
-          sqft: sizeToSqft[size] || 800,
+            `${sizeInfo.label} ${safeCategory.toLowerCase()} project in ${zip}. Budget range: ${sizeInfo.budget}. This is a ${sizeInfo.label}-sized residential project.`,
+          sqft: sizeInfo.sqft,
           location: zip,
           quality: "mid-range",
         },
