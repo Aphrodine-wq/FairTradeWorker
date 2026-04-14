@@ -2,17 +2,72 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import {
-  Check,
-  Minus,
-  Shield,
-  Zap,
-  Users,
-  Building2,
-  Home,
-  Star,
-  ChevronDown,
-} from "lucide-react";
+/* Geometric inline SVG icons — no lucide */
+const GeoCheck = ({ className }: { className?: string; strokeWidth?: number }) => (
+  <svg className={className} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <line x1="4" y1="10.5" x2="8" y2="15" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square" />
+    <line x1="8" y1="15" x2="16" y2="5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square" />
+  </svg>
+);
+
+const GeoMinus = ({ className }: { className?: string; strokeWidth?: number }) => (
+  <svg className={className} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <line x1="4" y1="8" x2="12" y2="8" stroke="currentColor" strokeWidth="2" strokeLinecap="square" />
+  </svg>
+);
+
+const GeoShield = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="10,1 18,5 18,11 10,19 2,11 2,5" fill="currentColor" opacity="0.15" />
+    <polygon points="10,3 16,6 16,11 10,17 4,11 4,6" stroke="currentColor" strokeWidth="1.5" fill="none" />
+  </svg>
+);
+
+const GeoZap = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="11,1 5,11 10,11 9,19 15,9 10,9" fill="currentColor" />
+  </svg>
+);
+
+const GeoUsers = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="7" cy="6" r="3" fill="currentColor" opacity="0.7" />
+    <circle cx="13" cy="6" r="3" fill="currentColor" opacity="0.4" />
+    <rect x="2" y="12" width="10" height="4" fill="currentColor" opacity="0.7" />
+    <rect x="8" y="12" width="10" height="4" fill="currentColor" opacity="0.4" />
+  </svg>
+);
+
+const GeoBuilding = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="4" y="3" width="12" height="15" stroke="currentColor" strokeWidth="1.5" fill="none" />
+    <rect x="7" y="6" width="2" height="2" fill="currentColor" />
+    <rect x="11" y="6" width="2" height="2" fill="currentColor" />
+    <rect x="7" y="10" width="2" height="2" fill="currentColor" />
+    <rect x="11" y="10" width="2" height="2" fill="currentColor" />
+    <rect x="8" y="14" width="4" height="4" fill="currentColor" opacity="0.4" />
+  </svg>
+);
+
+const GeoHome = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="10,2 18,10 15,10 15,18 5,18 5,10 2,10" stroke="currentColor" strokeWidth="1.5" fill="none" />
+    <rect x="8" y="12" width="4" height="6" fill="currentColor" opacity="0.3" />
+  </svg>
+);
+
+const GeoStar = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="10,2 12.5,7.5 18,8 14,12 15,18 10,15 5,18 6,12 2,8 7.5,7.5" fill="currentColor" />
+  </svg>
+);
+
+const GeoChevron = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <line x1="3" y1="5.5" x2="8" y2="10.5" stroke="currentColor" strokeWidth="2" strokeLinecap="square" />
+    <line x1="8" y1="10.5" x2="13" y2="5.5" stroke="currentColor" strokeWidth="2" strokeLinecap="square" />
+  </svg>
+);
 import { Navbar } from "@marketplace/components/navbar";
 import { Footer } from "@marketplace/components/footer";
 import { Button } from "@shared/ui/button";
@@ -384,8 +439,8 @@ const homeownerComparison = [
 
 // --- Tier icons ---
 
-const contractorIcons = [Shield, Zap, Users, Building2] as const;
-const homeownerIcons = [Home, Star] as const;
+const contractorIcons = [GeoShield, GeoZap, GeoUsers, GeoBuilding] as const;
+const homeownerIcons = [GeoHome, GeoStar] as const;
 
 // --- FAQ data ---
 
@@ -444,19 +499,18 @@ function Cell({ value, featured }: { value: CellValue; featured?: boolean }) {
     if (value) {
       return (
         <div className="flex justify-center">
-          <Check
+          <GeoCheck
             className={cn(
               "w-5 h-5",
               featured ? "text-brand-600" : "text-gray-600"
             )}
-            strokeWidth={2.5}
           />
         </div>
       );
     }
     return (
       <div className="flex justify-center">
-        <Minus className="w-4 h-4 text-gray-200" strokeWidth={2} />
+        <GeoMinus className="w-4 h-4 text-gray-200" />
       </div>
     );
   }
@@ -650,12 +704,11 @@ function PricingCard({
               )}
             >
               {!isHeader && (
-                <Check
+                <GeoCheck
                   className={cn(
                     "w-4 h-4 mt-0.5 flex-shrink-0",
                     tier.featured ? "text-brand-600" : "text-gray-600"
                   )}
-                  strokeWidth={2.5}
                 />
               )}
               <span
@@ -695,7 +748,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
         className="w-full flex items-center justify-between py-5 px-1 text-left group"
       >
         <span className="text-sm font-medium text-gray-900 pr-4">{q}</span>
-        <ChevronDown
+        <GeoChevron
           className={cn(
             "w-4 h-4 text-gray-600 flex-shrink-0 transition-transform",
             open && "rotate-180"
@@ -887,9 +940,8 @@ export default function PricingPage() {
                   },
                 ].map((item) => (
                   <div key={item.title} className="flex items-start gap-3">
-                    <Check
+                    <GeoCheck
                       className="w-5 h-5 mt-0.5 text-brand-600 flex-shrink-0"
-                      strokeWidth={2.5}
                     />
                     <div>
                       <p className="text-sm font-medium text-gray-900">
@@ -931,9 +983,8 @@ export default function PricingPage() {
                   },
                 ].map((item) => (
                   <div key={item.title} className="flex items-start gap-3">
-                    <Check
+                    <GeoCheck
                       className="w-5 h-5 mt-0.5 text-brand-600 flex-shrink-0"
-                      strokeWidth={2.5}
                     />
                     <div>
                       <p className="text-sm font-medium text-gray-900">

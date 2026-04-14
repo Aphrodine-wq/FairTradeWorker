@@ -2,7 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
+/* Geometric inline SVG — no lucide */
+const GeoChevron = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <line x1="4" y1="7" x2="10" y2="13" stroke="currentColor" strokeWidth="2" strokeLinecap="square" />
+    <line x1="10" y1="13" x2="16" y2="7" stroke="currentColor" strokeWidth="2" strokeLinecap="square" />
+  </svg>
+);
 import { Navbar } from "@marketplace/components/navbar";
 import { Footer } from "@marketplace/components/footer";
 import { Button } from "@shared/ui/button";
@@ -176,7 +182,7 @@ export default function FAQPage() {
                           <span className="text-base font-semibold text-gray-900 group-hover:text-brand-600 transition-colors">
                             {item.q}
                           </span>
-                          <ChevronDown
+                          <GeoChevron
                             className={`w-5 h-5 text-gray-600 flex-shrink-0 mt-0.5 transition-transform duration-200 ${
                               isOpen ? "rotate-180 text-brand-600" : ""
                             }`}

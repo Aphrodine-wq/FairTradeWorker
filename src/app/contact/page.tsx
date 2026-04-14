@@ -8,7 +8,35 @@ import { Button } from "@shared/ui/button";
 import { Input } from "@shared/ui/input";
 import { Textarea } from "@shared/ui/textarea";
 import { Separator } from "@shared/ui/separator";
-import { Mail, Phone, Clock, MapPin } from "lucide-react";
+/* Geometric inline SVG icons — no lucide */
+const GeoMail = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="1,4 8,9 15,4" stroke="currentColor" strokeWidth="1.5" fill="none" />
+    <polygon points="1,12 8,7 15,12" stroke="currentColor" strokeWidth="1.5" fill="currentColor" opacity="0.15" />
+  </svg>
+);
+
+const GeoPhone = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="3" y="1" width="10" height="14" stroke="currentColor" strokeWidth="1.5" fill="none" transform="rotate(-8 8 8)" />
+    <rect x="6" y="4" width="4" height="6" fill="currentColor" opacity="0.2" transform="rotate(-8 8 8)" />
+  </svg>
+);
+
+const GeoClock = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" fill="none" />
+    <line x1="8" y1="4" x2="8" y2="8" stroke="currentColor" strokeWidth="1.5" />
+    <line x1="8" y1="8" x2="11" y2="10" stroke="currentColor" strokeWidth="1.5" />
+  </svg>
+);
+
+const GeoMapPin = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="8,1 14,8 8,15 2,8" stroke="currentColor" strokeWidth="1.5" fill="none" />
+    <circle cx="8" cy="8" r="2" fill="currentColor" opacity="0.3" />
+  </svg>
+);
 
 const SUBJECTS = [
   "General",
@@ -176,7 +204,7 @@ export default function ContactPage() {
                 </h3>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
-                    <Mail className="w-4 h-4 text-brand-600 mt-0.5 flex-shrink-0" />
+                    <GeoMail className="w-4 h-4 text-brand-600 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-xs text-gray-600 mb-0.5">Email</p>
                       <a
@@ -188,14 +216,14 @@ export default function ContactPage() {
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
-                    <Phone className="w-4 h-4 text-brand-600 mt-0.5 flex-shrink-0" />
+                    <GeoPhone className="w-4 h-4 text-brand-600 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-xs text-gray-600 mb-0.5">Phone</p>
                       <span className="text-sm text-gray-900">(512) 555-0100</span>
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
-                    <Clock className="w-4 h-4 text-brand-600 mt-0.5 flex-shrink-0" />
+                    <GeoClock className="w-4 h-4 text-brand-600 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-xs text-gray-600 mb-0.5">Hours</p>
                       <span className="text-sm text-gray-900">
@@ -204,7 +232,7 @@ export default function ContactPage() {
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
-                    <MapPin className="w-4 h-4 text-brand-600 mt-0.5 flex-shrink-0" />
+                    <GeoMapPin className="w-4 h-4 text-brand-600 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-xs text-gray-600 mb-0.5">Location</p>
                       <span className="text-sm text-gray-900">Oxford, MS</span>
