@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
-const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-key-change-in-production";
+// Use SECRET_KEY_BASE to match Spring Boot, fall back to JWT_SECRET for backwards compat
+const JWT_SECRET = process.env.SECRET_KEY_BASE || process.env.JWT_SECRET || "dev-secret-key-change-in-production";
 const TOKEN_EXPIRY = "24h";
 export const COOKIE_MAX_AGE = 60 * 60 * 24; // 24h — must match TOKEN_EXPIRY
 
@@ -11,6 +12,14 @@ export interface TokenPayload {
   email: string;
   role: "CONTRACTOR" | "HOMEOWNER" | "SUBCONTRACTOR";
   roles: ("CONTRACTOR" | "HOMEOWNER" | "SUBCONTRACTOR")[];
+}
+
+// Internal JWT claims use user_id/snake_case to match Spring Boot format
+interface JwtClaims {
+  user_id: string;
+  email: string;
+  role: string;
+  roles: string[];
 }
 
 export function hashPassword(password: string): Promise<string> {
@@ -22,14 +31,44 @@ export function verifyPassword(password: string, hash: string): Promise<boolean>
 }
 
 export function createToken(payload: TokenPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
+  const claims: JwtClaims = {
+    user_id: payload.userId,
+    email: payload.email,
+    role: payload.role,
+    roles: payload.roles,
+  };
+  return jwt.sign(claims, JWT_SECRET, {
+    expiresIn: TOKEN_EXPIRY,
+    issuer: "ftw-realtime",
+    audience: "ftw",
+  });
 }
 
 export function verifyToken(token: string): TokenPayload | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as TokenPayload;
+    const claims = jwt.verify(token, JWT_SECRET, {
+      issuer: "ftw-realtime",
+      audience: "ftw",
+    }) as JwtClaims;
+    return {
+      userId: claims.user_id,
+      email: claims.email,
+      role: claims.role as TokenPayload["role"],
+      roles: claims.roles as TokenPayload["roles"],
+    };
   } catch {
-    return null;
+    // Try without issuer/audience for tokens minted before this change
+    try {
+      const claims = jwt.verify(token, JWT_SECRET) as any;
+      return {
+        userId: claims.user_id || claims.userId,
+        email: claims.email,
+        role: claims.role,
+        roles: claims.roles,
+      };
+    } catch {
+      return null;
+    }
   }
 }
 
