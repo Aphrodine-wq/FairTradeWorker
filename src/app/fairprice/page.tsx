@@ -153,12 +153,20 @@ export default function FairPricePage() {
 
       if (res.ok) {
         const data = await res.json();
-        const ai = data.estimate;
+        // Handle double-nested response: {estimate: {estimate: {...}}}
+        const raw = data.estimate ?? {};
+        const ai = raw.estimate ?? raw;
 
         // Parse AI response into our EstimateResult shape
         const base = BASE_ESTIMATES[category] ?? BASE_ESTIMATES["General Contracting"];
         // Derive range from total (±15%) if min/max not provided
         const total = ai.total ?? ai.subtotal ?? 0;
+
+        // If AI returned $0 or no usable data, fall through to local estimate
+        if (total <= 0 && !ai.estimate_min && !ai.min) {
+          throw new Error("AI returned empty estimate");
+        }
+
         const low = Math.round(ai.estimate_min ?? ai.min ?? total * 0.85);
         const high = Math.round(ai.estimate_max ?? ai.max ?? total * 1.15);
         const mid = (low + high) / 2 || total;
