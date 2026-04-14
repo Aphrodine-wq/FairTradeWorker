@@ -119,11 +119,18 @@ export async function getQBAccess(contractorId: string) {
 
   if (!conn) return null;
 
-  // Refresh if token expires within 5 minutes
+  // If refresh token itself has expired, contractor must re-authorize
+  if (conn.refreshTokenExpiry && conn.refreshTokenExpiry < new Date()) {
+    await prisma.quickBooksConnection.delete({ where: { contractorId } });
+    throw new Error("QuickBooks session expired — contractor must reconnect");
+  }
+
+  // Refresh if access token expires within 5 minutes
   const fiveMinFromNow = new Date(Date.now() + 5 * 60 * 1000);
   if (conn.tokenExpiry < fiveMinFromNow) {
     const tokens = await refreshTokens(conn.refreshToken);
     const newExpiry = new Date(Date.now() + tokens.expires_in * 1000);
+    const newRefreshExpiry = new Date(Date.now() + tokens.x_refresh_token_expires_in * 1000);
 
     await prisma.quickBooksConnection.update({
       where: { contractorId },
@@ -131,6 +138,7 @@ export async function getQBAccess(contractorId: string) {
         accessToken: tokens.access_token,
         refreshToken: tokens.refresh_token,
         tokenExpiry: newExpiry,
+        refreshTokenExpiry: newRefreshExpiry,
       },
     });
 

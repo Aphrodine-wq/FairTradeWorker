@@ -43,6 +43,7 @@ export async function GET(req: NextRequest) {
 
   // Upsert QuickBooks connection
   const tokenExpiry = new Date(Date.now() + tokenData.expires_in * 1000);
+  const refreshTokenExpiry = new Date(Date.now() + tokenData.x_refresh_token_expires_in * 1000);
   await prisma.quickBooksConnection.upsert({
     where: { contractorId: contractor.id },
     create: {
@@ -51,6 +52,7 @@ export async function GET(req: NextRequest) {
       accessToken: tokenData.access_token,
       refreshToken: tokenData.refresh_token,
       tokenExpiry,
+      refreshTokenExpiry,
       companyName,
     },
     update: {
@@ -58,6 +60,7 @@ export async function GET(req: NextRequest) {
       accessToken: tokenData.access_token,
       refreshToken: tokenData.refresh_token,
       tokenExpiry,
+      refreshTokenExpiry,
       companyName,
     },
   });

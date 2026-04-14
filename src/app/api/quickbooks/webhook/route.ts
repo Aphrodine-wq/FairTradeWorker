@@ -33,10 +33,46 @@ export async function POST(req: NextRequest) {
     for (const entity of entities) {
       const { name, id, operation } = entity;
 
-      // When a payment is created in QB, find our invoice and process the payout
+      // When a payment is created in QB, look up which invoice it covers and trigger payout
       if (name === "Payment" && operation === "Create") {
         console.log(`[QB Webhook] Payment created: ${id} in realm ${realmId}`);
-        // Payment objects are handled below via invoice update
+
+        // Find the contractor QB connection for this realm
+        const qbConn = await prisma.quickBooksConnection.findFirst({
+          where: { realmId },
+        });
+
+        if (qbConn) {
+          try {
+            // Fetch the payment from QB to get the linked invoice(s)
+            const { getQBAccess, qbFetch } = await import("@shared/lib/quickbooks");
+            const access = await getQBAccess(qbConn.contractorId);
+            if (access) {
+              const paymentRes = await fetch(
+                `${process.env.QB_SANDBOX === "true" ? "https://sandbox-quickbooks.api.intuit.com" : "https://quickbooks.api.intuit.com"}/v3/company/${access.realmId}/payment/${id}?minorversion=65`,
+                { headers: { Authorization: `Bearer ${access.accessToken}`, Accept: "application/json" } }
+              );
+              if (paymentRes.ok) {
+                const paymentData = await paymentRes.json();
+                const lines = paymentData?.Payment?.Line || [];
+                for (const line of lines) {
+                  const linkedInvoiceId = line?.LinkedTxn?.find((t: { TxnType: string }) => t.TxnType === "Invoice")?.TxnId;
+                  if (linkedInvoiceId) {
+                    const updateResult = await prisma.invoice.updateMany({
+                      where: { qbInvoiceId: linkedInvoiceId, status: { not: "paid" } },
+                      data: { status: "paid", paidAt: new Date() },
+                    });
+                    if (updateResult.count > 0) {
+                      await executeQueuedPayout(linkedInvoiceId);
+                    }
+                  }
+                }
+              }
+            }
+          } catch (err) {
+            console.error(`[QB Webhook] Payment lookup failed for ${id}:`, err);
+          }
+        }
       }
 
       // When an invoice is updated (e.g., marked paid by Intuit payment)
@@ -114,15 +150,16 @@ async function executeQueuedPayout(qbInvoiceId: string) {
     });
 
     // Create the QB Bill (what we owe the contractor)
+    // DB stores cents, QB API expects dollars
     const vendorName = bid.contractor.company || bid.contractor.user.name;
     const { bill, vendorId } = await createQBBill({
       contractorId: bid.contractorId,
       vendorName,
       vendorEmail: bid.contractor.user.email,
-      amount: payout.netAmount,
+      amount: payout.netAmount / 100,
       description: `FTW Payout — ${bid.job.title} (Bid #${bid.id.slice(-8)})`,
       dueDate: new Date().toISOString().split("T")[0],
-      memo: `Platform fee: $${payout.platformFee.toFixed(2)} (${payout.feePercent}%) | Gross: $${payout.grossAmount.toFixed(2)}`,
+      memo: `Platform fee: $${(payout.platformFee / 100).toFixed(2)} (${payout.feePercent}%) | Gross: $${(payout.grossAmount / 100).toFixed(2)}`,
     });
 
     await prisma.payout.update({
@@ -135,11 +172,12 @@ async function executeQueuedPayout(qbInvoiceId: string) {
     });
 
     // Pay the Bill (execute the transfer)
+    // DB stores cents, QB API expects dollars
     const billPayment = await payQBBill({
       contractorId: bid.contractorId,
       billId: bill.Id,
       vendorId: vendorId!,
-      amount: payout.netAmount,
+      amount: payout.netAmount / 100,
     });
 
     // Mark payout complete
@@ -158,7 +196,7 @@ async function executeQueuedPayout(qbInvoiceId: string) {
         userId: bid.contractor.userId,
         type: "payout_completed",
         title: "Payout Processed",
-        body: `$${payout.netAmount.toFixed(2)} payout for "${bid.job.title}" has been sent to your account.`,
+        body: `$${(payout.netAmount / 100).toFixed(2)} payout for "${bid.job.title}" has been sent to your account.`,
         data: {
           bidId: bid.id,
           payoutId: payout.id,
@@ -169,7 +207,7 @@ async function executeQueuedPayout(qbInvoiceId: string) {
       },
     });
 
-    console.log(`[QB Webhook] Payout ${payout.id} completed: $${payout.netAmount.toFixed(2)} to ${vendorName}`);
+    console.log(`[QB Webhook] Payout ${payout.id} completed: $${(payout.netAmount / 100).toFixed(2)} to ${vendorName}`);
   } catch (err) {
     console.error(`[QB Webhook] Payout execution failed for invoice ${qbInvoiceId}:`, err);
 
