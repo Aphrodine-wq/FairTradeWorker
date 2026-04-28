@@ -262,8 +262,7 @@ function LoginContent() {
                 size="sm"
                 className="w-full text-xs text-gray-700"
                 onClick={() => {
-                  const payload = btoa(JSON.stringify({ sub: "demo-contractor", role: "CONTRACTOR", roles: ["CONTRACTOR", "SUBCONTRACTOR"], demo: true }));
-                  document.cookie = `ftw-token=demo.${payload}.demo; path=/`;
+                  document.cookie = "ftw-token=demo.contractor; path=/";
                   router.push("/contractor/dashboard");
                 }}
               >
@@ -276,8 +275,7 @@ function LoginContent() {
                 size="sm"
                 className="w-full text-xs text-gray-700"
                 onClick={() => {
-                  const payload = btoa(JSON.stringify({ sub: "demo-homeowner", role: "HOMEOWNER", roles: ["HOMEOWNER"], demo: true }));
-                  document.cookie = `ftw-token=demo.${payload}.demo; path=/`;
+                  document.cookie = "ftw-token=demo.homeowner; path=/";
                   router.push("/homeowner/dashboard");
                 }}
               >
@@ -290,8 +288,7 @@ function LoginContent() {
                 size="sm"
                 className="w-full text-xs text-gray-700"
                 onClick={() => {
-                  const payload = btoa(JSON.stringify({ sub: "demo-sub", role: "SUBCONTRACTOR", roles: ["CONTRACTOR", "SUBCONTRACTOR"], demo: true }));
-                  document.cookie = `ftw-token=demo.${payload}.demo; path=/`;
+                  document.cookie = "ftw-token=demo.subcontractor; path=/";
                   router.push("/subcontractor/dashboard");
                 }}
               >
