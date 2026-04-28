@@ -1,12 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { sendContactNotification, sendContactReceipt } from "@shared/lib/email";
 
-/**
- * POST /api/contact
- *
- * Receives contact form submissions. For now, logs to console.
- * Wire to SendGrid/Resend/SMTP when ready.
- */
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export async function POST(request: NextRequest) {
   try {
     const { name, email, subject, message } = await request.json();
@@ -17,21 +14,23 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+    if (typeof email !== "string" || !EMAIL_RE.test(email)) {
+      return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
+    }
+    if (typeof message !== "string" || message.length > 5000) {
+      return NextResponse.json({ error: "Message too long" }, { status: 400 });
+    }
 
-    // TODO: wire to email service
+    const [notify] = await Promise.all([
+      sendContactNotification({ name, email, subject, message }),
+      sendContactReceipt({ name, email }),
+    ]);
 
-    // If Spring Boot backend is available, forward there too
-    const backendUrl = process.env.NEXT_PUBLIC_REALTIME_URL;
-    if (backendUrl) {
-      try {
-        await fetch(`${backendUrl}/api/contact`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, subject, message }),
-        });
-      } catch {
-        // Backend forwarding is optional
-      }
+    if (!notify.ok) {
+      return NextResponse.json(
+        { error: "Couldn't send your message. Please try again or email hello@fairtradeworker.com directly." },
+        { status: 502 }
+      );
     }
 
     return NextResponse.json({ ok: true });
