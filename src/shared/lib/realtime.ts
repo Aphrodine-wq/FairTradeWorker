@@ -148,6 +148,24 @@ export const api = {
     return apiFetch("/api/auth/me");
   },
 
+  async loginWithGoogle(idToken: string, role?: string): Promise<AuthResponse> {
+    const data = await apiFetch<AuthResponse>("/api/auth/google", {
+      method: "POST",
+      body: JSON.stringify({ idToken, role }),
+    });
+    setAuthToken(data.token);
+    return data;
+  },
+
+  async loginWithApple(idToken: string, name?: string, role?: string): Promise<AuthResponse> {
+    const data = await apiFetch<AuthResponse>("/api/auth/apple", {
+      method: "POST",
+      body: JSON.stringify({ idToken, name, role }),
+    });
+    setAuthToken(data.token);
+    return data;
+  },
+
   async switchRole(role: string): Promise<AuthResponse> {
     return apiFetch("/api/auth/switch-role", {
       method: "POST",

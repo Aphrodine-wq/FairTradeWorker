@@ -137,6 +137,26 @@ function stopSessionCheck() {
   }
 }
 
+async function finalizeOAuthLogin(result: { token: string; user: Record<string, unknown> }): Promise<AuthUser> {
+  const apiUser = result.user;
+  const role = normalizeRole(String(apiUser.role));
+  const apiRoles = apiUser.roles as string[] | undefined;
+  const user: AuthUser = {
+    id: String(apiUser.id),
+    email: String(apiUser.email),
+    name: String(apiUser.name),
+    role,
+    roles: apiRoles ? apiRoles.map((r) => normalizeRole(r)) : [role],
+  };
+  _state = { token: result.token, user };
+  save(_state);
+  setAuthToken(result.token);
+  await syncTokenCookie(result.token);
+  startSessionCheck();
+  notify();
+  return user;
+}
+
 export const authStore = {
   getState(): AuthState {
     return _state;
@@ -273,6 +293,16 @@ export const authStore = {
       notify();
       return user;
     }
+  },
+
+  async loginWithGoogle(idToken: string, role?: UserRoleClient): Promise<AuthUser> {
+    const result = await api.loginWithGoogle(idToken, role);
+    return finalizeOAuthLogin(result);
+  },
+
+  async loginWithApple(idToken: string, name?: string, role?: UserRoleClient): Promise<AuthUser> {
+    const result = await api.loginWithApple(idToken, name, role);
+    return finalizeOAuthLogin(result);
   },
 
   async switchRole(targetRole: UserRoleClient): Promise<AuthUser> {
