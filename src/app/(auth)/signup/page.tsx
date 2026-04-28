@@ -521,9 +521,9 @@ function StepTwo({
         </div>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-4" aria-describedby={error ? "signup-error" : undefined}>
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-sm">
+          <div id="signup-error" role="alert" aria-live="polite" className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-sm">
             {error}
           </div>
         )}

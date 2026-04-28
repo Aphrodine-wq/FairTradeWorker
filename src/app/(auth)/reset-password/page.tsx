@@ -120,9 +120,9 @@ function ResetPasswordContent() {
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-5" aria-describedby={error ? "reset-error" : undefined}>
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-sm">
+                <div id="reset-error" role="alert" aria-live="polite" className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-sm">
                   {error}
                 </div>
               )}
