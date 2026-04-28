@@ -240,12 +240,12 @@ export default function NewWayPage() {
         </section>
 
         {/* CTA */}
-        <section style={{ backgroundColor: "#0F1419" }} className="py-16 lg:py-20">
+        <section className="bg-surface py-16 lg:py-20">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
               Ready to try it?
             </h2>
-            <p className="mt-3 text-gray-300 max-w-lg mx-auto">
+            <p className="mt-3 text-gray-600 max-w-lg mx-auto">
               Post your first project for free. See what comes back.
               No credit card, no commitment, no catch.
             </p>
@@ -256,7 +256,6 @@ export default function NewWayPage() {
               <Button
                 size="xl"
                 variant="outline"
-                className="border-gray-600 bg-transparent text-white hover:bg-white/10 hover:text-white hover:border-gray-500"
                 asChild
               >
                 <Link href="/signup?role=contractor">Join as Contractor</Link>

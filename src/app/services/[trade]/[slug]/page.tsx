@@ -74,23 +74,23 @@ function SubServiceIndex({ trade, sub }: { trade: Trade; sub: SubService }) {
 
   return (
     <>
-      <section className="bg-[#0F1419] py-20 lg:py-28">
+      <section className="bg-surface py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="mb-6 text-sm text-gray-400" aria-label="Breadcrumb">
+          <nav className="mb-6 text-sm text-gray-500" aria-label="Breadcrumb">
             <ol className="flex items-center gap-1.5 flex-wrap">
-              <li><Link href="/" className="hover:text-white transition-colors duration-150">Home</Link></li>
-              <li className="text-gray-600">/</li>
-              <li><Link href="/services" className="hover:text-white transition-colors duration-150">Services</Link></li>
-              <li className="text-gray-600">/</li>
-              <li><Link href={`/services/${trade.slug}`} className="hover:text-white transition-colors duration-150">{trade.plural}</Link></li>
-              <li className="text-gray-600">/</li>
-              <li className="text-gray-300">{sub.name}</li>
+              <li><Link href="/" className="hover:text-gray-900 transition-colors duration-150">Home</Link></li>
+              <li className="text-gray-400">/</li>
+              <li><Link href="/services" className="hover:text-gray-900 transition-colors duration-150">Services</Link></li>
+              <li className="text-gray-400">/</li>
+              <li><Link href={`/services/${trade.slug}`} className="hover:text-gray-900 transition-colors duration-150">{trade.plural}</Link></li>
+              <li className="text-gray-400">/</li>
+              <li className="text-gray-900">{sub.name}</li>
             </ol>
           </nav>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight max-w-3xl">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight max-w-3xl">
             {sub.name} in Mississippi
           </h1>
-          <p className="mt-4 text-lg text-gray-300 max-w-2xl leading-relaxed">
+          <p className="mt-4 text-lg text-gray-600 max-w-2xl leading-relaxed">
             {sub.description} Select your city below to find verified {trade.plural.toLowerCase()} near you. Typical cost: {sub.costRange}.
           </p>
           <div className="mt-8">
@@ -185,35 +185,35 @@ function TradeLocationPage({ trade, location }: { trade: Trade; location: Servic
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 
       {/* Hero */}
-      <section className="bg-[#0F1419] py-20 lg:py-28">
+      <section className="bg-surface py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="mb-6 text-sm text-gray-400" aria-label="Breadcrumb">
+          <nav className="mb-6 text-sm text-gray-500" aria-label="Breadcrumb">
             <ol className="flex items-center gap-1.5 flex-wrap">
-              <li><Link href="/" className="hover:text-white transition-colors duration-150">Home</Link></li>
-              <li className="text-gray-600">/</li>
-              <li><Link href="/services" className="hover:text-white transition-colors duration-150">Services</Link></li>
-              <li className="text-gray-600">/</li>
-              <li><Link href={`/services/${trade.slug}`} className="hover:text-white transition-colors duration-150">{trade.plural}</Link></li>
-              <li className="text-gray-600">/</li>
-              <li className="text-gray-300">{location.city}, {location.stateAbbr}</li>
+              <li><Link href="/" className="hover:text-gray-900 transition-colors duration-150">Home</Link></li>
+              <li className="text-gray-400">/</li>
+              <li><Link href="/services" className="hover:text-gray-900 transition-colors duration-150">Services</Link></li>
+              <li className="text-gray-400">/</li>
+              <li><Link href={`/services/${trade.slug}`} className="hover:text-gray-900 transition-colors duration-150">{trade.plural}</Link></li>
+              <li className="text-gray-400">/</li>
+              <li className="text-gray-900">{location.city}, {location.stateAbbr}</li>
             </ol>
           </nav>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight max-w-3xl">{title}</h1>
-          <p className="mt-4 text-lg text-gray-300 max-w-2xl leading-relaxed">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight max-w-3xl">{title}</h1>
+          <p className="mt-4 text-lg text-gray-600 max-w-2xl leading-relaxed">
             Find verified {trade.plural.toLowerCase()} in {location.city}, {location.stateAbbr}. Post your project for free, compare bids from licensed professionals, and hire with escrow-protected payments. No lead fees.
           </p>
 
           <div className="mt-6 flex flex-wrap gap-4">
-            <div className="flex items-center gap-2 text-sm text-gray-300"><Shield className="w-4 h-4 text-[#C41E3A]" />License verified</div>
-            <div className="flex items-center gap-2 text-sm text-gray-300"><Star className="w-4 h-4 text-[#C41E3A]" />Real reviews</div>
-            <div className="flex items-center gap-2 text-sm text-gray-300"><DollarSign className="w-4 h-4 text-[#C41E3A]" />Escrow payments</div>
-            <div className="flex items-center gap-2 text-sm text-gray-300"><Clock className="w-4 h-4 text-[#C41E3A]" />Avg. cost: {trade.avgCostRange}</div>
+            <div className="flex items-center gap-2 text-sm text-gray-600"><Shield className="w-4 h-4 text-[#C41E3A]" />License verified</div>
+            <div className="flex items-center gap-2 text-sm text-gray-600"><Star className="w-4 h-4 text-[#C41E3A]" />Real reviews</div>
+            <div className="flex items-center gap-2 text-sm text-gray-600"><DollarSign className="w-4 h-4 text-[#C41E3A]" />Escrow payments</div>
+            <div className="flex items-center gap-2 text-sm text-gray-600"><Clock className="w-4 h-4 text-[#C41E3A]" />Avg. cost: {trade.avgCostRange}</div>
           </div>
 
           <div className="mt-8 flex flex-col sm:flex-row gap-3">
             <Button size="xl" asChild><Link href="/signup?role=homeowner">Post Your {trade.name} Project Free</Link></Button>
-            <Button size="xl" variant="outline" className="border-gray-600 bg-transparent text-white hover:bg-white/10 hover:text-white hover:border-gray-500" asChild>
+            <Button size="xl" variant="outline" asChild>
               <Link href="/fairprice">Get Instant Estimate</Link>
             </Button>
           </div>
@@ -331,15 +331,15 @@ function TradeLocationPage({ trade, location }: { trade: Trade; location: Servic
       </section>
 
       {/* CTA */}
-      <section className="bg-[#0F1419] py-16 lg:py-20">
+      <section className="bg-surface py-16 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white">Get Free {trade.name} Estimates in {location.city}</h2>
-          <p className="mt-3 text-gray-300 max-w-lg mx-auto">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Get Free {trade.name} Estimates in {location.city}</h2>
+          <p className="mt-3 text-gray-600 max-w-lg mx-auto">
             Post your project and receive bids from verified {trade.plural.toLowerCase()} in {location.city}, {location.stateAbbr}. Free to post. No lead fees. Escrow on every job.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
             <Button size="xl" asChild><Link href="/signup?role=homeowner">Post a Job Free</Link></Button>
-            <Button size="xl" variant="outline" className="border-gray-600 bg-transparent text-white hover:bg-white/10 hover:text-white hover:border-gray-500" asChild>
+            <Button size="xl" variant="outline" asChild>
               <Link href="/signup?role=contractor">Join as {location.city} Contractor</Link>
             </Button>
           </div>

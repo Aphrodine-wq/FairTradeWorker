@@ -105,10 +105,10 @@ export default async function FindTradeWorkPage({ params }: Props) {
           </div>
         </section>
 
-        <section style={{ backgroundColor: "#0F1419" }} className="py-16 lg:py-20">
+        <section className="bg-surface py-16 lg:py-20">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-2xl font-bold text-white">Ready to find {trade.name.toLowerCase()} work?</h2>
-            <p className="mt-3 text-gray-300">Join free. Browse jobs. Bid when you see something you want.</p>
+            <h2 className="text-2xl font-bold text-gray-900">Ready to find {trade.name.toLowerCase()} work?</h2>
+            <p className="mt-3 text-gray-600">Join free. Browse jobs. Bid when you see something you want.</p>
             <div className="mt-8">
               <Button size="xl" asChild>
                 <Link href="/signup?role=contractor">Join Free</Link>

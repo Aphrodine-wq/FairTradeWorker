@@ -306,12 +306,12 @@ export default function MississippiContractorResourcesPage() {
         </section>
 
         {/* CTA */}
-        <section style={{ backgroundColor: "#0F1419" }} className="py-16 lg:py-20">
+        <section className="bg-surface py-16 lg:py-20">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold text-white">
+            <h2 className="text-3xl font-bold text-gray-900">
               Join FairTradeWorker
             </h2>
-            <p className="mt-3 text-gray-300 max-w-lg mx-auto">
+            <p className="mt-3 text-gray-600 max-w-lg mx-auto">
               Flat monthly rate. No lead fees. Escrow on every job. Join
               Mississippi's growing network of verified contractors.
             </p>
@@ -319,7 +319,7 @@ export default function MississippiContractorResourcesPage() {
               <Button size="xl" asChild>
                 <Link href="/signup?role=contractor">Join as Contractor</Link>
               </Button>
-              <Button size="xl" variant="outline" className="border-gray-600 bg-transparent text-white hover:bg-white/10 hover:text-white hover:border-gray-500" asChild>
+              <Button size="xl" variant="outline" asChild>
                 <Link href="/signup?role=homeowner">Post a Job Free</Link>
               </Button>
             </div>

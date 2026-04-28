@@ -151,12 +151,12 @@ export default async function FindTradeLocationWorkPage({ params }: Props) {
           </div>
         </section>
 
-        <section style={{ backgroundColor: "#0F1419" }} className="py-16 lg:py-20">
+        <section className="bg-surface py-16 lg:py-20">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-2xl font-bold text-white">
+            <h2 className="text-2xl font-bold text-gray-900">
               Find {trade.name.toLowerCase()} work in {loc.city}
             </h2>
-            <p className="mt-3 text-gray-300">
+            <p className="mt-3 text-gray-600">
               Join free. See real projects. Bid when you're ready.
             </p>
             <div className="mt-8">
