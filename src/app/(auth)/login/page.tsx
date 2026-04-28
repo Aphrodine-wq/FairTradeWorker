@@ -262,9 +262,14 @@ function LoginContent() {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-5" aria-describedby={error ? "login-error" : undefined}>
                 {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-sm">
+                  <div
+                    id="login-error"
+                    role="alert"
+                    aria-live="polite"
+                    className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-sm"
+                  >
                     {error}
                   </div>
                 )}
@@ -280,9 +285,12 @@ function LoginContent() {
                     id="email"
                     type="email"
                     autoComplete="email"
+                    inputMode="email"
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    aria-invalid={!!error}
+                    aria-describedby={error ? "login-error" : undefined}
                     required
                   />
                 </div>

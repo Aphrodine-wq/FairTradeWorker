@@ -25,6 +25,15 @@ const nextConfig: NextConfig = {
       source: '/(.*)',
       headers: securityHeaders,
     },
+    {
+      // Apple requires the AASA file to be served as JSON (no extension)
+      source: '/.well-known/apple-app-site-association',
+      headers: [{ key: 'Content-Type', value: 'application/json' }],
+    },
+    {
+      source: '/.well-known/assetlinks.json',
+      headers: [{ key: 'Content-Type', value: 'application/json' }],
+    },
   ],
 };
 
