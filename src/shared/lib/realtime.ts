@@ -151,7 +151,7 @@ export const api = {
   async loginWithGoogle(idToken: string, role?: string): Promise<AuthResponse> {
     const data = await apiFetch<AuthResponse>("/api/auth/google", {
       method: "POST",
-      body: JSON.stringify({ idToken, role }),
+      body: JSON.stringify({ id_token: idToken, role }),
     });
     setAuthToken(data.token);
     return data;
@@ -160,7 +160,7 @@ export const api = {
   async loginWithApple(idToken: string, name?: string, role?: string): Promise<AuthResponse> {
     const data = await apiFetch<AuthResponse>("/api/auth/apple", {
       method: "POST",
-      body: JSON.stringify({ idToken, name, role }),
+      body: JSON.stringify({ id_token: idToken, name, role }),
     });
     setAuthToken(data.token);
     return data;
