@@ -188,8 +188,8 @@ export default function ContractorDashboardPage() {
   useEffect(() => {
     fetchJobs().then(setJobs);
     fetchEstimates().then(setEstimates);
-    fetchReviews().then((apiReviews) => {
-      if (apiReviews.length > 0) setReviews(apiReviews);
+    fetchReviews().then(({ data }) => {
+      if (data.length > 0) setReviews(data);
     });
   }, []);
 

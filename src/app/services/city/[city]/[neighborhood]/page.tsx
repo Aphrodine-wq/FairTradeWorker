@@ -79,31 +79,31 @@ export default async function NeighborhoodPage({ params }: Props) {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
 
         {/* Hero */}
-        <section className="bg-[#0F1419] py-20 lg:py-28">
+        <section className="bg-surface py-20 lg:py-28">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <nav className="mb-6 text-sm text-gray-400" aria-label="Breadcrumb">
+            <nav className="mb-6 text-sm text-gray-500" aria-label="Breadcrumb">
               <ol className="flex items-center gap-1.5 flex-wrap">
-                <li><Link href="/" className="hover:text-white transition-colors duration-150">Home</Link></li>
-                <li className="text-gray-600">/</li>
-                <li><Link href="/services" className="hover:text-white transition-colors duration-150">Services</Link></li>
-                <li className="text-gray-600">/</li>
-                <li><Link href={`/services/city/${loc.slug}`} className="hover:text-white transition-colors duration-150">{loc.city}, {loc.stateAbbr}</Link></li>
-                <li className="text-gray-600">/</li>
-                <li className="text-gray-300">{hood.name}</li>
+                <li><Link href="/" className="hover:text-gray-900 transition-colors duration-150">Home</Link></li>
+                <li className="text-gray-400">/</li>
+                <li><Link href="/services" className="hover:text-gray-900 transition-colors duration-150">Services</Link></li>
+                <li className="text-gray-400">/</li>
+                <li><Link href={`/services/city/${loc.slug}`} className="hover:text-gray-900 transition-colors duration-150">{loc.city}, {loc.stateAbbr}</Link></li>
+                <li className="text-gray-400">/</li>
+                <li className="text-gray-900">{hood.name}</li>
               </ol>
             </nav>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight max-w-3xl">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight max-w-3xl">
               Contractors Near {hood.name}, {loc.city}
             </h1>
-            <p className="mt-4 text-lg text-gray-300 max-w-2xl leading-relaxed">
+            <p className="mt-4 text-lg text-gray-600 max-w-2xl leading-relaxed">
               {hood.description} Find verified contractors who know the {hood.name} area — local building codes, soil conditions, and architectural style.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-4">
-              <div className="flex items-center gap-2 text-sm text-gray-300"><Shield className="w-4 h-4 text-[#C41E3A]" />License verified</div>
-              <div className="flex items-center gap-2 text-sm text-gray-300"><Star className="w-4 h-4 text-[#C41E3A]" />Real reviews</div>
-              <div className="flex items-center gap-2 text-sm text-gray-300"><MapPin className="w-4 h-4 text-[#C41E3A]" />{loc.city}, {loc.stateAbbr}</div>
+              <div className="flex items-center gap-2 text-sm text-gray-600"><Shield className="w-4 h-4 text-[#C41E3A]" />License verified</div>
+              <div className="flex items-center gap-2 text-sm text-gray-600"><Star className="w-4 h-4 text-[#C41E3A]" />Real reviews</div>
+              <div className="flex items-center gap-2 text-sm text-gray-600"><MapPin className="w-4 h-4 text-[#C41E3A]" />{loc.city}, {loc.stateAbbr}</div>
             </div>
 
             <div className="mt-8">
@@ -182,17 +182,17 @@ export default async function NeighborhoodPage({ params }: Props) {
         </section>
 
         {/* CTA */}
-        <section className="bg-[#0F1419] py-16 lg:py-20">
+        <section className="bg-surface py-16 lg:py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
               Find Contractors Near {hood.name}
             </h2>
-            <p className="mt-3 text-gray-300 max-w-lg mx-auto">
+            <p className="mt-3 text-gray-600 max-w-lg mx-auto">
               Post your project for free. Verified contractors near {hood.name} in {loc.city} bid on your job. No lead fees, escrow protection on every project.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
               <Button size="xl" asChild><Link href="/signup?role=homeowner">Post a Job Free</Link></Button>
-              <Button size="xl" variant="outline" className="border-gray-600 bg-transparent text-white hover:bg-white/10 hover:text-white hover:border-gray-500" asChild>
+              <Button size="xl" variant="outline" asChild>
                 <Link href="/fairprice">Get Instant Estimate</Link>
               </Button>
             </div>

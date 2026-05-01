@@ -230,15 +230,15 @@ docs/                            # Business intelligence + research
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/api/integrations/quickbooks/connect` | Initiate Intuit OAuth2 flow |
-| GET | `/api/integrations/quickbooks/callback` | OAuth2 callback handler |
-| POST | `/api/integrations/quickbooks/disconnect` | Revoke QB connection |
-| GET | `/api/integrations/quickbooks/status` | Check connection status |
-| POST | `/api/integrations/quickbooks/create-invoice` | Create invoice in QB |
-| POST | `/api/integrations/quickbooks/sync-estimate` | Sync estimate to QB |
-| POST | `/api/integrations/quickbooks/payout` | Execute contractor payout via QB Bill |
-| GET | `/api/integrations/quickbooks/receipt` | Generate payment receipt |
-| POST | `/api/integrations/quickbooks/webhook` | Intuit webhook receiver |
+| GET | `/api/quickbooks/connect` | Initiate Intuit OAuth2 flow |
+| GET | `/api/quickbooks/callback` | OAuth2 callback handler |
+| DELETE | `/api/quickbooks/disconnect` | Revoke QB connection |
+| GET | `/api/quickbooks/status` | Check connection status |
+| POST | `/api/quickbooks/create-invoice` | Create invoice in QB |
+| POST | `/api/quickbooks/sync-estimate` | Sync estimate to QB |
+| POST | `/api/quickbooks/payout` | Execute contractor payout via QB Bill |
+| GET | `/api/quickbooks/receipt` | Generate payment receipt |
+| POST | `/api/quickbooks/webhook` | Intuit webhook receiver |
 
 ### Seed
 

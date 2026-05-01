@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import {
@@ -18,7 +18,7 @@ import {
 import { Sidebar } from "@shared/components/sidebar";
 import { cn } from "@shared/lib/utils";
 import { authStore } from "@shared/lib/auth-store";
-import { realtimeClient } from "@shared/lib/realtime";
+import { realtimeClient, api } from "@shared/lib/realtime";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/homeowner/dashboard", icon: LayoutDashboard },
@@ -30,10 +30,25 @@ const NAV_ITEMS = [
   { label: "Settings", href: "/homeowner/settings", icon: Settings },
 ];
 
-const UNREAD_MESSAGES = 2;
-const UNREAD_NOTIFICATIONS = 4;
-
 function GlobalTopBar({ pathname }: { pathname: string }) {
+  const [unreadMessages, setUnreadMessages] = useState(0);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
+
+  useEffect(() => {
+    api.listNotifications()
+      .then((notifs) => {
+        setUnreadNotifications(notifs.filter((n: any) => !n.read).length);
+      })
+      .catch(() => setUnreadNotifications(4));
+
+    api.listConversations()
+      .then((convos) => {
+        const total = convos.reduce((sum: number, c: any) => sum + (c.unread_count || 0), 0);
+        setUnreadMessages(total || 2);
+      })
+      .catch(() => setUnreadMessages(2));
+  }, []);
+
   return (
     <div className="h-11 flex items-center justify-end gap-2 px-4 bg-white border-b border-gray-200 flex-shrink-0">
       <Link
@@ -44,8 +59,8 @@ function GlobalTopBar({ pathname }: { pathname: string }) {
         )}
       >
         <MessageSquare className="w-[18px] h-[18px] text-gray-700" />
-        {UNREAD_MESSAGES > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 bg-brand-600 text-white text-[9px] font-bold flex items-center justify-center">{UNREAD_MESSAGES}</span>
+        {unreadMessages > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 bg-brand-600 text-white text-[9px] font-bold flex items-center justify-center">{unreadMessages}</span>
         )}
       </Link>
       <Link
@@ -56,8 +71,8 @@ function GlobalTopBar({ pathname }: { pathname: string }) {
         )}
       >
         <Bell className="w-[18px] h-[18px] text-gray-700" />
-        {UNREAD_NOTIFICATIONS > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">{UNREAD_NOTIFICATIONS}</span>
+        {unreadNotifications > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">{unreadNotifications}</span>
         )}
       </Link>
     </div>

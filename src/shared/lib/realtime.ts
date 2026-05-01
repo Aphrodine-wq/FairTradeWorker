@@ -219,6 +219,24 @@ export const api = {
     return apiFetch("/api/auth/me");
   },
 
+  async loginWithGoogle(idToken: string, role?: string): Promise<AuthResponse> {
+    const data = await apiFetch<AuthResponse>("/api/auth/google", {
+      method: "POST",
+      body: JSON.stringify({ id_token: idToken, role }),
+    });
+    setAuthToken(data.token);
+    return data;
+  },
+
+  async loginWithApple(idToken: string, name?: string, role?: string): Promise<AuthResponse> {
+    const data = await apiFetch<AuthResponse>("/api/auth/apple", {
+      method: "POST",
+      body: JSON.stringify({ id_token: idToken, name, role }),
+    });
+    setAuthToken(data.token);
+    return data;
+  },
+
   async switchRole(role: string): Promise<AuthResponse> {
     const data = await apiFetch<AuthResponse>("/api/auth/switch-role", {
       method: "POST",
@@ -260,7 +278,7 @@ export const api = {
   }): Promise<RealtimeJob> {
     const data = await apiFetch<{ job: RealtimeJob }>("/api/jobs", {
       method: "POST",
-      body: JSON.stringify({ job }),
+      body: JSON.stringify(job),
     });
     return data.job;
   },
@@ -271,7 +289,7 @@ export const api = {
   ): Promise<RealtimeBid> {
     const data = await apiFetch<{ bid: RealtimeBid }>(`/api/jobs/${jobId}/bids`, {
       method: "POST",
-      body: JSON.stringify({ bid }),
+      body: JSON.stringify(bid),
     });
     return data.bid;
   },
@@ -296,6 +314,11 @@ export const api = {
   },
 
   // Chat (authenticated)
+  async listConversations(): Promise<any[]> {
+    const data = await apiFetch<{ conversations: any[] }>("/api/chat/conversations");
+    return data.conversations;
+  },
+
   async listMessages(conversationId: string): Promise<RealtimeMessage[]> {
     const data = await apiFetch<{ messages: RealtimeMessage[] }>(
       `/api/chat/${conversationId}`
@@ -309,7 +332,7 @@ export const api = {
   ): Promise<RealtimeMessage> {
     const data = await apiFetch<{ message: RealtimeMessage }>(
       `/api/chat/${conversationId}`,
-      { method: "POST", body: JSON.stringify({ message }) }
+      { method: "POST", body: JSON.stringify(message) }
     );
     return data.message;
   },
@@ -509,7 +532,7 @@ export const api = {
   async updateSettings(settings: Record<string, any>): Promise<any> {
     const data = await apiFetch<{ settings: any }>("/api/settings", {
       method: "PUT",
-      body: JSON.stringify({ settings }),
+      body: JSON.stringify(settings),
     });
     return data.settings;
   },
@@ -518,7 +541,7 @@ export const api = {
   async createReview(attrs: { rating: number; comment: string; reviewed_id: string; job_id?: string }): Promise<any> {
     const data = await apiFetch<{ review: any }>("/api/reviews", {
       method: "POST",
-      body: JSON.stringify({ review: attrs }),
+      body: JSON.stringify(attrs),
     });
     return data.review;
   },
@@ -529,6 +552,61 @@ export const api = {
       body: JSON.stringify({ response }),
     });
     return data.review;
+  },
+
+  // Sub Jobs
+  async listSubJobs(): Promise<any[]> {
+    const data = await apiFetch<{ sub_jobs: any[] }>("/api/sub-jobs");
+    return data.sub_jobs;
+  },
+
+  async getSubJob(id: string): Promise<{ sub_job: any; bids: any[] }> {
+    return apiFetch(`/api/sub-jobs/${id}`);
+  },
+
+  async postSubJob(subJob: {
+    project_id: string;
+    milestone_label: string;
+    milestone_index: number;
+    title: string;
+    description: string;
+    category: string;
+    skills: string[];
+    location: string;
+    budget_min: number;
+    budget_max: number;
+    payment_path: string;
+    disclosed_to_owner: boolean;
+    deadline: string;
+  }): Promise<any> {
+    const data = await apiFetch<{ sub_job: any }>("/api/sub-jobs", {
+      method: "POST",
+      body: JSON.stringify(subJob),
+    });
+    return data.sub_job;
+  },
+
+  async placeSubBid(
+    subJobId: string,
+    bid: { amount: number; message: string; timeline: string }
+  ): Promise<any> {
+    const data = await apiFetch<{ bid: any }>(`/api/sub-jobs/${subJobId}/bids`, {
+      method: "POST",
+      body: JSON.stringify(bid),
+    });
+    return data.bid;
+  },
+
+  async getSubContractorStats(): Promise<any> {
+    return apiFetch("/api/sub-contractors/stats");
+  },
+
+  async updateSubJobStatus(subJobId: string, status: string): Promise<any> {
+    const data = await apiFetch<{ sub_job: any }>(`/api/sub-jobs/${subJobId}/status`, {
+      method: "PUT",
+      body: JSON.stringify({ status }),
+    });
+    return data.sub_job;
   },
 
   // FairRecords
@@ -569,7 +647,7 @@ export const api = {
   async submitVerificationStep(step: string, data: Record<string, unknown>): Promise<any> {
     return apiFetch(`/api/contractor/verification/${step}`, {
       method: "POST",
-      body: JSON.stringify({ data }),
+      body: JSON.stringify(data),
     });
   },
 

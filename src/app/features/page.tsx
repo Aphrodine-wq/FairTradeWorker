@@ -1,15 +1,75 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  Mic,
-  DollarSign,
-  Shield,
-  BarChart3,
-  Users,
-  FileText,
-  Check,
-  ArrowRight,
-} from "lucide-react";
+/* Geometric inline SVG icons — no lucide */
+const GeoMic = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="8" y="2" width="4" height="10" fill="currentColor" />
+    <rect x="5" y="8" width="10" height="2" fill="currentColor" opacity="0.5" />
+    <circle cx="10" cy="15" r="2" fill="currentColor" />
+    <rect x="9" y="13" width="2" height="4" fill="currentColor" />
+  </svg>
+);
+
+const GeoDollar = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="9" y="2" width="2" height="16" fill="currentColor" />
+    <rect x="6" y="5" width="8" height="2" fill="currentColor" />
+    <rect x="6" y="9" width="8" height="2" fill="currentColor" />
+    <rect x="6" y="13" width="8" height="2" fill="currentColor" />
+  </svg>
+);
+
+const GeoShield = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="10,1 18,5 18,11 10,19 2,11 2,5" fill="currentColor" opacity="0.15" />
+    <polygon points="10,3 16,6 16,11 10,17 4,11 4,6" stroke="currentColor" strokeWidth="1.5" fill="none" />
+    <rect x="9" y="7" width="2" height="5" fill="currentColor" />
+    <rect x="9" y="13" width="2" height="2" fill="currentColor" />
+  </svg>
+);
+
+const GeoBarChart = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="2" y="12" width="3" height="6" fill="currentColor" opacity="0.4" />
+    <rect x="7" y="8" width="3" height="10" fill="currentColor" opacity="0.6" />
+    <rect x="12" y="4" width="3" height="14" fill="currentColor" opacity="0.8" />
+    <rect x="17" y="2" width="1" height="16" fill="currentColor" />
+  </svg>
+);
+
+const GeoUsers = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="7" cy="6" r="3" fill="currentColor" opacity="0.7" />
+    <circle cx="13" cy="6" r="3" fill="currentColor" opacity="0.4" />
+    <rect x="2" y="12" width="10" height="4" fill="currentColor" opacity="0.7" />
+    <rect x="8" y="12" width="10" height="4" fill="currentColor" opacity="0.4" />
+  </svg>
+);
+
+const GeoFileText = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="3" y="1" width="14" height="18" stroke="currentColor" strokeWidth="1.5" fill="none" />
+    <polygon points="12,1 17,6 12,6" fill="currentColor" opacity="0.3" />
+    <rect x="6" y="9" width="8" height="1.5" fill="currentColor" />
+    <rect x="6" y="12" width="6" height="1.5" fill="currentColor" />
+    <rect x="6" y="15" width="4" height="1.5" fill="currentColor" opacity="0.5" />
+  </svg>
+);
+
+const GeoCheck = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <line x1="2" y1="6.5" x2="5" y2="9.5" stroke="currentColor" strokeWidth="2" strokeLinecap="square" />
+    <line x1="5" y1="9.5" x2="10" y2="3" stroke="currentColor" strokeWidth="2" strokeLinecap="square" />
+  </svg>
+);
+
+const GeoArrowRight = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <line x1="2" y1="8" x2="12" y2="8" stroke="currentColor" strokeWidth="2" />
+    <line x1="9" y1="4" x2="13" y2="8" stroke="currentColor" strokeWidth="2" />
+    <line x1="9" y1="12" x2="13" y2="8" stroke="currentColor" strokeWidth="2" />
+  </svg>
+);
 import { Navbar } from "@marketplace/components/navbar";
 import { Footer } from "@marketplace/components/footer";
 
@@ -28,21 +88,21 @@ export const metadata: Metadata = {
 
 const TOP_FEATURES = [
   {
-    icon: Mic,
+    icon: GeoMic,
     title: "Hunter Voice AI",
     description: "Walk the job site. Describe the scope out loud. Hunter builds a line-item estimate in three minutes — materials, labor, markup.",
     points: ["Works on your phone, no laptop", "CSI-division breakdowns", "Learns your pricing over time", "Edit before sending"],
     stat: { value: "3 min", label: "average estimate time" },
   },
   {
-    icon: DollarSign,
+    icon: GeoDollar,
     title: "Zero Lead Fees",
     description: "Other platforms charge $50\u2013$100 per lead, win or lose. We charge a flat subscription. No commissions, no per-lead charges.",
     points: ["Save $6,000+/year on average", "No percentage cut on revenue", "No caps on core features", "Lower bids \u2014 no lead cost to pad"],
     stat: { value: "$0", label: "per lead, every plan" },
   },
   {
-    icon: Shield,
+    icon: GeoShield,
     title: "Escrow on Every Job",
     description: "Homeowners fund milestones upfront. Contractors get paid when work is verified. No chasing invoices, no bounced checks.",
     points: ["Milestone-based payments", "Contractors paid when verified", "5-day dispute resolution", "Full payment history + receipts"],
@@ -95,7 +155,7 @@ export default function FeaturesPage() {
                       {feature.points.map((d) => (
                         <li key={d} className="flex items-center gap-2.5 text-sm text-gray-800">
                           <div className="w-5 h-5 rounded-sm bg-brand-50 flex items-center justify-center shrink-0">
-                            <Check className="w-3 h-3 text-brand-600" strokeWidth={3} />
+                            <GeoCheck className="w-3 h-3 text-brand-600" />
                           </div>
                           {d}
                         </li>
@@ -120,7 +180,7 @@ export default function FeaturesPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               <div>
                 <div className="w-12 h-12 rounded-sm bg-brand-50 flex items-center justify-center mb-5">
-                  <BarChart3 className="w-5 h-5 text-brand-600" />
+                  <GeoBarChart className="w-5 h-5 text-brand-600" />
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight mb-3">
                   Know your numbers.
@@ -138,7 +198,7 @@ export default function FeaturesPage() {
                   ].map((d) => (
                     <li key={d} className="flex items-center gap-2.5 text-sm text-gray-800">
                       <div className="w-5 h-5 rounded-sm bg-brand-50 flex items-center justify-center shrink-0">
-                        <Check className="w-3 h-3 text-brand-600" strokeWidth={3} />
+                        <GeoCheck className="w-3 h-3 text-brand-600" />
                       </div>
                       {d}
                     </li>
@@ -170,13 +230,13 @@ export default function FeaturesPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {[
                 {
-                  icon: Users,
+                  icon: GeoUsers,
                   title: "Built for crews.",
                   description: "Shared projects, assignments, and status updates from the field. No more group texts. Team plans support up to 5 members, Enterprise is unlimited.",
                   points: ["Shared project dashboard", "Assignment and scope tracking", "Team activity feed", "Role-based access for field and office"],
                 },
                 {
-                  icon: FileText,
+                  icon: GeoFileText,
                   title: "Estimates that close.",
                   description: "Branded PDF estimates with your logo and line-item breakdowns. Build manually, generate with AI, or reuse templates from past jobs.",
                   points: ["Your branding on every estimate", "Reusable templates from past jobs", "PDF generation and direct sharing", "Materials, labor, and markup detail"],
@@ -198,7 +258,7 @@ export default function FeaturesPage() {
                       {feature.points.map((d) => (
                         <li key={d} className="flex items-center gap-2.5 text-sm text-gray-800">
                           <div className="w-5 h-5 rounded-sm bg-brand-50 flex items-center justify-center shrink-0">
-                            <Check className="w-3 h-3 text-brand-600" strokeWidth={3} />
+                            <GeoCheck className="w-3 h-3 text-brand-600" />
                           </div>
                           {d}
                         </li>
@@ -227,7 +287,7 @@ export default function FeaturesPage() {
                 className="inline-flex items-center gap-2 rounded-sm bg-brand-600 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-700 transition-colors"
               >
                 Get Started Free
-                <ArrowRight className="w-4 h-4" />
+                <GeoArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 href="/pricing"

@@ -36,6 +36,7 @@ const footerLinks = {
   Company: [
     { label: "About", href: "/about" },
     { label: "Careers", href: "/careers" },
+    { label: "Resources", href: "/resources" },
     { label: "Contact", href: "/contact" },
     { label: "Privacy Policy", href: "/privacy" },
     { label: "Terms of Service", href: "/terms" },
@@ -44,7 +45,7 @@ const footerLinks = {
 
 export function Footer() {
   return (
-    <footer style={{ backgroundColor: "#0F1419" }} className="border-t border-gray-800">
+    <footer className="bg-surface border-t border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main footer content */}
         <div className="py-14 grid grid-cols-2 md:grid-cols-5 gap-10">
@@ -55,27 +56,27 @@ export function Footer() {
               className="flex items-center gap-2.5 hover:opacity-80 transition-opacity duration-150"
             >
               <BrandMark className="w-7 h-7" />
-              <span className="text-lg font-bold text-white">FairTradeWorker</span>
+              <span className="text-lg font-bold text-gray-900">FairTradeWorker</span>
             </Link>
-            <p className="mt-3 text-sm text-gray-300 leading-relaxed">
+            <p className="mt-3 text-sm text-gray-600 leading-relaxed">
               The fair way to find and hire contractors. Flat-rate subscriptions,
               zero lead fees, escrow on every job.
             </p>
-            <p className="mt-4 text-sm text-gray-300">
+            <p className="mt-4 text-sm text-gray-600">
               <a
                 href="mailto:hello@fairtradeworker.com"
-                className="hover:text-white transition-colors duration-150"
+                className="hover:text-gray-900 transition-colors duration-150"
               >
                 hello@fairtradeworker.com
               </a>
             </p>
-            <p className="text-sm text-gray-300 mt-1">Oxford, MS</p>
+            <p className="text-sm text-gray-600 mt-1">Oxford, MS</p>
           </div>
 
           {/* Link columns */}
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
-              <h4 className="text-xs font-bold text-white uppercase tracking-widest mb-4">
+              <h4 className="text-xs font-bold text-gray-900 uppercase tracking-widest mb-4">
                 {category}
               </h4>
               <ul className="space-y-3">
@@ -83,7 +84,7 @@ export function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm text-gray-300 hover:text-white transition-colors duration-150"
+                      className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150"
                     >
                       {link.label}
                     </Link>
@@ -95,27 +96,27 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="py-6 border-t border-gray-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <p className="text-sm text-gray-300">
+        <div className="py-6 border-t border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <p className="text-sm text-gray-500">
             &copy; {new Date().getFullYear()} FairTradeWorker. All rights
             reserved.
           </p>
           <div className="flex items-center gap-6">
             <Link
               href="/privacy"
-              className="text-sm text-gray-300 hover:text-white transition-colors duration-150"
+              className="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-150"
             >
               Privacy
             </Link>
             <Link
               href="/terms"
-              className="text-sm text-gray-300 hover:text-white transition-colors duration-150"
+              className="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-150"
             >
               Terms
             </Link>
             <Link
               href="/contact"
-              className="text-sm text-gray-300 hover:text-white transition-colors duration-150"
+              className="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-150"
             >
               Contact
             </Link>

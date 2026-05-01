@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Toaster } from "@shared/ui/toaster";
 import { CookieConsent } from "@shared/components/cookie-consent";
 import "@/styles/globals.css";
@@ -90,6 +91,7 @@ export default function RootLayout({
         {children}
         <Toaster />
         <CookieConsent />
+        <Analytics />
       </body>
     </html>
   );

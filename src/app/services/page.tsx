@@ -36,25 +36,25 @@ export default function ServicesIndexPage() {
       <Navbar />
       <main className="pt-16">
         {/* Hero */}
-        <section className="bg-[#0F1419] py-20 lg:py-28">
+        <section className="bg-surface py-20 lg:py-28">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight max-w-3xl">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight max-w-3xl">
               Find Verified Contractors Near You
             </h1>
-            <p className="mt-4 text-lg text-gray-300 max-w-2xl leading-relaxed">
+            <p className="mt-4 text-lg text-gray-600 max-w-2xl leading-relaxed">
               Browse by trade or location. Every contractor is license-verified,
               insured, and reviewed by real homeowners. No lead fees — ever.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <div className="flex items-center gap-2 text-sm text-gray-400">
+              <div className="flex items-center gap-2 text-sm text-gray-500">
                 <Shield className="w-4 h-4 text-[#C41E3A]" />
                 License verified
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-400">
+              <div className="flex items-center gap-2 text-sm text-gray-500">
                 <Star className="w-4 h-4 text-[#C41E3A]" />
                 Real reviews only
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-400">
+              <div className="flex items-center gap-2 text-sm text-gray-500">
                 <MapPin className="w-4 h-4 text-[#C41E3A]" />
                 {SERVICE_LOCATIONS.length} cities covered
               </div>
@@ -159,12 +159,12 @@ export default function ServicesIndexPage() {
         </section>
 
         {/* CTA */}
-        <section className="bg-[#0F1419] py-16 lg:py-20">
+        <section className="bg-surface py-16 lg:py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
               Ready to get started?
             </h2>
-            <p className="mt-3 text-gray-300 max-w-lg mx-auto">
+            <p className="mt-3 text-gray-600 max-w-lg mx-auto">
               Post your project for free and receive bids from verified
               contractors in your area. No lead fees, no hidden costs.
             </p>
@@ -175,7 +175,6 @@ export default function ServicesIndexPage() {
               <Button
                 size="xl"
                 variant="outline"
-                className="border-gray-600 bg-transparent text-white hover:bg-white/10 hover:text-white hover:border-gray-500"
                 asChild
               >
                 <Link href="/signup?role=contractor">Join as Contractor</Link>

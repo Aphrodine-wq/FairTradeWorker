@@ -24,24 +24,24 @@ describe("cn", () => {
 });
 
 describe("formatCurrency", () => {
-  it("formats zero", () => {
+  it("formats zero cents", () => {
     expect(formatCurrency(0)).toBe("$0");
   });
 
-  it("formats whole dollar amounts without decimals", () => {
-    expect(formatCurrency(1000)).toBe("$1,000");
+  it("formats cents to whole dollar amounts without decimals", () => {
+    expect(formatCurrency(100000)).toBe("$1,000");
   });
 
-  it("formats large amounts with commas", () => {
-    expect(formatCurrency(12500)).toBe("$12,500");
+  it("formats large cent amounts with commas", () => {
+    expect(formatCurrency(1250000)).toBe("$12,500");
   });
 
-  it("rounds fractional cents", () => {
-    expect(formatCurrency(99.99)).toBe("$100");
+  it("formats small cent amounts", () => {
+    expect(formatCurrency(9999)).toBe("$100");
   });
 
-  it("formats negative amounts", () => {
-    expect(formatCurrency(-500)).toBe("-$500");
+  it("formats negative cent amounts", () => {
+    expect(formatCurrency(-50000)).toBe("-$500");
   });
 });
 

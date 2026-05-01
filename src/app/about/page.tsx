@@ -173,8 +173,8 @@ export default function AboutPage() {
           <Separator className="my-14" />
 
           {/* CTA */}
-          <section className="bg-dark rounded-sm p-10 text-center">
-            <h2 className="text-2xl font-bold text-white mb-3">
+          <section className="bg-surface rounded-sm p-10 text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">
               Ready to see it for yourself?
             </h2>
             <p className="text-gray-600 mb-6 max-w-md mx-auto">
@@ -188,7 +188,6 @@ export default function AboutPage() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-gray-600 bg-transparent text-white hover:bg-white/10 hover:text-white hover:border-gray-500"
                 asChild
               >
                 <Link href="/contact">Talk to Us</Link>

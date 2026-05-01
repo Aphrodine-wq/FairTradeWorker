@@ -7,7 +7,7 @@ import { Button } from "@shared/ui/button";
 import { Badge } from "@shared/ui/badge";
 import { Textarea } from "@shared/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@shared/ui/dialog";
-import { mockSubJobs, type SubJob, type SubPaymentPath } from "@shared/lib/mock-data";
+import { type SubJob, type SubPaymentPath } from "@shared/lib/mock-data";
 import { fetchSubJobs } from "@shared/lib/data";
 import { api } from "@shared/lib/realtime";
 import { SubJobCard } from "@subcontractor/components/sub-job-card";
@@ -38,7 +38,7 @@ const SKILL_FILTERS = [
 
 export default function BrowseSubJobsPage() {
   usePageTitle("Browse Sub Jobs");
-  const [subJobs, setSubJobs] = useState<SubJob[]>(mockSubJobs);
+  const [subJobs, setSubJobs] = useState<SubJob[]>([]);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortOption>("newest");
   const [showFilters, setShowFilters] = useState(true);

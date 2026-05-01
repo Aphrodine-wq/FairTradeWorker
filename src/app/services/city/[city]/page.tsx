@@ -22,10 +22,14 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { city } = await params;
   const loc = getLocationBySlug(city);
-  if (!loc?.profile) return {};
+  if (!loc) return {};
 
-  const title = `Contractors in ${loc.city}, ${loc.stateAbbr} — All Trades, Verified Pros`;
-  const description = `Find verified contractors in ${loc.city}, Mississippi for HVAC, electrical, plumbing, roofing, painting, and more. Compare bids by neighborhood. No lead fees. Free to post.`;
+  const title = loc.profile
+    ? `Contractors in ${loc.city}, ${loc.stateAbbr} — All Trades, Verified Pros`
+    : `Contractors in ${loc.city}, ${loc.stateAbbr} | FairTradeWorker`;
+  const description = loc.profile
+    ? `Find verified contractors in ${loc.city}, Mississippi for HVAC, electrical, plumbing, roofing, painting, and more. Compare bids by neighborhood. No lead fees. Free to post.`
+    : `Find verified contractors in ${loc.city}, ${loc.stateAbbr}. Compare bids, read reviews, and hire with confidence on FairTradeWorker.`;
 
   return {
     title,
@@ -90,31 +94,31 @@ export default async function CityHubPage({ params }: Props) {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 
         {/* Hero */}
-        <section className="bg-[#0F1419] py-20 lg:py-28">
+        <section className="bg-surface py-20 lg:py-28">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <nav className="mb-6 text-sm text-gray-400" aria-label="Breadcrumb">
+            <nav className="mb-6 text-sm text-gray-500" aria-label="Breadcrumb">
               <ol className="flex items-center gap-1.5 flex-wrap">
-                <li><Link href="/" className="hover:text-white transition-colors duration-150">Home</Link></li>
-                <li className="text-gray-600">/</li>
-                <li><Link href="/services" className="hover:text-white transition-colors duration-150">Services</Link></li>
-                <li className="text-gray-600">/</li>
-                <li className="text-gray-300">{loc.city}, {loc.stateAbbr}</li>
+                <li><Link href="/" className="hover:text-gray-900 transition-colors duration-150">Home</Link></li>
+                <li className="text-gray-400">/</li>
+                <li><Link href="/services" className="hover:text-gray-900 transition-colors duration-150">Services</Link></li>
+                <li className="text-gray-400">/</li>
+                <li className="text-gray-900">{loc.city}, {loc.stateAbbr}</li>
               </ol>
             </nav>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight max-w-3xl">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight max-w-3xl">
               {profile.tagline}
             </h1>
-            <p className="mt-4 text-lg text-gray-300 max-w-2xl leading-relaxed">
+            <p className="mt-4 text-lg text-gray-600 max-w-2xl leading-relaxed">
               {profile.description}
             </p>
-            <p className="mt-3 text-sm text-gray-400">Population: {profile.population}</p>
+            <p className="mt-3 text-sm text-gray-500">Population: {profile.population}</p>
 
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
               <Button size="xl" asChild>
                 <Link href="/signup?role=homeowner">Post Your Project Free</Link>
               </Button>
-              <Button size="xl" variant="outline" className="border-gray-600 bg-transparent text-white hover:bg-white/10 hover:text-white hover:border-gray-500" asChild>
+              <Button size="xl" variant="outline" asChild>
                 <Link href="/fairprice">Get Instant Estimate</Link>
               </Button>
             </div>
@@ -253,17 +257,17 @@ export default async function CityHubPage({ params }: Props) {
         )}
 
         {/* CTA */}
-        <section className="bg-[#0F1419] py-16 lg:py-20">
+        <section className="bg-surface py-16 lg:py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
               Start Your {loc.city} Project Today
             </h2>
-            <p className="mt-3 text-gray-300 max-w-lg mx-auto">
+            <p className="mt-3 text-gray-600 max-w-lg mx-auto">
               Post your project for free. Verified contractors in {loc.city} bid on your job. No lead fees, escrow on every project.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
               <Button size="xl" asChild><Link href="/signup?role=homeowner">Post a Job Free</Link></Button>
-              <Button size="xl" variant="outline" className="border-gray-600 bg-transparent text-white hover:bg-white/10 hover:text-white hover:border-gray-500" asChild>
+              <Button size="xl" variant="outline" asChild>
                 <Link href="/signup?role=contractor">Join as {loc.city} Contractor</Link>
               </Button>
             </div>

@@ -25,7 +25,6 @@ import { Input } from "@shared/ui/input";
 import { Badge } from "@shared/ui/badge";
 import { cn } from "@shared/lib/utils";
 import { JOB_CATEGORIES } from "@shared/lib/constants";
-import { api } from "@shared/lib/realtime";
 
 const PROJECT_SIZES = [
   { label: "Small — under $5K", value: "small", multiplier: 1 },
@@ -126,46 +125,6 @@ function generateEstimate(category: string, zip: string, size: string): Estimate
   };
 }
 
-function mapFairPriceResponse(
-  response: any,
-  category: string,
-  zip: string,
-  size: string
-): EstimateResult | null {
-  const payload = response?.fair_price || response?.estimate || response;
-  if (!payload) return null;
-  const low = Number(payload.low ?? payload.low_estimate ?? payload.min_price);
-  const high = Number(payload.high ?? payload.high_estimate ?? payload.max_price);
-  if (!Number.isFinite(low) || !Number.isFinite(high)) return null;
-  const tips = Array.isArray(payload.tips) ? payload.tips : [];
-  const midpoint = (low + high) / 2;
-  const materialsPct = Number(payload.materials_pct ?? 35);
-  const laborPct = Number(payload.labor_pct ?? 50);
-  const overheadPct = Math.max(0, 100 - materialsPct - laborPct);
-  return {
-    low,
-    high,
-    materials: Math.round((midpoint * materialsPct) / 100),
-    labor: Math.round((midpoint * laborPct) / 100),
-    overhead: Math.round((midpoint * overheadPct) / 100),
-    materialsPct,
-    laborPct,
-    overheadPct,
-    confidence: "medium",
-    category,
-    zip,
-    size: PROJECT_SIZES.find((s) => s.value === size)?.label ?? size,
-    sizeValue: size,
-    regionLabel: payload.region_label || "Local market",
-    regionMultiplier: Number(payload.region_multiplier ?? 1),
-    nationalLow: Number(payload.national_low ?? low),
-    nationalHigh: Number(payload.national_high ?? high),
-    timelineMin: Number(payload.timeline_min ?? 1),
-    timelineMax: Number(payload.timeline_max ?? 2),
-    tips,
-  };
-}
-
 function formatUSD(n: number): string {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
 }
@@ -177,21 +136,92 @@ export default function FairPricePage() {
   const [result, setResult] = useState<EstimateResult | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const [aiPowered, setAiPowered] = useState(false);
   const canSubmit = category && zip.length === 5 && size;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!canSubmit) return;
     setLoading(true);
+
     try {
-      const response = await api.getFairPrice({ category, zip, size });
-      const mapped = mapFairPriceResponse(response, category, zip, size);
-      setResult(mapped || generateEstimate(category, zip, size));
+      const res = await fetch("/api/fairprice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ category, zip, size }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        // Handle double-nested response: {estimate: {estimate: {...}}}
+        const raw = data.estimate ?? {};
+        const ai = raw.estimate ?? raw;
+
+        // Parse AI response into our EstimateResult shape
+        const base = BASE_ESTIMATES[category] ?? BASE_ESTIMATES["General Contracting"];
+        // Derive range from total (±15%) if min/max not provided
+        const total = ai.total ?? ai.subtotal ?? 0;
+
+        // If AI returned $0 or no usable data, fall through to local estimate
+        if (total <= 0 && !ai.estimate_min && !ai.min) {
+          throw new Error("AI returned empty estimate");
+        }
+
+        const low = Math.round(ai.estimate_min ?? ai.min ?? total * 0.85);
+        const high = Math.round(ai.estimate_max ?? ai.max ?? total * 1.15);
+        const mid = (low + high) / 2 || total;
+        const materialCost = ai.material_cost ?? Math.round(mid * (base.materials));
+        const laborCost = ai.labor_cost ?? Math.round(mid * (base.labor));
+        const overhead = mid - materialCost - laborCost;
+        const materialsPct = mid > 0 ? Math.round((materialCost / mid) * 100) : base.materials * 100;
+        const laborPct = mid > 0 ? Math.round((laborCost / mid) * 100) : base.labor * 100;
+
+        const zipPrefix = parseInt(zip.slice(0, 3), 10);
+        let regionMultiplier = ai.region_factor ?? 1.0;
+        let regionLabel = "AI-calibrated for your area";
+        if (zipPrefix >= 700 && zipPrefix <= 799) regionLabel = "Southern US";
+        else if (zipPrefix >= 900 && zipPrefix <= 961) regionLabel = "California";
+        else if (zipPrefix >= 100 && zipPrefix <= 119) regionLabel = "NYC metro";
+        else if (zipPrefix >= 200 && zipPrefix <= 219) regionLabel = "DC metro";
+        else if (zipPrefix >= 300 && zipPrefix <= 399) regionLabel = "Southeast US";
+        else if (zipPrefix >= 600 && zipPrefix <= 629) regionLabel = "Chicago metro";
+
+        const sizeConfig = PROJECT_SIZES.find((s) => s.value === size);
+        const nationalLow = Math.round(low / regionMultiplier);
+        const nationalHigh = Math.round(high / regionMultiplier);
+
+        setResult({
+          low, high,
+          materials: materialCost,
+          labor: laborCost,
+          overhead: Math.max(0, overhead),
+          materialsPct,
+          laborPct,
+          overheadPct: Math.max(0, 100 - materialsPct - laborPct),
+          confidence: (ai.confidence ?? 0.7) > 0.7 ? "high" : (ai.confidence ?? 0.7) > 0.4 ? "medium" : "low",
+          category, zip,
+          size: sizeConfig?.label ?? size,
+          sizeValue: size,
+          regionLabel,
+          regionMultiplier,
+          nationalLow,
+          nationalHigh,
+          timelineMin: ai.timeline_weeks ? Math.max(1, ai.timeline_weeks - 1) : base.timelineWeeks[0],
+          timelineMax: ai.timeline_weeks ? ai.timeline_weeks + 1 : base.timelineWeeks[1],
+          tips: Array.isArray(ai.notes) && ai.notes.length > 0 ? ai.notes.slice(0, 3) : base.tips,
+        });
+        setAiPowered(true);
+        setLoading(false);
+        return;
+      }
     } catch {
-      setResult(generateEstimate(category, zip, size));
-    } finally {
-      setLoading(false);
+      // Fall through to local estimate
     }
+
+    // Fallback: local hardcoded estimate
+    setResult(generateEstimate(category, zip, size));
+    setAiPowered(false);
+    setLoading(false);
   }
 
   function handleReset() {
@@ -451,9 +481,9 @@ export default function FairPricePage() {
                       <div className="flex items-start gap-2 p-2.5 bg-gray-50 rounded-sm mb-6">
                         <Info className="w-3.5 h-3.5 text-gray-600 mt-0.5 shrink-0" />
                         <p className="text-xs text-gray-700">
-                          Estimates reflect typical costs for your region and scope.
-                          Actual prices depend on site conditions, material choices,
-                          and contractor availability.
+                          {aiPowered
+                            ? "Estimate generated by ConstructionAI, our fine-tuned model trained on real bid data. Actual prices depend on site conditions, material choices, and contractor availability."
+                            : "Estimates reflect typical costs for your region and scope. Actual prices depend on site conditions, material choices, and contractor availability."}
                         </p>
                       </div>
                     </div>

@@ -21,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/fairprice",
     "/login",
     "/signup",
+    "/resources",
     "/privacy",
     "/terms",
   ];

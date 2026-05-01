@@ -13,13 +13,6 @@ export const metadata: Metadata = {
   },
   alternates: { canonical: "/" },
 };
-import {
-  ArrowRight,
-  ShieldCheck,
-  Lock,
-  BadgeCheck,
-  CreditCard,
-} from "lucide-react";
 import { Navbar } from "@marketplace/components/navbar";
 import { Hero } from "@marketplace/components/hero";
 
@@ -48,7 +41,7 @@ export default function HomePage() {
               <Button variant="default" size="lg" asChild>
                 <Link href="/new-way" className="inline-flex items-center gap-2">
                   See how it works
-                  <ArrowRight className="w-4 h-4" />
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </Link>
               </Button>
             </div>
@@ -92,13 +85,13 @@ export default function HomePage() {
               <Button variant="outline" asChild>
                 <Link href="/features" className="inline-flex items-center gap-2">
                   See all features
-                  <ArrowRight className="w-4 h-4" />
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </Link>
               </Button>
               <Button variant="outline" asChild>
                 <Link href="/fairprice" className="inline-flex items-center gap-2">
                   Get a free estimate
-                  <ArrowRight className="w-4 h-4" />
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </Link>
               </Button>
             </div>
@@ -156,7 +149,7 @@ export default function HomePage() {
               <Button variant="outline" asChild>
                 <Link href="/new-way" className="inline-flex items-center gap-2">
                   Learn more
-                  <ArrowRight className="w-4 h-4" />
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </Link>
               </Button>
             </div>
@@ -192,7 +185,7 @@ export default function HomePage() {
               <Button variant="outline" asChild>
                 <Link href="/testimonials" className="inline-flex items-center gap-2">
                   Read more stories
-                  <ArrowRight className="w-4 h-4" />
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </Link>
               </Button>
             </div>
@@ -206,31 +199,24 @@ export default function HomePage() {
               Backed by tools you already use
             </p>
 
-            {/* Integration logos */}
+            {/* Integration labels */}
             <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 mb-12">
-              <div className="flex items-center gap-2 text-gray-600">
-                <CreditCard className="w-5 h-5" />
-                <span className="text-sm font-semibold tracking-wide">QuickBooks</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-600">
-                <BadgeCheck className="w-5 h-5" />
-                <span className="text-sm font-semibold tracking-wide">Persona ID</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-600">
-                <ShieldCheck className="w-5 h-5" />
-                <span className="text-sm font-semibold tracking-wide">Checkr</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-600">
-                <Lock className="w-5 h-5" />
-                <span className="text-sm font-semibold tracking-wide">256-bit SSL</span>
-              </div>
+              <span className="text-sm font-bold text-gray-600 tracking-wide">QuickBooks</span>
+              <span className="text-sm font-bold text-gray-600 tracking-wide">Persona ID</span>
+              <span className="text-sm font-bold text-gray-600 tracking-wide">Checkr</span>
+              <span className="text-sm font-bold text-gray-600 tracking-wide">256-bit SSL</span>
             </div>
 
             {/* Trust badges */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <div className="text-center">
-                <div className="w-12 h-12 rounded-sm bg-brand-50 flex items-center justify-center mx-auto mb-3">
-                  <ShieldCheck className="w-6 h-6 text-brand-600" />
+                <div className="w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                  {/* Overlapping squares — layers of verification */}
+                  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect x="6" y="12" width="24" height="24" rx="2" stroke="#059669" strokeWidth="2.5" fill="none" />
+                    <rect x="18" y="12" width="24" height="24" rx="2" stroke="#059669" strokeWidth="2.5" fill="none" />
+                    <rect x="12" y="6" width="24" height="24" rx="2" stroke="#0F1419" strokeWidth="2.5" fill="none" />
+                  </svg>
                 </div>
                 <h4 className="text-sm font-bold text-gray-900 mb-1">
                   Every contractor verified
@@ -240,8 +226,13 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 rounded-sm bg-brand-50 flex items-center justify-center mx-auto mb-3">
-                  <Lock className="w-6 h-6 text-brand-600" />
+                <div className="w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                  {/* Concentric rectangles — containment/protection */}
+                  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect x="4" y="8" width="40" height="32" rx="2" stroke="#059669" strokeWidth="2.5" fill="none" />
+                    <rect x="11" y="14" width="26" height="20" rx="2" stroke="#059669" strokeWidth="2.5" fill="none" />
+                    <rect x="18" y="20" width="12" height="8" rx="1" stroke="#0F1419" strokeWidth="2.5" fill="none" />
+                  </svg>
                 </div>
                 <h4 className="text-sm font-bold text-gray-900 mb-1">
                   Escrow-protected payments
@@ -251,8 +242,11 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 rounded-sm bg-brand-50 flex items-center justify-center mx-auto mb-3">
-                  <BadgeCheck className="w-6 h-6 text-brand-600" />
+                <div className="w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                  {/* Checkmark from two bold bars at an angle */}
+                  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M10 26l10 10L38 12" stroke="#059669" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                  </svg>
                 </div>
                 <h4 className="text-sm font-bold text-gray-900 mb-1">
                   FairTrade Promise

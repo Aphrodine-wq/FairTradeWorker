@@ -1,0 +1,13 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["FILL_TEAM_ID.com.fairtradeworker.app"],
+        "components": [
+          { "/": "/reset-password*" },
+          { "/": "/r/*" }
+        ]
+      }
+    ]
+  }
+}

@@ -107,36 +107,36 @@ export default async function TradePage({ params }: Props) {
         />
 
         {/* Hero */}
-        <section className="bg-[#0F1419] py-20 lg:py-28">
+        <section className="bg-surface py-20 lg:py-28">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Breadcrumb */}
-            <nav className="mb-6 text-sm text-gray-400" aria-label="Breadcrumb">
+            <nav className="mb-6 text-sm text-gray-500" aria-label="Breadcrumb">
               <ol className="flex items-center gap-1.5">
                 <li>
-                  <Link href="/" className="hover:text-white transition-colors duration-150">
+                  <Link href="/" className="hover:text-gray-900 transition-colors duration-150">
                     Home
                   </Link>
                 </li>
-                <li className="text-gray-600">/</li>
+                <li className="text-gray-400">/</li>
                 <li>
-                  <Link href="/services" className="hover:text-white transition-colors duration-150">
+                  <Link href="/services" className="hover:text-gray-900 transition-colors duration-150">
                     Services
                   </Link>
                 </li>
-                <li className="text-gray-600">/</li>
-                <li className="text-gray-300">{trade.plural}</li>
+                <li className="text-gray-400">/</li>
+                <li className="text-gray-900">{trade.plural}</li>
               </ol>
             </nav>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight max-w-3xl">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight max-w-3xl">
               {trade.plural} Near You
             </h1>
-            <p className="mt-4 text-lg text-gray-300 max-w-2xl leading-relaxed">
+            <p className="mt-4 text-lg text-gray-600 max-w-2xl leading-relaxed">
               {trade.description} Compare bids from verified professionals. No
               lead fees on any plan.
             </p>
-            <p className="mt-3 text-sm text-gray-400">
-              Average project cost: <strong className="text-white">{trade.avgCostRange}</strong>
+            <p className="mt-3 text-sm text-gray-500">
+              Average project cost: <strong className="text-gray-900">{trade.avgCostRange}</strong>
             </p>
 
             <div className="mt-8">
@@ -277,12 +277,12 @@ export default async function TradePage({ params }: Props) {
         </section>
 
         {/* CTA */}
-        <section className="bg-[#0F1419] py-16 lg:py-20">
+        <section className="bg-surface py-16 lg:py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
               Get Free {trade.name} Estimates
             </h2>
-            <p className="mt-3 text-gray-300 max-w-lg mx-auto">
+            <p className="mt-3 text-gray-600 max-w-lg mx-auto">
               Post your project and receive bids from verified{" "}
               {trade.plural.toLowerCase()} in your area. Free to post, no lead
               fees, escrow on every job.
@@ -294,7 +294,6 @@ export default async function TradePage({ params }: Props) {
               <Button
                 size="xl"
                 variant="outline"
-                className="border-gray-600 bg-transparent text-white hover:bg-white/10 hover:text-white hover:border-gray-500"
                 asChild
               >
                 <Link href="/fairprice">Try FairPrice Estimator</Link>

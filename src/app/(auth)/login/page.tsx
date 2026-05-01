@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect, useCallback } from "react";
+import Script from "next/script";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Shield, DollarSign, Mic } from "lucide-react";
 import { toast } from "sonner";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Button } from "@shared/ui/button";
 import { Card, CardContent } from "@shared/ui/card";
 import { Input } from "@shared/ui/input";
@@ -14,11 +16,31 @@ import { track, identify } from "@shared/lib/analytics";
 import { BrandMark } from "@shared/components/brand-mark";
 import { startQuickBooksSignIn } from "@shared/lib/ftw-svc-gaps";
 
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
+const APPLE_SERVICE_ID = process.env.NEXT_PUBLIC_APPLE_SERVICE_ID || "";
+const APPLE_REDIRECT_URI = process.env.NEXT_PUBLIC_APPLE_REDIRECT_URI || "";
+
+declare global {
+  interface Window {
+    AppleID?: {
+      auth: {
+        init: (config: Record<string, unknown>) => void;
+        signIn: () => Promise<{
+          authorization: { id_token: string; code: string; state?: string };
+          user?: { name?: { firstName?: string; lastName?: string }; email?: string };
+        }>;
+      };
+    };
+  }
+}
+
 export default function LoginPage() {
   return (
-    <Suspense>
-      <LoginContent />
-    </Suspense>
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <Suspense>
+        <LoginContent />
+      </Suspense>
+    </GoogleOAuthProvider>
   );
 }
 
@@ -49,7 +71,108 @@ function LoginContent() {
     }
   };
 
+  const routeAfterAuth = useCallback((role: string) => {
+    if (role === "homeowner") router.push("/homeowner/dashboard");
+    else if (role === "subcontractor") router.push("/subcontractor/dashboard");
+    else router.push("/contractor/dashboard");
+  }, [router]);
+
+  // Google Identity Services (id_token flow). This loads via <Script> tag
+  // and renders into the #google-signin-button div.
+  const onGoogleCredential = useCallback(async (credential: string) => {
+    try {
+      setLoading(true);
+      const user = await authStore.loginWithGoogle(credential);
+      identify(user.id, { email: user.email, role: user.role });
+      track("login", { method: "google", role: user.role });
+      routeAfterAuth(user.role);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Google sign-in failed";
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  }, [routeAfterAuth]);
+
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID) return;
+    type GsiResponse = { credential: string };
+    type Gsi = { accounts: { id: { initialize: (cfg: { client_id: string; callback: (r: GsiResponse) => void }) => void; prompt: () => void; renderButton: (el: HTMLElement, opts: Record<string, unknown>) => void } } };
+    const init = () => {
+      const w = window as unknown as { google?: Gsi };
+      if (!w.google?.accounts?.id) return;
+      w.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: (r: GsiResponse) => onGoogleCredential(r.credential),
+      });
+      const target = document.getElementById("google-signin-button");
+      if (target) {
+        w.google.accounts.id.renderButton(target, {
+          theme: "outline",
+          size: "large",
+          text: "continue_with",
+          width: 360,
+        });
+      }
+    };
+    init();
+    window.addEventListener("gsi-loaded", init);
+    return () => window.removeEventListener("gsi-loaded", init);
+  }, [onGoogleCredential]);
+
+  const onAppleSignIn = async () => {
+    if (!APPLE_SERVICE_ID || typeof window === "undefined" || !window.AppleID) {
+      toast.error("Apple sign-in not configured");
+      return;
+    }
+    try {
+      setLoading(true);
+      const result = await window.AppleID.auth.signIn();
+      const idToken = result.authorization.id_token;
+      const name = result.user
+        ? [result.user.name?.firstName, result.user.name?.lastName].filter(Boolean).join(" ")
+        : undefined;
+      const user = await authStore.loginWithApple(idToken, name);
+      identify(user.id, { email: user.email, role: user.role });
+      track("login", { method: "apple", role: user.role });
+      routeAfterAuth(user.role);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Apple sign-in failed";
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onAppleScriptLoad = () => {
+    if (!APPLE_SERVICE_ID || !window.AppleID) return;
+    window.AppleID.auth.init({
+      clientId: APPLE_SERVICE_ID,
+      scope: "name email",
+      redirectURI: APPLE_REDIRECT_URI || `${window.location.origin}/login`,
+      usePopup: true,
+    });
+  };
+
   return (
+    <>
+      {GOOGLE_CLIENT_ID && (
+        <Script
+          src="https://accounts.google.com/gsi/client"
+          strategy="afterInteractive"
+          onLoad={() => {
+            // re-trigger the effect dependency so the button renders
+            window.dispatchEvent(new Event("gsi-loaded"));
+          }}
+        />
+      )}
+      {APPLE_SERVICE_ID && (
+        <Script
+          src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"
+          strategy="afterInteractive"
+          onLoad={onAppleScriptLoad}
+        />
+      )}
     <div className="min-h-screen bg-white flex">
       {/* Left panel — value prop */}
       <div className="hidden lg:flex lg:w-[45%] bg-[#F7F8FA] border-r border-gray-200 flex-col justify-between p-12">
@@ -140,9 +263,14 @@ function LoginContent() {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-5" aria-describedby={error ? "login-error" : undefined}>
                 {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-sm">
+                  <div
+                    id="login-error"
+                    role="alert"
+                    aria-live="polite"
+                    className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-sm"
+                  >
                     {error}
                   </div>
                 )}
@@ -158,9 +286,12 @@ function LoginContent() {
                     id="email"
                     type="email"
                     autoComplete="email"
+                    inputMode="email"
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    aria-invalid={!!error}
+                    aria-describedby={error ? "login-error" : undefined}
                     required
                   />
                 </div>
@@ -239,16 +370,20 @@ function LoginContent() {
                 Sign in with QuickBooks
               </button>
 
-              <div className="grid grid-cols-2 gap-3 mt-3">
-                <Button type="button" variant="outline" size="lg" className="w-full font-medium">
-                  <GoogleIcon className="w-4 h-4 mr-2 flex-shrink-0" />
-                  Google
-                </Button>
-                <Button type="button" variant="outline" size="lg" className="w-full font-medium">
-                  <AppleIcon className="w-4 h-4 mr-2 flex-shrink-0" />
-                  Apple
-                </Button>
-              </div>
+              {GOOGLE_CLIENT_ID && (
+                <div className="mt-3 flex justify-center" id="google-signin-button" />
+              )}
+              {APPLE_SERVICE_ID && (
+                <button
+                  type="button"
+                  onClick={onAppleSignIn}
+                  disabled={loading}
+                  className="w-full mt-3 flex items-center justify-center gap-2.5 h-11 rounded-md bg-black hover:bg-gray-900 text-white text-sm font-semibold transition-colors disabled:opacity-50"
+                >
+                  <AppleIcon className="w-4 h-4 flex-shrink-0" />
+                  Sign in with Apple
+                </button>
+              )}
 
               <p className="mt-7 text-center text-sm text-gray-700">
                 Don&apos;t have an account?{" "}
@@ -270,8 +405,7 @@ function LoginContent() {
                 size="sm"
                 className="w-full text-xs text-gray-700"
                 onClick={() => {
-                  const payload = btoa(JSON.stringify({ sub: "demo-contractor", role: "CONTRACTOR", roles: ["CONTRACTOR", "SUBCONTRACTOR"], demo: true }));
-                  document.cookie = `ftw-token=demo.${payload}.demo; path=/`;
+                  document.cookie = "ftw-token=demo.contractor; path=/";
                   router.push("/contractor/dashboard");
                 }}
               >
@@ -284,8 +418,7 @@ function LoginContent() {
                 size="sm"
                 className="w-full text-xs text-gray-700"
                 onClick={() => {
-                  const payload = btoa(JSON.stringify({ sub: "demo-homeowner", role: "HOMEOWNER", roles: ["HOMEOWNER"], demo: true }));
-                  document.cookie = `ftw-token=demo.${payload}.demo; path=/`;
+                  document.cookie = "ftw-token=demo.homeowner; path=/";
                   router.push("/homeowner/dashboard");
                 }}
               >
@@ -298,8 +431,7 @@ function LoginContent() {
                 size="sm"
                 className="w-full text-xs text-gray-700"
                 onClick={() => {
-                  const payload = btoa(JSON.stringify({ sub: "demo-sub", role: "SUBCONTRACTOR", roles: ["CONTRACTOR", "SUBCONTRACTOR"], demo: true }));
-                  document.cookie = `ftw-token=demo.${payload}.demo; path=/`;
+                  document.cookie = "ftw-token=demo.subcontractor; path=/";
                   router.push("/subcontractor/dashboard");
                 }}
               >
@@ -317,6 +449,7 @@ function LoginContent() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

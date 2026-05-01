@@ -111,12 +111,12 @@ export default function FindSubWorkPage() {
         </section>
 
         {/* CTA */}
-        <section style={{ backgroundColor: "#0F1419" }} className="py-16 lg:py-20">
+        <section className="bg-surface py-16 lg:py-20">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold text-white">
+            <h2 className="text-3xl font-bold text-gray-900">
               Stop chasing GCs for checks.
             </h2>
-            <p className="mt-3 text-gray-300 max-w-lg mx-auto">
+            <p className="mt-3 text-gray-600 max-w-lg mx-auto">
               Escrow on every sub-job. You do the work, the money's already
               there. Join free and start finding sub work in Mississippi.
             </p>

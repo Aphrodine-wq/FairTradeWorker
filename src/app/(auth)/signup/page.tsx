@@ -12,6 +12,7 @@ import { Card, CardContent } from "@shared/ui/card";
 import { Input } from "@shared/ui/input";
 import { cn } from "@shared/lib/utils";
 import { BrandMark } from "@shared/components/brand-mark";
+import { OAuthButtons } from "@shared/components/oauth-buttons";
 
 type Role = "homeowner" | "contractor" | null;
 
@@ -128,6 +129,13 @@ function SignupContent() {
     }
   };
 
+  const handleOAuthSuccess = (resolvedRole: string) => {
+    toast.success("Welcome!");
+    if (resolvedRole === "homeowner") router.push("/homeowner/onboarding");
+    else if (resolvedRole === "subcontractor") router.push("/subcontractor/dashboard");
+    else router.push("/contractor/onboarding");
+  };
+
   return (
     <div className="min-h-screen bg-[#FAFAFA] flex">
       {/* Left panel — value prop */}
@@ -230,6 +238,7 @@ function SignupContent() {
                   onSubmit={handleSubmit}
                   error={error}
                   loading={loading}
+                  onOAuthSuccess={handleOAuthSuccess}
                 />
               )}
             </CardContent>
@@ -449,6 +458,7 @@ interface StepTwoProps {
   onSubmit: (e: React.FormEvent) => void;
   error: string;
   loading: boolean;
+  onOAuthSuccess: (role: string) => void;
 }
 
 function StepTwo({
@@ -463,6 +473,7 @@ function StepTwo({
   onSubmit,
   error,
   loading,
+  onOAuthSuccess,
 }: StepTwoProps) {
   const isContractor = role === "contractor";
 
@@ -478,9 +489,9 @@ function StepTwo({
           <ChevronLeft className="w-4 h-4" />
         </button>
         <div>
-          <h1 className="text-xl font-bold text-gray-900 tracking-tight">
+          <h2 className="text-xl font-bold text-gray-900 tracking-tight">
             {isContractor ? "Contractor details" : "Your details"}
-          </h1>
+          </h2>
           <p className="text-sm text-gray-700">
             {isContractor
               ? "Tell us about your business"
@@ -489,9 +500,30 @@ function StepTwo({
         </div>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-4">
+      <div className="space-y-3">
+        <OAuthButtons
+          role={role as "homeowner" | "contractor"}
+          onSuccess={onOAuthSuccess}
+          trackEvent="signup"
+          buttonId="signup-google-button"
+          buttonWidth={400}
+        />
+      </div>
+
+      <div className="relative my-6">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-border" />
+        </div>
+        <div className="relative flex justify-center text-xs">
+          <span className="bg-white px-3 text-gray-600 font-medium uppercase tracking-wide">
+            or sign up with email
+          </span>
+        </div>
+      </div>
+
+      <form onSubmit={onSubmit} className="space-y-4" aria-describedby={error ? "signup-error" : undefined}>
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-sm">
+          <div id="signup-error" role="alert" aria-live="polite" className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-sm">
             {error}
           </div>
         )}

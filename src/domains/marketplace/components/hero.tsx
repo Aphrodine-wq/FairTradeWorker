@@ -40,22 +40,15 @@ export function Hero() {
 
           {/* Left — copy */}
           <div className="lg:w-[55%] relative z-10">
-            <p className="text-sm font-semibold text-brand-600 uppercase tracking-widest mb-4">
-              The fun way to get home projects done
-            </p>
-
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.08]">
-              <span className="text-gray-900">Your project.</span>
+              <span className="text-gray-900">$0 Lead Fee</span>
               <br />
-              <span className="text-gray-900">Their best offer.</span>
-              <br />
-              <span className="text-brand-600">Your call.</span>
+              <span className="text-brand-600">Marketplace.</span>
             </h1>
 
             <p className="mt-6 text-lg text-gray-600 max-w-lg leading-relaxed">
-              Homeowners post projects. Contractors bid on them. Contractors
-              sub out the specialized work right on the platform. Everyone
-              gets paid through escrow. No lead fees. No chasing checks.
+              Post your project. Get bids from licensed contractors.
+              Pick the best one. No lead fees. No chasing checks.
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row gap-3">

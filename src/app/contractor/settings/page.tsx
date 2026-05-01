@@ -28,17 +28,13 @@ import { Input } from "@shared/ui/input";
 import { Textarea } from "@shared/ui/textarea";
 import { Badge } from "@shared/ui/badge";
 import { Card, CardContent } from "@shared/ui/card";
+import { useQuickBooks } from "@shared/hooks/use-quickbooks";
 import { Separator } from "@shared/ui/separator";
 import { mockContractors } from "@shared/lib/mock-data";
 import { JOB_CATEGORIES } from "@shared/lib/constants";
 import { getInitials, cn } from "@shared/lib/utils";
 import { fetchSettings, saveSettings } from "@shared/lib/data";
 import { api } from "@shared/lib/realtime";
-import {
-  disconnectQuickBooks as disconnectQuickBooksGap,
-  getQuickBooksSupportState,
-  startQuickBooksConnect as startQuickBooksConnectGap,
-} from "@shared/lib/ftw-svc-gaps";
 import { toast } from "sonner";
 import { usePageTitle } from "@shared/hooks/use-page-title";
 
@@ -691,52 +687,26 @@ function InsuranceSection() {
 }
 
 function IntegrationsSection() {
-  const qbSupport = getQuickBooksSupportState();
-  const [qbStatus, setQbStatus] = useState<{
-    connected: boolean;
-    companyName?: string;
-    connectedAt?: string;
-  }>({ connected: false });
-  const [qbLoading, setQbLoading] = useState(false);
-  const [qbConnecting, setQbConnecting] = useState(false);
-  const [qbDisconnecting, setQbDisconnecting] = useState(false);
+  const {
+    status: qbStatus,
+    loading: qbLoading,
+    connecting: qbConnecting,
+    disconnecting: qbDisconnecting,
+    error: qbError,
+    connect: connectQuickBooks,
+    disconnect: disconnectQuickBooks,
+  } = useQuickBooks();
 
   // Check for OAuth redirect result
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const qbResult = params.get("qb");
     if (qbResult === "connected") {
-      // Clean up URL
       const url = new URL(window.location.href);
       url.searchParams.delete("qb");
       window.history.replaceState({}, "", url.pathname + url.search);
     }
   }, []);
-
-  async function connectQuickBooks() {
-    setQbConnecting(true);
-    try {
-      await startQuickBooksConnectGap();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : qbSupport.description;
-      toast.error(message);
-    } finally {
-      setQbConnecting(false);
-    }
-  }
-
-  async function disconnectQuickBooks() {
-    setQbDisconnecting(true);
-    try {
-      await disconnectQuickBooksGap();
-      setQbStatus({ connected: false });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : qbSupport.description;
-      toast.error(message);
-    } finally {
-      setQbDisconnecting(false);
-    }
-  }
 
   const futureIntegrations = [
     { name: "Google Calendar", desc: "Sync project schedule", icon: "GC" },
@@ -763,7 +733,7 @@ function IntegrationsSection() {
                   ? "Checking connection..."
                   : qbStatus.connected
                     ? `Connected to ${qbStatus.companyName || "QuickBooks"}`
-                    : qbSupport.description}
+                    : "Connect your account to sync invoices and payouts."}
               </p>
             </div>
           </div>
@@ -783,14 +753,15 @@ function IntegrationsSection() {
             </div>
           ) : (
             <Button size="sm" onClick={connectQuickBooks} disabled={qbConnecting}>
-              {qbConnecting ? "Opening..." : "View TODO"}
+              {qbConnecting ? "Opening..." : "Connect"}
             </Button>
           )}
         </div>
-        <div className="rounded-sm border border-amber-200 bg-amber-50 p-3">
-          <p className="text-xs font-medium text-amber-900">{qbSupport.title}</p>
-          <p className="mt-1 text-xs text-amber-800">{qbSupport.todo}</p>
-        </div>
+        {qbError ? (
+          <div className="rounded-sm border border-red-200 bg-red-50 p-3">
+            <p className="text-xs font-medium text-red-800">{qbError}</p>
+          </div>
+        ) : null}
 
         {/* Future integrations — still mock */}
         {futureIntegrations.map((int) => (

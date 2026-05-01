@@ -1,9 +1,147 @@
-import { Mic, DollarSign, Shield, BarChart3, Users, FileText } from "lucide-react";
 import { cn } from "@shared/lib/utils";
+
+function VoiceWaveIllustration() {
+  return (
+    <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Microphone body */}
+      <rect x="35" y="10" width="10" height="30" fill="#059669" />
+      <rect x="30" y="38" width="20" height="4" fill="#059669" />
+      <rect x="38" y="42" width="4" height="10" fill="#0F1419" />
+      <rect x="32" y="52" width="16" height="3" fill="#0F1419" />
+      {/* Sound waves */}
+      <rect x="18" y="20" width="3" height="16" fill="#D1D5DB" />
+      <rect x="12" y="24" width="3" height="8" fill="#D1D5DB" />
+      <rect x="59" y="20" width="3" height="16" fill="#D1D5DB" />
+      <rect x="65" y="24" width="3" height="8" fill="#D1D5DB" />
+      {/* Waveform bars at bottom */}
+      <rect x="10" y="62" width="4" height="8" fill="#059669" />
+      <rect x="18" y="58" width="4" height="12" fill="#059669" />
+      <rect x="26" y="60" width="4" height="10" fill="#0F1419" />
+      <rect x="34" y="55" width="4" height="15" fill="#059669" />
+      <rect x="42" y="58" width="4" height="12" fill="#0F1419" />
+      <rect x="50" y="56" width="4" height="14" fill="#059669" />
+      <rect x="58" y="60" width="4" height="10" fill="#0F1419" />
+      <rect x="66" y="58" width="4" height="12" fill="#059669" />
+    </svg>
+  );
+}
+
+function DollarBarsIllustration() {
+  return (
+    <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Dollar sign made of geometric bars */}
+      <rect x="38" y="8" width="4" height="64" fill="#D1D5DB" />
+      {/* Top horizontal bar */}
+      <rect x="24" y="18" width="32" height="6" fill="#059669" />
+      {/* Upper left vertical */}
+      <rect x="24" y="18" width="6" height="16" fill="#059669" />
+      {/* Middle horizontal bar */}
+      <rect x="24" y="34" width="32" height="6" fill="#0F1419" />
+      {/* Lower right vertical */}
+      <rect x="50" y="40" width="6" height="16" fill="#059669" />
+      {/* Bottom horizontal bar */}
+      <rect x="24" y="50" width="32" height="6" fill="#059669" />
+      {/* Accent dots */}
+      <circle cx="16" cy="40" r="3" fill="#D1D5DB" />
+      <circle cx="66" cy="40" r="3" fill="#D1D5DB" />
+    </svg>
+  );
+}
+
+function EscrowShieldIllustration() {
+  return (
+    <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Shield outline from rectangles */}
+      <rect x="16" y="10" width="48" height="6" fill="#059669" />
+      <rect x="16" y="10" width="6" height="40" fill="#059669" />
+      <rect x="58" y="10" width="6" height="40" fill="#059669" />
+      {/* Shield bottom point */}
+      <rect x="22" y="50" width="6" height="10" fill="#059669" />
+      <rect x="52" y="50" width="6" height="10" fill="#059669" />
+      <rect x="28" y="56" width="6" height="8" fill="#059669" />
+      <rect x="46" y="56" width="6" height="8" fill="#059669" />
+      <rect x="34" y="62" width="12" height="6" fill="#059669" />
+      {/* Lock body */}
+      <rect x="30" y="30" width="20" height="16" fill="#0F1419" />
+      {/* Lock shackle */}
+      <rect x="34" y="22" width="3" height="10" fill="#0F1419" />
+      <rect x="43" y="22" width="3" height="10" fill="#0F1419" />
+      <rect x="34" y="22" width="12" height="3" fill="#0F1419" />
+      {/* Keyhole */}
+      <circle cx="40" cy="37" r="3" fill="#059669" />
+      <rect x="39" y="39" width="2" height="4" fill="#059669" />
+    </svg>
+  );
+}
+
+function BarChartIllustration() {
+  return (
+    <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Axis lines */}
+      <rect x="14" y="10" width="3" height="56" fill="#D1D5DB" />
+      <rect x="14" y="63" width="54" height="3" fill="#D1D5DB" />
+      {/* Bars */}
+      <rect x="22" y="44" width="8" height="19" fill="#059669" />
+      <rect x="34" y="32" width="8" height="31" fill="#0F1419" />
+      <rect x="46" y="38" width="8" height="25" fill="#059669" />
+      <rect x="58" y="20" width="8" height="43" fill="#0F1419" />
+      {/* Trend dots */}
+      <circle cx="26" cy="40" r="2.5" fill="#059669" />
+      <circle cx="38" cy="28" r="2.5" fill="#059669" />
+      <circle cx="50" cy="34" r="2.5" fill="#059669" />
+      <circle cx="62" cy="16" r="2.5" fill="#059669" />
+      {/* Trend line segments */}
+      <rect x="27" y="33" width="10" height="2" fill="#059669" transform="rotate(20 27 33)" />
+      <rect x="39" y="29" width="10" height="2" fill="#059669" transform="rotate(12 39 29)" />
+      <rect x="51" y="24" width="10" height="2" fill="#059669" transform="rotate(32 51 24)" />
+    </svg>
+  );
+}
+
+function CrewCirclesIllustration() {
+  return (
+    <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Overlapping circles representing people */}
+      <circle cx="30" cy="32" r="14" fill="#059669" />
+      <circle cx="50" cy="32" r="14" fill="#0F1419" />
+      <circle cx="40" cy="48" r="14" fill="#059669" opacity="0.6" />
+      {/* Small accent circles */}
+      <circle cx="16" cy="54" r="4" fill="#D1D5DB" />
+      <circle cx="64" cy="54" r="4" fill="#D1D5DB" />
+      <circle cx="40" cy="14" r="3" fill="#D1D5DB" />
+      {/* Connector dots */}
+      <circle cx="40" cy="32" r="3" fill="white" />
+      <circle cx="35" cy="42" r="2" fill="white" />
+      <circle cx="45" cy="42" r="2" fill="white" />
+    </svg>
+  );
+}
+
+function DocumentStackIllustration() {
+  return (
+    <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Back document */}
+      <rect x="22" y="8" width="40" height="52" fill="#D1D5DB" />
+      {/* Middle document */}
+      <rect x="18" y="14" width="40" height="52" fill="#0F1419" />
+      {/* Front document */}
+      <rect x="14" y="20" width="40" height="52" fill="#059669" />
+      {/* Text lines on front document */}
+      <rect x="20" y="30" width="22" height="3" fill="white" />
+      <rect x="20" y="37" width="28" height="2" fill="white" opacity="0.6" />
+      <rect x="20" y="42" width="24" height="2" fill="white" opacity="0.6" />
+      <rect x="20" y="47" width="26" height="2" fill="white" opacity="0.6" />
+      <rect x="20" y="52" width="18" height="2" fill="white" opacity="0.6" />
+      {/* Checkmark */}
+      <rect x="20" y="60" width="8" height="3" fill="white" transform="rotate(-40 20 60)" />
+      <rect x="25" y="61" width="14" height="3" fill="white" transform="rotate(30 25 61)" />
+    </svg>
+  );
+}
 
 const features = [
   {
-    icon: Mic,
+    illustration: VoiceWaveIllustration,
     title: "Talk to Hunter.",
     subtitle: "Voice AI estimation, built for job sites.",
     description:
@@ -18,7 +156,7 @@ const features = [
     bg: "bg-[#FAFAFA]",
   },
   {
-    icon: DollarSign,
+    illustration: DollarBarsIllustration,
     title: "Your money stays your money.",
     subtitle: "Zero lead fees. Flat subscription.",
     description:
@@ -33,7 +171,7 @@ const features = [
     bg: "bg-surface",
   },
   {
-    icon: Shield,
+    illustration: EscrowShieldIllustration,
     title: "Escrow on every job.",
     subtitle: "No chasing invoices. No bounced checks.",
     description:
@@ -48,7 +186,7 @@ const features = [
     bg: "bg-[#FAFAFA]",
   },
   {
-    icon: BarChart3,
+    illustration: BarChartIllustration,
     title: "Know your numbers.",
     subtitle: "Real analytics for your business.",
     description:
@@ -63,7 +201,7 @@ const features = [
     bg: "bg-surface",
   },
   {
-    icon: Users,
+    illustration: CrewCirclesIllustration,
     title: "Built for crews.",
     subtitle: "One dashboard for the whole team.",
     description:
@@ -78,7 +216,7 @@ const features = [
     bg: "bg-[#FAFAFA]",
   },
   {
-    icon: FileText,
+    illustration: DocumentStackIllustration,
     title: "Estimates that close.",
     subtitle: "Your brand. Your numbers.",
     description:
@@ -98,16 +236,16 @@ export function Features() {
   return (
     <section id="features" className="divide-y divide-border">
       {features.map((feature) => {
-        const Icon = feature.icon;
+        const Illustration = feature.illustration;
         return (
           <div key={feature.title} className={feature.bg}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
               <div className="flex flex-col lg:flex-row lg:items-start lg:gap-16">
                 {/* Left — content */}
                 <div className="lg:flex-1">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-sm bg-brand-50 flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-5 h-5 text-brand-600" />
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="flex-shrink-0">
+                      <Illustration />
                     </div>
                     <p className="text-sm font-bold text-brand-600 uppercase tracking-widest">
                       {feature.subtitle}

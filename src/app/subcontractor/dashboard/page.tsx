@@ -16,14 +16,10 @@ import {
 } from "lucide-react";
 import { Badge } from "@shared/ui/badge";
 import {
-  subContractorDashboardStats,
-  mockSubJobs,
-  mockSubBids,
-  mockEstimates,
   type SubJob,
   type Estimate,
 } from "@shared/lib/mock-data";
-import { fetchSubJobs, fetchEstimates } from "@shared/lib/data";
+import { fetchSubJobs, fetchSubContractorStats, fetchEstimates } from "@shared/lib/data";
 import { formatCurrency, cn } from "@shared/lib/utils";
 import { usePageTitle } from "@shared/hooks/use-page-title";
 
@@ -160,15 +156,15 @@ function TileHeader({ title, count, linkHref, linkLabel }: { title: string; coun
 
 export default function SubContractorDashboardPage() {
   usePageTitle("Dashboard");
-  const [subJobs, setSubJobs] = useState<SubJob[]>(mockSubJobs);
-  const [estimates, setEstimates] = useState<Estimate[]>(mockEstimates);
+  const [subJobs, setSubJobs] = useState<SubJob[]>([]);
+  const [estimates, setEstimates] = useState<Estimate[]>([]);
+  const [stats, setStats] = useState({ activeSubJobs: 0, completedSubJobs: 0, monthlyRevenue: 0, revenueChange: 0, avgRating: 0, winRate: 0, responseTime: "—", pendingBids: 0 });
 
   useEffect(() => {
     fetchSubJobs().then(setSubJobs);
     fetchEstimates().then(setEstimates);
+    fetchSubContractorStats().then(setStats);
   }, []);
-
-  const stats = subContractorDashboardStats;
   const openSubJobs = subJobs.filter((sj) => sj.status === "open");
   const activeSubJobs = subJobs.filter((sj) => sj.status === "in_progress");
   const pendingEstimates = estimates.filter((e) => e.status === "sent" || e.status === "viewed");

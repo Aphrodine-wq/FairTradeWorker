@@ -151,10 +151,10 @@ export default function FindWorkPage() {
         </section>
 
         {/* CTA */}
-        <section style={{ backgroundColor: "#0F1419" }} className="py-16 lg:py-20">
+        <section className="bg-surface py-16 lg:py-20">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold text-white">Stop buying leads. Start winning jobs.</h2>
-            <p className="mt-3 text-gray-300 max-w-lg mx-auto">
+            <h2 className="text-3xl font-bold text-gray-900">Stop buying leads. Start winning jobs.</h2>
+            <p className="mt-3 text-gray-600 max-w-lg mx-auto">
               Sign up free. Browse jobs in your area. Bid when you see something you want. That's it.
             </p>
             <div className="mt-8">

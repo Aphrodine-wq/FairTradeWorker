@@ -48,6 +48,9 @@ const AUTH_RATE_LIMIT_PATHS = ["/login", "/signup", "/forgot-password", "/reset-
 const AUTH_RATE_LIMIT = 10; // requests
 const AUTH_RATE_WINDOW = 60_000; // 1 minute
 
+const FAIRPRICE_RATE_LIMIT = 5; // requests — each one burns GPU
+const FAIRPRICE_RATE_WINDOW = 60_000; // 1 minute
+
 function isAuthPath(pathname: string): boolean {
   return AUTH_RATE_LIMIT_PATHS.some((p) => pathname.startsWith(p));
 }
@@ -131,8 +134,37 @@ export async function middleware(request: NextRequest) {
     return addSecurityHeaders(response);
   }
 
+  // Rate-limit FairPrice AI endpoint: 5 requests per minute per IP
+  if (pathname === "/api/fairprice") {
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+      request.headers.get("x-real-ip") ??
+      "unknown";
+    const key = `fairprice:${ip}`;
+    const { allowed, remaining, resetAt } = checkRateLimit(
+      key,
+      FAIRPRICE_RATE_LIMIT,
+      FAIRPRICE_RATE_WINDOW,
+    );
+
+    if (!allowed) {
+      const retryAfter = Math.ceil((resetAt - Date.now()) / 1000);
+      const response = NextResponse.json(
+        { error: "Too many estimate requests. Please wait a moment.", fallback: true },
+        { status: 429 },
+      );
+      response.headers.set("Retry-After", String(retryAfter));
+      return addSecurityHeaders(response);
+    }
+
+    const response = NextResponse.next();
+    response.headers.set("X-RateLimit-Limit", String(FAIRPRICE_RATE_LIMIT));
+    response.headers.set("X-RateLimit-Remaining", String(remaining));
+    return addSecurityHeaders(response);
+  }
+
   // Route protection for authenticated areas
-  if (pathname.startsWith("/contractor") || pathname.startsWith("/homeowner") || pathname.startsWith("/subcontractor")) {
+  if (pathname.startsWith("/contractor") || pathname.startsWith("/homeowner") || pathname.startsWith("/subcontractor") || pathname.startsWith("/admin")) {
     const token = request.cookies.get("ftw-token")?.value;
     if (!token) {
       return redirectToLogin(request, pathname);
@@ -157,6 +189,11 @@ export async function middleware(request: NextRequest) {
       ["/homeowner", "homeowner"],
       ["/subcontractor", "subcontractor"],
     ];
+
+    // Admin routes require admin role
+    if (pathname.startsWith("/admin") && rawRole !== "admin") {
+      return addSecurityHeaders(NextResponse.redirect(new URL("/login", request.url)));
+    }
 
     for (const [prefix, expectedRole] of roleChecks) {
       if (pathname.startsWith(prefix) && rawRole !== expectedRole) {
