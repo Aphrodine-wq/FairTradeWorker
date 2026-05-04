@@ -320,7 +320,7 @@ export function useRealtimeSubJobBids(subJobId: string | null) {
   useEffect(() => {
     if (!subJobId) return;
     api.getSubJob(subJobId).then((data) => {
-      setSubJob(data.subJob);
+      setSubJob((data as any).sub_job ?? (data as any).subJob ?? null);
       setBids(data.bids);
       setLoading(false);
     });

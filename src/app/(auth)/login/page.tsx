@@ -62,7 +62,9 @@ function LoginContent() {
       const user = await authStore.login(email, password);
       identify(user.id, { email: user.email, role: user.role });
       track("login", { role: user.role });
-      router.push(user.role === "homeowner" ? "/homeowner/dashboard" : "/contractor/dashboard");
+      if (user.role === "homeowner") router.push("/homeowner/dashboard");
+      else if (user.role === "subcontractor") router.push("/subcontractor/dashboard");
+      else router.push("/contractor/dashboard");
     } catch {
       setError("Invalid email or password");
       toast.error("Invalid email or password");
@@ -406,7 +408,7 @@ function LoginContent() {
                 className="w-full text-xs text-gray-700"
                 onClick={() => {
                   document.cookie = "ftw-token=demo.contractor; path=/";
-                  router.push("/contractor/dashboard");
+                  router.push("/demo/contractor/dashboard");
                 }}
               >
                 Contractor Demo
@@ -419,7 +421,7 @@ function LoginContent() {
                 className="w-full text-xs text-gray-700"
                 onClick={() => {
                   document.cookie = "ftw-token=demo.homeowner; path=/";
-                  router.push("/homeowner/dashboard");
+                  router.push("/demo/homeowner/dashboard");
                 }}
               >
                 Homeowner Demo
@@ -432,7 +434,7 @@ function LoginContent() {
                 className="w-full text-xs text-gray-700"
                 onClick={() => {
                   document.cookie = "ftw-token=demo.subcontractor; path=/";
-                  router.push("/subcontractor/dashboard");
+                  router.push("/demo/subcontractor/dashboard");
                 }}
               >
                 Sub Demo

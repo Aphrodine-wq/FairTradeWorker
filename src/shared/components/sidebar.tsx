@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 import { cn, getInitials } from "@shared/lib/utils";
 import { BrandMark } from "@shared/components/brand-mark";
 import { RoleSwitcher } from "@shared/components/role-switcher";
 import type { UserRoleClient } from "@shared/lib/auth-store";
+import { authStore } from "@shared/lib/auth-store";
+import { api } from "@shared/lib/realtime";
 
 interface NavItem {
   label: string;
@@ -24,22 +26,81 @@ interface SidebarProps {
   autoCollapse?: boolean;
 }
 
+/** Shown in /demo/* sidebars and as legacy placeholder labels */
 const MOCK_USER: Record<string, { name: string; email: string; rating: number }> = {
   contractor: { name: "Marcus Johnson", email: "marcus@johnson.com", rating: 4.8 },
   homeowner: { name: "Michael Brown", email: "michael@brown.com", rating: 4.9 },
   subcontractor: { name: "Marcus Johnson", email: "marcus@johnson.com", rating: 4.7 },
 };
 
+type Profile = { name: string; email: string; rating?: number };
+
+function demoProfileForPath(pathname: string, userRole: SidebarProps["userRole"]): Profile | null {
+  if (pathname.startsWith("/demo/contractor") && userRole === "contractor") return MOCK_USER.contractor;
+  if (pathname.startsWith("/demo/homeowner") && userRole === "homeowner") return MOCK_USER.homeowner;
+  if (pathname.startsWith("/demo/subcontractor") && userRole === "subcontractor") return MOCK_USER.subcontractor;
+  return null;
+}
+
 export function Sidebar({ items, currentPath, userRole, roles, topAction, autoCollapse }: SidebarProps) {
   const [manualOverride, setManualOverride] = useState<boolean | null>(null);
   const collapsed = manualOverride ?? (autoCollapse || false);
   const router = useRouter();
-  const user = MOCK_USER[userRole];
+  const pathname = usePathname();
+  const demoProfile = demoProfileForPath(pathname, userRole);
+  const [profile, setProfile] = useState<Profile | null>(() => demoProfile);
 
-  // Reset manual override when autoCollapse changes (route change)
   useEffect(() => {
     setManualOverride(null);
   }, [autoCollapse]);
+
+  useEffect(() => {
+    if (demoProfile) {
+      setProfile(demoProfile);
+      return;
+    }
+
+    const applyStore = () => {
+      const u = authStore.getUser();
+      if (u) {
+        setProfile({ name: u.name, email: u.email });
+      }
+    };
+    applyStore();
+
+    let cancelled = false;
+    if (!authStore.getUser()) {
+      api
+        .me()
+        .then((res) => {
+          if (cancelled) return;
+          const raw = res.user as Record<string, unknown>;
+          const name = String(raw?.name ?? "").trim();
+          const email = String(raw?.email ?? "").trim();
+          if (email) setProfile({ name: name || email.split("@")[0] || "User", email });
+        })
+        .catch(() => {});
+    }
+
+    const unsub = authStore.subscribe(() => {
+      if (demoProfileForPath(pathname, userRole)) return;
+      const u = authStore.getUser();
+      if (u) setProfile({ name: u.name, email: u.email });
+    });
+
+    return () => {
+      cancelled = true;
+      unsub();
+    };
+  }, [demoProfile, pathname, userRole]);
+
+  const display = profile ?? { name: "Account", email: "", rating: undefined };
+  const showRating = display.rating != null && display.rating > 0;
+
+  function handleLogout() {
+    authStore.logout();
+    router.push("/login");
+  }
 
   return (
     <aside
@@ -120,21 +181,26 @@ export function Sidebar({ items, currentPath, userRole, roles, topAction, autoCo
           >
             <div className="w-8 h-8 rounded-sm bg-brand-100 border border-brand-200 flex items-center justify-center flex-shrink-0">
               <span className="text-brand-700 text-xs font-bold">
-                {getInitials(user.name)}
+                {getInitials(display.name)}
               </span>
             </div>
             {!collapsed && (
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-gray-900 truncate">{user.name}</p>
-                <p className="text-[11px] leading-tight mt-0.5">
-                  <span className="text-amber-500">&#9733;</span>{" "}
-                  <span className="font-semibold text-gray-800">{user.rating}</span>
-                </p>
-                <p className="text-xs text-gray-700 truncate">{user.email}</p>
+                <p className="text-xs font-semibold text-gray-900 truncate">{display.name}</p>
+                {showRating ? (
+                  <p className="text-[11px] leading-tight mt-0.5">
+                    <span className="text-amber-500">&#9733;</span>{" "}
+                    <span className="font-semibold text-gray-800">{display.rating}</span>
+                  </p>
+                ) : null}
+                {display.email ? (
+                  <p className="text-xs text-gray-700 truncate">{display.email}</p>
+                ) : null}
               </div>
             )}
             <button
-              onClick={() => router.push("/login")}
+              type="button"
+              onClick={handleLogout}
               className={cn(
                 "flex-shrink-0 w-7 h-7 rounded-sm hover:bg-red-50 flex items-center justify-center text-gray-600 hover:text-red-500 transition-colors",
                 collapsed && "mx-auto"

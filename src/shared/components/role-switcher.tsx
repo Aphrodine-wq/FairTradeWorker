@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { cn } from "@shared/lib/utils";
 import { authStore, type UserRoleClient } from "@shared/lib/auth-store";
+import { DEMO_ACCESS_TOKENS, demoDashboardUrl } from "@shared/lib/demo-routes";
 
 interface RoleSwitcherProps {
   activeRole: UserRoleClient;
@@ -28,19 +29,20 @@ export function RoleSwitcher({ activeRole, roles, collapsed }: RoleSwitcherProps
 
     // Check if this is a demo token — update the cookie directly and navigate
     const existingCookie = document.cookie.split("; ").find((c) => c.startsWith("ftw-token="));
-    const tokenValue = existingCookie?.split("=")[1] || "";
-    if (tokenValue.startsWith("demo.")) {
-      try {
-        const payloadStr = atob(tokenValue.split(".")[1]);
-        const payload = JSON.parse(payloadStr);
-        payload.role = targetRole.toUpperCase();
-        const newPayload = btoa(JSON.stringify(payload));
-        document.cookie = `ftw-token=demo.${newPayload}.demo; path=/`;
-      } catch {
-        // Non-critical
+    const rawTok = existingCookie?.split("=")[1] || "";
+    const tokenValue = rawTok ? decodeURIComponent(rawTok) : "";
+    if (DEMO_ACCESS_TOKENS.has(tokenValue)) {
+      const tokenByRole: Record<UserRoleClient, string> = {
+        contractor: "demo.contractor",
+        subcontractor: "demo.subcontractor",
+        homeowner: "demo.homeowner",
+      };
+      const nextTok = tokenByRole[targetRole];
+      if (nextTok) {
+        document.cookie = `ftw-token=${nextTok}; path=/`;
+        const dest = demoDashboardUrl(nextTok) ?? ROLE_CONFIG[targetRole].dashboard;
+        window.location.href = dest;
       }
-      const config = ROLE_CONFIG[targetRole];
-      if (config) window.location.href = config.dashboard;
       return;
     }
 

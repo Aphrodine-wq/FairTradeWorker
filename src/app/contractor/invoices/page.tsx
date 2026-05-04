@@ -29,7 +29,7 @@ import {
 } from "@shared/ui/dialog";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
 import { toast } from "sonner";
-import { fetchInvoices, createInvoice, updateInvoice } from "@shared/lib/data";
+import { fetchInvoices, createInvoice, fetchInvoiceableMilestones, fetchProjects, updateInvoice } from "@shared/lib/data";
 import { usePageTitle } from "@shared/hooks/use-page-title";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -243,6 +243,13 @@ const PROJECTS_WITH_MILESTONES = [
   },
 ];
 
+type InvoiceProjectOption = {
+  id?: string;
+  name: string;
+  client: { name: string; email: string; address: string };
+  milestones: { name: string; number: number; total: number; amount: number; invoiced: boolean }[];
+};
+
 const PAYMENT_TERMS_OPTIONS = [
   "50% upfront, 50% on completion",
   "Net 14",
@@ -284,6 +291,7 @@ export default function InvoicesPage() {
   const [createLineItems, setCreateLineItems] = useState<LineItem[]>([]);
   const [createNotes, setCreateNotes] = useState("");
   const [createPaymentTerms, setCreatePaymentTerms] = useState("Net 14");
+  const [projectOptions, setProjectOptions] = useState<InvoiceProjectOption[]>(PROJECTS_WITH_MILESTONES);
 
   useEffect(() => {
     fetchInvoices().then((apiInvoices) => {
@@ -319,9 +327,38 @@ export default function InvoicesPage() {
         );
       }
     });
+
+    fetchProjects().then(async (projects) => {
+      if (!Array.isArray(projects) || projects.length === 0) return;
+      const options = await Promise.all(
+        projects.map(async (project: any) => {
+          const invoiceable = await fetchInvoiceableMilestones(project.id);
+          const milestones = Array.isArray(invoiceable)
+            ? invoiceable.map((m: any, idx: number) => ({
+                name: m.name || `Milestone ${idx + 1}`,
+                number: Number(m.number || idx + 1),
+                total: Number(m.total || invoiceable.length || 1),
+                amount: Number(m.amount || 0),
+                invoiced: Boolean(m.invoiced),
+              }))
+            : [];
+          return {
+            id: project.id,
+            name: project.name || "Project",
+            client: {
+              name: project.client?.name || "Client",
+              email: project.client?.email || "",
+              address: project.client?.address || "",
+            },
+            milestones,
+          };
+        })
+      );
+      if (options.length > 0) setProjectOptions(options);
+    });
   }, []);
 
-  const selectedProject = PROJECTS_WITH_MILESTONES.find(
+  const selectedProject = projectOptions.find(
     (p) => p.name === createProject
   );
   const availableMilestones =
@@ -356,7 +393,7 @@ export default function InvoicesPage() {
 
   function handleMilestoneChange(milestoneName: string) {
     setCreateMilestone(milestoneName);
-    const proj = PROJECTS_WITH_MILESTONES.find((p) => p.name === createProject);
+    const proj = projectOptions.find((p) => p.name === createProject);
     const ms = proj?.milestones.find((m) => m.name === milestoneName);
     if (ms) {
       setCreateLineItems([
@@ -913,7 +950,7 @@ export default function InvoicesPage() {
                 className="w-full h-10 rounded-sm border border-gray-200 bg-white px-3 text-[13px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600"
               >
                 <option value="">Select a project</option>
-                {PROJECTS_WITH_MILESTONES.map((p) => (
+                {projectOptions.map((p) => (
                   <option key={p.name} value={p.name}>
                     {p.name} — {p.client.name}
                   </option>

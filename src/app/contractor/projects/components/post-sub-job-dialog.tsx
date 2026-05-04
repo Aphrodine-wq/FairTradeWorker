@@ -88,44 +88,45 @@ export function PostSubJobDialog({
     }
 
     setSubmitting(true);
-    const payload = {
-      project_id: projectId,
-      milestone_label: milestoneLabel,
-      milestone_index: milestoneIndex,
-      title: `${milestoneLabel} - ${projectName}`,
-      description: description.trim(),
-      category: projectCategory,
-      skills: selectedSkills,
-      location: projectLocation,
-      budget_min: Number(budgetMin) || undefined,
-      budget_max: Number(budgetMax) || undefined,
-      payment_path: paymentPath,
-      disclosed_to_owner: disclosed,
-      deadline: deadline || undefined,
-    };
-    const ok = onSubmit
-      ? await onSubmit(payload)
-      : await (async () => {
-          await postSubJob({
-            projectId,
-            milestoneLabel,
-            milestoneIndex,
-            title: payload.title,
-            description: payload.description,
-            category: projectCategory,
-            skills: selectedSkills,
-            location: projectLocation,
-            budgetMin: Number(budgetMin),
-            budgetMax: Number(budgetMax),
-            paymentPath,
-            disclosedToOwner: disclosed,
-            deadline,
-          });
-          return true;
-        })();
-    if (!ok) return;
-    toast.success(`Sub job posted for "${milestoneLabel}"`);
-    onOpenChange(false);
+    try {
+      const payload = {
+        project_id: projectId,
+        milestone_label: milestoneLabel,
+        milestone_index: milestoneIndex,
+        title: `${milestoneLabel} - ${projectName}`,
+        description: description.trim(),
+        category: projectCategory,
+        skills: selectedSkills,
+        location: projectLocation,
+        budget_min: Number(budgetMin) || undefined,
+        budget_max: Number(budgetMax) || undefined,
+        payment_path: paymentPath,
+        disclosed_to_owner: disclosed,
+        deadline: deadline || undefined,
+      };
+      const ok = onSubmit
+        ? await onSubmit(payload)
+        : await (async () => {
+            await postSubJob({
+              projectId,
+              milestoneLabel,
+              milestoneIndex,
+              title: payload.title,
+              description: payload.description,
+              category: projectCategory,
+              skills: selectedSkills,
+              location: projectLocation,
+              budgetMin: Number(budgetMin),
+              budgetMax: Number(budgetMax),
+              paymentPath,
+              disclosedToOwner: disclosed,
+              deadline,
+            });
+            return true;
+          })();
+      if (!ok) return;
+      toast.success(`Sub job posted for "${milestoneLabel}"`);
+      onOpenChange(false);
 
       // Reset form
       setDescription("");

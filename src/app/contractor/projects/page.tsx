@@ -40,7 +40,18 @@ import {
   DialogTrigger,
 } from "@shared/ui/dialog";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
-import { fetchProjects, updateProject as persistProject } from "@shared/lib/data";
+import {
+  createProjectChangeOrder,
+  createProjectDocument,
+  createProjectExpense,
+  createProjectPunchItem,
+  fetchProjectChangeOrders,
+  fetchProjectDocuments,
+  fetchProjectExpenses,
+  fetchProjectPunchItems,
+  fetchProjects,
+  updateProject as persistProject,
+} from "@shared/lib/data";
 import { api } from "@shared/lib/realtime";
 import { toast } from "sonner";
 import { usePageTitle } from "@shared/hooks/use-page-title";
@@ -441,7 +452,7 @@ function OverviewTab({ project }: { project: typeof PROJECTS[0] }) {
 /* CalendarView and ScheduleTab removed — schedule routes to MilestoneScheduleTab */
 
 function ChangeOrdersTab({ projectId }: { projectId: string }) {
-  const cos = ALL_COS[projectId] ?? [];
+  const [cos, setCos] = useState<ChangeOrder[]>(ALL_COS[projectId] ?? []);
   const [selected, setSelected] = useState<ChangeOrder | null>(null);
   const [newCOOpen, setNewCOOpen] = useState(false);
   const [description, setDescription] = useState("");
@@ -450,6 +461,24 @@ function ChangeOrdersTab({ projectId }: { projectId: string }) {
   const [reason, setReason] = useState("");
 
   const total = (parseFloat(labor) || 0) + (parseFloat(materials) || 0);
+
+  useEffect(() => {
+    fetchProjectChangeOrders(projectId).then((rows) => {
+      if (!Array.isArray(rows) || rows.length === 0) return;
+      setCos(
+        rows.map((co: any, idx: number) => ({
+          id: co.id || `CO-${idx + 1}`,
+          description: co.description || "Change order",
+          amount: Number(co.amount || 0),
+          status: (co.status || "Pending") as COStatus,
+          date: co.date || new Date().toISOString().split("T")[0],
+          labor: Number(co.labor || 0),
+          materials: Number(co.materials || 0),
+          reason: co.reason || "",
+        }))
+      );
+    });
+  }, [projectId]);
 
   if (cos.length === 0) {
     return (
@@ -473,7 +502,27 @@ function ChangeOrdersTab({ projectId }: { projectId: string }) {
                 <label className="text-sm font-medium text-gray-900">Reason</label>
                 <Textarea placeholder="Explain what triggered this change..." rows={3} value={reason} onChange={(e) => setReason(e.target.value)} />
               </div>
-              <Button className="w-full" disabled={!description || total === 0}>Send Change Order</Button>
+              <Button
+                className="w-full"
+                disabled={!description || total === 0}
+                onClick={async () => {
+                  await createProjectChangeOrder(projectId, { description, labor: Number(labor || 0), materials: Number(materials || 0), reason });
+                  const next: ChangeOrder = {
+                    id: `CO-${Date.now()}`,
+                    description,
+                    amount: total,
+                    status: "Pending",
+                    date: new Date().toISOString().split("T")[0],
+                    labor: Number(labor || 0),
+                    materials: Number(materials || 0),
+                    reason,
+                  };
+                  setCos((prev) => [next, ...prev]);
+                  setNewCOOpen(false);
+                }}
+              >
+                Send Change Order
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -571,6 +620,22 @@ function PunchListTab({ projectId }: { projectId: string }) {
   const [newPriority, setNewPriority] = useState<Priority>("medium");
   const [newAssignedTo, setNewAssignedTo] = useState("");
 
+  useEffect(() => {
+    fetchProjectPunchItems(projectId).then((rows) => {
+      if (!Array.isArray(rows) || rows.length === 0) return;
+      setItems(
+        rows.map((item: any, idx: number) => ({
+          id: item.id || `p-${idx}`,
+          description: item.description || "Punch list item",
+          location: item.location || "—",
+          priority: (item.priority || "medium") as Priority,
+          status: (item.status || "open") as ItemStatus,
+          assignedTo: item.assignedTo || "Unassigned",
+        }))
+      );
+    });
+  }, [projectId]);
+
   function toggleStatus(id: string) {
     setItems((prev) => prev.map((item) => {
       if (item.id !== id) return item;
@@ -590,6 +655,13 @@ function PunchListTab({ projectId }: { projectId: string }) {
       assignedTo: newAssignedTo.trim() || "Unassigned",
     };
     setItems((prev) => [...prev, newItem]);
+    void createProjectPunchItem(projectId, {
+      description: newItem.description,
+      location: newItem.location,
+      priority: newItem.priority,
+      status: newItem.status,
+      assignedTo: newItem.assignedTo,
+    });
     setNewDesc("");
     setNewLocation("");
     setNewPriority("medium");
@@ -821,6 +893,22 @@ function CostsTab({ projectId, project }: { projectId: string; project: typeof P
   const remaining = totalEstimated - totalActual;
   const milestones = project.milestones as Milestone[];
 
+  useEffect(() => {
+    fetchProjectExpenses(projectId).then((rows) => {
+      if (!Array.isArray(rows) || rows.length === 0) return;
+      setExpenses(
+        rows.map((exp: any) => ({
+          date: exp.date || new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+          description: exp.description || "Expense",
+          amount: Number(exp.amount || 0),
+          category: (exp.category || "Other") as ExpenseCategory,
+          milestone: exp.milestone || undefined,
+          vendor: exp.vendor || undefined,
+        }))
+      );
+    });
+  }, [projectId]);
+
   function handleAddExpense() {
     if (!expDesc.trim() || !expAmount) return;
     const newExp: Expense = {
@@ -832,6 +920,14 @@ function CostsTab({ projectId, project }: { projectId: string; project: typeof P
       vendor: expVendor.trim() || undefined,
     };
     setExpenses((prev) => [newExp, ...prev]);
+    void createProjectExpense(projectId, {
+      date: newExp.date,
+      description: newExp.description,
+      amount: newExp.amount,
+      category: newExp.category,
+      milestone: newExp.milestone,
+      vendor: newExp.vendor,
+    });
     setExpDesc("");
     setExpAmount("");
     setExpCategory("Materials");
@@ -1354,11 +1450,29 @@ const DOC_TYPE_LABEL: Record<string, string> = {
   inspection: "Inspection",
 };
 
-function DocumentsTab() {
+function DocumentsTab({ projectId }: { projectId: string }) {
+  const [documents, setDocuments] = useState(MOCK_DOCUMENTS);
+
+  useEffect(() => {
+    fetchProjectDocuments(projectId).then((rows) => {
+      if (!Array.isArray(rows) || rows.length === 0) return;
+      setDocuments(
+        rows.map((doc: any, idx: number) => ({
+          id: doc.id || `d-${idx}`,
+          name: doc.name || "Document",
+          type: doc.type || "other",
+          size: doc.size || "—",
+          date: doc.date || new Date().toISOString().split("T")[0],
+          status: doc.status || "pending",
+        }))
+      );
+    });
+  }, [projectId]);
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-[13px] text-gray-700">{MOCK_DOCUMENTS.length} documents</p>
+        <p className="text-[13px] text-gray-700">{documents.length} documents</p>
         <div className="flex items-center gap-2">
           <button
             onClick={() => toast.info("Google Drive integration coming soon")}
@@ -1367,7 +1481,13 @@ function DocumentsTab() {
             <Cloud className="w-3.5 h-3.5" />
             Connect Google Drive
           </button>
-          <Button size="sm" className="h-8 text-[12px] gap-1.5">
+          <Button
+            size="sm"
+            className="h-8 text-[12px] gap-1.5"
+            onClick={() => {
+              void createProjectDocument(projectId, { name: "New Document", type: "other" });
+            }}
+          >
             <Upload className="w-3.5 h-3.5" />
             Upload Document
           </Button>
@@ -1375,7 +1495,7 @@ function DocumentsTab() {
       </div>
 
       <div className="bg-white rounded-sm border border-border overflow-hidden">
-        {MOCK_DOCUMENTS.map((doc, i) => {
+        {documents.map((doc, i) => {
           const status = DOC_STATUS_STYLE[doc.status] || DOC_STATUS_STYLE.pending;
           const typeLabel = DOC_TYPE_LABEL[doc.type] || doc.type;
           return (
@@ -1383,7 +1503,7 @@ function DocumentsTab() {
               key={doc.id}
               className={cn(
                 "flex items-center gap-4 px-4 py-3 hover:bg-gray-50/80 transition-colors",
-                i < MOCK_DOCUMENTS.length - 1 && "border-b border-border"
+                i < documents.length - 1 && "border-b border-border"
               )}
             >
               <div className="w-8 h-8 rounded-sm bg-gray-100 flex items-center justify-center flex-shrink-0">
@@ -1496,7 +1616,7 @@ export default function ProjectsPage() {
         const progress = ms.length > 0 ? Math.round(ms.filter((m) => m.done).length / ms.length * 100) : 0;
         const status = progress >= 100 ? "completed" : "in_progress";
         const spent = ms
-          .filter((m) => m.status === "paid" || m.status === "approved")
+          .filter((m) => m.status === "paid" || m.status === "complete")
           .reduce((sum, m) => sum + m.amount, 0);
         setProjects((prev) => prev.map((p) => p.id === selectedProjectId ? { ...p, milestones: ms as typeof p.milestones, progress } : p));
         void persistProject(selectedProjectId, {
@@ -1508,7 +1628,7 @@ export default function ProjectsPage() {
       case "change-orders": return <ChangeOrdersTab projectId={selectedProjectId} />;
       case "punch-list": return <PunchListTab projectId={selectedProjectId} />;
       case "costs": return <CostsTab projectId={selectedProjectId} project={project} />;
-      case "documents": return <DocumentsTab />;
+      case "documents": return <DocumentsTab projectId={selectedProjectId} />;
       default: return <OverviewTab project={project} />;
     }
   };

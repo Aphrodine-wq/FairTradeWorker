@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import {
   Search,
@@ -58,7 +58,7 @@ import { JOB_CATEGORIES } from "@shared/lib/constants";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
 import { type BadgeProps } from "@shared/ui/badge";
 import { useRealtimeJobs } from "@shared/hooks/use-realtime";
-import { fetchJobs } from "@shared/lib/data";
+import { fetchClients, fetchEstimateTemplates, fetchJobs } from "@shared/lib/data";
 import { usePageTitle } from "@shared/hooks/use-page-title";
 
 // ─── Shared types ─────────────────────────────────────────────────────────────
@@ -730,8 +730,44 @@ function NewEstimateTab() {
   const [validityDays, setValidityDays] = useState(30);
   const [paymentTerms, setPaymentTerms] = useState(DEFAULT_PAYMENT_TERMS);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [templateOptions, setTemplateOptions] = useState(TEMPLATES);
+  const [clientOptions, setClientOptions] = useState(MOCK_CLIENTS);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+
+  useEffect(() => {
+    fetchEstimateTemplates().then((templates) => {
+      if (!Array.isArray(templates) || templates.length === 0) return;
+      const normalized = templates.map((tpl: any) => ({
+        id: tpl.id || `tpl-${Math.random().toString(36).slice(2)}`,
+        name: tpl.name || "Template",
+        description: tpl.projectType || "Imported from ftw-svc",
+        items: Array.isArray(tpl.lineItems)
+          ? tpl.lineItems.map((li: any) => ({
+              description: li.name || li.description || "",
+              category: "Material" as LineCategory,
+              quantity: Number(li.qty ?? li.quantity ?? 1),
+              unitPrice: Number(li.unitPrice ?? li.unit_price ?? 0),
+            }))
+          : [{ description: "", category: "Labor" as LineCategory, quantity: 1, unitPrice: 0 }],
+      }));
+      setTemplateOptions([
+        ...normalized,
+        { id: "custom", name: "Custom", description: "Start from scratch", items: [{ description: "", category: "Labor" as LineCategory, quantity: 1, unitPrice: 0 }] },
+      ]);
+    });
+
+    fetchClients().then((clients) => {
+      if (!Array.isArray(clients) || clients.length === 0) return;
+      const normalized = clients.map((client: any) => ({
+        name: client.name || "Client",
+        email: client.email || "",
+        phone: client.phone || "",
+        address: client.address || "",
+      }));
+      setClientOptions(normalized);
+    });
+  }, []);
 
   const subtotal = lineItems.reduce((s, i) => s + i.quantity * i.unitPrice, 0);
   const taxAmount = subtotal * (taxRate / 100);
@@ -767,7 +803,7 @@ function NewEstimateTab() {
 
   const handleClientSelect = (idx: number) => {
     setSelectedClientIdx(idx);
-    const c = MOCK_CLIENTS[idx];
+    const c = clientOptions[idx];
     setClientName(c.name);
     setClientEmail(c.email);
     setClientPhone(c.phone);
@@ -788,7 +824,7 @@ function NewEstimateTab() {
           Start From a Template
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {TEMPLATES.map((template) => {
+          {templateOptions.map((template) => {
             const isActive = selectedTemplate === template.id;
             return (
               <button
@@ -880,7 +916,7 @@ function NewEstimateTab() {
                   onChange={(e) => { const val = e.target.value; if (val !== "") handleClientSelect(Number(val)); }}
                 >
                   <option value="">Choose a client...</option>
-                  {MOCK_CLIENTS.map((c, idx) => <option key={idx} value={idx}>{c.name}</option>)}
+                  {clientOptions.map((c, idx) => <option key={idx} value={idx}>{c.name}</option>)}
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-3">

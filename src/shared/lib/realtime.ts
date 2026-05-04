@@ -10,7 +10,6 @@
  */
 import { Client, IMessage, StompSubscription } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-import { changePassword as changePasswordGap } from "./ftw-svc-gaps";
 
 // FairTradeWorker talks to ftw-svc through this base URL.
 const API_BASE = process.env.NEXT_PUBLIC_REALTIME_URL || "http://localhost:4000";
@@ -61,6 +60,7 @@ export interface RealtimeMessage {
 
 export interface AuthResponse {
   token: string;
+  cookieToken?: string;
   user: {
     id: string;
     email: string;
@@ -191,10 +191,18 @@ export const api = {
 
   // Auth
   async login(email: string, password: string): Promise<AuthResponse> {
-    const data = await apiFetch<AuthResponse>("/api/auth/login", {
+    // Call the local Next.js route so the response token is signed with JWT_SECRET,
+    // which allows the middleware to verify the ftw-token cookie.
+    const res = await fetch("/api/auth/login", {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || body.message || `Login failed: ${res.status}`);
+    }
+    const data = await res.json() as AuthResponse;
     setAuthToken(data.token);
     return data;
   },
@@ -247,7 +255,13 @@ export const api = {
   },
 
   async changePassword(currentPassword: string, newPassword: string): Promise<any> {
-    return changePasswordGap(currentPassword, newPassword);
+    return apiFetch("/api/auth/change-password", {
+      method: "POST",
+      body: JSON.stringify({
+        current_password: currentPassword,
+        new_password: newPassword,
+      }),
+    });
   },
 
   // Jobs (public — no auth required for listing)
@@ -493,6 +507,118 @@ export const api = {
     });
   },
 
+  async getContractorDashboard(): Promise<any> {
+    return apiFetch("/api/contractor/dashboard");
+  },
+
+  async getHomeownerDashboard(): Promise<any> {
+    return apiFetch("/api/homeowner/dashboard");
+  },
+
+  async listEstimateTemplates(): Promise<any[]> {
+    const data = await apiFetch<{ templates: any[] } | any[]>("/api/estimate-templates");
+    return unwrapList<any>(data, "templates");
+  },
+
+  async getPublicStats(): Promise<any> {
+    return apiFetch("/api/public/stats", {
+      headers: { "X-Allow-401": "1" },
+    });
+  },
+
+  async listJobCategories(): Promise<any[]> {
+    const data = await apiFetch<{ categories: any[] } | any[]>("/api/taxonomies/job-categories", {
+      headers: { "X-Allow-401": "1" },
+    });
+    return unwrapList<any>(data, "categories");
+  },
+
+  async listTrades(): Promise<any[]> {
+    const data = await apiFetch<{ trades: any[] } | any[]>("/api/taxonomies/trades", {
+      headers: { "X-Allow-401": "1" },
+    });
+    return unwrapList<any>(data, "trades");
+  },
+
+  async getProjectChangeOrders(projectId: string): Promise<any[]> {
+    const data = await apiFetch<{ changeOrders: any[] }>(`/api/projects/${projectId}/change-orders`);
+    return data.changeOrders || [];
+  },
+
+  async createProjectChangeOrder(projectId: string, payload: Record<string, unknown>): Promise<any> {
+    const data = await apiFetch<{ changeOrder: any } | any>(`/api/projects/${projectId}/change-orders`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    return unwrapOne<any>(data, "changeOrder");
+  },
+
+  async getProjectPunchItems(projectId: string): Promise<any[]> {
+    const data = await apiFetch<{ items: any[] }>(`/api/projects/${projectId}/punch-items`);
+    return data.items || [];
+  },
+
+  async createProjectPunchItem(projectId: string, payload: Record<string, unknown>): Promise<any> {
+    const data = await apiFetch<{ item: any } | any>(`/api/projects/${projectId}/punch-items`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    return unwrapOne<any>(data, "item");
+  },
+
+  async getProjectExpenses(projectId: string): Promise<{ totals: any; expenses: any[] }> {
+    return apiFetch(`/api/projects/${projectId}/expenses`);
+  },
+
+  async createProjectExpense(projectId: string, payload: Record<string, unknown>): Promise<any> {
+    const data = await apiFetch<{ expense: any } | any>(`/api/projects/${projectId}/expenses`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    return unwrapOne<any>(data, "expense");
+  },
+
+  async getProjectDocuments(projectId: string): Promise<any[]> {
+    const data = await apiFetch<{ documents: any[] }>(`/api/projects/${projectId}/documents`);
+    return data.documents || [];
+  },
+
+  async createProjectDocument(projectId: string, payload: Record<string, unknown>): Promise<any> {
+    const data = await apiFetch<{ document: any } | any>(`/api/projects/${projectId}/documents`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    return unwrapOne<any>(data, "document");
+  },
+
+  async getInvoiceableMilestones(projectId: string): Promise<any[]> {
+    const data = await apiFetch<{ milestones: any[] }>(`/api/projects/${projectId}/invoiceable-milestones`);
+    return data.milestones || [];
+  },
+
+  async getSubcontractorEarningsSummary(subcontractorId: string): Promise<any> {
+    return apiFetch(`/api/subcontractors/${subcontractorId}/earnings-summary`);
+  },
+
+  async getSubcontractorPayouts(
+    subcontractorId: string,
+    params?: { page?: number; pageSize?: number }
+  ): Promise<any> {
+    return apiFetch(`/api/subcontractors/${subcontractorId}/payouts${toQuery(params || {})}`);
+  },
+
+  async getQuickBooksStatus(): Promise<any> {
+    return apiFetch("/api/integrations/quickbooks/status");
+  },
+
+  async startQuickBooksConnect(): Promise<{ authUrl: string; state: string; expiresInSeconds: number }> {
+    return apiFetch("/api/integrations/quickbooks/connect");
+  },
+
+  async disconnectQuickBooks(): Promise<any> {
+    return apiFetch("/api/integrations/quickbooks/disconnect", { method: "POST" });
+  },
+
   // File Uploads
   async uploadFile(file: File, entityType: string, entityId: string): Promise<any> {
     const formData = new FormData();
@@ -554,15 +680,7 @@ export const api = {
     return data.review;
   },
 
-  // Sub Jobs
-  async listSubJobs(): Promise<any[]> {
-    const data = await apiFetch<{ sub_jobs: any[] }>("/api/sub-jobs");
-    return data.sub_jobs;
-  },
-
-  async getSubJob(id: string): Promise<{ sub_job: any; bids: any[] }> {
-    return apiFetch(`/api/sub-jobs/${id}`);
-  },
+  // Sub Jobs (legacy wrappers used by some pages)
 
   async postSubJob(subJob: {
     project_id: string;
@@ -584,17 +702,6 @@ export const api = {
       body: JSON.stringify(subJob),
     });
     return data.sub_job;
-  },
-
-  async placeSubBid(
-    subJobId: string,
-    bid: { amount: number; message: string; timeline: string }
-  ): Promise<any> {
-    const data = await apiFetch<{ bid: any }>(`/api/sub-jobs/${subJobId}/bids`, {
-      method: "POST",
-      body: JSON.stringify(bid),
-    });
-    return data.bid;
   },
 
   async getSubContractorStats(): Promise<any> {

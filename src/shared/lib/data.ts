@@ -76,6 +76,18 @@ export async function fetchInvoices(): Promise<any[]> {
   try { return await api.listInvoices(); } catch { return []; }
 }
 
+export async function fetchInvoice(id: string): Promise<any | null> {
+  try { return await api.getInvoice(id); } catch { return null; }
+}
+
+export async function createInvoice(payload: Record<string, unknown>): Promise<any | null> {
+  try { return await api.createInvoice(payload); } catch { return null; }
+}
+
+export async function updateInvoice(id: string, payload: Record<string, unknown>): Promise<any | null> {
+  try { return await api.updateInvoice(id, payload); } catch { return null; }
+}
+
 /**
  * Fetch projects — real API with empty fallback.
  */
@@ -83,11 +95,115 @@ export async function fetchProjects(): Promise<any[]> {
   try { return await api.listProjects(); } catch { return []; }
 }
 
+export async function fetchProject(id: string): Promise<any | null> {
+  try { return await api.getProject(id); } catch { return null; }
+}
+
+export async function createProject(payload: Record<string, unknown>): Promise<any | null> {
+  try { return await api.createProject(payload); } catch { return null; }
+}
+
+export async function updateProject(id: string, payload: Record<string, unknown>): Promise<any | null> {
+  try { return await api.updateProject(id, payload); } catch { return null; }
+}
+
+export async function fetchContractorDashboard(): Promise<any | null> {
+  try { return await api.getContractorDashboard(); } catch { return null; }
+}
+
+export async function fetchHomeownerDashboard(): Promise<any | null> {
+  try { return await api.getHomeownerDashboard(); } catch { return null; }
+}
+
+export async function fetchProjectChangeOrders(projectId: string): Promise<any[]> {
+  try { return await api.getProjectChangeOrders(projectId); } catch { return []; }
+}
+
+export async function createProjectChangeOrder(projectId: string, payload: Record<string, unknown>): Promise<any | null> {
+  try { return await api.createProjectChangeOrder(projectId, payload); } catch { return null; }
+}
+
+export async function fetchProjectPunchItems(projectId: string): Promise<any[]> {
+  try { return await api.getProjectPunchItems(projectId); } catch { return []; }
+}
+
+export async function createProjectPunchItem(projectId: string, payload: Record<string, unknown>): Promise<any | null> {
+  try { return await api.createProjectPunchItem(projectId, payload); } catch { return null; }
+}
+
+export async function fetchProjectExpenses(projectId: string): Promise<{ totals: any; expenses: any[] } | null> {
+  try { return await api.getProjectExpenses(projectId); } catch { return null; }
+}
+
+export async function createProjectExpense(projectId: string, payload: Record<string, unknown>): Promise<any | null> {
+  try { return await api.createProjectExpense(projectId, payload); } catch { return null; }
+}
+
+export async function fetchProjectDocuments(projectId: string): Promise<any[]> {
+  try { return await api.getProjectDocuments(projectId); } catch { return []; }
+}
+
+export async function createProjectDocument(projectId: string, payload: Record<string, unknown>): Promise<any | null> {
+  try { return await api.createProjectDocument(projectId, payload); } catch { return null; }
+}
+
+export async function fetchInvoiceableMilestones(projectId: string): Promise<any[]> {
+  try { return await api.getInvoiceableMilestones(projectId); } catch { return []; }
+}
+
+export async function fetchEstimateTemplates(): Promise<any[]> {
+  try { return await api.listEstimateTemplates(); } catch { return []; }
+}
+
+export async function fetchPublicStats(): Promise<any | null> {
+  try { return await api.getPublicStats(); } catch { return null; }
+}
+
+export async function fetchJobCategories(): Promise<any[]> {
+  try { return await api.listJobCategories(); } catch { return []; }
+}
+
+export async function fetchTrades(): Promise<any[]> {
+  try { return await api.listTrades(); } catch { return []; }
+}
+
+export async function fetchSubcontractorEarningsSummary(subcontractorId: string): Promise<any | null> {
+  try { return await api.getSubcontractorEarningsSummary(subcontractorId); } catch { return null; }
+}
+
+export async function fetchSubcontractorPayouts(
+  subcontractorId: string,
+  params?: { page?: number; pageSize?: number }
+): Promise<any | null> {
+  try { return await api.getSubcontractorPayouts(subcontractorId, params); } catch { return null; }
+}
+
 /**
  * Fetch clients — real API with empty fallback.
  */
 export async function fetchClients(): Promise<any[]> {
   try { return await api.listClients(); } catch { return []; }
+}
+
+export async function fetchClient(id: string): Promise<any | null> {
+  try { return await api.getClient(id); } catch { return null; }
+}
+
+export async function createClient(payload: Record<string, unknown>): Promise<any | null> {
+  try { return await api.createClient(payload); } catch { return null; }
+}
+
+export async function updateClient(id: string, payload: Record<string, unknown>): Promise<any | null> {
+  try { return await api.updateClient(id, payload); } catch { return null; }
+}
+
+export async function removeClient(id: string): Promise<boolean> {
+  try {
+    await api.deleteClient(id);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 /**

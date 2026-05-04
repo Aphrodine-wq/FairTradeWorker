@@ -19,6 +19,7 @@ import {
 import { Sidebar } from "@shared/components/sidebar";
 import { cn } from "@shared/lib/utils";
 import { authStore } from "@shared/lib/auth-store";
+import { DEMO_ACCESS_TOKENS } from "@shared/lib/demo-routes";
 import { realtimeClient, api } from "@shared/lib/realtime";
 
 const NAV_ITEMS = [
@@ -43,16 +44,17 @@ function GlobalTopBar({ pathname }: { pathname: string }) {
     // Fetch real counts from API, fall back to mock counts
     api.listNotifications()
       .then((notifs) => {
-        setUnreadNotifications(notifs.filter((n: any) => !n.read).length);
+        setUnreadNotifications(Array.isArray(notifs) ? notifs.filter((n: any) => !n.read).length : 0);
       })
-      .catch(() => setUnreadNotifications(5));
+      .catch(() => setUnreadNotifications(0));
 
     api.listConversations()
       .then((convos) => {
-        const total = convos.reduce((sum: number, c: any) => sum + (c.unread_count || 0), 0);
-        setUnreadMessages(total || 3);
+        const list = Array.isArray(convos) ? convos : [];
+        const total = list.reduce((sum: number, c: any) => sum + (Number(c.unread_count) || 0), 0);
+        setUnreadMessages(total);
       })
-      .catch(() => setUnreadMessages(3));
+      .catch(() => setUnreadMessages(0));
   }, []);
 
   return (
@@ -94,7 +96,7 @@ export default function ContractorLayout({
 
   React.useEffect(() => {
     const token = authStore.getToken();
-    if (token) {
+    if (token && !DEMO_ACCESS_TOKENS.has(token)) {
       realtimeClient.connect(token);
     }
     return () => realtimeClient.disconnect();

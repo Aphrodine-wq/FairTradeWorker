@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { authStore } from "@shared/lib/auth-store";
+import { api } from "@shared/lib/realtime";
 
 // ── Types ────────────────────────────────────────────────────────
 
@@ -89,11 +90,8 @@ export function useQuickBooks() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/quickbooks/status", {
-        headers: authHeaders(),
-      });
-      const data = await res.json();
-      setStatus(data);
+      const data = await api.getQuickBooksStatus();
+      setStatus(data as QBConnectionStatus);
     } catch {
       setStatus({ connected: false });
     } finally {
@@ -105,11 +103,7 @@ export function useQuickBooks() {
     setConnecting(true);
     setError(null);
     try {
-      const res = await fetch("/api/quickbooks/connect", {
-        headers: authHeaders(),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to initiate connection");
+      const data = await api.startQuickBooksConnect();
       if (data.authUrl) {
         window.location.href = data.authUrl;
       }
@@ -123,15 +117,8 @@ export function useQuickBooks() {
     setDisconnecting(true);
     setError(null);
     try {
-      const res = await fetch("/api/quickbooks/disconnect", {
-        method: "DELETE",
-        headers: authHeaders(),
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to disconnect");
-      }
-      setStatus({ connected: false });
+      const data = await api.disconnectQuickBooks();
+      setStatus((data || { connected: false }) as QBConnectionStatus);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Disconnect failed");
     } finally {

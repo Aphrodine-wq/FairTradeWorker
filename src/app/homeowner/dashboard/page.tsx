@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   FolderOpen,
   TrendingDown,
@@ -47,7 +48,7 @@ import { Progress } from "@shared/ui/progress";
 import { Badge } from "@shared/ui/badge";
 import { formatCurrency, formatDate } from "@shared/lib/utils";
 import { mockProjects, homeownerDashboardStats, type Project } from "@shared/lib/mock-data";
-import { fetchNotifications } from "@shared/lib/data";
+import { fetchHomeownerDashboard, fetchJobCategories, fetchNotifications } from "@shared/lib/data";
 import { usePageTitle } from "@shared/hooks/use-page-title";
 
 const CATEGORIES = [
@@ -115,16 +116,69 @@ function generateMockScope(category: string, title: string, areas: string[], mat
 
 export default function HomeownerDashboardPage() {
   usePageTitle("Dashboard");
+  const pathname = usePathname();
+  const isDemoFixture = pathname.startsWith("/demo/homeowner");
+  const basePath = isDemoFixture ? "/demo/homeowner" : "/homeowner";
+
   const [projects, setProjects] = useState<Project[]>(mockProjects);
+  const [dashboardStats, setDashboardStats] = useState(homeownerDashboardStats);
+  const [categories, setCategories] = useState(CATEGORIES);
   const [notificationCount, setNotificationCount] = useState(0);
 
   useEffect(() => {
+    if (isDemoFixture) {
+      setProjects(mockProjects);
+      setDashboardStats(homeownerDashboardStats);
+      setCategories(CATEGORIES);
+      setNotificationCount(0);
+      return;
+    }
+    fetchHomeownerDashboard().then((data) => {
+      if (!data) return;
+      if (data.stats) {
+        setDashboardStats({
+          activeProjects: data.stats.activeProjects ?? homeownerDashboardStats.activeProjects,
+          pendingEstimates: data.stats.pendingBids ?? homeownerDashboardStats.pendingEstimates,
+          totalSpent: data.stats.totalSpentToDate ?? homeownerDashboardStats.totalSpent,
+          savedVsAverage: data.stats.savedVsLocalAverage ?? homeownerDashboardStats.savedVsAverage,
+        });
+      }
+      if (Array.isArray(data.projects) && data.projects.length > 0) {
+        setProjects(
+          data.projects.map((project: any, idx: number) => ({
+            ...mockProjects[idx % Math.max(mockProjects.length, 1)],
+            id: project.id || `proj-${idx}`,
+            title: project.title || "Project",
+            contractor: project.contractor?.name || "Contractor",
+            status: project.status === "active" ? "in_progress" : project.status || "in_progress",
+            progress: Number(project.progressPct || 0),
+            budget: Number(project.budget || 0),
+            spent: Number(project.spent || 0),
+          }))
+        );
+      }
+    });
+
+    fetchJobCategories().then((data) => {
+      if (!Array.isArray(data) || data.length === 0) return;
+      const mapped = data
+        .filter((c: any) => c.active !== false && c.label)
+        .map((c: any, idx: number) => {
+          const base = CATEGORIES[idx % CATEGORIES.length];
+          return {
+            ...base,
+            label: c.label,
+          };
+        });
+      if (mapped.length > 0) setCategories(mapped);
+    });
+
     fetchNotifications().then(({ data }) => {
       if (data.length > 0) {
         setNotificationCount(data.filter((n: any) => !n.read).length);
       }
     });
-  }, []);
+  }, [isDemoFixture]);
 
   const activeProjects = projects.filter((p) => p.status === "in_progress");
 
@@ -174,7 +228,7 @@ export default function HomeownerDashboardPage() {
     setContact((p) => p.includes(c) ? p.filter((x) => x !== c) : [...p, c]);
   }
 
-  const cat = CATEGORIES.find((c) => c.label === selectedCategory);
+  const cat = categories.find((c) => c.label === selectedCategory);
 
   // ── Selection helper for pill/card buttons ──
   function sel(isActive: boolean) {
@@ -195,7 +249,7 @@ export default function HomeownerDashboardPage() {
         </div>
 
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-          {CATEGORIES.map((c) => {
+          {categories.map((c) => {
             const Icon = c.icon;
             const active = selectedCategory === c.label;
             return (
@@ -595,23 +649,23 @@ export default function HomeownerDashboardPage() {
       {/* ── Activity Strip ────────────────────────────────────────── */}
       <div className="flex items-center gap-6 mb-8 py-4 border-y border-border">
         <div className="flex items-center gap-2">
-          <span className="text-2xl font-bold text-gray-900">{homeownerDashboardStats.activeProjects}</span>
+          <span className="text-2xl font-bold text-gray-900">{dashboardStats.activeProjects}</span>
           <span className="text-sm text-gray-700">active projects</span>
         </div>
         <div className="w-px h-8 bg-border" />
         <div className="flex items-center gap-2">
-          <span className="text-2xl font-bold text-gray-900">{homeownerDashboardStats.pendingEstimates}</span>
+          <span className="text-2xl font-bold text-gray-900">{dashboardStats.pendingEstimates}</span>
           <span className="text-sm text-gray-700">bids waiting</span>
         </div>
         <div className="w-px h-8 bg-border" />
         <div className="flex items-center gap-2">
-          <span className="text-2xl font-bold text-gray-900">{formatCurrency(homeownerDashboardStats.totalSpent)}</span>
+          <span className="text-2xl font-bold text-gray-900">{formatCurrency(dashboardStats.totalSpent)}</span>
           <span className="text-sm text-gray-700">spent this year</span>
         </div>
         <div className="flex-1" />
         <div className="flex items-center gap-1.5 text-sm">
           <TrendingDown className="h-4 w-4 text-brand-600" />
-          <span className="text-brand-700 font-medium">{formatCurrency(homeownerDashboardStats.savedVsAverage)} saved</span>
+          <span className="text-brand-700 font-medium">{formatCurrency(dashboardStats.savedVsAverage)} saved</span>
           <span className="text-gray-600">vs market avg</span>
         </div>
       </div>
@@ -621,7 +675,7 @@ export default function HomeownerDashboardPage() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">Your Projects</h2>
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/homeowner/projects" className="flex items-center gap-1">View all <ArrowRight className="h-3.5 w-3.5" /></Link>
+            <Link href={`${basePath}/projects`} className="flex items-center gap-1">View all <ArrowRight className="h-3.5 w-3.5" /></Link>
           </Button>
         </div>
 
@@ -639,7 +693,7 @@ export default function HomeownerDashboardPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {activeProjects.map((project) => (
-            <Link key={project.id} href="/homeowner/projects" className="block group">
+            <Link key={project.id} href={`${basePath}/projects`} className="block group">
               <Card className="h-full transition-colors group-hover:border-brand-200">
                 <CardContent className="p-5">
                   <div className="flex items-start justify-between gap-3 mb-3">

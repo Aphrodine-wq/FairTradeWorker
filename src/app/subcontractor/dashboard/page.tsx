@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   ChevronRight,
   ChevronLeft,
@@ -18,6 +19,7 @@ import { Badge } from "@shared/ui/badge";
 import {
   type SubJob,
   type Estimate,
+  mockSubJobs,
 } from "@shared/lib/mock-data";
 import { fetchSubJobs, fetchSubContractorStats, fetchEstimates } from "@shared/lib/data";
 import { formatCurrency, cn } from "@shared/lib/utils";
@@ -156,15 +158,34 @@ function TileHeader({ title, count, linkHref, linkLabel }: { title: string; coun
 
 export default function SubContractorDashboardPage() {
   usePageTitle("Dashboard");
+  const pathname = usePathname();
+  const isDemoFixture = pathname.startsWith("/demo/subcontractor");
+  const basePath = isDemoFixture ? "/demo/subcontractor" : "/subcontractor";
+
   const [subJobs, setSubJobs] = useState<SubJob[]>([]);
   const [estimates, setEstimates] = useState<Estimate[]>([]);
   const [stats, setStats] = useState({ activeSubJobs: 0, completedSubJobs: 0, monthlyRevenue: 0, revenueChange: 0, avgRating: 0, winRate: 0, responseTime: "—", pendingBids: 0 });
 
   useEffect(() => {
+    if (isDemoFixture) {
+      setSubJobs(mockSubJobs);
+      setEstimates([]);
+      setStats({
+        activeSubJobs: 2,
+        completedSubJobs: 14,
+        monthlyRevenue: 12400,
+        revenueChange: 8,
+        avgRating: 4.8,
+        winRate: 62,
+        responseTime: "2.1 hrs",
+        pendingBids: 3,
+      });
+      return;
+    }
     fetchSubJobs().then(setSubJobs);
     fetchEstimates().then(setEstimates);
     fetchSubContractorStats().then(setStats);
-  }, []);
+  }, [isDemoFixture]);
   const openSubJobs = subJobs.filter((sj) => sj.status === "open");
   const activeSubJobs = subJobs.filter((sj) => sj.status === "in_progress");
   const pendingEstimates = estimates.filter((e) => e.status === "sent" || e.status === "viewed");
@@ -177,7 +198,7 @@ export default function SubContractorDashboardPage() {
         <div className="flex items-center justify-between">
           <h1 className="text-[24px] font-semibold text-gray-900 tracking-tight">{formatTodayDate()}</h1>
           <div className="flex items-center gap-3">
-            <Link href="/subcontractor/work" className="flex items-center gap-1.5 h-8 px-3 rounded-sm bg-gray-900 text-white text-[12px] font-semibold hover:bg-gray-800 transition-colors">
+            <Link href={`${basePath}/work`} className="flex items-center gap-1.5 h-8 px-3 rounded-sm bg-gray-900 text-white text-[12px] font-semibold hover:bg-gray-800 transition-colors">
               <Briefcase className="w-3.5 h-3.5" />
               Find Work
             </Link>
@@ -191,17 +212,17 @@ export default function SubContractorDashboardPage() {
 
           {/* Sub Job Marketplace */}
           <BentoTile className="col-span-1 xl:col-span-2">
-            <TileHeader title="Sub Job Marketplace" count={openSubJobs.length} linkHref="/subcontractor/work" linkLabel="Browse all" />
+            <TileHeader title="Sub Job Marketplace" count={openSubJobs.length} linkHref={`${basePath}/work`} linkLabel="Browse all" />
             <SubJobCarousel subJobs={openSubJobs} />
           </BentoTile>
 
           {/* Active Sub Jobs */}
           <BentoTile className="col-span-1 xl:col-span-2">
-            <TileHeader title="Active Sub Jobs" count={activeSubJobs.length} linkHref="/subcontractor/jobs" linkLabel="All jobs" />
+            <TileHeader title="Active Sub Jobs" count={activeSubJobs.length} linkHref={`${basePath}/jobs`} linkLabel="All jobs" />
             <div className="px-5 pb-5">
               {activeSubJobs.length > 0 ? (
                 activeSubJobs.map((sj, i) => (
-                  <Link key={sj.id} href="/subcontractor/jobs" className="group flex items-center gap-3 py-2.5 border-b border-gray-100 last:border-0 hover:opacity-80 transition-opacity">
+                  <Link key={sj.id} href={`${basePath}/jobs`} className="group flex items-center gap-3 py-2.5 border-b border-gray-100 last:border-0 hover:opacity-80 transition-opacity">
                     <Circle className="w-4.5 h-4.5 text-amber-400 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-[14px] font-bold text-gray-900 truncate">{sj.title}</p>
@@ -231,12 +252,12 @@ export default function SubContractorDashboardPage() {
 
           {/* Estimate History */}
           <BentoTile className="col-span-1 xl:col-span-2">
-            <TileHeader title="Estimate History" count={pendingEstimates.length} linkHref="/subcontractor/estimates" linkLabel="View all" />
+            <TileHeader title="Estimate History" count={pendingEstimates.length} linkHref={`${basePath}/estimates`} linkLabel="View all" />
             <div className="px-5 pb-5">
               {pendingEstimates.length > 0 ? (
                 <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                   {pendingEstimates.map((est) => (
-                    <Link key={est.id} href="/subcontractor/estimates" className="group flex items-center justify-between hover:opacity-80 transition-opacity">
+                    <Link key={est.id} href={`${basePath}/estimates`} className="group flex items-center justify-between hover:opacity-80 transition-opacity">
                       <div className="min-w-0 flex-1">
                         <p className="text-base font-bold text-gray-900 group-hover:text-brand-700 transition-colors truncate">{est.clientName}</p>
                         <p className="text-base text-gray-900 tabular-nums mt-0.5">{formatCurrency(est.amount)}</p>
@@ -255,7 +276,7 @@ export default function SubContractorDashboardPage() {
 
           {/* Scorecard */}
           <BentoTile className="col-span-1 xl:col-span-2 bg-white border border-gray-200">
-            <TileHeader title="Scorecard" linkHref="/subcontractor/records" linkLabel="Details" />
+            <TileHeader title="Scorecard" linkHref={`${basePath}/records`} linkLabel="Details" />
             <div className="px-5 pb-4 flex-1 flex flex-col justify-center">
               {/* Revenue + Rating */}
               <div className="flex items-start justify-between pb-4 border-b border-gray-100">

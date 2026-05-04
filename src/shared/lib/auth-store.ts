@@ -178,7 +178,7 @@ export const authStore = {
     _state = { token: result.token, user };
     save(_state);
     setAuthToken(result.token);
-    syncTokenCookie(result.token);
+    syncTokenCookie(result.cookieToken ?? result.token);
     startSessionCheck();
     notify();
     return user;
@@ -204,7 +204,7 @@ export const authStore = {
     _state = { token: loginResult.token, user };
     save(_state);
     setAuthToken(loginResult.token);
-    syncTokenCookie(loginResult.token);
+    syncTokenCookie(loginResult.cookieToken ?? loginResult.token);
     startSessionCheck();
     notify();
     return user;

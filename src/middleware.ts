@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 import { checkRateLimit } from "@shared/lib/rate-limit";
+import { DEMO_ACCESS_TOKENS, demoDashboardUrl } from "@shared/lib/demo-routes";
 
 /**
  * Next.js middleware for FairTradeWorker.
@@ -15,16 +16,13 @@ import { checkRateLimit } from "@shared/lib/rate-limit";
 // JWT config (must match auth.ts and Spring Boot)
 // ---------------------------------------------------------------------------
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "dev-secret-key-change-in-production"
-);
-
-// Known demo tokens — only these specific tokens bypass auth, not any "demo.*" prefix
-const DEMO_TOKENS = new Set([
-  "demo.contractor",
-  "demo.homeowner",
-  "demo.subcontractor",
-]);
+// Must match `src/shared/lib/auth.ts` (createToken / verifyToken) so cookies minted
+// on the login API route verify here. Spring/local often uses SECRET_KEY_BASE.
+const signingSecret =
+  process.env.SECRET_KEY_BASE ||
+  process.env.JWT_SECRET ||
+  "dev-secret-key-change-in-production";
+const JWT_SECRET = new TextEncoder().encode(signingSecret);
 
 interface JwtPayload {
   role: string;
@@ -163,6 +161,45 @@ export async function middleware(request: NextRequest) {
     return addSecurityHeaders(response);
   }
 
+  // Demo sandbox — only demo cookie values; real JWT users are sent to the production app
+  if (pathname.startsWith("/demo/")) {
+    const token = request.cookies.get("ftw-token")?.value;
+    if (!token) {
+      return redirectToLogin(request, pathname);
+    }
+
+    if (DEMO_ACCESS_TOKENS.has(token)) {
+      const expectedPrefix =
+        token === "demo.contractor"
+          ? "/demo/contractor"
+          : token === "demo.homeowner"
+            ? "/demo/homeowner"
+            : "/demo/subcontractor";
+      if (!pathname.startsWith(expectedPrefix)) {
+        const dest = demoDashboardUrl(token);
+        if (dest) {
+          return addSecurityHeaders(NextResponse.redirect(new URL(dest, request.url)));
+        }
+        return redirectToLogin(request, pathname);
+      }
+      return addSecurityHeaders(NextResponse.next());
+    }
+
+    const demoJwtPayload = await verifyJwt(token);
+    if (demoJwtPayload) {
+      const r = normalizeRole(demoJwtPayload.role);
+      const dest =
+        r === "homeowner"
+          ? "/homeowner/dashboard"
+          : r === "subcontractor"
+            ? "/subcontractor/dashboard"
+            : "/contractor/dashboard";
+      return addSecurityHeaders(NextResponse.redirect(new URL(dest, request.url)));
+    }
+
+    return redirectToLogin(request, pathname, true);
+  }
+
   // Route protection for authenticated areas
   if (pathname.startsWith("/contractor") || pathname.startsWith("/homeowner") || pathname.startsWith("/subcontractor") || pathname.startsWith("/admin")) {
     const token = request.cookies.get("ftw-token")?.value;
@@ -170,9 +207,12 @@ export async function middleware(request: NextRequest) {
       return redirectToLogin(request, pathname);
     }
 
-    // Only allow specific known demo tokens, not any arbitrary "demo.*" prefix
-    if (DEMO_TOKENS.has(token)) {
-      return addSecurityHeaders(NextResponse.next());
+    if (DEMO_ACCESS_TOKENS.has(token)) {
+      const dest = demoDashboardUrl(token);
+      if (dest) {
+        return addSecurityHeaders(NextResponse.redirect(new URL(dest, request.url)));
+      }
+      return redirectToLogin(request, pathname);
     }
 
     // Verify JWT signature and expiry using jose (Edge-compatible)
