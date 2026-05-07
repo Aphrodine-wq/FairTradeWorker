@@ -22,8 +22,6 @@ import { Badge } from "@shared/ui/badge";
 import { cn, formatCurrency } from "@shared/lib/utils";
 import { authStore } from "@shared/lib/auth-store";
 import {
-  mockJobs,
-  mockContractors,
   type Job,
   type Contractor,
 } from "@shared/lib/mock-data";
@@ -50,38 +48,38 @@ function normalizeBidAmount(amount: number): number {
   return amount > 100000 ? amount / 100 : amount;
 }
 
-function generateMockBids(): Bid[] {
-  const jobs = mockJobs.filter((j) => j.status === "open").slice(0, 3);
-  const bids: Bid[] = [];
-  jobs.forEach((job) => {
-    const bidders = mockContractors.slice(0, 3 + Math.floor(Math.random() * 3));
-    bidders.forEach((c, i) => {
-      bids.push({
-        id: `bid-${job.id}-${c.id}`,
-        jobId: job.id,
-        contractor: c,
-        amount: job.budget.min + Math.random() * (job.budget.max - job.budget.min),
-        message: `I've handled similar ${job.category.toLowerCase()} projects and can deliver quality work within your timeline.`,
-        timeline: `${1 + Math.floor(Math.random() * 3)} weeks`,
-        status: "pending",
-        createdAt: new Date(Date.now() - i * 3600000 * (1 + Math.random() * 24)).toISOString(),
-      });
-    });
-  });
-  return bids;
+function toFallbackContractor(name?: string, rating?: number | null): Contractor {
+  return {
+    id: "unknown-contractor",
+    name: name || "Contractor",
+    company: "Unknown Company",
+    avatar: "",
+    rating: rating ?? 0,
+    reviewCount: 0,
+    specialty: "General Contracting",
+    location: "",
+    yearsExperience: 0,
+    jobsCompleted: 0,
+    hourlyRate: 0,
+    verified: false,
+    licensed: false,
+    insured: false,
+    bio: "",
+    skills: [],
+  };
 }
 
 export default function BidsPage() {
   usePageTitle("Bids");
-  const [bids, setBids] = useState<Bid[]>(generateMockBids);
-  const [jobs, setJobs] = useState<Job[]>(mockJobs.filter((j) => j.status === "open").slice(0, 3));
+  const [bids, setBids] = useState<Bid[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [acceptingBid, setAcceptingBid] = useState<string | null>(null);
 
   useEffect(() => {
     fetchJobs().then((apiJobs) => {
       const openJobs = apiJobs.filter((j) => j.status === "open").slice(0, 5);
-      if (openJobs.length > 0) setJobs(openJobs);
+      setJobs(openJobs);
     });
   }, []);
 
@@ -95,11 +93,7 @@ export default function BidsPage() {
       setBids(realtimeBids.map((b) => ({
         id: b.id,
         jobId: activeJob!,
-        contractor: mockContractors.find((c) => c.id === b.contractor?.id) || {
-          ...mockContractors[0],
-          name: b.contractor?.name || "Contractor",
-          rating: b.contractor?.rating || 4.5,
-        },
+        contractor: toFallbackContractor(b.contractor?.name, b.contractor?.rating),
         amount: normalizeBidAmount(b.amount || 0),
         message: b.message,
         timeline: b.timeline,
@@ -109,18 +103,16 @@ export default function BidsPage() {
     } else if (activeJob) {
       // Fallback to REST
       fetchBidsForJob(activeJob).then((apiBids) => {
-        if (apiBids.length > 0) {
-          setBids(apiBids.map((b) => ({
-            id: b.id,
-            jobId: activeJob,
-            contractor: mockContractors.find((c) => c.id === b.contractor?.id) || mockContractors[0],
-            amount: normalizeBidAmount(b.amount || 0),
-            message: b.message,
-            timeline: b.timeline,
-            status: b.status as Bid["status"],
-            createdAt: b.placed_at,
-          })));
-        }
+        setBids(apiBids.map((b) => ({
+          id: b.id,
+          jobId: activeJob,
+          contractor: toFallbackContractor(b.contractor?.name, b.contractor?.rating),
+          amount: normalizeBidAmount(b.amount || 0),
+          message: b.message,
+          timeline: b.timeline,
+          status: b.status as Bid["status"],
+          createdAt: b.placed_at,
+        })));
       });
     }
   }, [realtimeBids, activeJob]);

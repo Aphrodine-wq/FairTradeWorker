@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   DollarSign,
@@ -24,6 +24,7 @@ import { Button } from "@shared/ui/button";
 import { Input } from "@shared/ui/input";
 import { formatCurrency, cn } from "@shared/lib/utils";
 import { usePageTitle } from "@shared/hooks/use-page-title";
+import { fetchProjects } from "@shared/lib/data";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -94,13 +95,6 @@ const PROJECTS: ProjectPayment[] = [
   },
 ];
 
-const PAYMENT_METHOD = {
-  type: "Visa",
-  last4: "4242",
-  expiry: "08/28",
-  name: "Michael Brown",
-};
-
 const STATUS_CONFIG: Record<MilestoneStatus, { label: string; color: string; bg: string }> = {
   paid:        { label: "Paid",         color: "text-emerald-950", bg: "bg-emerald-950/10 border-emerald-800/30" },
   approved:    { label: "Processing",   color: "text-blue-700",    bg: "bg-blue-100 border-blue-300" },
@@ -113,13 +107,52 @@ const STATUS_CONFIG: Record<MilestoneStatus, { label: string; color: string; bg:
 
 export default function HomeownerPaymentsPage() {
   usePageTitle("Payments");
-  const [expandedProject, setExpandedProject] = useState<string | null>("j1");
+  const [projects, setProjects] = useState<ProjectPayment[]>([]);
+  const [expandedProject, setExpandedProject] = useState<string | null>(null);
   const [expandedMilestone, setExpandedMilestone] = useState<string | null>(null);
   const [showBalances, setShowBalances] = useState(true);
   const [search, setSearch] = useState("");
 
-  const allMilestones = PROJECTS.flatMap((p) => p.milestones);
-  const totalFunded = PROJECTS.reduce((s, p) => s + p.contractValue, 0);
+  useEffect(() => {
+    fetchProjects().then((apiProjects) => {
+      const normalizeMoney = (value: unknown) =>
+        typeof value === "number" ? (value > 100000 ? value / 100 : value) : 0;
+      const toMilestoneStatus = (status: unknown): MilestoneStatus => {
+        const s = String(status ?? "").toLowerCase();
+        if (s === "paid") return "paid";
+        if (s === "approved") return "approved";
+        if (s === "submitted") return "submitted";
+        if (s === "in_progress" || s === "in-progress") return "in_progress";
+        return "pending";
+      };
+      const mapped = Array.isArray(apiProjects)
+        ? apiProjects.map((p: any, idx: number): ProjectPayment => ({
+            id: String(p.id ?? `proj-${idx}`),
+            name: String(p.name ?? p.title ?? "Project"),
+            contractor: String(p.contractor?.name ?? "Contractor"),
+            contractValue: normalizeMoney(p.contractValue ?? p.budget),
+            milestones: Array.isArray(p.milestones)
+              ? p.milestones.map((m: any, mIdx: number): PaymentMilestone => ({
+                  id: String(m.id ?? `${p.id ?? idx}-m-${mIdx}`),
+                  label: String(m.label ?? m.name ?? `Milestone ${mIdx + 1}`),
+                  amount: normalizeMoney(m.amount),
+                  status: toMilestoneStatus(m.status),
+                  paidDate: m.paidDate ?? m.paid_date,
+                  approvedDate: m.approvedDate ?? m.approved_date,
+                  submittedDate: m.submittedDate ?? m.submitted_date,
+                  reference: m.reference,
+                  platformFee: typeof m.platformFee === "number" ? normalizeMoney(m.platformFee) : undefined,
+                }))
+              : [],
+          }))
+        : [];
+      setProjects(mapped);
+      setExpandedProject(mapped[0]?.id ?? null);
+    });
+  }, []);
+
+  const allMilestones = projects.flatMap((p) => p.milestones);
+  const totalFunded = projects.reduce((s, p) => s + p.contractValue, 0);
   const totalPaid = allMilestones.filter((m) => m.status === "paid").reduce((s, m) => s + m.amount, 0);
   const totalProcessing = allMilestones.filter((m) => m.status === "approved").reduce((s, m) => s + m.amount, 0);
   const totalHeld = totalFunded - totalPaid - totalProcessing;
@@ -196,7 +229,7 @@ export default function HomeownerPaymentsPage() {
         <div className="grid grid-cols-3 gap-5">
           {/* Left — Project milestone payments (2 cols) */}
           <div className="col-span-2 space-y-4">
-            {PROJECTS.map((project) => {
+            {projects.map((project) => {
               const isExpanded = expandedProject === project.id;
               const paid = project.milestones.filter((m) => m.status === "paid").reduce((s, m) => s + m.amount, 0);
               const pct = project.contractValue > 0 ? Math.round((paid / project.contractValue) * 100) : 0;
@@ -344,18 +377,9 @@ export default function HomeownerPaymentsPage() {
             {/* Payment method */}
             <div className="bg-white rounded-sm border border-border p-5">
               <p className="text-[12px] font-semibold text-gray-900 uppercase tracking-wider mb-4">Payment Method</p>
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-sm border border-border">
-                <div className="w-10 h-10 rounded-sm bg-dark flex items-center justify-center shrink-0">
-                  <CreditCard className="w-5 h-5 text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-semibold text-gray-900">{PAYMENT_METHOD.type} ending in {PAYMENT_METHOD.last4}</p>
-                  <p className="text-[11px] text-gray-600">Expires {PAYMENT_METHOD.expiry}</p>
-                </div>
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-sm border border-border">
+                <p className="text-[13px] text-gray-700">No payment method connected</p>
               </div>
-              <button className="w-full mt-3 h-8 rounded-sm border border-border text-[12px] font-medium text-gray-800 hover:bg-gray-50 transition-colors">
-                Update payment method
-              </button>
             </div>
 
             {/* Quick actions */}
@@ -384,7 +408,7 @@ export default function HomeownerPaymentsPage() {
                   </div>
                   <div className="flex-1">
                     <p className="text-[13px] font-medium text-gray-900">View Projects</p>
-                    <p className="text-[11px] text-gray-600">{PROJECTS.length} active</p>
+                    <p className="text-[11px] text-gray-600">{projects.length} active</p>
                   </div>
                   <ExternalLink className="w-3.5 h-3.5 text-gray-300" />
                 </Link>
@@ -418,6 +442,11 @@ export default function HomeownerPaymentsPage() {
             </div>
           </div>
         </div>
+        {projects.length === 0 && (
+          <div className="mt-4 bg-white rounded-sm border border-border p-6">
+            <p className="text-sm text-gray-700">No payment data available yet.</p>
+          </div>
+        )}
       </div>
     </div>
   );

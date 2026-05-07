@@ -2,8 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { Button } from "@shared/ui/button";
+import { authStore } from "@shared/lib/auth-store";
+import type { MarketingSession } from "@shared/lib/marketing-nav";
+import { getAccountSettingsHref, getDashboardHref } from "@shared/lib/marketing-nav";
 
 const navLinks = [
   { href: "/features", label: "Features" },
@@ -14,8 +18,11 @@ const navLinks = [
   { href: "/faq", label: "FAQ" },
 ];
 
-export function MobileNav() {
+export function MobileNav({ session }: { session: MarketingSession | null }) {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
+  const dashboardHref = session ? getDashboardHref(session) : null;
+  const accountHref = session ? getAccountSettingsHref(session) : null;
 
   return (
     <div className="md:hidden">
@@ -70,18 +77,53 @@ export function MobileNav() {
         </nav>
 
         <div className="px-4 pt-2 border-t border-border flex flex-col gap-3 mt-2">
-          <Link
-            href="/login"
-            onClick={() => setOpen(false)}
-            className="block px-3 py-2.5 text-sm text-gray-800 hover:text-gray-900 transition-colors duration-150"
-          >
-            Log In
-          </Link>
-          <Button size="sm" asChild className="w-full">
-            <Link href="/signup" onClick={() => setOpen(false)}>
-              Get Started
-            </Link>
-          </Button>
+          {session && dashboardHref ? (
+            <>
+              <Link
+                href={dashboardHref}
+                onClick={() => setOpen(false)}
+                className="block px-3 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 rounded-sm transition-colors duration-150"
+              >
+                Dashboard
+              </Link>
+              {accountHref ? (
+                <Link
+                  href={accountHref}
+                  onClick={() => setOpen(false)}
+                  className="block px-3 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 rounded-sm transition-colors duration-150"
+                >
+                  Account
+                </Link>
+              ) : null}
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  authStore.logout();
+                  router.push("/");
+                  router.refresh();
+                }}
+                className="block w-full text-left px-3 py-2.5 text-sm text-gray-800 hover:text-gray-900 hover:bg-gray-100 rounded-sm transition-colors duration-150"
+              >
+                Log out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                onClick={() => setOpen(false)}
+                className="block px-3 py-2.5 text-sm text-gray-800 hover:text-gray-900 transition-colors duration-150"
+              >
+                Log In
+              </Link>
+              <Button size="sm" asChild className="w-full">
+                <Link href="/signup" onClick={() => setOpen(false)}>
+                  Get Started
+                </Link>
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </div>

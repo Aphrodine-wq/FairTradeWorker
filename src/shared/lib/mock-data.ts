@@ -66,7 +66,14 @@ export interface Job {
   deadline: string;
   preferredStartDate: string;
   estimatedDuration: string;
-  status: "open" | "in_progress" | "completed" | "cancelled";
+  status:
+    | "open"
+    | "bidding"
+    | "awarded"
+    | "in_progress"
+    | "completed"
+    | "disputed"
+    | "cancelled";
   bidsCount: number;
   viewCount: number;
   photos: JobPhoto[];

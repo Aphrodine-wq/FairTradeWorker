@@ -25,6 +25,55 @@ export interface RealtimeUser {
   rating: number | null;
 }
 
+export interface RealtimeJobPhoto {
+  url: string;
+  caption?: string;
+  type?: "photo" | "video";
+}
+
+export interface RealtimeJobRequirement {
+  label: string;
+  met: boolean;
+}
+
+/** Property block as returned by GET /api/jobs (snake_case keys; may be partial). */
+export interface RealtimePropertyApi {
+  stories?: number;
+  foundation?: string;
+  exterior?: string;
+  roof_type?: string;
+  roof_age?: number;
+  garage?: string;
+  lot_size?: string;
+  hoa?: boolean;
+  hoa_notes?: string;
+  heating?: string;
+  cooling?: string;
+  water_heater?: string;
+  plumbing?: string;
+  electrical?: string;
+  sewer?: string;
+  known_issues?: string[];
+  recent_work?: string[];
+}
+
+export interface RealtimeJobPostedBy {
+  id: string;
+  name: string;
+  avatar?: string | null;
+  rating?: number | null;
+  jobs_posted?: number | null;
+}
+
+export interface RealtimeJobHomeowner {
+  id: string;
+  name: string;
+  role?: string;
+  location?: string;
+  rating?: number | null;
+  avatar_url?: string | null;
+}
+
 export interface RealtimeJob {
   id: string;
   title: string;
@@ -33,11 +82,70 @@ export interface RealtimeJob {
   budget_min: number;
   budget_max: number;
   location: string;
-  status: "open" | "bidding" | "awarded" | "in_progress" | "completed" | "disputed" | "cancelled";
+  status: string;
   bid_count: number;
-  homeowner: RealtimeUser;
   posted_at: string;
+  inserted_at?: string;
+  /** Legacy: string name or embedded homeowner (Elixir API). */
+  homeowner?: string | RealtimeUser | RealtimeJobHomeowner;
+  detailed_scope?: string;
+  subcategory?: string;
+  full_address?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  view_count?: number;
+  deadline?: string;
+  preferred_start_date?: string;
+  estimated_duration?: string;
+  urgency?: string;
+  property_type?: string;
+  sqft?: number;
+  year_built?: number;
+  materials_provided?: boolean;
+  permits_required?: boolean;
+  inspection_required?: boolean;
+  insurance_claim?: boolean;
+  access_notes?: string;
+  special_instructions?: string;
+  tags?: string[];
+  thumbnail?: string;
+  photos?: RealtimeJobPhoto[];
+  requirements?: RealtimeJobRequirement[];
+  property?: RealtimePropertyApi;
+  posted_by?: RealtimeJobPostedBy;
 }
+
+/** Fields accepted by POST /api/jobs (wrapped as `{ job: ... }` or sent flat). */
+export type RealtimeJobCreatePayload = {
+  title: string;
+  description: string;
+  category: string;
+  budget_min: number;
+  budget_max: number;
+  location: string;
+} & Partial<{
+  detailed_scope: string;
+  subcategory: string;
+  full_address: string;
+  deadline: string;
+  preferred_start_date: string;
+  estimated_duration: string;
+  urgency: string;
+  property_type: string;
+  sqft: number;
+  year_built: number;
+  materials_provided: boolean;
+  permits_required: boolean;
+  inspection_required: boolean;
+  insurance_claim: boolean;
+  access_notes: string;
+  special_instructions: string;
+  tags: string[];
+  thumbnail: string;
+  photos: RealtimeJobPhoto[];
+  requirements: RealtimeJobRequirement[];
+  property: RealtimePropertyApi;
+}>;
 
 export interface RealtimeBid {
   id: string;
@@ -156,7 +264,9 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
     throw new Error(body.error || body.message || `API error: ${res.status}`);
   }
 
-  return res.json();
+  // Some endpoints (e.g. DELETE) return 204/empty body.
+  const text = await res.text();
+  return (text ? JSON.parse(text) : undefined) as T;
 }
 
 function toQuery(params: Record<string, string | number | undefined>) {
@@ -281,20 +391,17 @@ export const api = {
     return apiFetch(`/api/jobs/${id}`);
   },
 
-  // Jobs (authenticated)
-  async postJob(job: {
-    title: string;
-    description: string;
-    category: string;
-    budget_min: number;
-    budget_max: number;
-    location: string;
-  }): Promise<RealtimeJob> {
-    const data = await apiFetch<{ job: RealtimeJob }>("/api/jobs", {
+  // Jobs (authenticated) — body may be flat or `{ job: ... }`; response may be wrapped or raw job.
+  async postJob(body: RealtimeJobCreatePayload | { job: RealtimeJobCreatePayload }): Promise<RealtimeJob> {
+    const data = await apiFetch<{ job: RealtimeJob } | RealtimeJob>("/api/jobs", {
       method: "POST",
-      body: JSON.stringify(job),
+      body: JSON.stringify(body),
     });
-    return data.job;
+    return unwrapOne<RealtimeJob>(data, "job");
+  },
+
+  async deleteJob(jobId: string): Promise<void> {
+    await apiFetch(`/api/jobs/${jobId}`, { method: "DELETE" });
   },
 
   async placeBid(
@@ -878,7 +985,9 @@ class RealtimeClient {
     if (!this.client) return () => {};
 
     const doSubscribe = () => {
-      const sub = this.client!.subscribe(topic, (msg: IMessage) => {
+      const client = this.client;
+      if (!client || !client.connected) return false;
+      const sub = client.subscribe(topic, (msg: IMessage) => {
         try {
           const parsed = JSON.parse(msg.body) as StompEvent;
           callback(parsed);
@@ -888,16 +997,21 @@ class RealtimeClient {
         }
       });
       this.subscriptions.set(topic, sub);
+      return true;
     };
 
-    if (this._connected) {
+    if (this._connected && this.client.connected) {
       doSubscribe();
     } else {
       // Wait for connection
       const interval = setInterval(() => {
-        if (this._connected) {
+        if (this._connected && this.client?.connected) {
           clearInterval(interval);
-          doSubscribe();
+          try {
+            doSubscribe();
+          } catch {
+            // Connection may have flapped between checks; allow reconnect loop to retry.
+          }
         }
       }, 100);
       setTimeout(() => clearInterval(interval), 10000);

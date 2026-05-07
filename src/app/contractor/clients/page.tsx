@@ -216,10 +216,10 @@ const STATUS_BADGE: Record<string, "default" | "success" | "secondary"> = {
 
 export default function ClientsPage() {
   usePageTitle("Clients");
-  const [clients, setClients] = useState<Client[]>(CLIENTS);
+  const [clients, setClients] = useState<Client[]>([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "active" | "lead" | "past">("all");
-  const [selectedId, setSelectedId] = useState<string>("c1");
+  const [selectedId, setSelectedId] = useState<string>("");
   const [addClientOpen, setAddClientOpen] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -232,32 +232,32 @@ export default function ClientsPage() {
 
   useEffect(() => {
     fetchClients().then((apiClients) => {
-      if (apiClients.length > 0) {
-        setClients(apiClients.map((c: any) => ({
-          id: c.id,
-          name: c.name,
-          email: c.email || "",
-          phone: c.phone || "",
-          address: c.address || "",
-          city: "",
-          propertyType: "",
-          source: "",
-          totalRevenue: 0,
-          totalPaid: 0,
-          outstanding: 0,
-          totalJobs: 0,
-          activeJobs: 0,
-          rating: null,
-          lastActivity: c.created_at,
-          firstContact: c.created_at,
-          status: "active" as const,
-          notes: c.notes || "",
-          tags: [],
-          jobs: [],
-          invoices: [],
-          communications: [],
-        })));
-      }
+      const mapped = apiClients.map((c: any) => ({
+        id: c.id,
+        name: c.name,
+        email: c.email || "",
+        phone: c.phone || "",
+        address: c.address || "",
+        city: "",
+        propertyType: "",
+        source: "",
+        totalRevenue: 0,
+        totalPaid: 0,
+        outstanding: 0,
+        totalJobs: 0,
+        activeJobs: 0,
+        rating: null,
+        lastActivity: c.created_at,
+        firstContact: c.created_at,
+        status: "active" as const,
+        notes: c.notes || "",
+        tags: [],
+        jobs: [],
+        invoices: [],
+        communications: [],
+      }));
+      setClients(mapped);
+      setSelectedId(mapped[0]?.id ?? "");
     });
   }, []);
 

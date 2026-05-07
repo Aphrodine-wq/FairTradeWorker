@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { Suspense, useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Save,
   Shield,
@@ -30,15 +31,22 @@ import { Badge } from "@shared/ui/badge";
 import { Card, CardContent } from "@shared/ui/card";
 import { useQuickBooks } from "@shared/hooks/use-quickbooks";
 import { Separator } from "@shared/ui/separator";
-import { mockContractors } from "@shared/lib/mock-data";
 import { JOB_CATEGORIES } from "@shared/lib/constants";
 import { getInitials, cn } from "@shared/lib/utils";
 import { fetchSettings, saveSettings } from "@shared/lib/data";
 import { api } from "@shared/lib/realtime";
+import { authStore } from "@shared/lib/auth-store";
 import { toast } from "sonner";
 import { usePageTitle } from "@shared/hooks/use-page-title";
 
-const contractor = mockContractors[0];
+const authUser = authStore.getState().user;
+const contractor = {
+  name: authUser?.name || "Contractor",
+  company: "FairTradeWorker",
+  bio: "",
+  specialty: "General Contracting",
+  location: "",
+};
 
 // ─── Shared Components ───────────────────────────────────────────────────────
 
@@ -123,11 +131,11 @@ function ProfileSection() {
   const [bio, setBio] = useState(contractor.bio);
   const [specialty, setSpecialty] = useState(contractor.specialty);
   const [location, setLocation] = useState(contractor.location);
-  const [email, setEmail] = useState("marcus@johnsonsons.com");
-  const [phone, setPhone] = useState("(512) 555-0147");
-  const [website, setWebsite] = useState("johnsonconstruction.com");
-  const [yearsExp, setYearsExp] = useState("12");
-  const [tagline, setTagline] = useState("Quality craftsmanship, honest pricing, on-time delivery.");
+  const [email, setEmail] = useState(authUser?.email || "");
+  const [phone, setPhone] = useState("");
+  const [website, setWebsite] = useState("");
+  const [yearsExp, setYearsExp] = useState("");
+  const [tagline, setTagline] = useState("");
   const [languages, setLanguages] = useState("English, Spanish");
   const { saved, onSave } = useSave();
 
@@ -208,7 +216,7 @@ function ProfileSection() {
 function ServiceAreaSection() {
   const [radius, setRadius] = useState("35");
   const [zip, setZip] = useState("78756");
-  const [areas, setAreas] = useState(["Austin", "Round Rock", "Cedar Park", "Georgetown", "Pflugerville", "San Marcos"]);
+  const [areas, setAreas] = useState<string[]>([]);
   const [newArea, setNewArea] = useState("");
   const { saved, onSave } = useSave();
 
@@ -325,13 +333,7 @@ function JobPreferencesSection() {
 }
 
 function TeamSection() {
-  const team = [
-    { name: "Marcus Johnson", role: "Owner / GC", email: "marcus@johnsonsons.com", phone: "(512) 555-0147", status: "active" as const, permissions: "Full access", joinDate: "Jan 2025" },
-    { name: "Tony Ramirez", role: "Lead Carpenter", email: "tony@johnsonsons.com", phone: "(512) 555-0283", status: "active" as const, permissions: "Projects, daily logs", joinDate: "Feb 2025" },
-    { name: "David Park", role: "Electrician (Sub)", email: "david@sparkelectric.com", phone: "(512) 555-0667", status: "active" as const, permissions: "View only", joinDate: "Mar 2025" },
-    { name: "Alex Rivera", role: "Laborer", email: "alex@johnsonsons.com", phone: "(512) 555-0491", status: "active" as const, permissions: "Daily logs only", joinDate: "Mar 2025" },
-    { name: "Maria Santos", role: "Office Manager", email: "maria@johnsonsons.com", phone: "(512) 555-0335", status: "active" as const, permissions: "Invoices, payments, clients", joinDate: "Jan 2025" },
-  ];
+  const team: Array<{ name: string; role: string; email: string; phone: string; permissions: string; joinDate: string }> = [];
 
   return (
     <div className="space-y-6">
@@ -344,7 +346,12 @@ function TeamSection() {
       </div>
 
       <div className="bg-white border border-border rounded-sm overflow-hidden">
-        {team.map((m, i) => (
+        {team.length === 0 ? (
+          <div className="px-5 py-8 text-center">
+            <p className="text-sm font-medium text-gray-900">No team members yet</p>
+            <p className="text-xs text-gray-600 mt-1">Add internal team members and subcontractors to manage access.</p>
+          </div>
+        ) : team.map((m, i) => (
           <div key={m.email} className={cn("flex items-center justify-between px-5 py-4", i < team.length - 1 && "border-b border-border")}>
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-sm bg-brand-100 flex items-center justify-center">
@@ -507,26 +514,26 @@ function BillingSection() {
       <div className="flex items-center justify-between p-4 rounded-sm bg-brand-50 border border-brand-100">
         <div>
           <div className="flex items-center gap-2">
-            <p className="text-sm font-bold text-gray-900">Pro Plan</p>
-            <Badge variant="success">Active</Badge>
+            <p className="text-sm font-bold text-gray-900">No plan data</p>
+            <Badge variant="secondary">Unavailable</Badge>
           </div>
-          <p className="text-xs text-gray-700 mt-0.5">$49 / month — renews Apr 19, 2026</p>
+          <p className="text-xs text-gray-700 mt-0.5">Billing details will appear when connected to the billing backend.</p>
         </div>
-        <p className="text-xl font-bold text-brand-600">$49<span className="text-xs font-normal text-gray-600">/mo</span></p>
+        <p className="text-xl font-bold text-brand-600">--</p>
       </div>
 
       <div className="grid grid-cols-3 gap-3 text-sm">
         <div className="p-3 rounded-sm border border-border">
-          <p className="text-xs text-gray-700">Estimates this month</p>
-          <p className="font-bold text-gray-900 mt-0.5">23 / Unlimited</p>
+              <p className="text-xs text-gray-700">Estimates this month</p>
+              <p className="font-bold text-gray-900 mt-0.5">--</p>
         </div>
         <div className="p-3 rounded-sm border border-border">
-          <p className="text-xs text-gray-700">Next billing</p>
-          <p className="font-bold text-gray-900 mt-0.5">Apr 19, 2026</p>
+              <p className="text-xs text-gray-700">Next billing</p>
+              <p className="font-bold text-gray-900 mt-0.5">--</p>
         </div>
         <div className="p-3 rounded-sm border border-border">
-          <p className="text-xs text-gray-700">YTD spend</p>
-          <p className="font-bold text-gray-900 mt-0.5">$147</p>
+              <p className="text-xs text-gray-700">YTD spend</p>
+              <p className="font-bold text-gray-900 mt-0.5">--</p>
         </div>
       </div>
 
@@ -536,8 +543,8 @@ function BillingSection() {
         <p className="text-sm font-semibold text-gray-900 mb-3">Payment Method</p>
         <div className="flex items-center justify-between p-4 rounded-sm bg-gray-50 border border-border">
           <div>
-            <p className="text-sm font-semibold text-gray-900">Chase Visa ending in 4821</p>
-            <p className="text-xs text-gray-700 mt-0.5">Expires 08/28</p>
+            <p className="text-sm font-semibold text-gray-900">No payment method connected</p>
+            <p className="text-xs text-gray-700 mt-0.5">Connect a billing method to enable subscription charges.</p>
           </div>
           <Button variant="outline" size="sm">Update Card</Button>
         </div>
@@ -552,9 +559,9 @@ function BillingSection() {
 }
 
 function LicensesSection() {
-  const [licenseNumber, setLicenseNumber] = useState("GC-MS-2019-48821");
-  const [licenseState, setLicenseState] = useState("MS");
-  const [licenseExpiry, setLicenseExpiry] = useState("2027-06-30");
+  const [licenseNumber, setLicenseNumber] = useState("");
+  const [licenseState, setLicenseState] = useState("");
+  const [licenseExpiry, setLicenseExpiry] = useState("");
   const { saved, onSave } = useSave();
 
   return (
@@ -616,13 +623,13 @@ function LicensesSection() {
 }
 
 function InsuranceSection() {
-  const [insuranceProvider, setInsuranceProvider] = useState("State Farm Commercial");
-  const [policyNumber, setPolicyNumber] = useState("SF-BOP-2024-99123");
-  const [coverageAmount, setCoverageAmount] = useState("2000000");
-  const [insuranceExpiry, setInsuranceExpiry] = useState("2026-12-31");
-  const [wcProvider, setWcProvider] = useState("Mississippi Mutual");
-  const [wcPolicy, setWcPolicy] = useState("WC-MS-2024-55781");
-  const [wcExpiry, setWcExpiry] = useState("2026-12-31");
+  const [insuranceProvider, setInsuranceProvider] = useState("");
+  const [policyNumber, setPolicyNumber] = useState("");
+  const [coverageAmount, setCoverageAmount] = useState("");
+  const [insuranceExpiry, setInsuranceExpiry] = useState("");
+  const [wcProvider, setWcProvider] = useState("");
+  const [wcPolicy, setWcPolicy] = useState("");
+  const [wcExpiry, setWcExpiry] = useState("");
   const { saved, onSave } = useSave();
 
   return (
@@ -830,6 +837,7 @@ function AppearanceSection() {
 }
 
 function AccountSection() {
+  const user = authStore.getState().user;
   return (
     <div className="space-y-6">
       <div>
@@ -841,14 +849,14 @@ function AccountSection() {
         <p className="text-sm font-semibold text-gray-900 mb-3">Account Details</p>
         <div className="space-y-0 text-sm">
           {[
-            ["Email", "marcus@johnsonsons.com"],
-            ["Account type", "Contractor — Pro"],
-            ["Plan", "$49/mo — renews Apr 19, 2026"],
-            ["Member since", "January 2025"],
-            ["Account ID", "FTW-C-00482"],
-            ["Profile visibility", "Public — listed in search"],
-            ["FairRecord score", "4.8 (12 reviews)"],
-            ["Total jobs completed", "27"],
+            ["Email", user?.email || "--"],
+            ["Account type", user ? `Contractor — ${user.role}` : "Contractor"],
+            ["Plan", "--"],
+            ["Member since", "--"],
+            ["Account ID", user?.id || "--"],
+            ["Profile visibility", "--"],
+            ["FairRecord score", "--"],
+            ["Total jobs completed", "--"],
           ].map(([label, value]) => (
             <div key={label} className="flex justify-between py-2.5 border-b border-gray-100 last:border-0">
               <span className="text-gray-700">{label}</span>
@@ -863,19 +871,10 @@ function AccountSection() {
       <div>
         <p className="text-sm font-semibold text-gray-900 mb-3">Recent Login Activity</p>
         <div className="space-y-0 text-sm">
-          {[
-            { device: "MacBook Pro — Chrome", location: "Oxford, MS", time: "Today, 3:42 PM", current: true },
-            { device: "iPhone 15 — Safari", location: "Oxford, MS", time: "Today, 8:15 AM", current: false },
-            { device: "MacBook Pro — Chrome", location: "Oxford, MS", time: "Yesterday, 6:30 PM", current: false },
-          ].map((s, i) => (
-            <div key={i} className="flex items-center justify-between py-2.5 border-b border-gray-100 last:border-0">
-              <div>
-                <p className="text-sm font-medium text-gray-900">{s.device}</p>
-                <p className="text-xs text-gray-600">{s.location} -- {s.time}</p>
-              </div>
-              {s.current && <Badge variant="success" className="text-[10px]">Current</Badge>}
-            </div>
-          ))}
+          <div className="py-2.5 border-b border-gray-100">
+            <p className="text-sm font-medium text-gray-900">No login history available</p>
+            <p className="text-xs text-gray-600">Recent sign-in activity will appear when backend tracking is enabled.</p>
+          </div>
         </div>
       </div>
 
@@ -1173,9 +1172,17 @@ const NAV_SECTIONS = [
 
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
-export default function SettingsPage() {
+function SettingsPageContent() {
   usePageTitle("Settings");
+  const searchParams = useSearchParams();
   const [active, setActive] = useState("profile");
+
+  useEffect(() => {
+    const s = searchParams.get("section");
+    if (s && NAV_SECTIONS.some((sec) => sec.id === s)) {
+      setActive(s);
+    }
+  }, [searchParams]);
 
   const renderSection = () => {
     switch (active) {
@@ -1237,5 +1244,25 @@ export default function SettingsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function SettingsPageFallback() {
+  return (
+    <div className="flex flex-col min-h-full bg-surface animate-pulse">
+      <div className="h-[88px] bg-white border-b border-border" />
+      <div className="flex flex-1 min-h-0">
+        <div className="w-48 flex-shrink-0 bg-white border-r border-border" />
+        <div className="flex-1 p-8 bg-surface" />
+      </div>
+    </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={<SettingsPageFallback />}>
+      <SettingsPageContent />
+    </Suspense>
   );
 }

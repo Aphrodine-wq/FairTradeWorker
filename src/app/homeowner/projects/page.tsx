@@ -698,41 +698,56 @@ function SidebarProjectItem({
 
 export default function HomeownerProjectsPage() {
   usePageTitle("Projects");
-  const [projects, setProjects] = useState<HomeownerProject[]>(PROJECTS);
-  const [selectedId, setSelectedId] = useState(PROJECTS[0].id);
+  const [projects, setProjects] = useState<HomeownerProject[]>([]);
+  const [selectedId, setSelectedId] = useState("");
 
   useEffect(() => {
     fetchProjects().then((apiProjects) => {
-      if (apiProjects.length > 0) {
-        const normalizeMoney = (value: unknown, fallback: number) =>
-          typeof value === "number" ? (value > 100000 ? value / 100 : value) : fallback;
-        setProjects((prev) =>
-          prev.map((p) => {
-            const apiProject = apiProjects.find((ap: any) => ap.id === p.id);
-            if (!apiProject) return p;
-            const mappedStatus =
-              apiProject.status === "in_progress"
-                ? "in-progress"
-                : apiProject.status === "completed"
-                  ? "completed"
-                  : p.status;
-            const budget = normalizeMoney(apiProject.budget, p.budget);
-            const spent = normalizeMoney(apiProject.spent, p.spent);
+      const normalizeMoney = (value: unknown) =>
+        typeof value === "number" ? (value > 100000 ? value / 100 : value) : 0;
+      const mapped = Array.isArray(apiProjects)
+        ? apiProjects.map((apiProject: any, idx: number): HomeownerProject => {
+            const status =
+              apiProject.status === "completed" ? "completed" : "in-progress";
+            const budget = normalizeMoney(apiProject.budget);
+            const spent = normalizeMoney(apiProject.spent);
+            const progress = budget > 0 ? Math.max(0, Math.min(100, Math.round((spent / budget) * 100))) : 0;
             return {
-              ...p,
-              title: apiProject.name || p.title,
-              status: mappedStatus,
+              id: String(apiProject.id ?? `proj-${idx}`),
+              title: String(apiProject.name ?? apiProject.title ?? "Project"),
+              status,
+              progress,
               budget,
               spent,
-              progress: budget > 0 ? Math.max(0, Math.min(100, Math.round((spent / budget) * 100))) : p.progress,
+              contractor: {
+                name: String(apiProject.contractor?.name ?? "Contractor"),
+                initials: String(apiProject.contractor?.name ?? "C")
+                  .split(" ")
+                  .map((x: string) => x[0] ?? "")
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase() || "C",
+                rating: Number(apiProject.contractor?.rating ?? 0),
+                reviews: Number(apiProject.contractor?.reviews ?? 0),
+                verified: Boolean(apiProject.contractor?.verified),
+              },
+              milestones: [],
+              payments: [],
+              documents: [],
+              changeOrders: [],
+              banner: {
+                type: "on-track",
+                message: "Project information will appear as milestones and payments sync.",
+              },
             };
           })
-        );
-      }
+        : [];
+      setProjects(mapped);
+      setSelectedId(mapped[0]?.id ?? "");
     });
   }, []);
 
-  const selected = projects.find((p) => p.id === selectedId) || projects[0];
+  const selected = projects.find((p) => p.id === selectedId) || null;
 
   const totalBudget = projects.reduce((sum, p) => sum + p.budget, 0);
   const totalPaid = projects.reduce((sum, p) => sum + p.spent, 0);
@@ -782,6 +797,11 @@ export default function HomeownerProjectsPage() {
 
       {/* Right Content */}
       <main className="flex-1 overflow-y-auto p-6">
+        {!selected ? (
+          <div className="max-w-3xl rounded-sm border border-border bg-white p-8">
+            <p className="text-sm text-gray-700">No projects available yet.</p>
+          </div>
+        ) : (
         <div className="max-w-3xl space-y-5">
           {/* Status Banner */}
           <StatusBannerSection banner={selected.banner} />
@@ -804,6 +824,7 @@ export default function HomeownerProjectsPage() {
           {/* FairRecord (completed projects only) */}
           <FairRecordSection project={selected} />
         </div>
+        )}
       </main>
     </div>
   );

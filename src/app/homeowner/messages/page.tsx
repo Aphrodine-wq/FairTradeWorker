@@ -88,30 +88,32 @@ export default function HomeownerMessagesPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Load conversations from API
+  // Load conversations from API.
   useEffect(() => {
     fetchConversations().then(({ data, isMock: mock }) => {
-      if (!mock && data.length > 0) {
-        const mapped: Conversation[] = data.map((c: any) => ({
-          id: c.id,
-          contractorId: c.other_user?.id || c.id,
-          contractorName: c.other_user?.name || "Contractor",
-          contractorCompany: c.other_user?.company || "",
-          jobTitle: c.job_title || "",
-          lastMessage: c.last_message?.body || "",
-          lastTime: c.last_message?.sent_at
-            ? new Date(c.last_message.sent_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
-            : "",
-          unread: c.unread_count || 0,
-          messages: [],
-        }));
-        setConversations(mapped);
-        if (mapped.length > 0) setActiveConvId(mapped[0].id);
-      } else {
+      if (mock) {
         setConversations(MOCK_CONVERSATIONS);
-        setActiveConvId(MOCK_CONVERSATIONS[0].id);
+        setActiveConvId(MOCK_CONVERSATIONS[0]?.id ?? "");
         setIsMock(true);
+        setLoading(false);
+        return;
       }
+      const mapped: Conversation[] = data.map((c: any) => ({
+        id: c.id,
+        contractorId: c.other_user?.id || c.id,
+        contractorName: c.other_user?.name || "Contractor",
+        contractorCompany: c.other_user?.company || "",
+        jobTitle: c.job_title || "",
+        lastMessage: c.last_message?.body || "",
+        lastTime: c.last_message?.sent_at
+          ? new Date(c.last_message.sent_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
+          : "",
+        unread: c.unread_count || 0,
+        messages: [],
+      }));
+      setConversations(mapped);
+      setActiveConvId(mapped[0]?.id ?? "");
+      setIsMock(false);
       setLoading(false);
     });
   }, []);

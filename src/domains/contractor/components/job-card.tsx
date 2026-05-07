@@ -3,6 +3,7 @@
 import {
   MapPin,
   Clock,
+  Briefcase,
   Users,
   Camera,
   Video,
@@ -15,7 +16,6 @@ import {
   FileCheck,
   AlertTriangle,
   Eye,
-  Timer,
   CheckCircle2,
   Circle,
   User,
@@ -126,19 +126,29 @@ const PROPERTY_ICONS = {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
+function hasRenderableImage(url?: string): boolean {
+  if (!url) return false;
+  return url.startsWith("http://") || url.startsWith("https://") || url.startsWith("/");
+}
+
 function daysUntil(dateStr: string): number {
+  if (!dateStr) return Number.NaN;
   const now = new Date();
   const target = new Date(dateStr);
+  if (Number.isNaN(target.getTime())) return Number.NaN;
   return Math.ceil((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 }
 
 function DeadlinePill({ deadline }: { deadline: string }) {
   const days = daysUntil(deadline);
+  const hasValidDeadline = Number.isFinite(days);
   return (
     <span
       className={cn(
         "text-[11px] font-medium flex items-center gap-1",
-        days <= 0
+        !hasValidDeadline
+          ? "text-gray-700"
+          : days <= 0
           ? "text-red-600"
           : days <= 7
           ? "text-red-600"
@@ -148,7 +158,7 @@ function DeadlinePill({ deadline }: { deadline: string }) {
       )}
     >
       <CalendarClock className="w-3 h-3" />
-      {days <= 0 ? "Past due" : `${days}d left`}
+      {!hasValidDeadline ? "No deadline" : days <= 0 ? "Past due" : `${days}d left`}
     </span>
   );
 }
@@ -246,12 +256,19 @@ function JobModalContent({ job }: { job: Job }) {
     <div className="flex flex-col">
       {/* Hero image */}
       <div className="relative h-64 bg-gray-100 flex-shrink-0 overflow-hidden rounded-t-xl">
-        <Image
-          src={job.thumbnail}
-          alt={job.title}
-          fill
-          className="object-cover"
-        />
+        {hasRenderableImage(job.thumbnail) ? (
+          <Image
+            src={job.thumbnail}
+            alt={job.title}
+            fill
+            className="object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 text-gray-500">
+            <Briefcase className="w-10 h-10 text-gray-400" />
+            <span className="text-xs mt-2 font-medium">No image provided</span>
+          </div>
+        )}
         {/* Overlay badges */}
         <div className="absolute top-3 left-3 right-3 flex items-start justify-between">
           <Badge
@@ -335,7 +352,7 @@ function JobModalContent({ job }: { job: Job }) {
         </div>
 
         {/* Job details row */}
-        <div className="grid grid-cols-3 gap-3 text-sm">
+        <div className="grid grid-cols-2 gap-3 text-sm">
           <div className="flex items-start gap-2">
             <MapPin className="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5" />
             <div>
@@ -346,15 +363,8 @@ function JobModalContent({ job }: { job: Job }) {
           <div className="flex items-start gap-2">
             <Calendar className="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5" />
             <div>
-              <span className="text-[10px] text-gray-600 block font-medium uppercase tracking-wide">Start Date</span>
-              <span className="text-gray-900 font-medium">{formatDate(job.preferredStartDate)}</span>
-            </div>
-          </div>
-          <div className="flex items-start gap-2">
-            <Timer className="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <span className="text-[10px] text-gray-600 block font-medium uppercase tracking-wide">Duration</span>
-              <span className="text-gray-900 font-medium">{job.estimatedDuration}</span>
+              <span className="text-[10px] text-gray-600 block font-medium uppercase tracking-wide">Post Date</span>
+              <span className="text-gray-900 font-medium">{formatDate(job.postedDate)}</span>
             </div>
           </div>
         </div>
@@ -732,6 +742,7 @@ export function JobCard({ job }: { job: Job }) {
   const photoCount = job.photos.filter((p) => p.type === "photo").length;
   const videoCount = job.photos.filter((p) => p.type === "video").length;
   const deadlineDays = daysUntil(job.deadline);
+  const hasValidDeadline = Number.isFinite(deadlineDays);
 
   return (
     <Dialog>
@@ -739,12 +750,19 @@ export function JobCard({ job }: { job: Job }) {
         <Card className="overflow-hidden hover:shadow-sm transition-shadow duration-200 flex flex-col cursor-pointer group">
           {/* Thumbnail */}
           <div className="relative h-56 bg-gray-100 overflow-hidden flex-shrink-0">
-            <Image
-              src={job.thumbnail}
-              alt={job.title}
-              fill
-              className="object-cover"
-            />
+            {hasRenderableImage(job.thumbnail) ? (
+              <Image
+                src={job.thumbnail}
+                alt={job.title}
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 text-gray-500">
+                <Briefcase className="w-8 h-8 text-gray-400" />
+                <span className="text-[11px] mt-1.5 font-medium">No image</span>
+              </div>
+            )}
 
             {/* Top badges */}
             <div className="absolute top-2 left-2 right-2 flex items-start justify-between">
@@ -822,19 +840,21 @@ export function JobCard({ job }: { job: Job }) {
                   {formatCurrency(job.budget.max)}
                 </span>
               </div>
-              <span
-                className={cn(
-                  "text-[11px] font-medium flex items-center gap-1",
-                  deadlineDays <= 7
-                    ? "text-red-600"
-                    : deadlineDays <= 21
-                    ? "text-amber-600"
-                    : "text-gray-700"
-                )}
-              >
-                <CalendarClock className="w-3 h-3" />
-                {deadlineDays <= 0 ? "Past due" : `${deadlineDays}d left`}
-              </span>
+              {hasValidDeadline && (
+                <span
+                  className={cn(
+                    "text-[11px] font-medium flex items-center gap-1",
+                    deadlineDays <= 7
+                      ? "text-red-600"
+                      : deadlineDays <= 21
+                      ? "text-amber-600"
+                      : "text-gray-700"
+                  )}
+                >
+                  <CalendarClock className="w-3 h-3" />
+                  {deadlineDays <= 0 ? "Past due" : `${deadlineDays}d left`}
+                </span>
+              )}
             </div>
 
             {/* FairPrice market rate */}
@@ -848,11 +868,7 @@ export function JobCard({ job }: { job: Job }) {
               </span>
               <span className="flex items-center gap-1">
                 <Calendar className="w-3 h-3 text-gray-600" />
-                {formatDate(job.preferredStartDate)}
-              </span>
-              <span className="flex items-center gap-1">
-                <Timer className="w-3 h-3 text-gray-600" />
-                {job.estimatedDuration}
+                {formatDate(job.postedDate)}
               </span>
               <span className="flex items-center gap-1">
                 <PropertyIcon className="w-3 h-3 text-gray-600" />

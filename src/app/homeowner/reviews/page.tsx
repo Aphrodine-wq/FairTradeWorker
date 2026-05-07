@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import {
   Award,
   Calendar,
@@ -244,7 +245,9 @@ const MOCK_COMPLETED_JOBS: CompletedJob[] = [
 
 export default function HomeownerFairRecordPage() {
   usePageTitle("FairRecord");
-  const [jobs, setJobs] = useState<CompletedJob[]>(MOCK_COMPLETED_JOBS);
+  const pathname = usePathname();
+  const isDemoFixture = pathname.startsWith("/demo/homeowner");
+  const [jobs, setJobs] = useState<CompletedJob[]>(isDemoFixture ? MOCK_COMPLETED_JOBS : []);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const needsReview = jobs.filter((j) => j.status === "needs_review");

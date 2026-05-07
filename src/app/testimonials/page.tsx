@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { Navbar } from "@marketplace/components/navbar";
 import { Testimonials } from "@marketplace/components/testimonials";
 
+import { CTASection } from "@marketplace/components/cta-section";
+import { Footer } from "@marketplace/components/footer";
+import { getMarketingSessionFromCookies } from "@shared/lib/marketing-cookie-session";
+
 export const metadata: Metadata = {
   title: "Testimonials",
   description: "See what homeowners and contractors are saying about FairTradeWorker.",
@@ -13,10 +17,10 @@ export const metadata: Metadata = {
     canonical: "/testimonials",
   },
 };
-import { CTASection } from "@marketplace/components/cta-section";
-import { Footer } from "@marketplace/components/footer";
 
-export default function TestimonialsPage() {
+export default async function TestimonialsPage() {
+  const session = await getMarketingSessionFromCookies();
+
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
       <Navbar />
@@ -30,7 +34,7 @@ export default function TestimonialsPage() {
           </p>
         </div>
         <Testimonials />
-        <CTASection />
+        <CTASection session={session} />
       </main>
       <Footer />
     </div>

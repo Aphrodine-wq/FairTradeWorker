@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Button } from "@shared/ui/button";
+import type { MarketingSession } from "@shared/lib/marketing-nav";
+import { getAccountSettingsHref, getDashboardHref } from "@shared/lib/marketing-nav";
 
 function HammerIcon({ className }: { className?: string }) {
   return (
@@ -32,7 +34,10 @@ function HammerIcon({ className }: { className?: string }) {
   );
 }
 
-export function Hero() {
+export function Hero({ session }: { session?: MarketingSession | null }) {
+  const dashboardHref = session ? getDashboardHref(session) : null;
+  const accountHref = session ? getAccountSettingsHref(session) : null;
+
   return (
     <section className="bg-[#FAFAFA] pt-28 pb-16 lg:pt-40 lg:pb-24 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -51,18 +56,42 @@ export function Hero() {
               Pick the best one. No lead fees. No chasing checks.
             </p>
 
-            <div className="mt-8 flex flex-col sm:flex-row gap-3">
-              <Button size="lg" asChild>
-                <Link href="/signup?role=homeowner">Post a Job Free</Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link href="/signup?role=contractor">Join as Contractor</Link>
-              </Button>
-            </div>
+            {session && dashboardHref ? (
+              <>
+                <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                  <Button size="lg" asChild>
+                    <Link href={dashboardHref}>Go to dashboard</Link>
+                  </Button>
+                  {accountHref ? (
+                    <Button size="lg" variant="outline" asChild>
+                      <Link href={accountHref}>Account & settings</Link>
+                    </Button>
+                  ) : (
+                    <Button size="lg" variant="outline" asChild>
+                      <Link href="/fairprice">FairPrice estimator</Link>
+                    </Button>
+                  )}
+                </div>
+                <p className="mt-4 text-sm text-gray-500">
+                  You&apos;re signed in — jump back into your workspace anytime.
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                  <Button size="lg" asChild>
+                    <Link href="/signup?role=homeowner">Post a Job Free</Link>
+                  </Button>
+                  <Button size="lg" variant="outline" asChild>
+                    <Link href="/signup?role=contractor">Join as Contractor</Link>
+                  </Button>
+                </div>
 
-            <p className="mt-4 text-sm text-gray-500">
-              Free to post. Free to bid. No credit card needed.
-            </p>
+                <p className="mt-4 text-sm text-gray-500">
+                  Free to post. Free to bid. No credit card needed.
+                </p>
+              </>
+            )}
           </div>
 
           {/* Right — hammer visual */}

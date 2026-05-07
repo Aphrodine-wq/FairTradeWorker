@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { usePathname } from "next/navigation";
 import {
   CheckCircle2,
   Circle,
@@ -166,7 +167,9 @@ const MOCK_PROJECTS: Project[] = [
 
 export default function HomeownerMilestonesPage() {
   usePageTitle("Milestones");
-  const [projects, setProjects] = useState<Project[]>(MOCK_PROJECTS);
+  const pathname = usePathname();
+  const isDemoFixture = pathname.startsWith("/demo/homeowner");
+  const [projects, setProjects] = useState<Project[]>(isDemoFixture ? MOCK_PROJECTS : []);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   function updateMilestoneStatus(projectId: string, milestoneId: string, status: MilestoneStatus) {
@@ -194,6 +197,11 @@ export default function HomeownerMilestonesPage() {
 
       {/* Project Sections */}
       <div className="space-y-8">
+        {projects.length === 0 && (
+          <div className="rounded-sm border border-border bg-white p-8 text-center">
+            <p className="text-[14px] text-gray-700">No milestone data yet.</p>
+          </div>
+        )}
         {projects.map((project) => (
           <ProjectSection
             key={project.id}

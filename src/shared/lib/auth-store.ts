@@ -24,6 +24,41 @@ function normalizeRole(role: string): UserRoleClient {
   return role.toLowerCase().replace(/_/g, "") as UserRoleClient;
 }
 
+function asNonEmptyString(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  if (!trimmed || trimmed.toLowerCase() === "undefined" || trimmed.toLowerCase() === "null") return null;
+  return trimmed;
+}
+
+function resolveUserName(rawUser: Record<string, unknown>, fallbackName?: string): string {
+  const direct =
+    asNonEmptyString(rawUser.name) ??
+    asNonEmptyString(rawUser.full_name) ??
+    asNonEmptyString(rawUser.fullName);
+  if (direct) return direct;
+
+  const first =
+    asNonEmptyString(rawUser.first_name) ??
+    asNonEmptyString(rawUser.firstName);
+  const last =
+    asNonEmptyString(rawUser.last_name) ??
+    asNonEmptyString(rawUser.lastName);
+  const combined = [first, last].filter(Boolean).join(" ").trim();
+  if (combined) return combined;
+
+  const fallback = asNonEmptyString(fallbackName);
+  if (fallback) return fallback;
+
+  const email = asNonEmptyString(rawUser.email);
+  if (email && email.includes("@")) return email.split("@")[0];
+  return "Account";
+}
+
+function resolveUserEmail(rawUser: Record<string, unknown>): string {
+  return asNonEmptyString(rawUser.email) ?? "";
+}
+
 const STORAGE_KEY = "ftw-auth";
 const SESSION_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutes
 const AUTH_COOKIE_KEY = "ftw-token";
@@ -77,14 +112,18 @@ function isTokenExpired(token: string): boolean {
   return payload.exp * 1000 < Date.now() + 60_000;
 }
 
-function toAuthUser(rawUser: Record<string, unknown>, fallbackRoles?: UserRoleClient[]): AuthUser {
+function toAuthUser(
+  rawUser: Record<string, unknown>,
+  fallbackRoles?: UserRoleClient[],
+  fallbackName?: string
+): AuthUser {
   const role = normalizeRole(String(rawUser.role));
   const rawRoles = rawUser.roles as string[] | undefined;
 
   return {
     id: String(rawUser.id),
-    email: String(rawUser.email),
-    name: String(rawUser.name),
+    email: resolveUserEmail(rawUser),
+    name: resolveUserName(rawUser, fallbackName),
     role,
     roles: rawRoles ? rawRoles.map((r) => normalizeRole(r)) : fallbackRoles || [role],
   };
@@ -125,14 +164,29 @@ function stopSessionCheck() {
   }
 }
 
+async function refreshUserFromApi(fallbackRoles?: UserRoleClient[], fallbackName?: string): Promise<void> {
+  if (!_state.token) return;
+  try {
+    const result = await api.me();
+    _state = {
+      ..._state,
+      user: toAuthUser(result.user as Record<string, unknown>, fallbackRoles ?? _state.user?.roles, fallbackName ?? _state.user?.name),
+    };
+    save(_state);
+    notify();
+  } catch {
+    // Non-fatal: keep current state when profile refresh fails.
+  }
+}
+
 async function finalizeOAuthLogin(result: { token: string; user: Record<string, unknown> }): Promise<AuthUser> {
   const apiUser = result.user;
   const role = normalizeRole(String(apiUser.role));
   const apiRoles = apiUser.roles as string[] | undefined;
   const user: AuthUser = {
     id: String(apiUser.id),
-    email: String(apiUser.email),
-    name: String(apiUser.name),
+    email: resolveUserEmail(apiUser),
+    name: resolveUserName(apiUser, _state.user?.name),
     role,
     roles: apiRoles ? apiRoles.map((r) => normalizeRole(r)) : [role],
   };
@@ -180,6 +234,7 @@ export const authStore = {
     setAuthToken(result.token);
     syncTokenCookie(result.cookieToken ?? result.token);
     startSessionCheck();
+    await refreshUserFromApi(user.roles, user.name);
     notify();
     return user;
   },
@@ -206,6 +261,7 @@ export const authStore = {
     setAuthToken(loginResult.token);
     syncTokenCookie(loginResult.cookieToken ?? loginResult.token);
     startSessionCheck();
+    await refreshUserFromApi(user.roles, user.name);
     notify();
     return user;
   },
@@ -226,11 +282,12 @@ export const authStore = {
     }
 
     const result = await api.switchRole(targetRole);
-    const user = toAuthUser(result.user as Record<string, unknown>, _state.user.roles);
+    const user = toAuthUser(result.user as Record<string, unknown>, _state.user.roles, _state.user.name);
     _state = { token: result.token, user };
     save(_state);
     setAuthToken(result.token);
     syncTokenCookie(result.token);
+    await refreshUserFromApi(user.roles, user.name);
     notify();
     return user;
   },
@@ -258,7 +315,7 @@ export const authStore = {
       .then((result) => {
         _state = {
           ..._state,
-          user: toAuthUser(result.user as Record<string, unknown>, _state.user?.roles),
+          user: toAuthUser(result.user as Record<string, unknown>, _state.user?.roles, _state.user?.name),
         };
         save(_state);
         notify();
@@ -272,4 +329,5 @@ export const authStore = {
 // Start session monitoring if already authenticated
 if (_state.token) {
   startSessionCheck();
+  authStore.checkSession();
 }

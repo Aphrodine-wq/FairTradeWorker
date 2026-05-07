@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   User,
   Wrench,
@@ -48,9 +49,21 @@ const NAV_ITEMS: NavItem[] = [
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
-export default function SubContractorSettingsPage() {
+const SECTION_KEYS = new Set<SectionKey>(
+  NAV_ITEMS.map((item) => item.key),
+);
+
+function SubContractorSettingsPageContent() {
   usePageTitle("Settings");
+  const searchParams = useSearchParams();
   const [activeSection, setActiveSection] = useState<SectionKey>("profile");
+
+  useEffect(() => {
+    const s = searchParams.get("section");
+    if (s && SECTION_KEYS.has(s as SectionKey)) {
+      setActiveSection(s as SectionKey);
+    }
+  }, [searchParams]);
 
   return (
     <div className="flex flex-col min-h-full bg-surface">
@@ -98,6 +111,26 @@ export default function SubContractorSettingsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function SubContractorSettingsFallback() {
+  return (
+    <div className="flex flex-col min-h-full bg-surface animate-pulse">
+      <div className="h-[72px] bg-white border-b border-gray-200" />
+      <div className="flex flex-1 overflow-hidden">
+        <div className="w-[220px] bg-white border-r border-gray-200 flex-shrink-0" />
+        <div className="flex-1 p-6 bg-surface" />
+      </div>
+    </div>
+  );
+}
+
+export default function SubContractorSettingsPage() {
+  return (
+    <Suspense fallback={<SubContractorSettingsFallback />}>
+      <SubContractorSettingsPageContent />
+    </Suspense>
   );
 }
 

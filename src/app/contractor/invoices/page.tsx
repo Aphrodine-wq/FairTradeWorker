@@ -279,10 +279,10 @@ const STATUS_CONFIG: Record<
 
 export default function InvoicesPage() {
   usePageTitle("Invoices");
-  const [invoices, setInvoices] = useState<Invoice[]>(MOCK_INVOICES);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [filter, setFilter] = useState<"all" | InvoiceStatus>("all");
   const [search, setSearch] = useState("");
-  const [selectedId, setSelectedId] = useState<string | null>("inv-3");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
 
   // Create form state
@@ -291,41 +291,39 @@ export default function InvoicesPage() {
   const [createLineItems, setCreateLineItems] = useState<LineItem[]>([]);
   const [createNotes, setCreateNotes] = useState("");
   const [createPaymentTerms, setCreatePaymentTerms] = useState("Net 14");
-  const [projectOptions, setProjectOptions] = useState<InvoiceProjectOption[]>(PROJECTS_WITH_MILESTONES);
+  const [projectOptions, setProjectOptions] = useState<InvoiceProjectOption[]>([]);
 
   useEffect(() => {
     fetchInvoices().then((apiInvoices) => {
-      if (apiInvoices.length > 0) {
-        setInvoices(
-          apiInvoices.map((inv: any) => ({
-            id: inv.id,
-            invoiceNumber: inv.invoice_number || inv.id,
-            project: inv.project_id || "",
-            client: {
-              name: inv.client?.name || "Unknown",
-              email: inv.client?.email || "",
-              address: inv.client?.address || "",
-            },
-            milestone: "",
-            milestoneNumber: 0,
-            totalMilestones: 0,
-            issueDate: inv.created_at,
-            dueDate: inv.due_date,
-            status: inv.status as InvoiceStatus,
-            lineItems: [],
-            subtotal:
-              typeof inv.amount === "number" && inv.amount > 1000
-                ? inv.amount / 100
-                : inv.amount,
-            platformFee: 0,
-            total:
-              typeof inv.amount === "number" && inv.amount > 1000
-                ? inv.amount / 100
-                : inv.amount,
-            paymentTerms: "Net 14",
-          }))
-        );
-      }
+      const mapped = apiInvoices.map((inv: any) => ({
+        id: inv.id,
+        invoiceNumber: inv.invoice_number || inv.id,
+        project: inv.project_id || "",
+        client: {
+          name: inv.client?.name || "Unknown",
+          email: inv.client?.email || "",
+          address: inv.client?.address || "",
+        },
+        milestone: "",
+        milestoneNumber: 0,
+        totalMilestones: 0,
+        issueDate: inv.created_at,
+        dueDate: inv.due_date,
+        status: inv.status as InvoiceStatus,
+        lineItems: [],
+        subtotal:
+          typeof inv.amount === "number" && inv.amount > 1000
+            ? inv.amount / 100
+            : inv.amount,
+        platformFee: 0,
+        total:
+          typeof inv.amount === "number" && inv.amount > 1000
+            ? inv.amount / 100
+            : inv.amount,
+        paymentTerms: "Net 14",
+      }));
+      setInvoices(mapped);
+      setSelectedId(mapped[0]?.id ?? null);
     });
 
     fetchProjects().then(async (projects) => {
@@ -354,7 +352,7 @@ export default function InvoicesPage() {
           };
         })
       );
-      if (options.length > 0) setProjectOptions(options);
+      setProjectOptions(options);
     });
   }, []);
 

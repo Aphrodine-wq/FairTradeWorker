@@ -19,11 +19,12 @@ import {
 } from "lucide-react";
 import { Badge } from "@shared/ui/badge";
 import { Button } from "@shared/ui/button";
-import { mockFairRecords, mockContractors, type FairRecord } from "@shared/lib/mock-data";
+import { type FairRecord } from "@shared/lib/mock-data";
 import { fetchFairRecords } from "@shared/lib/data";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
 import { track } from "@shared/lib/analytics";
 import { usePageTitle } from "@shared/hooks/use-page-title";
+import { authStore } from "@shared/lib/auth-store";
 
 // ─── Star Rating ────────────────────────────────────────────────────────────
 
@@ -53,13 +54,23 @@ function StarRating({ rating, size = 14 }: { rating: number; size?: number }) {
 
 export default function ContractorRecordsPage() {
   usePageTitle("FairRecord");
-  const [records, setRecords] = useState<FairRecord[]>(mockFairRecords);
-  const contractor = mockContractors[0]; // current logged-in contractor
+  const [records, setRecords] = useState<FairRecord[]>([]);
+  const authUser = authStore.getState().user;
+  const contractor = {
+    name: authUser?.name || "Contractor",
+    company: "FairTradeWorker Contractor",
+    verified: false,
+    specialty: "General Contracting",
+    yearsExperience: 0,
+    licensed: false,
+    insured: false,
+    skills: [] as string[],
+  };
   const [stats, setStats] = useState({
-    total: mockFairRecords.length,
-    avg_budget_accuracy: 96.8,
-    on_time_rate: 80.0,
-    avg_rating: 4.9,
+    total: 0,
+    avg_budget_accuracy: 0,
+    on_time_rate: 0,
+    avg_rating: 0,
   });
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [copiedProfile, setCopiedProfile] = useState(false);

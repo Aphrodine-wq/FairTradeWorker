@@ -224,30 +224,32 @@ export default function ContractorMessagesPage() {
   const typingDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Load conversations from API, fall back to mock
+  // Load conversations from API.
   useEffect(() => {
     fetchConversations().then(({ data, isMock: mock }) => {
-      if (!mock && data.length > 0) {
-        const mapped: Conversation[] = data.map((c: any) => ({
-          id: c.id,
-          homeownerName: c.other_user?.name || c.otherUserName || "Unknown",
-          jobTitle: c.job_title || c.jobTitle || "",
-          lastMessage: c.last_message?.body || c.lastMessage || "",
-          lastTimestamp: c.last_message?.sent_at
-            ? new Date(c.last_message.sent_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
-            : "",
-          unread: (c.unread_count || 0) > 0,
-          unreadCount: c.unread_count || 0,
-          online: c.other_user?.online ?? false,
-          messages: [],
-        }));
-        setConversations(mapped);
-        if (mapped.length > 0) setSelectedId(mapped[0].id);
-      } else {
+      if (mock) {
         setConversations(MOCK_CONVERSATIONS);
-        setSelectedId(MOCK_CONVERSATIONS[0].id);
+        setSelectedId(MOCK_CONVERSATIONS[0]?.id ?? "");
         setIsMock(true);
+        setLoading(false);
+        return;
       }
+      const mapped: Conversation[] = data.map((c: any) => ({
+        id: c.id,
+        homeownerName: c.other_user?.name || c.otherUserName || "Unknown",
+        jobTitle: c.job_title || c.jobTitle || "",
+        lastMessage: c.last_message?.body || c.lastMessage || "",
+        lastTimestamp: c.last_message?.sent_at
+          ? new Date(c.last_message.sent_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
+          : "",
+        unread: (c.unread_count || 0) > 0,
+        unreadCount: c.unread_count || 0,
+        online: c.other_user?.online ?? false,
+        messages: [],
+      }));
+      setConversations(mapped);
+      setSelectedId(mapped[0]?.id ?? "");
+      setIsMock(false);
       setLoading(false);
     });
   }, []);

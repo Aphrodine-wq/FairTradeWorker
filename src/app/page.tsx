@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Navbar } from "@marketplace/components/navbar";
+import { Hero } from "@marketplace/components/hero";
+
+import { CTASection } from "@marketplace/components/cta-section";
+import { Footer } from "@marketplace/components/footer";
+import { Button } from "@shared/ui/button";
+import { getMarketingSessionFromCookies } from "@shared/lib/marketing-cookie-session";
 
 export const metadata: Metadata = {
   title: "FairTradeWorker — The Fun Way to Get Home Projects Done",
@@ -13,19 +20,15 @@ export const metadata: Metadata = {
   },
   alternates: { canonical: "/" },
 };
-import { Navbar } from "@marketplace/components/navbar";
-import { Hero } from "@marketplace/components/hero";
 
-import { CTASection } from "@marketplace/components/cta-section";
-import { Footer } from "@marketplace/components/footer";
-import { Button } from "@shared/ui/button";
+export default async function HomePage() {
+  const session = await getMarketingSessionFromCookies();
 
-export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
       <Navbar />
       <main>
-        <Hero />
+        <Hero session={session} />
 
         {/* New way teaser */}
         <section className="bg-white py-20 lg:py-28 border-b border-border">
@@ -259,7 +262,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <CTASection />
+        <CTASection session={session} />
       </main>
       <Footer />
     </div>

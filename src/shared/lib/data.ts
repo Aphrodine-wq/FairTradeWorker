@@ -2,28 +2,183 @@
  * Data layer — tries real Elixir API first, falls back to mock data.
  * Pages import from here instead of mock-data directly.
  */
-import { api, type RealtimeJob, type RealtimeBid } from "./realtime";
-import { mockJobs, mockEstimates, mockFairRecords, mockSubJobs, mockSubBids, subContractorDashboardStats, type Job, type Estimate, type FairRecord, type SubJob, type SubBid } from "./mock-data";
+import {
+  api,
+  getAuthToken,
+  type RealtimeJob,
+  type RealtimeBid,
+  type RealtimePropertyApi,
+} from "./realtime";
+import {
+  mockJobs,
+  mockEstimates,
+  mockFairRecords,
+  mockSubJobs,
+  mockSubBids,
+  subContractorDashboardStats,
+  type Job,
+  type Estimate,
+  type FairRecord,
+  type SubJob,
+  type SubBid,
+  type PropertyDetails,
+} from "./mock-data";
 
-// Convert a RealtimeJob from the API to the mock Job shape pages expect
-function toJob(rj: RealtimeJob): Job {
+function hasAuthenticatedSession(): boolean {
+  if (getAuthToken()) return true;
+  if (typeof window === "undefined") return false;
+  try {
+    const raw = window.localStorage.getItem("ftw-auth");
+    if (!raw) return false;
+    const parsed = JSON.parse(raw) as { token?: string | null };
+    return Boolean(parsed?.token);
+  } catch {
+    return false;
+  }
+}
+
+function shouldUseMockFallback(): boolean {
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === "true" || process.env.NEXT_PUBLIC_ENABLE_MOCK_FALLBACK === "true") {
+    return true;
+  }
+  return process.env.NODE_ENV !== "production" && !hasAuthenticatedSession();
+}
+
+const DEFAULT_PROPERTY: PropertyDetails = {
+  stories: 0,
+  foundation: "slab",
+  exterior: "",
+  roofType: "",
+  roofAge: 0,
+  garage: "none",
+  lotSize: "",
+  hoa: false,
+  hoaNotes: "",
+  heating: "",
+  cooling: "",
+  waterHeater: "electric",
+  plumbing: "",
+  electrical: "",
+  sewer: "city",
+  knownIssues: [],
+  recentWork: [],
+};
+
+function mapPropertyFromApi(p?: RealtimePropertyApi | null): PropertyDetails {
+  if (!p) return { ...DEFAULT_PROPERTY };
+  const rawFoundation = (p.foundation || "slab").toLowerCase().replace(/[\s-]+/g, "_");
+  const foundation = (
+    rawFoundation === "pier_beam" ||
+    rawFoundation === "basement" ||
+    rawFoundation === "crawlspace" ||
+    rawFoundation === "slab"
+      ? rawFoundation
+      : "slab"
+  ) as PropertyDetails["foundation"];
+  const g = (p.garage || "none").toLowerCase();
+  const garage: PropertyDetails["garage"] =
+    g === "attached" || g === "detached" || g === "carport" || g === "none" ? g : "none";
+  const sewer: PropertyDetails["sewer"] = (p.sewer || "city").toLowerCase() === "septic" ? "septic" : "city";
+  const wh = (p.water_heater || "electric").toLowerCase();
+  const waterHeater: PropertyDetails["waterHeater"] =
+    wh === "gas" || wh === "electric" || wh === "tankless_gas" || wh === "tankless_electric" ? wh : "electric";
+
   return {
-    ...mockJobs[0], // inherit defaults for fields the API doesn't have yet
+    stories: p.stories ?? 0,
+    foundation,
+    exterior: p.exterior ?? "",
+    roofType: p.roof_type ?? "",
+    roofAge: p.roof_age ?? 0,
+    garage,
+    lotSize: p.lot_size ?? "",
+    hoa: Boolean(p.hoa),
+    hoaNotes: p.hoa_notes ?? "",
+    heating: p.heating ?? "",
+    cooling: p.cooling ?? "",
+    waterHeater,
+    plumbing: p.plumbing ?? "",
+    electrical: p.electrical ?? "",
+    sewer,
+    knownIssues: Array.isArray(p.known_issues) ? p.known_issues : [],
+    recentWork: Array.isArray(p.recent_work) ? p.recent_work : [],
+  };
+}
+
+function homeownerDisplayName(ho: RealtimeJob["homeowner"]): string {
+  if (!ho) return "Homeowner";
+  if (typeof ho === "string") return ho;
+  return ho.name ?? "Homeowner";
+}
+
+function normUrgency(u: string | undefined): Job["urgency"] {
+  const x = (u || "medium").toLowerCase();
+  if (x === "low" || x === "high" || x === "medium") return x;
+  return "medium";
+}
+
+function normPropertyType(p: string | undefined): Job["propertyType"] {
+  const x = (p || "residential").toLowerCase();
+  if (x === "residential" || x === "commercial" || x === "industrial") return x;
+  return "residential";
+}
+
+/** Maps GET /api/jobs (and WebSocket job payloads) to the UI `Job` model. */
+export function mapRealtimeJobToJob(rj: RealtimeJob): Job {
+  const ho = rj.homeowner;
+  const pb = rj.posted_by;
+  const postedByName = pb?.name ?? homeownerDisplayName(ho);
+  const postedByRating = Number(
+    pb?.rating ?? (typeof ho === "object" && ho && "rating" in ho ? ho.rating ?? 0 : 0)
+  );
+  const postedByJobs = Number(pb?.jobs_posted ?? 0);
+  const postedByAvatar =
+    String(pb?.avatar ?? "").trim() ||
+    String(typeof ho === "object" && ho && "avatar_url" in ho ? ho.avatar_url ?? "" : "").trim();
+
+  const tags = rj.tags?.length ? rj.tags : [rj.category];
+
+  return {
     id: rj.id,
     title: rj.title,
     description: rj.description,
-    detailedScope: rj.description,
+    detailedScope: rj.detailed_scope ?? rj.description,
     category: rj.category,
+    subcategory: rj.subcategory ?? rj.category,
     budget: { min: rj.budget_min, max: rj.budget_max },
     location: rj.location,
-    fullAddress: rj.location,
-    postedBy: typeof rj.homeowner === "string" ? rj.homeowner : rj.homeowner?.name ?? "Homeowner",
-    postedDate: rj.posted_at,
+    fullAddress: rj.full_address ?? rj.location,
+    postedBy: postedByName,
+    postedByRating,
+    postedByJobs,
+    postedByAvatar,
+    postedDate: rj.inserted_at ?? rj.posted_at,
+    deadline: rj.deadline ?? "",
+    preferredStartDate: rj.preferred_start_date ?? "",
+    estimatedDuration: rj.estimated_duration ?? "",
     status: rj.status as Job["status"],
     bidsCount: rj.bid_count,
-    tags: [rj.category],
-    thumbnail: "",
-    photos: [],
+    viewCount: Number(rj.view_count ?? 0),
+    urgency: normUrgency(rj.urgency),
+    propertyType: normPropertyType(rj.property_type),
+    sqft: Number(rj.sqft ?? 0),
+    yearBuilt: Number(rj.year_built ?? 0),
+    accessNotes: rj.access_notes ?? "",
+    materialsProvided: Boolean(rj.materials_provided),
+    permitsRequired: Boolean(rj.permits_required),
+    inspectionRequired: Boolean(rj.inspection_required),
+    insuranceClaim: Boolean(rj.insurance_claim),
+    requirements: Array.isArray(rj.requirements)
+      ? rj.requirements.map((r) => ({ label: r.label, met: Boolean(r.met) }))
+      : [],
+    tags,
+    specialInstructions: rj.special_instructions ?? "",
+    thumbnail: rj.thumbnail ?? "",
+    photos: (rj.photos ?? []).map((ph) => ({
+      url: ph.url,
+      caption: ph.caption ?? "",
+      type: ph.type === "video" ? "video" : "photo",
+    })),
+    property: mapPropertyFromApi(rj.property),
   };
 }
 
@@ -33,13 +188,11 @@ function toJob(rj: RealtimeJob): Job {
 export async function fetchJobs(): Promise<Job[]> {
   try {
     const realtimeJobs = await api.listJobs();
-    if (realtimeJobs.length > 0) {
-      return realtimeJobs.map(toJob);
-    }
+    return realtimeJobs.map(mapRealtimeJobToJob);
   } catch {
-    // Backend not available — fall through to mock
+    if (shouldUseMockFallback()) return mockJobs;
+    return [];
   }
-  return mockJobs;
 }
 
 /**
@@ -60,13 +213,11 @@ export async function fetchBidsForJob(jobId: string): Promise<RealtimeBid[]> {
 export async function fetchEstimates(): Promise<Estimate[]> {
   try {
     const apiEstimates = await api.listEstimates();
-    if (apiEstimates.length > 0) {
-      return apiEstimates;
-    }
+    return apiEstimates;
   } catch {
-    // Backend not available — fall through to mock
+    if (shouldUseMockFallback()) return mockEstimates;
+    return [];
   }
-  return mockEstimates;
 }
 
 /**
@@ -239,11 +390,11 @@ export async function fetchNotifications(): Promise<{ data: any[]; isMock: boole
 export async function fetchConversations(): Promise<{ data: any[]; isMock: boolean }> {
   try {
     const convos = await api.listConversations();
-    if (convos.length > 0) return { data: convos, isMock: false };
+    return { data: convos, isMock: false };
   } catch {
-    // Backend not available — fall through to mock
+    // Conversation fallback to hardcoded mock data is intentionally disabled.
+    return { data: [], isMock: false };
   }
-  return { data: [], isMock: true };
 }
 
 /**
@@ -285,9 +436,27 @@ export async function submitVerification(step: string, data: Record<string, any>
 export async function fetchFairRecords(contractorId?: string): Promise<{ records: FairRecord[]; stats: any }> {
   try {
     const data = await api.listFairRecords(contractorId || "me");
-    if (data.records.length > 0) return data;
+    return {
+      records: data.records || [],
+      stats: data.stats || {
+        total: 0,
+        avg_budget_accuracy: 0,
+        on_time_rate: 0,
+        avg_rating: 0,
+      },
+    };
   } catch {
-    // Backend not available — fall through to mock
+    if (!shouldUseMockFallback()) {
+      return {
+        records: [],
+        stats: {
+          total: 0,
+          avg_budget_accuracy: 0,
+          on_time_rate: 0,
+          avg_rating: 0,
+        },
+      };
+    }
   }
   return {
     records: mockFairRecords,
@@ -307,7 +476,7 @@ export async function fetchPublicRecord(publicId: string): Promise<FairRecord | 
   try {
     return await api.getPublicRecord(publicId);
   } catch {
-    // Fall through to mock
+    if (!shouldUseMockFallback()) return null;
   }
   return mockFairRecords.find((r) => r.publicId === publicId) || null;
 }
@@ -363,13 +532,11 @@ function toSubBid(raw: any): SubBid {
 export async function fetchSubJobs(): Promise<SubJob[]> {
   try {
     const rawSubJobs = await api.listSubJobs();
-    if (rawSubJobs.length > 0) {
-      return rawSubJobs.map(toSubJob);
-    }
+    return rawSubJobs.map(toSubJob);
   } catch {
-    // Backend not available — fall through to mock
+    if (shouldUseMockFallback()) return mockSubJobs;
+    return [];
   }
-  return mockSubJobs;
 }
 
 /**
@@ -378,13 +545,11 @@ export async function fetchSubJobs(): Promise<SubJob[]> {
 export async function fetchSubBids(subJobId: string): Promise<SubBid[]> {
   try {
     const { bids } = await api.getSubJob(subJobId);
-    if (bids && bids.length > 0) {
-      return bids.map(toSubBid);
-    }
+    return (bids || []).map(toSubBid);
   } catch {
-    // Backend not available — fall through to mock
+    if (shouldUseMockFallback()) return mockSubBids.filter((b) => b.subJobId === subJobId);
+    return [];
   }
-  return mockSubBids.filter((b) => b.subJobId === subJobId);
 }
 
 /**
@@ -394,10 +559,11 @@ export async function fetchSubContractorStats() {
   try {
     const stats = await api.getSubContractorStats();
     if (stats) return stats;
+    return null;
   } catch {
-    // Backend not available — fall through to mock
+    if (shouldUseMockFallback()) return subContractorDashboardStats;
+    return null;
   }
-  return subContractorDashboardStats;
 }
 
 /**

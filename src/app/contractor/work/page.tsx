@@ -53,12 +53,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@shared/ui/dialog";
-import { mockJobs, mockEstimates, type Estimate, type Job } from "@shared/lib/mock-data";
+import { mockEstimates, type Estimate, type Job } from "@shared/lib/mock-data";
 import { JOB_CATEGORIES } from "@shared/lib/constants";
 import { formatCurrency, formatDate, cn } from "@shared/lib/utils";
 import { type BadgeProps } from "@shared/ui/badge";
 import { useRealtimeJobs } from "@shared/hooks/use-realtime";
-import { fetchClients, fetchEstimateTemplates, fetchJobs } from "@shared/lib/data";
+import { fetchClients, fetchEstimateTemplates, fetchJobs, mapRealtimeJobToJob } from "@shared/lib/data";
 import { usePageTitle } from "@shared/hooks/use-page-title";
 
 // ─── Shared types ─────────────────────────────────────────────────────────────
@@ -101,8 +101,8 @@ function BrowseJobsTab() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
 
-  // Load jobs from API (falls back to mock data if backend is down)
-  const [apiJobs, setApiJobs] = useState<Job[]>(mockJobs);
+  // Load jobs from API
+  const [apiJobs, setApiJobs] = useState<Job[]>([]);
   React.useEffect(() => {
     fetchJobs().then(setApiJobs);
   }, []);
@@ -113,30 +113,15 @@ function BrowseJobsTab() {
   // Merge: API jobs as base, realtime updates overlay
   const allJobs = useMemo(() => {
     if (realtimeJobs.length === 0) return apiJobs;
-    const rtConverted: Job[] = realtimeJobs.map((rj) => ({
-      ...mockJobs[0],
-      id: rj.id,
-      title: rj.title,
-      description: rj.description,
-      detailedScope: rj.description,
-      category: rj.category,
-      budget: { min: rj.budget_min, max: rj.budget_max },
-      location: rj.location,
-      fullAddress: rj.location,
-      postedBy: typeof rj.homeowner === "string" ? rj.homeowner : rj.homeowner?.name ?? "Homeowner",
-      postedDate: rj.posted_at,
-      status: rj.status as "open" | "in_progress" | "completed" | "cancelled",
-      bidsCount: rj.bid_count,
-      tags: [rj.category],
-      thumbnail: "",
-      photos: [],
-    }));
+    const rtConverted: Job[] = realtimeJobs.map(mapRealtimeJobToJob);
     const apiIds = new Set(apiJobs.map((j) => j.id));
     const newRt = rtConverted.filter((j) => !apiIds.has(j.id));
     return [...newRt, ...apiJobs];
   }, [realtimeJobs, apiJobs]);
 
-  const openJobs = allJobs.filter((j) => j.status === "open");
+  const openJobs = allJobs.filter((j) =>
+    j.status === "open" || j.status === "bidding" || j.status === "awarded"
+  );
 
   // Derived stats
   const urgentCount = openJobs.filter((j) => j.urgency === "high").length;
@@ -1385,8 +1370,16 @@ function CalculatorTab() {
 
 export default function WorkPage() {
   usePageTitle("Browse Jobs");
-  const openJobs = mockJobs.filter((j) => j.status === "open");
-  const totalBudget = openJobs.reduce((s, j) => s + j.budget.max, 0);
+  const [openJobsCount, setOpenJobsCount] = useState(0);
+  const [totalBudget, setTotalBudget] = useState(0);
+
+  useEffect(() => {
+    fetchJobs().then((jobs) => {
+      const openJobs = jobs.filter((j) => j.status === "open");
+      setOpenJobsCount(openJobs.length);
+      setTotalBudget(openJobs.reduce((s, j) => s + j.budget.max, 0));
+    });
+  }, []);
 
   return (
     <div className="flex flex-col min-h-full bg-surface">
@@ -1394,7 +1387,7 @@ export default function WorkPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-[22px] font-semibold text-gray-900 tracking-tight">Job Marketplace</h1>
-            <p className="text-[13px] text-gray-600 mt-0.5">{openJobs.length} open jobs — {formatCurrency(totalBudget)} in available work</p>
+            <p className="text-[13px] text-gray-600 mt-0.5">{openJobsCount} open jobs — {formatCurrency(totalBudget)} in available work</p>
           </div>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />

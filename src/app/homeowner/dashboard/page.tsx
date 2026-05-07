@@ -47,7 +47,7 @@ import { Card, CardContent } from "@shared/ui/card";
 import { Progress } from "@shared/ui/progress";
 import { Badge } from "@shared/ui/badge";
 import { formatCurrency, formatDate } from "@shared/lib/utils";
-import { mockProjects, homeownerDashboardStats, type Project } from "@shared/lib/mock-data";
+import { type Project } from "@shared/lib/mock-data";
 import { fetchHomeownerDashboard, fetchJobCategories, fetchNotifications } from "@shared/lib/data";
 import { usePageTitle } from "@shared/hooks/use-page-title";
 
@@ -120,15 +120,25 @@ export default function HomeownerDashboardPage() {
   const isDemoFixture = pathname.startsWith("/demo/homeowner");
   const basePath = isDemoFixture ? "/demo/homeowner" : "/homeowner";
 
-  const [projects, setProjects] = useState<Project[]>(mockProjects);
-  const [dashboardStats, setDashboardStats] = useState(homeownerDashboardStats);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [dashboardStats, setDashboardStats] = useState({
+    activeProjects: 0,
+    pendingEstimates: 0,
+    totalSpent: 0,
+    savedVsAverage: 0,
+  });
   const [categories, setCategories] = useState(CATEGORIES);
   const [notificationCount, setNotificationCount] = useState(0);
 
   useEffect(() => {
     if (isDemoFixture) {
-      setProjects(mockProjects);
-      setDashboardStats(homeownerDashboardStats);
+      setProjects([]);
+      setDashboardStats({
+        activeProjects: 0,
+        pendingEstimates: 0,
+        totalSpent: 0,
+        savedVsAverage: 0,
+      });
       setCategories(CATEGORIES);
       setNotificationCount(0);
       return;
@@ -137,16 +147,14 @@ export default function HomeownerDashboardPage() {
       if (!data) return;
       if (data.stats) {
         setDashboardStats({
-          activeProjects: data.stats.activeProjects ?? homeownerDashboardStats.activeProjects,
-          pendingEstimates: data.stats.pendingBids ?? homeownerDashboardStats.pendingEstimates,
-          totalSpent: data.stats.totalSpentToDate ?? homeownerDashboardStats.totalSpent,
-          savedVsAverage: data.stats.savedVsLocalAverage ?? homeownerDashboardStats.savedVsAverage,
+          activeProjects: Number(data.stats.activeProjects ?? 0),
+          pendingEstimates: Number(data.stats.pendingBids ?? 0),
+          totalSpent: Number(data.stats.totalSpentToDate ?? 0),
+          savedVsAverage: Number(data.stats.savedVsLocalAverage ?? 0),
         });
       }
-      if (Array.isArray(data.projects) && data.projects.length > 0) {
-        setProjects(
-          data.projects.map((project: any, idx: number) => ({
-            ...mockProjects[idx % Math.max(mockProjects.length, 1)],
+      const mappedProjects = Array.isArray(data.projects)
+        ? data.projects.map((project: any, idx: number) => ({
             id: project.id || `proj-${idx}`,
             title: project.title || "Project",
             contractor: project.contractor?.name || "Contractor",
@@ -154,9 +162,12 @@ export default function HomeownerDashboardPage() {
             progress: Number(project.progressPct || 0),
             budget: Number(project.budget || 0),
             spent: Number(project.spent || 0),
+            startDate: project.startDate || project.start_date || "",
+            estimatedEnd: project.estimatedEnd || project.estimated_end || "",
+            milestones: Array.isArray(project.milestones) ? project.milestones : [],
           }))
-        );
-      }
+        : [];
+      setProjects(mappedProjects);
     });
 
     fetchJobCategories().then((data) => {
@@ -174,9 +185,7 @@ export default function HomeownerDashboardPage() {
     });
 
     fetchNotifications().then(({ data }) => {
-      if (data.length > 0) {
-        setNotificationCount(data.filter((n: any) => !n.read).length);
-      }
+      setNotificationCount(data.filter((n: any) => !n.read).length);
     });
   }, [isDemoFixture]);
 

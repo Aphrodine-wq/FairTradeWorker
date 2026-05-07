@@ -142,6 +142,89 @@ function groupDashboardMilestoneRows(items: Record<string, unknown>[]): Dashboar
   });
 }
 
+function mapDashboardMarketplaceItemToJob(item: any, index: number): Job {
+  const pb = item.posted_by ?? item.postedBy;
+  const ho = item.homeowner;
+  const postedByName =
+    (typeof pb === "object" && pb?.name) ||
+    (typeof ho === "object" && ho?.name) ||
+    item.postedBy ||
+    "Homeowner";
+  const postedByRating = Number(
+    (typeof pb === "object" ? pb?.rating : undefined) ??
+      (typeof ho === "object" ? ho?.rating : undefined) ??
+      item.postedByRating ??
+      0
+  );
+  const postedByJobs = Number((typeof pb === "object" ? pb?.jobs_posted : undefined) ?? item.postedByJobs ?? 0);
+  const postedByAvatar = String(
+    (typeof pb === "object" ? pb?.avatar : undefined) ??
+      (typeof ho === "object" ? ho?.avatar_url : undefined) ??
+      item.postedByAvatar ??
+      ""
+  );
+
+  const prop = item.property ?? {};
+  return {
+    id: item.id || `dash-job-${index}`,
+    title: item.title || "Job",
+    description: item.description || "",
+    detailedScope: (item.detailed_scope ?? item.detailedScope ?? item.description) || "",
+    category: item.category || "General",
+    subcategory: item.subcategory || item.category || "General",
+    budget: {
+      min: Number(item.budget?.min ?? item.budget_min ?? 0),
+      max: Number(item.budget?.max ?? item.budget_max ?? 0),
+    },
+    location: item.location || "",
+    fullAddress: (item.full_address ?? item.fullAddress ?? item.location) || "",
+    postedBy: String(postedByName),
+    postedByRating,
+    postedByJobs,
+    postedByAvatar,
+    postedDate: (item.inserted_at ?? item.posted_at ?? item.postedDate) || new Date().toISOString(),
+    deadline: item.deadline || new Date().toISOString(),
+    preferredStartDate: (item.preferred_start_date ?? item.preferredStartDate) || new Date().toISOString(),
+    estimatedDuration: (item.estimated_duration ?? item.estimatedDuration) || "",
+    status: (item.status || "open") as Job["status"],
+    bidsCount: Number(item.bidsCount ?? item.bid_count ?? 0),
+    viewCount: Number(item.view_count ?? item.viewCount ?? 0),
+    photos: Array.isArray(item.photos) ? item.photos : [],
+    urgency: (item.urgency || "medium") as Job["urgency"],
+    propertyType: ((item.property_type ?? item.propertyType) || "residential") as Job["propertyType"],
+    sqft: Number(item.sqft ?? 0),
+    yearBuilt: Number(item.year_built ?? item.yearBuilt ?? 0),
+    accessNotes: (item.access_notes ?? item.accessNotes) || "",
+    materialsProvided: Boolean(item.materials_provided ?? item.materialsProvided),
+    permitsRequired: Boolean(item.permits_required ?? item.permitsRequired),
+    inspectionRequired: Boolean(item.inspection_required ?? item.inspectionRequired),
+    insuranceClaim: Boolean(item.insurance_claim ?? item.insuranceClaim),
+    requirements: Array.isArray(item.requirements) ? item.requirements : [],
+    tags: Array.isArray(item.tags) ? item.tags : [],
+    specialInstructions: (item.special_instructions ?? item.specialInstructions) || "",
+    thumbnail: item.thumbnail || "",
+    property: {
+      stories: Number(prop.stories ?? 0),
+      foundation: prop.foundation || "slab",
+      exterior: prop.exterior || "",
+      roofType: (prop.roof_type ?? prop.roofType) || "",
+      roofAge: Number(prop.roof_age ?? prop.roofAge ?? 0),
+      garage: prop.garage || "none",
+      lotSize: (prop.lot_size ?? prop.lotSize) || "",
+      hoa: Boolean(prop.hoa),
+      hoaNotes: (prop.hoa_notes ?? prop.hoaNotes) || "",
+      heating: prop.heating || "",
+      cooling: prop.cooling || "",
+      waterHeater: ((prop.water_heater ?? prop.waterHeater) || "electric") as Job["property"]["waterHeater"],
+      plumbing: prop.plumbing || "",
+      electrical: prop.electrical || "",
+      sewer: prop.sewer || "city",
+      knownIssues: Array.isArray(prop.known_issues) ? prop.known_issues : Array.isArray(prop.knownIssues) ? prop.knownIssues : [],
+      recentWork: Array.isArray(prop.recent_work) ? prop.recent_work : Array.isArray(prop.recentWork) ? prop.recentWork : [],
+    },
+  };
+}
+
 // ─── Job Carousel ────────────────────────────────────────────────────────────
 
 function JobCarousel({ jobs }: { jobs: Job[] }) {
@@ -202,7 +285,7 @@ function JobCarousel({ jobs }: { jobs: Job[] }) {
           <div className="flex items-center gap-3 mt-2 text-[13px] text-gray-500">
             <span>{job.category}</span>
             <span>{job.bidsCount} bids</span>
-            <span>{job.estimatedDuration}</span>
+            {job.estimatedDuration ? <span>{job.estimatedDuration}</span> : null}
           </div>
         </div>
       </div>
@@ -246,9 +329,9 @@ export default function ContractorDashboardPage() {
   const isDemoFixture = pathname.startsWith("/demo/contractor");
   const basePath = isDemoFixture ? "/demo/contractor" : "/contractor";
 
-  const [jobs, setJobs] = useState<Job[]>(mockJobs);
-  const [estimates, setEstimates] = useState<Estimate[]>(mockEstimates);
-  const [reviews, setReviews] = useState(mockReviews);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [estimates, setEstimates] = useState<Estimate[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
   const [dashboard, setDashboard] = useState<any | null>(null);
   const [projects, setProjects] = useState<Record<string, unknown>[]>([]);
 
@@ -264,29 +347,12 @@ export default function ContractorDashboardPage() {
     fetchJobs().then(setJobs);
     fetchEstimates().then(setEstimates);
     fetchProjects().then((list) => setProjects(Array.isArray(list) ? list : []));
-    fetchReviews().then(({ data }) => {
-      if (data.length > 0) setReviews(data);
-    });
+    fetchReviews().then(({ data }) => setReviews(data));
     api.getContractorDashboard().then(setDashboard).catch(() => null);
   }, [isDemoFixture]);
 
   const dashboardOpenJobs: Job[] =
-    dashboard?.jobMarketplace?.items?.map((item: any, index: number) => ({
-      ...mockJobs[0],
-      id: item.id || `dash-job-${index}`,
-      title: item.title || "Job",
-      description: item.description || "",
-      detailedScope: item.description || "",
-      category: item.category || "General",
-      budget: { min: Number(item.budget?.min || 0), max: Number(item.budget?.max || 0) },
-      location: item.location || "",
-      fullAddress: item.location || "",
-      bidsCount: Number(item.bidsCount || 0),
-      estimatedDuration: item.estimatedDuration || "TBD",
-      status: item.status || "open",
-      thumbnail: item.thumbnail || "",
-      photos: [],
-    })) || [];
+    dashboard?.jobMarketplace?.items?.map((item: any, index: number) => mapDashboardMarketplaceItemToJob(item, index)) || [];
   const openJobs = dashboardOpenJobs.length > 0 ? dashboardOpenJobs : jobs.filter((j) => j.status === "open");
 
   const projectCards = useMemo((): DashboardProjectCard[] => {

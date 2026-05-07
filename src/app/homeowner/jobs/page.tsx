@@ -34,6 +34,7 @@ import {
   TrendingUp,
   Minus,
   Sparkles,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@shared/ui/button";
 import { Separator } from "@shared/ui/separator";
@@ -46,7 +47,7 @@ import {
 } from "@shared/ui/dialog";
 import { cn, formatCurrency, formatDate, getInitials } from "@shared/lib/utils";
 import { mockContractors, mockJobs, type Job } from "@shared/lib/mock-data";
-import { fetchJobs } from "@shared/lib/data";
+import { fetchJobs, mapRealtimeJobToJob } from "@shared/lib/data";
 import { useRealtimeJobs } from "@shared/hooks/use-realtime";
 import { api } from "@shared/lib/realtime";
 import type { LucideIcon } from "lucide-react";
@@ -267,17 +268,15 @@ const MOCK_BIDS: Bid[] = [
 ];
 
 // Use first 3 jobs, override statuses for filter variety
-const INITIAL_JOBS = mockJobs.slice(0, 3).map((job, i) => ({
-  ...job,
-  status: i === 1 ? ("in_progress" as const) : i === 2 ? ("completed" as const) : job.status,
-}));
-
 type StatusFilter = "all" | "open" | "in_progress" | "completed";
 
 const STATUS_BADGE: Record<string, { label: string; className: string }> = {
   open:        { label: "Open",        className: "bg-brand-50 text-brand-700 border-brand-200" },
+  bidding:     { label: "Bidding",     className: "bg-sky-50 text-sky-700 border-sky-200" },
+  awarded:     { label: "Awarded",     className: "bg-purple-50 text-purple-700 border-purple-200" },
   in_progress: { label: "In Progress", className: "bg-amber-50 text-amber-700 border-amber-200" },
   completed:   { label: "Completed",   className: "bg-gray-100 text-gray-800 border-gray-200" },
+  disputed:    { label: "Disputed",    className: "bg-orange-50 text-orange-800 border-orange-200" },
   cancelled:   { label: "Cancelled",   className: "bg-red-50 text-red-600 border-red-200" },
 };
 
@@ -768,7 +767,8 @@ function InlineBidCard({
 
 export default function JobsPage() {
   usePageTitle("My Jobs");
-  const [jobs, setJobs] = useState(INITIAL_JOBS);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [deletingJobId, setDeletingJobId] = useState<string | null>(null);
   const [filter, setFilter] = useState<StatusFilter>("all");
   const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
 
@@ -777,24 +777,9 @@ export default function JobsPage() {
 
   useEffect(() => {
     if (wsConnected && realtimeJobs.length > 0) {
-      // Map realtime jobs to the shape pages expect
-      setJobs(realtimeJobs.map((rj) => ({
-        ...mockJobs[0],
-        id: rj.id,
-        title: rj.title,
-        description: rj.description,
-        detailedScope: rj.description,
-        category: rj.category,
-        budget: { min: rj.budget_min, max: rj.budget_max },
-        location: rj.location,
-        status: rj.status as Job["status"],
-        bidsCount: rj.bid_count,
-        postedDate: rj.posted_at,
-      })));
+      setJobs(realtimeJobs.map(mapRealtimeJobToJob));
     } else {
-      fetchJobs().then((apiJobs) => {
-        if (apiJobs.length > 0) setJobs(apiJobs);
-      });
+      fetchJobs().then(setJobs);
     }
   }, [realtimeJobs, wsConnected]);
   const [bidStatuses, setBidStatuses] = useState<Record<string, BidStatus>>(() => {
@@ -826,10 +811,43 @@ export default function JobsPage() {
   };
   const handleDecline = (bidId: string) => setBidStatuses((prev) => ({ ...prev, [bidId]: "declined" }));
 
-  const filteredJobs = useMemo(
-    () => jobs.filter((j) => filter === "all" || j.status === filter),
-    [filter, jobs]
-  );
+  const handleDeleteJob = async (job: Job) => {
+    if (job.status !== "open") {
+      toast.error("Only open jobs can be deleted.");
+      return;
+    }
+
+    if (!window.confirm("Delete this job posting? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      setDeletingJobId(job.id);
+      await api.deleteJob(job.id);
+      setJobs((prev) => prev.filter((j) => j.id !== job.id));
+      if (expandedJobId === job.id) {
+        setExpandedJobId(null);
+      }
+      // Soft refresh to reconcile with backend state.
+      const freshJobs = await fetchJobs();
+      setJobs(freshJobs);
+      toast.success("Job deleted");
+    } catch {
+      toast.error("Could not delete job");
+    } finally {
+      setDeletingJobId(null);
+    }
+  };
+
+  const filteredJobs = useMemo(() => {
+    return jobs.filter((j) => {
+      if (filter === "all") return true;
+      if (filter === "open") {
+        return j.status === "open" || j.status === "bidding" || j.status === "awarded";
+      }
+      return j.status === filter;
+    });
+  }, [filter, jobs]);
 
   const getBidsForJob = (jobId: string) =>
     MOCK_BIDS.filter((b) => b.jobId === jobId).map((b) => ({
@@ -1027,6 +1045,23 @@ export default function JobsPage() {
                           ))}
                         </div>
                       )}
+
+                      <div className="flex justify-end mt-4 pt-3 border-t border-gray-200">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          disabled={job.status !== "open" || deletingJobId === job.id}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteJob(job);
+                          }}
+                          className="gap-1.5 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 disabled:text-gray-400 disabled:border-gray-200"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          {deletingJobId === job.id ? "Deleting..." : "Delete Job"}
+                        </Button>
+                      </div>
                     </div>
                   )}
                 </div>

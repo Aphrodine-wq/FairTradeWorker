@@ -35,6 +35,13 @@ const MOCK_USER: Record<string, { name: string; email: string; rating: number }>
 
 type Profile = { name: string; email: string; rating?: number };
 
+function safeName(name: string | null | undefined, email?: string): string {
+  const cleaned = (name || "").trim();
+  if (cleaned && cleaned.toLowerCase() !== "undefined" && cleaned.toLowerCase() !== "null") return cleaned;
+  if (email && email.includes("@")) return email.split("@")[0];
+  return "Account";
+}
+
 function demoProfileForPath(pathname: string, userRole: SidebarProps["userRole"]): Profile | null {
   if (pathname.startsWith("/demo/contractor") && userRole === "contractor") return MOCK_USER.contractor;
   if (pathname.startsWith("/demo/homeowner") && userRole === "homeowner") return MOCK_USER.homeowner;
@@ -63,7 +70,7 @@ export function Sidebar({ items, currentPath, userRole, roles, topAction, autoCo
     const applyStore = () => {
       const u = authStore.getUser();
       if (u) {
-        setProfile({ name: u.name, email: u.email });
+        setProfile({ name: safeName(u.name, u.email), email: u.email });
       }
     };
     applyStore();
@@ -77,7 +84,7 @@ export function Sidebar({ items, currentPath, userRole, roles, topAction, autoCo
           const raw = res.user as Record<string, unknown>;
           const name = String(raw?.name ?? "").trim();
           const email = String(raw?.email ?? "").trim();
-          if (email) setProfile({ name: name || email.split("@")[0] || "User", email });
+          if (email) setProfile({ name: safeName(name, email), email });
         })
         .catch(() => {});
     }
@@ -85,7 +92,7 @@ export function Sidebar({ items, currentPath, userRole, roles, topAction, autoCo
     const unsub = authStore.subscribe(() => {
       if (demoProfileForPath(pathname, userRole)) return;
       const u = authStore.getUser();
-      if (u) setProfile({ name: u.name, email: u.email });
+      if (u) setProfile({ name: safeName(u.name, u.email), email: u.email });
     });
 
     return () => {

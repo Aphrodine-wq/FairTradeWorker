@@ -18,12 +18,15 @@ export function formatCurrency(cents: number): string {
   }).format(cents / 100);
 }
 
-export function formatDate(date: string | Date): string {
+export function formatDate(date: string | Date | null | undefined): string {
+  if (!date) return "--";
+  const parsed = new Date(date);
+  if (Number.isNaN(parsed.getTime())) return "--";
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
-  }).format(new Date(date));
+  }).format(parsed);
 }
 
 export function getInitials(name: string): string {

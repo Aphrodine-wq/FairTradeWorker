@@ -1562,50 +1562,71 @@ const PROJECT_NAV = [
 
 export default function ProjectsPage() {
   usePageTitle("Projects");
-  const [projects, setProjects] = useState(PROJECTS);
+  const [projects, setProjects] = useState<typeof PROJECTS>([]);
   const searchParams = useSearchParams();
   const paramProject = searchParams.get("project");
   const paramTab = searchParams.get("tab");
   const paramMilestone = searchParams.get("milestone");
 
-  const [selectedProjectId, setSelectedProjectId] = useState(paramProject || "j1");
+  const [selectedProjectId, setSelectedProjectId] = useState(paramProject || "");
   const [activeSection, setActiveSection] = useState(paramTab || "overview");
   const [initialMilestoneIndex] = useState(paramMilestone ? parseInt(paramMilestone) : null);
   const [createProjectOpen, setCreateProjectOpen] = useState(false);
 
   useEffect(() => {
     fetchProjects().then((apiProjects) => {
-      if (apiProjects.length > 0) {
-        const normalizeMoney = (value: unknown, fallback: number) =>
-          typeof value === "number" ? (value > 100000 ? value / 100 : value) : fallback;
-        setProjects((prev) =>
-          prev.map((p) => {
-            const apiProject = apiProjects.find((ap: any) => ap.id === p.id);
-            if (!apiProject) return p;
-            const mappedStatus =
-              apiProject.status === "in_progress"
-                ? "active"
-                : apiProject.status === "completed"
-                  ? "complete"
-                  : p.status;
-            const budget = normalizeMoney(apiProject.budget, p.contractValue);
-            const spent = normalizeMoney(apiProject.spent, p.spent);
-            return {
-              ...p,
-              name: apiProject.name || p.name,
-              description: apiProject.description || p.description,
-              status: mappedStatus,
-              contractValue: budget,
-              spent,
-              progress: budget > 0 ? Math.max(0, Math.min(100, Math.round((spent / budget) * 100))) : p.progress,
-            };
-          })
-        );
-      }
+      const normalizeMoney = (value: unknown, fallback = 0) =>
+        typeof value === "number" ? (value > 100000 ? value / 100 : value) : fallback;
+      const mapped = (Array.isArray(apiProjects) ? apiProjects : []).map((apiProject: any) => {
+        const budget = normalizeMoney(apiProject.budget, 0);
+        const spent = normalizeMoney(apiProject.spent, 0);
+        const milestones = Array.isArray(apiProject.milestones) ? apiProject.milestones : [];
+        return {
+          id: apiProject.id,
+          name: apiProject.name || "Project",
+          client: apiProject.client?.name || apiProject.homeowner?.name || "Client",
+          description: apiProject.description || "",
+          contractValue: budget,
+          spent,
+          status: apiProject.status === "completed" ? "complete" as const : "active" as const,
+          startDate: apiProject.startDate || apiProject.created_at || new Date().toISOString().split("T")[0],
+          estimatedEnd: apiProject.estimatedEnd || apiProject.dueDate || new Date().toISOString().split("T")[0],
+          progress: budget > 0 ? Math.max(0, Math.min(100, Math.round((spent / budget) * 100))) : 0,
+          milestones: milestones.map((m: any) => ({
+            label: m.label || m.name || "Milestone",
+            done: Boolean(m.done),
+            amount: Number(m.amount || 0),
+            status: (m.status || "pending") as MilestoneStatus,
+            completedDate: m.completedDate,
+            note: m.note,
+          })),
+          changeOrders: 0,
+          hoursThisWeek: 0,
+          punchListComplete: 0,
+          punchListTotal: 0,
+        };
+      });
+      setProjects(mapped);
+      setSelectedProjectId((current) => current || mapped[0]?.id || "");
     });
   }, []);
 
-  const project = projects.find((p) => p.id === selectedProjectId)!;
+  const project = projects.find((p) => p.id === selectedProjectId) ?? null;
+  if (!project) {
+    return (
+      <div className="flex flex-col min-h-full bg-surface">
+        <div className="px-6 pt-5 pb-4 bg-white shadow-[0_4px_16px_-2px_rgba(0,0,0,0.1)] relative z-10">
+          <h1 className="text-[22px] font-semibold text-gray-900 tracking-tight">Projects</h1>
+        </div>
+        <div className="flex-1 flex items-center justify-center p-6">
+          <div className="text-center">
+            <p className="text-sm font-semibold text-gray-900">No projects yet</p>
+            <p className="text-xs text-gray-600 mt-1">Projects will appear here once they exist in your account.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
   const clientInfo = CLIENT_INFO[project.id] ?? { phone: "(512) 555-0000", email: "client@email.com", preferred: "Text" };
   const coCount = ALL_COS[selectedProjectId]?.length ?? 0;
 

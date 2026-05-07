@@ -17,7 +17,6 @@ import {
 import { cn } from "@shared/lib/utils";
 import { fetchNotifications } from "@shared/lib/data";
 import { useRealtimeNotifications } from "@shared/hooks/use-realtime";
-import { FallbackBanner } from "@shared/components/fallback-banner";
 import { NotificationListSkeleton } from "@shared/components/loading-skeleton";
 import { usePageTitle } from "@shared/hooks/use-page-title";
 
@@ -36,21 +35,6 @@ interface Notification {
   href: string;
   filterGroup: FilterKey;
 }
-
-// ─── Mock fallback ──────────────────────────────────────────────────────────
-
-const MOCK_NOTIFICATIONS: Notification[] = [
-  { id: "hn1", type: "new_bid", title: "New bid received", body: "Marcus Johnson submitted a bid on your Kitchen Remodel — $38,500", time: "5 min ago", read: false, href: "/homeowner/jobs", filterGroup: "bids" },
-  { id: "hn2", type: "message", title: "Contractor messaged you", body: "Marcus Johnson sent you a message about the tile selection", time: "22 min ago", read: false, href: "/homeowner/messages", filterGroup: "messages" },
-  { id: "hn3", type: "bid_accepted", title: "Bid accepted", body: "You accepted Marcus Johnson's bid for Kitchen Remodel", time: "1 hr ago", read: false, href: "/homeowner/projects", filterGroup: "projects" },
-  { id: "hn4", type: "milestone_complete", title: "Milestone completed", body: 'Marcus Johnson marked "Demolition" as complete — $7,700 payment is due', time: "3 hrs ago", read: false, href: "/homeowner/projects", filterGroup: "payments" },
-  { id: "hn5", type: "payment_confirmed", title: "Payment confirmed", body: "Your $7,700 milestone payment for Kitchen Remodel was received", time: "4 hrs ago", read: true, href: "/homeowner/projects", filterGroup: "payments" },
-  { id: "hn6", type: "review_reminder", title: "Review reminder", body: "Your Kitchen Remodel is complete — leave a review for Marcus Johnson", time: "Yesterday", read: true, href: "/homeowner/reviews", filterGroup: "projects" },
-  { id: "hn7", type: "contractor_match", title: "New bids available", body: "3 new verified contractors bid on your Flooring Installation job", time: "Yesterday", read: true, href: "/homeowner/jobs", filterGroup: "bids" },
-  { id: "hn8", type: "estimate_updated", title: "Estimate updated", body: "Garcia Plumbing revised their estimate for your Bathroom Renovation", time: "2 days ago", read: true, href: "/homeowner/jobs", filterGroup: "bids" },
-  { id: "hn9", type: "job_expired", title: "Job expired", body: "Your Bathroom Renovation job has expired with no accepted bids", time: "3 days ago", read: true, href: "/homeowner/jobs", filterGroup: "projects" },
-  { id: "hn10", type: "verification_update", title: "Verification update", body: "Marcus Johnson just completed background check verification", time: "3 days ago", read: true, href: "/homeowner/jobs", filterGroup: "projects" },
-];
 
 const NOTIF_ICONS: Record<NotifType, { icon: React.ComponentType<{ className?: string }>; bg: string }> = {
   new_bid:            { icon: Gavel,        bg: "bg-blue-100 text-blue-600" },
@@ -94,21 +78,17 @@ export default function HomeownerNotificationsPage() {
 
   useEffect(() => {
     fetchNotifications().then(({ data, isMock: mock }) => {
-      if (!mock && data.length > 0) {
-        setNotifications(data.map((n: any) => ({
-          id: n.id,
-          type: (n.type || "new_bid") as NotifType,
-          title: n.title,
-          body: n.body,
-          time: n.created_at ? new Date(n.created_at).toLocaleDateString() : n.time || "",
-          read: n.read ?? false,
-          href: n.href || "/homeowner/dashboard",
-          filterGroup: inferFilterGroup(n.type || "new_bid"),
-        })));
-      } else {
-        setNotifications(MOCK_NOTIFICATIONS);
-        setIsMock(true);
-      }
+      setNotifications(data.map((n: any) => ({
+        id: n.id,
+        type: (n.type || "new_bid") as NotifType,
+        title: n.title,
+        body: n.body,
+        time: n.created_at ? new Date(n.created_at).toLocaleDateString() : n.time || "",
+        read: n.read ?? false,
+        href: n.href || "/homeowner/dashboard",
+        filterGroup: inferFilterGroup(n.type || "new_bid"),
+      })));
+      setIsMock(Boolean(mock));
       setLoading(false);
     });
   }, []);
@@ -152,7 +132,6 @@ export default function HomeownerNotificationsPage() {
 
   return (
     <div className="flex flex-col min-h-full bg-surface">
-      {isMock && <FallbackBanner />}
       <div className="px-6 pt-5 pb-4 bg-white shadow-[0_4px_16px_-2px_rgba(0,0,0,0.1)] relative z-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">

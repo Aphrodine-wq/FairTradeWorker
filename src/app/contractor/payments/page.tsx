@@ -85,7 +85,7 @@ const MOCK_PAYOUTS: PayoutRecord[] = [
 
 export default function ContractorPaymentsPage() {
   usePageTitle("Payments");
-  const [payouts] = useState<PayoutRecord[]>(MOCK_PAYOUTS);
+  const [payouts] = useState<PayoutRecord[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [showAllHistory, setShowAllHistory] = useState(false);
 

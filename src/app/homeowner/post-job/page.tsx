@@ -117,13 +117,32 @@ export default function PostJobPage() {
 
     try {
       // Post job via Elixir backend (realtime API)
-      const job = await api.postJob({
+      const urgencyApi = form.urgency.toLowerCase() as "low" | "medium" | "high";
+      const propertyTypeApi = form.propertyType.toLowerCase() as "residential" | "commercial" | "industrial";
+
+      await api.postJob({
         title: form.title || `${form.category} Project`,
         description: form.description,
+        detailed_scope: form.detailedScope || undefined,
         category: form.category,
+        subcategory: undefined,
         budget_min: form.budgetMin ? parseFloat(form.budgetMin) : 0,
         budget_max: form.budgetMax ? parseFloat(form.budgetMax) : 0,
         location: form.location || "Mississippi",
+        full_address: form.fullAddress || undefined,
+        deadline: form.deadline ? new Date(form.deadline).toISOString() : undefined,
+        preferred_start_date: form.preferredStartDate || undefined,
+        estimated_duration: form.estimatedDuration || undefined,
+        urgency: urgencyApi,
+        property_type: propertyTypeApi,
+        sqft: form.sqft ? parseInt(form.sqft, 10) : undefined,
+        year_built: form.yearBuilt ? parseInt(form.yearBuilt, 10) : undefined,
+        materials_provided: form.materialsProvided,
+        permits_required: form.permitsRequired,
+        inspection_required: form.inspectionRequired,
+        insurance_claim: form.insuranceClaim,
+        access_notes: form.accessNotes || undefined,
+        special_instructions: form.specialInstructions || undefined,
       });
 
       // Request AI estimate in the background

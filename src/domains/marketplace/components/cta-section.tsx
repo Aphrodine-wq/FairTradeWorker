@@ -1,35 +1,65 @@
 import Link from "next/link";
 import { Button } from "@shared/ui/button";
+import type { MarketingSession } from "@shared/lib/marketing-nav";
+import { getAccountSettingsHref, getDashboardHref } from "@shared/lib/marketing-nav";
 
-export function CTASection() {
+export function CTASection({ session }: { session?: MarketingSession | null }) {
+  const dashboardHref = session ? getDashboardHref(session) : null;
+  const accountHref = session ? getAccountSettingsHref(session) : null;
+
   return (
     <section className="bg-surface py-20 lg:py-28 overflow-hidden border-t border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between">
           {/* Left — content */}
           <div className="lg:max-w-xl">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
-              Your next job is waiting.
-            </h2>
-            <p className="mt-4 text-base text-gray-600 leading-relaxed max-w-lg">
-              3,200+ verified contractors. 12,800+ jobs completed. Zero lead
-              fees on every plan. Whether you&apos;re a contractor looking for work or
-              a homeowner with a project, the platform is free to start and takes
-              less than two minutes to set up.
-            </p>
+            {session && dashboardHref ? (
+              <>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
+                  Welcome back.
+                </h2>
+                <p className="mt-4 text-base text-gray-600 leading-relaxed max-w-lg">
+                  Head to your dashboard to manage jobs, bids, and messages — or open
+                  account settings to update your profile and preferences.
+                </p>
 
-            <div className="mt-8 flex flex-col sm:flex-row gap-3">
-              <Button size="xl" asChild>
-                <Link href="/signup?role=homeowner">Post a Job</Link>
-              </Button>
-              <Button size="xl" variant="outline" asChild>
-                <Link href="/signup?role=contractor">Find Work</Link>
-              </Button>
-            </div>
+                <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                  <Button size="xl" asChild>
+                    <Link href={dashboardHref}>Open dashboard</Link>
+                  </Button>
+                  {accountHref ? (
+                    <Button size="xl" variant="outline" asChild>
+                      <Link href={accountHref}>Account & settings</Link>
+                    </Button>
+                  ) : null}
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
+                  Your next job is waiting.
+                </h2>
+                <p className="mt-4 text-base text-gray-600 leading-relaxed max-w-lg">
+                  3,200+ verified contractors. 12,800+ jobs completed. Zero lead
+                  fees on every plan. Whether you&apos;re a contractor looking for work or
+                  a homeowner with a project, the platform is free to start and takes
+                  less than two minutes to set up.
+                </p>
 
-            <p className="mt-5 text-sm text-gray-500">
-              No credit card required. Cancel anytime.
-            </p>
+                <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                  <Button size="xl" asChild>
+                    <Link href="/signup?role=homeowner">Post a Job</Link>
+                  </Button>
+                  <Button size="xl" variant="outline" asChild>
+                    <Link href="/signup?role=contractor">Find Work</Link>
+                  </Button>
+                </div>
+
+                <p className="mt-5 text-sm text-gray-500">
+                  No credit card required. Cancel anytime.
+                </p>
+              </>
+            )}
           </div>
 
           {/* Right — atmospheric large text */}

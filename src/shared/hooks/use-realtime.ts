@@ -6,6 +6,7 @@ import {
   api,
   getAuthToken,
   type RealtimeJob,
+  type RealtimeJobCreatePayload,
   type RealtimeBid,
   type RealtimeMessage,
   type RealtimeSubJob,
@@ -52,19 +53,9 @@ export function useRealtimeJobs() {
     return leave;
   }, []);
 
-  const postJob = useCallback(
-    async (attrs: {
-      title: string;
-      description: string;
-      category: string;
-      budget_min: number;
-      budget_max: number;
-      location: string;
-    }) => {
-      return api.postJob(attrs);
-    },
-    []
-  );
+  const postJob = useCallback(async (attrs: RealtimeJobCreatePayload | { job: RealtimeJobCreatePayload }) => {
+    return api.postJob(attrs);
+  }, []);
 
   return { jobs, loading, connected, postJob };
 }

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { Suspense, useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Save,
   Shield,
@@ -22,8 +23,23 @@ import { Separator } from "@shared/ui/separator";
 import { Badge } from "@shared/ui/badge";
 import { cn } from "@shared/lib/utils";
 import { fetchSettings, saveSettings } from "@shared/lib/data";
+import { authStore } from "@shared/lib/auth-store";
 import { toast } from "sonner";
 import { usePageTitle } from "@shared/hooks/use-page-title";
+
+function safeUserName(name?: string | null, email?: string | null): string {
+  const cleaned = (name || "").trim();
+  if (cleaned && cleaned.toLowerCase() !== "undefined" && cleaned.toLowerCase() !== "null") return cleaned;
+  if (email && email.includes("@")) return email.split("@")[0];
+  return "";
+}
+
+function initialsFromName(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "U";
+  if (parts.length === 1) return (parts[0][0] || "U").toUpperCase();
+  return `${parts[0][0] || ""}${parts[1][0] || ""}`.toUpperCase();
+}
 
 // ─── Shared Components ───────────────────────────────────────────────────────
 
@@ -70,11 +86,21 @@ function useSave() {
 // ─── Sections ────────────────────────────────────────────────────────────────
 
 function ProfileSection() {
-  const [name, setName] = useState("Sarah Mitchell");
-  const [email, setEmail] = useState("sarah.mitchell@gmail.com");
-  const [phone, setPhone] = useState("(512) 555-0283");
-  const [address, setAddress] = useState("215 South Lamar Blvd, Oxford, MS 38655");
+  const authUser = authStore.getState().user;
+  const [name, setName] = useState(safeUserName(authUser?.name, authUser?.email));
+  const [email, setEmail] = useState(authUser?.email ?? "");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
   const { saved, onSave } = useSave();
+
+  useEffect(() => {
+    const unsub = authStore.subscribe(() => {
+      const u = authStore.getState().user;
+      setName(safeUserName(u?.name, u?.email));
+      setEmail(u?.email ?? "");
+    });
+    return unsub;
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -85,7 +111,7 @@ function ProfileSection() {
 
       <div className="flex items-center gap-4">
         <div className="w-16 h-16 rounded-sm bg-brand-100 border-2 border-brand-200 flex items-center justify-center">
-          <span className="text-brand-700 font-bold text-xl">SM</span>
+          <span className="text-brand-700 font-bold text-xl">{initialsFromName(name)}</span>
         </div>
         <div>
           <Button variant="outline" size="sm">Upload Photo</Button>
@@ -119,10 +145,7 @@ function ProfileSection() {
 }
 
 function PropertiesSection() {
-  const properties = [
-    { id: 1, label: "Primary Residence", address: "215 South Lamar Blvd, Oxford, MS 38655", type: "Single Family", sqft: "2,450", yearBuilt: "2008" },
-    { id: 2, label: "Vacation Home", address: "104 Sardis Lake Rd, Batesville, MS 38606", type: "Cabin", sqft: "1,180", yearBuilt: "1994" },
-  ];
+  const properties: Array<{ id: number; label: string; address: string; type: string; sqft: string; yearBuilt: string }> = [];
 
   return (
     <div className="space-y-6">
@@ -135,6 +158,11 @@ function PropertiesSection() {
       </div>
 
       <div className="space-y-3">
+        {properties.length === 0 && (
+          <div className="bg-white border border-border rounded-sm p-5">
+            <p className="text-sm text-gray-700">No properties saved yet.</p>
+          </div>
+        )}
         {properties.map((prop) => (
           <div key={prop.id} className="bg-white border border-border rounded-sm p-5">
             <div className="flex items-center justify-between mb-3">
@@ -170,12 +198,9 @@ function PropertiesSection() {
 }
 
 function PaymentSection() {
-  const [autoPay, setAutoPay] = useState(true);
+  const [autoPay, setAutoPay] = useState(false);
 
-  const methods = [
-    { id: 1, type: "Visa", last4: "4242", label: "Chase Visa ending in 4242", expiry: "09/28", isDefault: true },
-    { id: 2, type: "Bank", last4: "7891", label: "Wells Fargo Checking ending in 7891", expiry: null, isDefault: false },
-  ];
+  const methods: Array<{ id: number; type: string; last4: string; label: string; expiry: string | null; isDefault: boolean }> = [];
 
   return (
     <div className="space-y-6">
@@ -188,6 +213,11 @@ function PaymentSection() {
       </div>
 
       <div className="space-y-3">
+        {methods.length === 0 && (
+          <div className="flex items-center justify-between p-4 bg-white border border-border rounded-sm">
+            <p className="text-sm text-gray-700">No payment methods connected.</p>
+          </div>
+        )}
         {methods.map((m) => (
           <div key={m.id} className="flex items-center justify-between p-4 bg-white border border-border rounded-sm">
             <div className="flex items-center gap-3">
@@ -358,10 +388,7 @@ function SecuritySection() {
   const [twoFactor, setTwoFactor] = useState(false);
   const { saved, onSave } = useSave();
 
-  const sessions = [
-    { id: 1, device: "MacBook Pro", location: "Oxford, MS", lastActive: "Active now", icon: Monitor },
-    { id: 2, device: "iPhone 15", location: "Oxford, MS", lastActive: "2 hours ago", icon: Smartphone },
-  ];
+  const sessions: Array<{ id: number; device: string; location: string; lastActive: string; icon: typeof Monitor }> = [];
 
   return (
     <div className="space-y-6">
@@ -408,6 +435,11 @@ function SecuritySection() {
           <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">Sign Out All Devices</Button>
         </div>
         <div className="space-y-2">
+          {sessions.length === 0 && (
+            <div className="flex items-center justify-between p-4 bg-white border border-border rounded-sm">
+              <p className="text-sm text-gray-700">No active session history available.</p>
+            </div>
+          )}
           {sessions.map((s) => {
             const DeviceIcon = s.icon;
             return (
@@ -446,9 +478,17 @@ const NAV_SECTIONS = [
 
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
-export default function HomeownerSettingsPage() {
+function HomeownerSettingsPageContent() {
   usePageTitle("Settings");
+  const searchParams = useSearchParams();
   const [active, setActive] = useState("profile");
+
+  useEffect(() => {
+    const s = searchParams.get("section");
+    if (s && NAV_SECTIONS.some((sec) => sec.id === s)) {
+      setActive(s);
+    }
+  }, [searchParams]);
 
   const renderSection = () => {
     switch (active) {
@@ -503,5 +543,25 @@ export default function HomeownerSettingsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function HomeownerSettingsPageFallback() {
+  return (
+    <div className="flex flex-col min-h-full bg-surface animate-pulse">
+      <div className="h-[88px] bg-white border-b border-border" />
+      <div className="flex flex-1 min-h-0">
+        <div className="w-48 flex-shrink-0 bg-white border-r border-border" />
+        <div className="flex-1 p-8 bg-surface" />
+      </div>
+    </div>
+  );
+}
+
+export default function HomeownerSettingsPage() {
+  return (
+    <Suspense fallback={<HomeownerSettingsPageFallback />}>
+      <HomeownerSettingsPageContent />
+    </Suspense>
   );
 }
